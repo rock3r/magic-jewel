@@ -17,13 +17,7 @@ ASSERT_SCRIPT="${ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-mixed-window-scree
 COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-command-window-screenshot.sh}"
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
-if [[ -z "${MAGIC_JEWEL_COMPOSE_TEXT+x}" ]]; then
-  if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" && "${EXPECT_STRICT_COMMANDS:-true}" == "true" && "${EXPECT_COMMAND_FALLBACK}" != "true" ]]; then
-    MAGIC_JEWEL_COMPOSE_TEXT=false
-  else
-    MAGIC_JEWEL_COMPOSE_TEXT=true
-  fi
-fi
+MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
 fi
@@ -89,7 +83,7 @@ Environment:
   EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
   EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
-  MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Defaults to false for strict command validation, true otherwise.
+  MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
