@@ -48,6 +48,33 @@ strict_command_allows_teardown_marker_drift() {
   run_validate_only "${dir}"
 }
 
+strict_command_requires_min_text_commands() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0 textCommands=8"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_TEXT_COMMANDS=8
+}
+
+strict_command_fails_without_min_text_commands() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0 textCommands=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MIN_TEXT_COMMANDS=1 2>/dev/null; then
+    echo "Expected strict command validation to fail below minimum text command count" >&2
+    return 1
+  fi
+}
+
 expected_image_fallback_passes() {
   local dir
   dir="$(make_report_dir)"
@@ -90,6 +117,8 @@ command_stream_invalid_fallback_passes() {
 
 strict_command_passes
 strict_command_allows_teardown_marker_drift
+strict_command_requires_min_text_commands
+strict_command_fails_without_min_text_commands
 expected_image_fallback_passes
 expected_fallback_requires_reason
 command_stream_invalid_fallback_passes

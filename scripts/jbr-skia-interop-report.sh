@@ -17,6 +17,7 @@ ASSERT_SCRIPT="${ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-mixed-window-scree
 COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-command-window-screenshot.sh}"
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
+EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
@@ -83,6 +84,7 @@ Environment:
   EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
   EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
+  EXPECT_MIN_TEXT_COMMANDS In strict command mode, require at least this many text commands in one CMP recorder frame. Default: 0.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
@@ -361,6 +363,24 @@ command_recorder_summary() {
   ' "${log}"
 }
 
+max_command_recorder_field() {
+  local log="$1"
+  local field="$2"
+  awk -v marker="${CMP_COMMAND_RECORDER_MARKER}" -v field="${field}" '
+    index($0, marker) {
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] == field && value[2] > maxValue) {
+          maxValue = value[2]
+        }
+      }
+    }
+    END {
+      printf "%.0f", maxValue
+    }
+  ' "${log}"
+}
+
 write_report() {
   local report="${OUT_DIR}/report.md"
   local old_summary
@@ -413,6 +433,7 @@ write_report() {
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_STREAM: ${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
+    echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
     echo
     echo "## Modes"
@@ -530,6 +551,12 @@ validate_report() {
       [[ "${jbr_picture_frames}" -eq 0 ]] || failures+=("unexpected JBR picture frames in strict command mode: ${jbr_picture_frames}")
       if grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*" "${OUT_DIR}/new.log" 2>/dev/null; then
         failures+=("CMP recorder reported unsupported command operations")
+      fi
+      if [[ "${EXPECT_MIN_TEXT_COMMANDS}" -gt 0 ]]; then
+        local max_text_commands
+        max_text_commands="$(max_command_recorder_field "${OUT_DIR}/new.log" "textCommands")"
+        [[ "${max_text_commands}" -ge "${EXPECT_MIN_TEXT_COMMANDS}" ]] ||
+          failures+=("CMP recorder max textCommands ${max_text_commands} below expected ${EXPECT_MIN_TEXT_COMMANDS}")
       fi
     fi
     if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" != "command-stream-invalid" ]]; then
