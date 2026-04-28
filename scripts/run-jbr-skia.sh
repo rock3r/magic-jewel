@@ -19,6 +19,7 @@ JBR_ARGS=(
 case "${JBR_SKIA_RENDER_MODE}" in
   commands)
     JBR_ARGS+=("-Dskiko.jbr.interop.renderCommands=true")
+    JBR_ARGS+=("-Dcompose.jbr.skia.command.strict=true")
     ;;
   diagnostic)
     JBR_ARGS+=("-Dskiko.jbr.interop.renderDiagnostic=true")

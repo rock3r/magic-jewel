@@ -22,6 +22,7 @@ SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
+CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
 MIXED_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_MIXED_SCREENSHOT_COUNTS"
 COMMAND_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_COMMAND_SCREENSHOT_COUNTS"
@@ -258,6 +259,43 @@ frame_marker_summary() {
   '
 }
 
+command_recorder_summary() {
+  local log="$1"
+  awk -v marker="${CMP_COMMAND_RECORDER_MARKER}" -v duration="${DURATION_SECONDS}" '
+    index($0, marker) {
+      frames++
+      frameUnsupported = 0
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] == "commands") {
+          commands += value[2]
+          if (value[2] > maxCommands) maxCommands = value[2]
+        } else if (value[1] == "unsupported") {
+          frameUnsupported = value[2]
+          unsupported += value[2]
+          if (value[2] > maxUnsupported) maxUnsupported = value[2]
+        } else if (value[2] ~ /^[0-9]+$/) {
+          reasons[value[1]] += value[2]
+        }
+      }
+      if (frameUnsupported > 0) unsupportedFrames++
+    }
+    END {
+      if (frames == 0) {
+        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 reasons=none"
+        exit
+      }
+      reasonSummary = "none"
+      for (reason in reasons) {
+        item = reason ":" reasons[reason]
+        reasonSummary = reasonSummary == "none" ? item : reasonSummary "," item
+      }
+      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f reasons=%s",
+        frames, frames / duration, commands / frames, maxCommands, unsupportedFrames, unsupported / frames, maxUnsupported, reasonSummary
+    }
+  ' "${log}"
+}
+
 write_report() {
   local report="${OUT_DIR}/report.md"
   local old_summary
@@ -272,6 +310,7 @@ write_report() {
   local jbr_picture_summary
   local skiko_command_summary
   local jbr_command_summary
+  local cmp_command_recorder_summary
   local screenshot_counts
   local screenshot_status
 
@@ -287,6 +326,7 @@ write_report() {
   jbr_picture_summary="$(payload_marker_summary "${JBR_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
   skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
   jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
+  cmp_command_recorder_summary="$(command_recorder_summary "${OUT_DIR}/new.log")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
@@ -333,6 +373,7 @@ write_report() {
     echo
     echo "## Command Replay Markers"
     echo
+    echo "- CMP command recorder: ${cmp_command_recorder_summary}"
     echo "- Skiko command frames: ${skiko_command_summary}"
     echo "- JBR command frames: ${jbr_command_summary}"
     echo
