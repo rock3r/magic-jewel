@@ -102,7 +102,7 @@ private fun MagicJewelApp() {
                     size = Size(size.width, stripeHeight * 3f),
                 )
                 drawRect(
-                    color = Color(0xFF8250DF),
+                    color = Color(0xFF824EDF),
                     topLeft = Offset(48f, 56f),
                     size = Size(220f, 120f),
                 )
