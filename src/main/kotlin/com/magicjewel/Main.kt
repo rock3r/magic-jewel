@@ -79,6 +79,7 @@ private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
 private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
+private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 
@@ -126,6 +127,9 @@ private fun MagicJewelApp() {
     }
     val composeClipOutEnabled = remember {
         System.getProperty(ComposeClipOutProperty, "false").toBoolean()
+    }
+    val unsupportedTextEnabled = remember {
+        System.getProperty(UnsupportedTextProperty, "false").toBoolean()
     }
     val imageProbe = remember(composeImageEnabled) {
         if (composeImageEnabled) createImageProbe() else null
@@ -286,6 +290,9 @@ private fun MagicJewelApp() {
                 MagicLabel("Deterministic color fields, Swing island, and always-on animation", composeTextEnabled, width = 470.dp)
                 MagicLabel("Window title: $WindowTitle", composeTextEnabled, width = 330.dp)
                 MagicLabel("Latin-1 text: Caf\u00e9", composeTextEnabled, width = 150.dp)
+                if (unsupportedTextEnabled) {
+                    MagicLabel("Unsupported text: \uD83D\uDE80", composeTextEnabled, width = 180.dp)
+                }
             }
         }
 

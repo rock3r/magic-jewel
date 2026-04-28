@@ -18,6 +18,7 @@ COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-co
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
 EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
+EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
@@ -37,6 +38,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=false
 fi
+if [[ -z "${MAGIC_JEWEL_UNSUPPORTED_TEXT+x}" ]]; then
+  MAGIC_JEWEL_UNSUPPORTED_TEXT=false
+fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_TRANSFORM
@@ -44,6 +48,7 @@ export MAGIC_JEWEL_COMPOSE_SAVELAYER
 export MAGIC_JEWEL_COMPOSE_CLIP
 export MAGIC_JEWEL_COMPOSE_CLIP_OUT
 export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
+export MAGIC_JEWEL_UNSUPPORTED_TEXT
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
@@ -85,12 +90,14 @@ Environment:
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
   EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
   EXPECT_MIN_TEXT_COMMANDS In strict command mode, require at least this many text commands in one CMP recorder frame. Default: 0.
+  EXPECT_MIN_IMAGE_REFS In strict command mode, require at least this many image refs in one CMP recorder frame. Default: 0.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP Enables the Compose clipRect probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP_OUT Enables the Compose clip-out probe. Default: false.
+  MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use cached-image command fallback. Default: false.
 EOF_USAGE
 }
 
@@ -431,9 +438,11 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_CLIP: ${MAGIC_JEWEL_COMPOSE_CLIP}"
     echo "- MAGIC_JEWEL_COMPOSE_CLIP_OUT: ${MAGIC_JEWEL_COMPOSE_CLIP_OUT}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_STREAM: ${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}"
+    echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
+    echo "- EXPECT_MIN_IMAGE_REFS: ${EXPECT_MIN_IMAGE_REFS}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
     echo
     echo "## Modes"
@@ -557,6 +566,12 @@ validate_report() {
         max_text_commands="$(max_command_recorder_field "${OUT_DIR}/new.log" "textCommands")"
         [[ "${max_text_commands}" -ge "${EXPECT_MIN_TEXT_COMMANDS}" ]] ||
           failures+=("CMP recorder max textCommands ${max_text_commands} below expected ${EXPECT_MIN_TEXT_COMMANDS}")
+      fi
+      if [[ "${EXPECT_MIN_IMAGE_REFS}" -gt 0 ]]; then
+        local max_image_refs
+        max_image_refs="$(max_command_recorder_field "${OUT_DIR}/new.log" "imageRefs")"
+        [[ "${max_image_refs}" -ge "${EXPECT_MIN_IMAGE_REFS}" ]] ||
+          failures+=("CMP recorder max imageRefs ${max_image_refs} below expected ${EXPECT_MIN_IMAGE_REFS}")
       fi
     fi
     if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" != "command-stream-invalid" ]]; then
