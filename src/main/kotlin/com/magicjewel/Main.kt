@@ -36,6 +36,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -73,6 +74,7 @@ private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
+private const val ComposeClipProperty = "magic.jewel.compose.clip"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 
@@ -114,6 +116,9 @@ private fun MagicJewelApp() {
     }
     val composeSaveLayerEnabled = remember {
         System.getProperty(ComposeSaveLayerProperty, "false").toBoolean()
+    }
+    val composeClipEnabled = remember {
+        System.getProperty(ComposeClipProperty, "false").toBoolean()
     }
     val imageProbe = remember(composeImageEnabled) {
         if (composeImageEnabled) createImageProbe() else null
@@ -224,6 +229,15 @@ private fun MagicJewelApp() {
                         canvas.saveLayer(Rect(24f, size.height - 144f, 132f, size.height - 36f), layerPaint)
                         canvas.drawRect(44f, size.height - 124f, 112f, size.height - 56f, layerPaint)
                         canvas.restore()
+                    }
+                }
+                if (composeClipEnabled) {
+                    clipRect(left = 36f, top = 58f, right = 176f, bottom = 136f) {
+                        drawRect(
+                            color = Color(0xFF22D3EE),
+                            topLeft = Offset(12f, 34f),
+                            size = Size(188f, 126f),
+                        )
                     }
                 }
             }

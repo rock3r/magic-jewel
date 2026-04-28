@@ -31,6 +31,9 @@ val composeTransformEnabled = providers.gradleProperty("magicJewelComposeTransfo
 val composeSaveLayerEnabled = providers.gradleProperty("magicJewelComposeSaveLayer")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_SAVELAYER"))
     .orElse("false")
+val composeClipEnabled = providers.gradleProperty("magicJewelComposeClip")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_CLIP"))
+    .orElse("false")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -80,6 +83,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.image", composeImageEnabled.get())
     systemProperty("magic.jewel.compose.transform", composeTransformEnabled.get())
     systemProperty("magic.jewel.compose.saveLayer", composeSaveLayerEnabled.get())
+    systemProperty("magic.jewel.compose.clip", composeClipEnabled.get())
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")
