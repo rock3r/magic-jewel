@@ -40,10 +40,12 @@ guard let context = CGContext(
 
 context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
 
-var dark = 0
-var cyan = 0
+var green = 0
+var blue = 0
+var purple = 0
 var yellow = 0
-var pink = 0
+var orange = 0
+var white = 0
 
 for y in 0..<height {
     for x in 0..<width {
@@ -52,28 +54,36 @@ for y in 0..<height {
         let g = Int(pixels[offset + 1])
         let b = Int(pixels[offset + 2])
 
-        if r < 40 && g < 55 && b < 75 {
-            dark += 1
+        if g > 110 && r < 90 && b < 110 {
+            green += 1
         }
-        if r < 60 && g > 140 && b > 140 {
-            cyan += 1
+        if b > 110 && r < 100 && g < 120 {
+            blue += 1
+        }
+        if r > 90 && b > 140 && g < 110 {
+            purple += 1
         }
         if r > 180 && g > 130 && b < 90 {
             yellow += 1
         }
-        if r > 180 && g < 100 && b > 100 {
-            pink += 1
+        if r > 200 && g > 100 && g < 190 && b < 120 {
+            orange += 1
+        }
+        if r > 220 && g > 220 && b > 220 {
+            white += 1
         }
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS dark=\(dark) cyan=\(cyan) yellow=\(yellow) pink=\(pink)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white)")
 
 let checks: [(String, Int, Int)] = [
-    ("dark", dark, 500000),
-    ("cyan", cyan, 20000),
-    ("yellow", yellow, 5000),
-    ("pink", pink, 5000),
+    ("green", green, 10000),
+    ("blue", blue, 10000),
+    ("purple", purple, 1000),
+    ("yellow", yellow, 500),
+    ("orange", orange, 1000),
+    ("white", white, 500),
 ]
 
 for (name, count, minimum) in checks where count < minimum {
