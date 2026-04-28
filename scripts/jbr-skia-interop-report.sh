@@ -175,6 +175,18 @@ run_mode() {
     sleep "${SAMPLE_INTERVAL_SECONDS}"
   done
 
+  if [[ "${mode}" == "new"
+      && "${screenshot_done}" == "false"
+      && -x "${CAPTURE_SCRIPT}"
+      && -x "${assert_script}"
+      && $(grep -c "${ready_marker}" "${log}" 2>/dev/null) -gt 0 ]]; then
+    if "${CAPTURE_SCRIPT}" "${CAPTURE_WINDOW_QUERY}" "${screenshot}" > "${OUT_DIR}/${mode}-capture.log" 2>&1; then
+      if "${assert_script}" "${screenshot}" > "${screenshot_assertion}" 2>&1; then
+        echo "passed" > "${screenshot_status}"
+      fi
+    fi
+  fi
+
   kill_process_tree "${root_pid}"
   wait "${root_pid}" >/dev/null 2>&1
   set -e

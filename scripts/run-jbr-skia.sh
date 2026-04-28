@@ -16,6 +16,18 @@ JBR_ARGS=(
   "-Dsun.java2d.skia.interop.library=${JBR_SKIA_LIB}"
 )
 
+case "${JBR_SKIA_RENDER_MODE}" in
+  commands)
+    JBR_ARGS+=("-Dskiko.jbr.interop.renderCommands=true")
+    ;;
+  diagnostic)
+    JBR_ARGS+=("-Dskiko.jbr.interop.renderDiagnostic=true")
+    ;;
+  *)
+    JBR_ARGS+=("-Dskiko.jbr.interop.renderPicture=true")
+    ;;
+esac
+
 printf -v JOINED_ARGS "%s " "${JBR_ARGS[@]}"
 cd "$ROOT"
 SKIKO_VERSION="$SKIKO_VERSION" ./gradlew runJbrSkiaInterop \
