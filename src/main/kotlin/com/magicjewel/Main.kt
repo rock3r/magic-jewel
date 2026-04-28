@@ -285,6 +285,7 @@ private fun MagicJewelApp() {
             ) {
                 MagicLabel("Deterministic color fields, Swing island, and always-on animation", composeTextEnabled, width = 470.dp)
                 MagicLabel("Window title: $WindowTitle", composeTextEnabled, width = 330.dp)
+                MagicLabel("Latin-1 text: Caf\u00e9", composeTextEnabled, width = 150.dp)
             }
         }
 
