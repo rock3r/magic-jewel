@@ -15,6 +15,15 @@ CMP_SCRIPTS_DIR="${CMP_SCRIPTS_DIR:-/Users/rock3r/src/cmp-jbr-skia-poc/compose/d
 CAPTURE_SCRIPT="${CAPTURE_SCRIPT:-${CMP_SCRIPTS_DIR}/capture-macos-window.sh}"
 ASSERT_SCRIPT="${ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-mixed-window-screenshot.sh}"
 COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-command-window-screenshot.sh}"
+EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
+if [[ -z "${MAGIC_JEWEL_COMPOSE_TEXT+x}" ]]; then
+  if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" && "${EXPECT_STRICT_COMMANDS:-true}" == "true" && "${EXPECT_COMMAND_FALLBACK}" != "true" ]]; then
+    MAGIC_JEWEL_COMPOSE_TEXT=false
+  else
+    MAGIC_JEWEL_COMPOSE_TEXT=true
+  fi
+fi
+export MAGIC_JEWEL_COMPOSE_TEXT
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
@@ -53,6 +62,8 @@ Environment:
   CAPTURE_WINDOW_QUERY     Window title/owner to capture. Default: MagicJewelJbrSkiaWindow.
   APP_PROCESS_QUERY        Process command substring for the launched app. Default: com.magicjewel.MainKt.
   EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
+  EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
+  MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Defaults to false for strict command validation, true otherwise.
 EOF_USAGE
 }
 
@@ -130,8 +141,13 @@ run_mode() {
   local assert_script="${ASSERT_SCRIPT}"
 
   if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" ]]; then
-    ready_marker="${SKIKO_COMMAND_MARKER}"
-    assert_script="${COMMAND_ASSERT_SCRIPT}"
+    if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
+      ready_marker="${SKIKO_PICTURE_MARKER}"
+      assert_script="${ASSERT_SCRIPT}"
+    else
+      ready_marker="${SKIKO_COMMAND_MARKER}"
+      assert_script="${COMMAND_ASSERT_SCRIPT}"
+    fi
   fi
 
   printf 'timestamp,mode,pid,cpu_percent,rss_kb\n' > "${csv}"
@@ -340,6 +356,8 @@ write_report() {
     echo "- Root: ${ROOT_DIR}"
     echo "- SKIKO_VERSION: ${SKIKO_VERSION}"
     echo "- JBR_SKIA_RENDER_MODE: ${JBR_SKIA_RENDER_MODE:-picture}"
+    echo "- MAGIC_JEWEL_COMPOSE_TEXT: ${MAGIC_JEWEL_COMPOSE_TEXT}"
+    echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
     echo
     echo "## Modes"
@@ -429,13 +447,23 @@ validate_report() {
     screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
     [[ "${recorder_frames}" -gt 0 ]] || failures+=("no CMP command recorder frames")
-    [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames")
-    [[ "${jbr_command_frames}" -gt 0 ]] || failures+=("no JBR command frames")
-    [[ "${skiko_command_frames}" -eq "${jbr_command_frames}" ]] || failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames}")
-    [[ "${skiko_picture_frames}" -eq 0 ]] || failures+=("unexpected Skiko picture frames in strict command mode: ${skiko_picture_frames}")
-    [[ "${jbr_picture_frames}" -eq 0 ]] || failures+=("unexpected JBR picture frames in strict command mode: ${jbr_picture_frames}")
-    if grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*" "${OUT_DIR}/new.log" 2>/dev/null; then
-      failures+=("CMP recorder reported unsupported command operations")
+    if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
+      [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")
+      [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during expected fallback: ${jbr_command_frames}")
+      [[ "${skiko_picture_frames}" -gt 0 ]] || failures+=("no Skiko picture frames during expected fallback")
+      [[ "${jbr_picture_frames}" -gt 0 ]] || failures+=("no JBR picture frames during expected fallback")
+      if ! grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*.*text=" "${OUT_DIR}/new.log" 2>/dev/null; then
+        failures+=("CMP recorder did not report text as an unsupported command operation")
+      fi
+    else
+      [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames")
+      [[ "${jbr_command_frames}" -gt 0 ]] || failures+=("no JBR command frames")
+      [[ "${skiko_command_frames}" -eq "${jbr_command_frames}" ]] || failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames}")
+      [[ "${skiko_picture_frames}" -eq 0 ]] || failures+=("unexpected Skiko picture frames in strict command mode: ${skiko_picture_frames}")
+      [[ "${jbr_picture_frames}" -eq 0 ]] || failures+=("unexpected JBR picture frames in strict command mode: ${jbr_picture_frames}")
+      if grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*" "${OUT_DIR}/new.log" 2>/dev/null; then
+        failures+=("CMP recorder reported unsupported command operations")
+      fi
     fi
     [[ "${screenshot_status}" == "passed" ]] || failures+=("screenshot assertion did not pass")
   fi

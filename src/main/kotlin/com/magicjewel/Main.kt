@@ -64,6 +64,7 @@ import java.util.concurrent.atomic.AtomicLong
 private const val WindowTitle = "MagicJewelJbrSkiaWindow"
 private const val FrameMarker = "MAGIC_JEWEL_COMPOSE_FRAME"
 private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
+private const val ComposeTextProperty = "magic.jewel.compose.text"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 
@@ -94,6 +95,9 @@ private fun showMagicJewel() {
 @Composable
 private fun MagicJewelApp() {
     var ticks by remember { mutableIntStateOf(0) }
+    val composeTextEnabled = remember {
+        System.getProperty(ComposeTextProperty, "true").toBoolean()
+    }
     val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
     val phase by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -117,15 +121,15 @@ private fun MagicJewelApp() {
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Magic Jewel")
+            MagicLabel("Magic Jewel", composeTextEnabled, width = 140.dp)
             Spacer(Modifier.width(16.dp))
-            Text("Swing ComposePanel / JBR Skia interop sample")
+            MagicLabel("Swing ComposePanel / JBR Skia interop sample", composeTextEnabled, width = 310.dp)
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            DefaultButton(onClick = { ticks++ }) { Text("Pulse") }
-            OutlinedButton(onClick = { ticks = 0 }) { Text("Reset") }
-            Text("frames=$ticks", modifier = Modifier.align(Alignment.CenterVertically))
+            DefaultButton(onClick = { ticks++ }) { MagicLabel("Pulse", composeTextEnabled, width = 48.dp) }
+            OutlinedButton(onClick = { ticks = 0 }) { MagicLabel("Reset", composeTextEnabled, width = 48.dp) }
+            MagicLabel("frames=$ticks", composeTextEnabled, modifier = Modifier.align(Alignment.CenterVertically), width = 92.dp)
         }
 
         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
@@ -200,15 +204,15 @@ private fun MagicJewelApp() {
                     .zIndex(2f),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("Compose overlay")
+                MagicLabel("Compose overlay", composeTextEnabled, width = 116.dp)
             }
 
             Column(
                 modifier = Modifier.align(Alignment.BottomStart).padding(24.dp).zIndex(2f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text("Deterministic color fields, Swing island, and always-on animation")
-                Text("Window title: $WindowTitle")
+                MagicLabel("Deterministic color fields, Swing island, and always-on animation", composeTextEnabled, width = 470.dp)
+                MagicLabel("Window title: $WindowTitle", composeTextEnabled, width = 330.dp)
             }
         }
 
@@ -227,6 +231,24 @@ private fun MagicJewelApp() {
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun MagicLabel(
+    text: String,
+    composeTextEnabled: Boolean,
+    modifier: Modifier = Modifier,
+    width: androidx.compose.ui.unit.Dp,
+) {
+    if (composeTextEnabled) {
+        Text(text, modifier = modifier)
+    } else {
+        Box(
+            modifier = modifier
+                .size(width = width, height = 16.dp)
+                .background(Color.White.copy(alpha = 0.72f))
+        )
     }
 }
 

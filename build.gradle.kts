@@ -19,6 +19,9 @@ val jbrSkiaJvmArgs = providers.gradleProperty("jbrSkiaInteropJvmArgs")
 val jbrSkiaRenderMode = providers.gradleProperty("jbrSkiaRenderMode")
     .orElse(providers.environmentVariable("JBR_SKIA_RENDER_MODE"))
     .orElse("picture")
+val composeTextEnabled = providers.gradleProperty("magicJewelComposeText")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_TEXT"))
+    .orElse("true")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -64,6 +67,7 @@ fun Project.patchedComposeRuntimeJars(): FileCollection {
 fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("compose.swing.render.on.graphics", "true")
     systemProperty("apple.awt.application.name", "Magic Jewel")
+    systemProperty("magic.jewel.compose.text", composeTextEnabled.get())
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")
