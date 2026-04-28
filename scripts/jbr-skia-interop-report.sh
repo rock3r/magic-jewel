@@ -52,6 +52,7 @@ Environment:
   COMMAND_ASSERT_SCRIPT    Command-mode screenshot assertion helper.
   CAPTURE_WINDOW_QUERY     Window title/owner to capture. Default: MagicJewelJbrSkiaWindow.
   APP_PROCESS_QUERY        Process command substring for the launched app. Default: com.magicjewel.MainKt.
+  EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
 EOF_USAGE
 }
 
@@ -406,6 +407,60 @@ write_report() {
   echo "${report}"
 }
 
+validate_report() {
+  local report="${OUT_DIR}/report.md"
+  local mode="${JBR_SKIA_RENDER_MODE:-picture}"
+  local expect_strict="${EXPECT_STRICT_COMMANDS:-true}"
+  local failures=()
+
+  if [[ "${mode}" == "commands" && "${expect_strict}" == "true" ]]; then
+    local recorder_frames
+    local skiko_command_frames
+    local jbr_command_frames
+    local skiko_picture_frames
+    local jbr_picture_frames
+    local screenshot_status
+
+    recorder_frames="$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
+    skiko_command_frames="$(grep -c "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
+    jbr_command_frames="$(grep -c "${JBR_COMMAND_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
+    skiko_picture_frames="$(grep -c "${SKIKO_PICTURE_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
+    jbr_picture_frames="$(grep -c "${JBR_PICTURE_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
+    screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
+
+    [[ "${recorder_frames}" -gt 0 ]] || failures+=("no CMP command recorder frames")
+    [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames")
+    [[ "${jbr_command_frames}" -gt 0 ]] || failures+=("no JBR command frames")
+    [[ "${skiko_command_frames}" -eq "${jbr_command_frames}" ]] || failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames}")
+    [[ "${skiko_picture_frames}" -eq 0 ]] || failures+=("unexpected Skiko picture frames in strict command mode: ${skiko_picture_frames}")
+    [[ "${jbr_picture_frames}" -eq 0 ]] || failures+=("unexpected JBR picture frames in strict command mode: ${jbr_picture_frames}")
+    if grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*" "${OUT_DIR}/new.log" 2>/dev/null; then
+      failures+=("CMP recorder reported unsupported command operations")
+    fi
+    [[ "${screenshot_status}" == "passed" ]] || failures+=("screenshot assertion did not pass")
+  fi
+
+  {
+    echo
+    echo "## Validation"
+    echo
+    if [[ "${#failures[@]}" -eq 0 ]]; then
+      echo "- status: passed"
+    else
+      echo "- status: failed"
+      for failure in "${failures[@]}"; do
+        echo "- ${failure}"
+      done
+    fi
+  } >> "${report}"
+
+  if [[ "${#failures[@]}" -ne 0 ]]; then
+    printf 'Strict command validation failed; see %s\n' "${report}" >&2
+    return 1
+  fi
+}
+
 run_mode old
 run_mode new
 write_report
+validate_report
