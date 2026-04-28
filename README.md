@@ -23,6 +23,7 @@ Old/new process and marker report:
 
 ```bash
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
+JBR_SKIA_RENDER_MODE=commands SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 ```
 
 The window title is `MagicJewelJbrSkiaWindow`, which is stable for screenshot/report scripts.

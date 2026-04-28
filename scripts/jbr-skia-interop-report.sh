@@ -12,12 +12,14 @@ CAPTURE_WINDOW_QUERY="${CAPTURE_WINDOW_QUERY:-MagicJewelJbrSkiaWindow}"
 CMP_SCRIPTS_DIR="${CMP_SCRIPTS_DIR:-/Users/rock3r/src/cmp-jbr-skia-poc/compose/desktop/desktop/samples/scripts}"
 CAPTURE_SCRIPT="${CAPTURE_SCRIPT:-${CMP_SCRIPTS_DIR}/capture-macos-window.sh}"
 ASSERT_SCRIPT="${ASSERT_SCRIPT:-${CMP_SCRIPTS_DIR}/assert-jbr-skia-window-screenshot.sh}"
+COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-command-window-screenshot.sh}"
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
+COMMAND_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_COMMAND_SCREENSHOT_COUNTS"
 
 mkdir -p "${OUT_DIR}"
 
@@ -39,6 +41,7 @@ Environment:
   JBR_API_SHIM             Public JBR API shim jar. Default: /tmp/jbr-api-shim.jar.
   JBR_SKIA_LIB             Native JBR Skia interop dylib. Default: /tmp/jbr-skia-native/libjbrskiainterop.dylib.
   CMP_SCRIPTS_DIR          CMP sample scripts directory containing capture/assert helpers.
+  COMMAND_ASSERT_SCRIPT    Command-mode screenshot assertion helper.
   CAPTURE_WINDOW_QUERY     Window title/owner to capture. Default: MagicJewelJbrSkiaWindow.
 EOF_USAGE
 }
@@ -112,6 +115,13 @@ run_mode() {
   local screenshot="${OUT_DIR}/${mode}-window.png"
   local screenshot_assertion="${OUT_DIR}/${mode}-screenshot-assertion.log"
   local screenshot_status="${OUT_DIR}/${mode}-screenshot-status.txt"
+  local ready_marker="${SKIKO_PICTURE_MARKER}"
+  local assert_script="${ASSERT_SCRIPT}"
+
+  if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" ]]; then
+    ready_marker="${SKIKO_COMMAND_MARKER}"
+    assert_script="${COMMAND_ASSERT_SCRIPT}"
+  fi
 
   printf 'timestamp,mode,pid,cpu_percent,rss_kb\n' > "${csv}"
 
@@ -132,10 +142,10 @@ run_mode() {
     if [[ "${mode}" == "new"
         && "${screenshot_done}" == "false"
         && -x "${CAPTURE_SCRIPT}"
-        && -x "${ASSERT_SCRIPT}"
-        && $(grep -c "${SKIKO_PICTURE_MARKER}" "${log}" 2>/dev/null) -gt 0 ]]; then
+        && -x "${assert_script}"
+        && $(grep -c "${ready_marker}" "${log}" 2>/dev/null) -gt 0 ]]; then
       if "${CAPTURE_SCRIPT}" "${CAPTURE_WINDOW_QUERY}" "${screenshot}" > "${OUT_DIR}/${mode}-capture.log" 2>&1; then
-        if "${ASSERT_SCRIPT}" "${screenshot}" > "${screenshot_assertion}" 2>&1; then
+        if "${assert_script}" "${screenshot}" > "${screenshot_assertion}" 2>&1; then
           echo "passed" > "${screenshot_status}"
           screenshot_done=true
         fi
@@ -215,7 +225,7 @@ write_report() {
   jbr_picture_summary="$(payload_marker_summary "${JBR_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
   skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
   jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
-  screenshot_counts="$(grep "${SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
+  screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
   {
@@ -273,7 +283,7 @@ write_report() {
     echo "## Notes"
     echo
     echo "CPU and RSS samples are coarse process-tree samples from ps. They are useful as a smoke signal only."
-    echo "Picture marker counts come from structured Skiko/JBR logs and are the primary signal that the JBR-owned replay path was used."
+    echo "Picture/command marker counts come from structured Skiko/JBR logs and are the primary signal that the JBR-owned replay path was used."
     echo "The new mode depends on patched local JBR, Skiko, and CMP artifacts; see README.md for the required paths and overrides."
   } > "${report}"
 
