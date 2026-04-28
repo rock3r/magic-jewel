@@ -33,6 +33,7 @@ import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
@@ -75,6 +76,7 @@ private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
+private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 
@@ -119,6 +121,9 @@ private fun MagicJewelApp() {
     }
     val composeClipEnabled = remember {
         System.getProperty(ComposeClipProperty, "false").toBoolean()
+    }
+    val composeClipOutEnabled = remember {
+        System.getProperty(ComposeClipOutProperty, "false").toBoolean()
     }
     val imageProbe = remember(composeImageEnabled) {
         if (composeImageEnabled) createImageProbe() else null
@@ -237,6 +242,15 @@ private fun MagicJewelApp() {
                             color = Color(0xFF22D3EE),
                             topLeft = Offset(12f, 34f),
                             size = Size(188f, 126f),
+                        )
+                    }
+                }
+                if (composeClipOutEnabled) {
+                    clipRect(left = 42f, top = 64f, right = 164f, bottom = 126f, clipOp = ClipOp.Difference) {
+                        drawRect(
+                            color = Color(0xFFE879F9),
+                            topLeft = Offset(18f, 38f),
+                            size = Size(176f, 120f),
                         )
                     }
                 }
