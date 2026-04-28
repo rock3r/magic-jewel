@@ -33,6 +33,8 @@ import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -65,6 +67,7 @@ private const val WindowTitle = "MagicJewelJbrSkiaWindow"
 private const val FrameMarker = "MAGIC_JEWEL_COMPOSE_FRAME"
 private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
+private const val ComposeImageProperty = "magic.jewel.compose.image"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 
@@ -97,6 +100,12 @@ private fun MagicJewelApp() {
     var ticks by remember { mutableIntStateOf(0) }
     val composeTextEnabled = remember {
         System.getProperty(ComposeTextProperty, "true").toBoolean()
+    }
+    val composeImageEnabled = remember {
+        System.getProperty(ComposeImageProperty, "false").toBoolean()
+    }
+    val imageProbe = remember(composeImageEnabled) {
+        if (composeImageEnabled) createImageProbe() else null
     }
     val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
     val phase by infiniteTransition.animateFloat(
@@ -184,6 +193,9 @@ private fun MagicJewelApp() {
                     drawCircle(Color.White, radius = 10f, center = outer)
                 }
                 drawCircle(Color.White.copy(alpha = 0.55f), radius = 190f, center = center, style = Stroke(width = 5f))
+                imageProbe?.let {
+                    drawImage(it, topLeft = Offset(size.width - 212f, size.height - 126f))
+                }
             }
 
             SwingPanel(
@@ -232,6 +244,21 @@ private fun MagicJewelApp() {
             }
         }
     }
+}
+
+private fun createImageProbe(): ImageBitmap {
+    val bitmap = ImageBitmap(72, 72)
+    val canvas = androidx.compose.ui.graphics.Canvas(bitmap)
+    val paint = Paint()
+
+    paint.color = Color(0xFFE879F9)
+    canvas.drawRect(0f, 0f, 72f, 72f, paint)
+    paint.color = Color(0xFF111827)
+    canvas.drawRect(12f, 12f, 60f, 60f, paint)
+    paint.color = Color(0xFF22D3EE)
+    canvas.drawCircle(Offset(36f, 36f), 20f, paint)
+
+    return bitmap
 }
 
 @Composable

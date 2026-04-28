@@ -16,6 +16,7 @@ CAPTURE_SCRIPT="${CAPTURE_SCRIPT:-${CMP_SCRIPTS_DIR}/capture-macos-window.sh}"
 ASSERT_SCRIPT="${ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-mixed-window-screenshot.sh}"
 COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-command-window-screenshot.sh}"
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
+EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_TEXT+x}" ]]; then
   if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" && "${EXPECT_STRICT_COMMANDS:-true}" == "true" && "${EXPECT_COMMAND_FALLBACK}" != "true" ]]; then
     MAGIC_JEWEL_COMPOSE_TEXT=false
@@ -23,7 +24,11 @@ if [[ -z "${MAGIC_JEWEL_COMPOSE_TEXT+x}" ]]; then
     MAGIC_JEWEL_COMPOSE_TEXT=true
   fi
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_IMAGE=false
+fi
 export MAGIC_JEWEL_COMPOSE_TEXT
+export MAGIC_JEWEL_COMPOSE_IMAGE
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
@@ -63,7 +68,9 @@ Environment:
   APP_PROCESS_QUERY        Process command substring for the launched app. Default: com.magicjewel.MainKt.
   EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
+  EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Defaults to false for strict command validation, true otherwise.
+  MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
 EOF_USAGE
 }
 
@@ -357,7 +364,9 @@ write_report() {
     echo "- SKIKO_VERSION: ${SKIKO_VERSION}"
     echo "- JBR_SKIA_RENDER_MODE: ${JBR_SKIA_RENDER_MODE:-picture}"
     echo "- MAGIC_JEWEL_COMPOSE_TEXT: ${MAGIC_JEWEL_COMPOSE_TEXT}"
+    echo "- MAGIC_JEWEL_COMPOSE_IMAGE: ${MAGIC_JEWEL_COMPOSE_IMAGE}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
+    echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
     echo
     echo "## Modes"
@@ -452,8 +461,8 @@ validate_report() {
       [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during expected fallback: ${jbr_command_frames}")
       [[ "${skiko_picture_frames}" -gt 0 ]] || failures+=("no Skiko picture frames during expected fallback")
       [[ "${jbr_picture_frames}" -gt 0 ]] || failures+=("no JBR picture frames during expected fallback")
-      if ! grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*.*text=" "${OUT_DIR}/new.log" 2>/dev/null; then
-        failures+=("CMP recorder did not report text as an unsupported command operation")
+      if ! grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*.*${EXPECT_COMMAND_FALLBACK_REASON}=" "${OUT_DIR}/new.log" 2>/dev/null; then
+        failures+=("CMP recorder did not report ${EXPECT_COMMAND_FALLBACK_REASON} as an unsupported command operation")
       fi
     else
       [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames")
