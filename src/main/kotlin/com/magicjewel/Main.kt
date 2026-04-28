@@ -37,13 +37,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.JbrSkiaCommandRecorder
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -218,16 +216,6 @@ private fun MagicJewelApp() {
                     drawCircle(Color.White, radius = 10f, center = outer)
                 }
                 drawCircle(Color.White.copy(alpha = 0.55f), radius = 190f, center = center, style = Stroke(width = 5f))
-                drawIntoCanvas {
-                    JbrSkiaCommandRecorder.drawTextUtf16(
-                        text = "JBR text command",
-                        x = 48f,
-                        baseline = size.height - 184f,
-                        fontSize = 18f,
-                        color = Color.White.toArgb(),
-                        antiAlias = true,
-                    )
-                }
                 imageProbe?.let {
                     drawImage(it, topLeft = Offset(size.width - 212f, size.height - 126f))
                 }

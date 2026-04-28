@@ -57,7 +57,6 @@ dependencies {
     implementation(compose.desktop.currentOs) {
         exclude(group = "org.jetbrains.compose.material")
     }
-    compileOnly(files("${localCmpOut.get()}/compose/ui/ui-graphics/build/libs/ui-graphics-desktop-9999.0.0-SNAPSHOT.jar"))
     implementation(libs.jewel.int.ui.standalone)
     implementation(libs.jewel.int.ui.decorated.window)
     implementation(libs.kotlinx.coroutines.swing)
