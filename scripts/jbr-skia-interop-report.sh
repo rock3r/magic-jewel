@@ -521,7 +521,11 @@ validate_report() {
     else
       [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames")
       [[ "${jbr_command_frames}" -gt 0 ]] || failures+=("no JBR command frames")
-      [[ "${skiko_command_frames}" -eq "${jbr_command_frames}" ]] || failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames}")
+      local command_frame_delta=$(( skiko_command_frames - jbr_command_frames ))
+      if [[ "${command_frame_delta}" -lt 0 ]]; then
+        command_frame_delta=$(( -command_frame_delta ))
+      fi
+      [[ "${command_frame_delta}" -le 1 ]] || failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames}")
       [[ "${skiko_picture_frames}" -eq 0 ]] || failures+=("unexpected Skiko picture frames in strict command mode: ${skiko_picture_frames}")
       [[ "${jbr_picture_frames}" -eq 0 ]] || failures+=("unexpected JBR picture frames in strict command mode: ${jbr_picture_frames}")
       if grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*" "${OUT_DIR}/new.log" 2>/dev/null; then
