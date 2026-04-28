@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,12 +37,16 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.JbrSkiaCommandRecorder
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -64,7 +69,6 @@ import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.ui.component.DefaultButton
 import org.jetbrains.jewel.ui.component.OutlinedButton
-import org.jetbrains.jewel.ui.component.Text
 import java.awt.Color as AwtColor
 import java.util.concurrent.atomic.AtomicLong
 
@@ -214,6 +218,16 @@ private fun MagicJewelApp() {
                     drawCircle(Color.White, radius = 10f, center = outer)
                 }
                 drawCircle(Color.White.copy(alpha = 0.55f), radius = 190f, center = center, style = Stroke(width = 5f))
+                drawIntoCanvas {
+                    JbrSkiaCommandRecorder.drawTextUtf16(
+                        text = "JBR text command",
+                        x = 48f,
+                        baseline = size.height - 184f,
+                        fontSize = 18f,
+                        color = Color.White.toArgb(),
+                        antiAlias = true,
+                    )
+                }
                 imageProbe?.let {
                     drawImage(it, topLeft = Offset(size.width - 212f, size.height - 126f))
                 }
@@ -327,7 +341,15 @@ private fun MagicLabel(
     width: androidx.compose.ui.unit.Dp,
 ) {
     if (composeTextEnabled) {
-        Text(text, modifier = modifier)
+        BasicText(
+            text = text,
+            modifier = modifier.width(width),
+            maxLines = 1,
+            style = TextStyle(
+                color = Color.Black,
+                fontSize = 16.sp,
+            ),
+        )
     } else {
         Box(
             modifier = modifier

@@ -328,6 +328,15 @@ command_recorder_summary() {
           frameUnsupported = value[2]
           unsupported += value[2]
           if (value[2] > maxUnsupported) maxUnsupported = value[2]
+        } else if (value[1] == "textCommands") {
+          textCommands += value[2]
+          if (value[2] > maxTextCommands) maxTextCommands = value[2]
+        } else if (value[1] == "imageDefines") {
+          imageDefines += value[2]
+          if (value[2] > maxImageDefines) maxImageDefines = value[2]
+        } else if (value[1] == "imageRefs") {
+          imageRefs += value[2]
+          if (value[2] > maxImageRefs) maxImageRefs = value[2]
         } else if (value[2] ~ /^[0-9]+$/) {
           reasons[value[1]] += value[2]
         }
@@ -336,7 +345,7 @@ command_recorder_summary() {
     }
     END {
       if (frames == 0) {
-        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 reasons=none"
+        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_refs=0 max_image_refs=0 reasons=none"
         exit
       }
       reasonSummary = "none"
@@ -344,8 +353,10 @@ command_recorder_summary() {
         item = reason ":" reasons[reason]
         reasonSummary = reasonSummary == "none" ? item : reasonSummary "," item
       }
-      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f reasons=%s",
-        frames, frames / duration, commands / frames, maxCommands, unsupportedFrames, unsupported / frames, maxUnsupported, reasonSummary
+      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_refs=%.1f max_image_refs=%.0f reasons=%s",
+        frames, frames / duration, commands / frames, maxCommands, unsupportedFrames, unsupported / frames, maxUnsupported,
+        textCommands / frames, maxTextCommands, imageDefines / frames, maxImageDefines, imageRefs / frames, maxImageRefs,
+        reasonSummary
     }
   ' "${log}"
 }
