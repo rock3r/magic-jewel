@@ -19,6 +19,7 @@ EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
 EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
 EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
+EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
@@ -41,6 +42,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_UNSUPPORTED_TEXT+x}" ]]; then
   MAGIC_JEWEL_UNSUPPORTED_TEXT=false
 fi
+if [[ -z "${MAGIC_JEWEL_IMAGE_CACHE_CHURN+x}" ]]; then
+  MAGIC_JEWEL_IMAGE_CACHE_CHURN=false
+fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_TRANSFORM
@@ -49,6 +53,7 @@ export MAGIC_JEWEL_COMPOSE_CLIP
 export MAGIC_JEWEL_COMPOSE_CLIP_OUT
 export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 export MAGIC_JEWEL_UNSUPPORTED_TEXT
+export MAGIC_JEWEL_IMAGE_CACHE_CHURN
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
@@ -91,6 +96,7 @@ Environment:
   EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
   EXPECT_MIN_TEXT_COMMANDS In strict command mode, require at least this many text commands in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_REFS In strict command mode, require at least this many image refs in one CMP recorder frame. Default: 0.
+  EXPECT_MIN_IMAGE_CACHE_CLEARS In strict command mode, require at least this many image cache clears in one CMP recorder frame. Default: 0.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
@@ -98,6 +104,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_CLIP Enables the Compose clipRect probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP_OUT Enables the Compose clip-out probe. Default: false.
   MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use cached-image command fallback. Default: false.
+  MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
 EOF_USAGE
 }
 
@@ -346,6 +353,9 @@ command_recorder_summary() {
         } else if (value[1] == "imageRefs") {
           imageRefs += value[2]
           if (value[2] > maxImageRefs) maxImageRefs = value[2]
+        } else if (value[1] == "imageCacheClears") {
+          imageCacheClears += value[2]
+          if (value[2] > maxImageCacheClears) maxImageCacheClears = value[2]
         } else if (value[2] ~ /^[0-9]+$/) {
           reasons[value[1]] += value[2]
         }
@@ -354,7 +364,7 @@ command_recorder_summary() {
     }
     END {
       if (frames == 0) {
-        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_refs=0 max_image_refs=0 reasons=none"
+        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_refs=0 max_image_refs=0 avg_image_cache_clears=0 max_image_cache_clears=0 reasons=none"
         exit
       }
       reasonSummary = "none"
@@ -362,9 +372,10 @@ command_recorder_summary() {
         item = reason ":" reasons[reason]
         reasonSummary = reasonSummary == "none" ? item : reasonSummary "," item
       }
-      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_refs=%.1f max_image_refs=%.0f reasons=%s",
+      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_refs=%.1f max_image_refs=%.0f avg_image_cache_clears=%.1f max_image_cache_clears=%.0f reasons=%s",
         frames, frames / duration, commands / frames, maxCommands, unsupportedFrames, unsupported / frames, maxUnsupported,
         textCommands / frames, maxTextCommands, imageDefines / frames, maxImageDefines, imageRefs / frames, maxImageRefs,
+        imageCacheClears / frames, maxImageCacheClears,
         reasonSummary
     }
   ' "${log}"
@@ -439,10 +450,12 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_CLIP_OUT: ${MAGIC_JEWEL_COMPOSE_CLIP_OUT}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_STREAM: ${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}"
     echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
+    echo "- MAGIC_JEWEL_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_IMAGE_CACHE_CHURN}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
     echo "- EXPECT_MIN_IMAGE_REFS: ${EXPECT_MIN_IMAGE_REFS}"
+    echo "- EXPECT_MIN_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_IMAGE_CACHE_CLEARS}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
     echo
     echo "## Modes"
@@ -572,6 +585,12 @@ validate_report() {
         max_image_refs="$(max_command_recorder_field "${OUT_DIR}/new.log" "imageRefs")"
         [[ "${max_image_refs}" -ge "${EXPECT_MIN_IMAGE_REFS}" ]] ||
           failures+=("CMP recorder max imageRefs ${max_image_refs} below expected ${EXPECT_MIN_IMAGE_REFS}")
+      fi
+      if [[ "${EXPECT_MIN_IMAGE_CACHE_CLEARS}" -gt 0 ]]; then
+        local max_image_cache_clears
+        max_image_cache_clears="$(max_command_recorder_field "${OUT_DIR}/new.log" "imageCacheClears")"
+        [[ "${max_image_cache_clears}" -ge "${EXPECT_MIN_IMAGE_CACHE_CLEARS}" ]] ||
+          failures+=("CMP recorder max imageCacheClears ${max_image_cache_clears} below expected ${EXPECT_MIN_IMAGE_CACHE_CLEARS}")
       fi
     fi
     if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" != "command-stream-invalid" ]]; then

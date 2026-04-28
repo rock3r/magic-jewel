@@ -80,6 +80,7 @@ private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
 private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
+private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 
@@ -130,6 +131,9 @@ private fun MagicJewelApp() {
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
+    }
+    val imageCacheChurnEnabled = remember {
+        System.getProperty(ImageCacheChurnProperty, "false").toBoolean()
     }
     val imageProbe = remember(composeImageEnabled) {
         if (composeImageEnabled) createImageProbe() else null
@@ -222,6 +226,14 @@ private fun MagicJewelApp() {
                 drawCircle(Color.White.copy(alpha = 0.55f), radius = 190f, center = center, style = Stroke(width = 5f))
                 imageProbe?.let {
                     drawImage(it, topLeft = Offset(size.width - 212f, size.height - 126f))
+                }
+                if (imageCacheChurnEnabled) {
+                    repeat(260) { index ->
+                        drawImage(
+                            createChurnImage(index, ticks),
+                            topLeft = Offset(12f + (index % 26) * 4f, size.height - 22f - (index / 26) * 4f),
+                        )
+                    }
                 }
                 if (composeTransformEnabled) {
                     rotate(degrees = 18f, pivot = Offset(160f, size.height - 96f)) {
@@ -326,6 +338,16 @@ private fun createImageProbe(): ImageBitmap {
     paint.color = Color(0xFF22D3EE)
     canvas.drawCircle(Offset(36f, 36f), 20f, paint)
 
+    return bitmap
+}
+
+private fun createChurnImage(index: Int, ticks: Int): ImageBitmap {
+    val bitmap = ImageBitmap(1, 1)
+    val canvas = androidx.compose.ui.graphics.Canvas(bitmap)
+    val paint = Paint().apply {
+        color = Color(0xff000000.toInt() or ((ticks and 0xff) shl 16) or ((index * 37) and 0xffff))
+    }
+    canvas.drawRect(0f, 0f, 1f, 1f, paint)
     return bitmap
 }
 

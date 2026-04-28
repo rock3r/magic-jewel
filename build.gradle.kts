@@ -40,6 +40,9 @@ val composeClipOutEnabled = providers.gradleProperty("magicJewelComposeClipOut")
 val unsupportedTextEnabled = providers.gradleProperty("magicJewelUnsupportedText")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_UNSUPPORTED_TEXT"))
     .orElse("false")
+val imageCacheChurnEnabled = providers.gradleProperty("magicJewelImageCacheChurn")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_IMAGE_CACHE_CHURN"))
+    .orElse("false")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -92,6 +95,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.clip", composeClipEnabled.get())
     systemProperty("magic.jewel.compose.clipOut", composeClipOutEnabled.get())
     systemProperty("magic.jewel.unsupportedText", unsupportedTextEnabled.get())
+    systemProperty("magic.jewel.imageCacheChurn", imageCacheChurnEnabled.get())
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")
