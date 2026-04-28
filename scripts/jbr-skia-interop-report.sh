@@ -20,6 +20,7 @@ EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
 EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
 EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
 EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
+EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
@@ -61,6 +62,7 @@ SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
+JBR_IMAGE_CACHE_CLEAR_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
 MIXED_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_MIXED_SCREENSHOT_COUNTS"
@@ -97,6 +99,7 @@ Environment:
   EXPECT_MIN_TEXT_COMMANDS In strict command mode, require at least this many text commands in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_REFS In strict command mode, require at least this many image refs in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_CACHE_CLEARS In strict command mode, require at least this many image cache clears in one CMP recorder frame. Default: 0.
+  EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers. Default: 0.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
@@ -414,6 +417,7 @@ write_report() {
   local skiko_command_summary
   local jbr_command_summary
   local cmp_command_recorder_summary
+  local jbr_image_cache_clear_summary
   local screenshot_counts
   local screenshot_status
 
@@ -430,6 +434,7 @@ write_report() {
   skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
   jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
   cmp_command_recorder_summary="$(command_recorder_summary "${OUT_DIR}/new.log")"
+  jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${OUT_DIR}/new.log")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
@@ -456,6 +461,7 @@ write_report() {
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
     echo "- EXPECT_MIN_IMAGE_REFS: ${EXPECT_MIN_IMAGE_REFS}"
     echo "- EXPECT_MIN_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_IMAGE_CACHE_CLEARS}"
+    echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
     echo
     echo "## Modes"
@@ -493,6 +499,7 @@ write_report() {
     echo "- CMP command recorder: ${cmp_command_recorder_summary}"
     echo "- Skiko command frames: ${skiko_command_summary}"
     echo "- JBR command frames: ${jbr_command_summary}"
+    echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
     echo
     echo "## Screenshot Assertion"
     echo
@@ -591,6 +598,12 @@ validate_report() {
         max_image_cache_clears="$(max_command_recorder_field "${OUT_DIR}/new.log" "imageCacheClears")"
         [[ "${max_image_cache_clears}" -ge "${EXPECT_MIN_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("CMP recorder max imageCacheClears ${max_image_cache_clears} below expected ${EXPECT_MIN_IMAGE_CACHE_CLEARS}")
+      fi
+      if [[ "${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}" -gt 0 ]]; then
+        local jbr_image_cache_clears
+        jbr_image_cache_clears="$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
+        [[ "${jbr_image_cache_clears}" -ge "${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}" ]] ||
+          failures+=("JBR image cache clear markers ${jbr_image_cache_clears} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}")
       fi
     fi
     if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" != "command-stream-invalid" ]]; then
