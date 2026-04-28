@@ -17,6 +17,7 @@ ASSERT_SCRIPT="${ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-mixed-window-scree
 COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-command-window-screenshot.sh}"
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
+SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
 SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
@@ -253,6 +254,8 @@ write_report() {
   local new_markers
   local old_app_frame_summary
   local new_app_frame_summary
+  local old_swing_frame_summary
+  local new_swing_frame_summary
   local skiko_picture_summary
   local jbr_picture_summary
   local skiko_command_summary
@@ -266,6 +269,8 @@ write_report() {
   new_markers="$(grep -c "${FALLBACK_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
   old_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${OUT_DIR}/old.log")"
   new_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${OUT_DIR}/new.log")"
+  old_swing_frame_summary="$(frame_marker_summary "${SWING_FRAME_MARKER}" "${OUT_DIR}/old.log")"
+  new_swing_frame_summary="$(frame_marker_summary "${SWING_FRAME_MARKER}" "${OUT_DIR}/new.log")"
   skiko_picture_summary="$(payload_marker_summary "${SKIKO_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
   jbr_picture_summary="$(payload_marker_summary "${JBR_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
   skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
@@ -298,6 +303,11 @@ write_report() {
     echo
     echo "- old: ${old_app_frame_summary}"
     echo "- new: ${new_app_frame_summary}"
+    echo
+    echo "## Swing Repaint Markers"
+    echo
+    echo "- old: ${old_swing_frame_summary}"
+    echo "- new: ${new_swing_frame_summary}"
     echo
     echo "## Fallback Markers"
     echo

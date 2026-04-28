@@ -39,11 +39,14 @@ import androidx.compose.ui.zIndex
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Font
+import java.awt.Graphics
+import java.awt.Graphics2D
+import java.awt.RenderingHints
 import javax.swing.BorderFactory
+import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JProgressBar
 import javax.swing.SwingUtilities
 import javax.swing.Timer
 import kotlin.math.PI
@@ -60,7 +63,9 @@ import java.util.concurrent.atomic.AtomicLong
 
 private const val WindowTitle = "MagicJewelJbrSkiaWindow"
 private const val FrameMarker = "MAGIC_JEWEL_COMPOSE_FRAME"
+private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private val FrameCounter = AtomicLong()
+private val SwingFrameCounter = AtomicLong()
 
 fun main() {
     SwingUtilities.invokeLater(::showMagicJewel)
@@ -233,12 +238,7 @@ private fun createSwingStatusPanel(): JPanel {
     val counter = JLabel("ticks=0").apply {
         foreground = AwtColor(220, 240, 255)
     }
-    val progress = JProgressBar().apply {
-        isIndeterminate = true
-        foreground = AwtColor(255, 166, 87)
-        background = AwtColor(21, 35, 54)
-        border = BorderFactory.createEmptyBorder()
-    }
+    val progress = MovingSwingProgressBar()
     var swingTicks = 0
     Timer(80) {
         swingTicks++
@@ -255,5 +255,51 @@ private fun createSwingStatusPanel(): JPanel {
         add(title, BorderLayout.NORTH)
         add(counter, BorderLayout.CENTER)
         add(progress, BorderLayout.SOUTH)
+    }
+}
+
+private class MovingSwingProgressBar : JComponent() {
+    private var phase = 0
+    private val timer = Timer(33) {
+        phase = (phase + 7) % 280
+        System.err.println("$SwingFrameMarker frame=${SwingFrameCounter.incrementAndGet()}")
+        repaint()
+    }.apply {
+        isRepeats = true
+        start()
+    }
+
+    init {
+        preferredSize = Dimension(220, 18)
+        minimumSize = Dimension(120, 18)
+        background = AwtColor(21, 35, 54)
+        foreground = AwtColor(255, 166, 87)
+        isOpaque = false
+    }
+
+    override fun removeNotify() {
+        timer.stop()
+        super.removeNotify()
+    }
+
+    override fun paintComponent(g: Graphics) {
+        val g2 = g.create() as Graphics2D
+        try {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+            g2.color = AwtColor(236, 240, 245)
+            g2.fillRoundRect(0, 3, width, height - 6, 9, 9)
+            g2.color = AwtColor(218, 224, 232)
+            g2.drawRoundRect(0, 3, width - 1, height - 7, 9, 9)
+
+            val blockWidth = (width * 0.34).toInt().coerceAtLeast(48)
+            val travel = (width + blockWidth).coerceAtLeast(1)
+            val x = ((phase * travel) / 280) - blockWidth
+            g2.color = AwtColor(255, 166, 87)
+            g2.fillRoundRect(x, 4, blockWidth, height - 8, 8, 8)
+            g2.color = AwtColor(255, 211, 61, 180)
+            g2.fillRoundRect(x + blockWidth / 3, 5, blockWidth / 3, height - 10, 7, 7)
+        } finally {
+            g2.dispose()
+        }
     }
 }
