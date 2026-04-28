@@ -80,7 +80,12 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
 }
 
 tasks.named<JavaExec>("run") {
+    val patchedCompose = patchedComposeRuntimeJars()
+    classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
     configureMagicJewelJvm(interoperable = false)
+    doFirst {
+        logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
+    }
 }
 
 tasks.register<JavaExec>("runJbrSkiaInterop") {

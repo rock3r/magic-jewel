@@ -1,5 +1,11 @@
 package com.magicjewel
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,15 +28,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposePanel
+import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.Font
+import javax.swing.BorderFactory
 import javax.swing.JFrame
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JProgressBar
 import javax.swing.SwingUtilities
+import javax.swing.Timer
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -39,8 +55,12 @@ import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.ui.component.DefaultButton
 import org.jetbrains.jewel.ui.component.OutlinedButton
 import org.jetbrains.jewel.ui.component.Text
+import java.awt.Color as AwtColor
+import java.util.concurrent.atomic.AtomicLong
 
 private const val WindowTitle = "MagicJewelJbrSkiaWindow"
+private const val FrameMarker = "MAGIC_JEWEL_COMPOSE_FRAME"
+private val FrameCounter = AtomicLong()
 
 fun main() {
     SwingUtilities.invokeLater(::showMagicJewel)
@@ -69,6 +89,17 @@ private fun showMagicJewel() {
 @Composable
 private fun MagicJewelApp() {
     var ticks by remember { mutableIntStateOf(0) }
+    val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
+    val phase by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "always-on-progress-phase",
+    )
+
     LaunchedEffect(Unit) {
         while (true) {
             delay(250)
@@ -94,6 +125,7 @@ private fun MagicJewelApp() {
 
         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
             Canvas(modifier = Modifier.fillMaxSize()) {
+                System.err.println("$FrameMarker frame=${FrameCounter.incrementAndGet()}")
                 val stripeHeight = size.height / 5f
                 drawRect(Color(0xFF2DA44E), size = Size(size.width, stripeHeight * 2f))
                 drawRect(
@@ -111,10 +143,25 @@ private fun MagicJewelApp() {
                     radius = 42f,
                     center = Offset(size.width - 112f, 96f),
                 )
-                val phase = ticks * 0.38
+                val sweep = phase * size.width
+                drawRect(
+                    color = Color(0xFFFFA657),
+                    topLeft = Offset((sweep % size.width) - size.width * 0.24f, 12f),
+                    size = Size(size.width * 0.24f, 18f),
+                )
+                repeat(52) { index ->
+                    val x = ((index * 43f) + phase * 860f) % (size.width + 120f) - 60f
+                    drawLine(
+                        color = Color.White.copy(alpha = 0.32f),
+                        start = Offset(x, 38f),
+                        end = Offset(x + 72f, size.height - 18f),
+                        strokeWidth = 3f,
+                    )
+                }
+                val spokePhase = ticks * 0.38 + phase * PI * 2.0
                 val center = Offset(size.width * 0.52f, size.height * 0.55f)
                 repeat(18) { index ->
-                    val angle = phase + index * (PI * 2.0 / 18.0)
+                    val angle = spokePhase + index * (PI * 2.0 / 18.0)
                     val outer = Offset(
                         center.x + cos(angle).toFloat() * 180f,
                         center.y + sin(angle).toFloat() * 120f,
@@ -129,11 +176,33 @@ private fun MagicJewelApp() {
                 }
                 drawCircle(Color.White.copy(alpha = 0.55f), radius = 190f, center = center, style = Stroke(width = 5f))
             }
+
+            SwingPanel(
+                factory = ::createSwingStatusPanel,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-28).dp, y = 34.dp)
+                    .size(width = 300.dp, height = 118.dp)
+                    .zIndex(1f),
+            )
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-52).dp, y = 128.dp)
+                    .size(width = 142.dp, height = 34.dp)
+                    .background(Color(0xCC824EDF))
+                    .zIndex(2f),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text("Compose overlay")
+            }
+
             Column(
-                modifier = Modifier.align(Alignment.BottomStart).padding(24.dp),
+                modifier = Modifier.align(Alignment.BottomStart).padding(24.dp).zIndex(2f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text("Deterministic color fields plus an animated Skia-heavy spoke test")
+                Text("Deterministic color fields, Swing island, and always-on animation")
                 Text("Window title: $WindowTitle")
             }
         }
@@ -153,5 +222,38 @@ private fun MagicJewelApp() {
                 )
             }
         }
+    }
+}
+
+private fun createSwingStatusPanel(): JPanel {
+    val title = JLabel("Swing island").apply {
+        font = Font(Font.SANS_SERIF, Font.BOLD, 13)
+        foreground = AwtColor(255, 255, 255)
+    }
+    val counter = JLabel("ticks=0").apply {
+        foreground = AwtColor(220, 240, 255)
+    }
+    val progress = JProgressBar().apply {
+        isIndeterminate = true
+        foreground = AwtColor(255, 166, 87)
+        background = AwtColor(21, 35, 54)
+        border = BorderFactory.createEmptyBorder()
+    }
+    var swingTicks = 0
+    Timer(80) {
+        swingTicks++
+        counter.text = "Swing timer ticks=$swingTicks"
+    }.start()
+
+    return JPanel(BorderLayout(10, 8)).apply {
+        name = "MagicJewelSwingIsland"
+        background = AwtColor(28, 47, 72)
+        border = BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(AwtColor(255, 211, 61), 3, true),
+            BorderFactory.createEmptyBorder(10, 12, 10, 12),
+        )
+        add(title, BorderLayout.NORTH)
+        add(counter, BorderLayout.CENTER)
+        add(progress, BorderLayout.SOUTH)
     }
 }

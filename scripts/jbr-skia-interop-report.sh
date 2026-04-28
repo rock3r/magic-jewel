@@ -6,19 +6,23 @@ ROOT_DIR="${ROOT_DIR:-$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)}"
 OUT_DIR="${OUT_DIR:-${ROOT_DIR}/out/jbr-skia-interop-report/$(date +%Y%m%d-%H%M%S)}"
 DURATION_SECONDS="${DURATION_SECONDS:-20}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
+STARTUP_TIMEOUT_SECONDS="${STARTUP_TIMEOUT_SECONDS:-45}"
 GRADLE="${GRADLE:-${ROOT_DIR}/gradlew}"
 SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 CAPTURE_WINDOW_QUERY="${CAPTURE_WINDOW_QUERY:-MagicJewelJbrSkiaWindow}"
+APP_PROCESS_QUERY="${APP_PROCESS_QUERY:-com.magicjewel.MainKt}"
 CMP_SCRIPTS_DIR="${CMP_SCRIPTS_DIR:-/Users/rock3r/src/cmp-jbr-skia-poc/compose/desktop/desktop/samples/scripts}"
 CAPTURE_SCRIPT="${CAPTURE_SCRIPT:-${CMP_SCRIPTS_DIR}/capture-macos-window.sh}"
-ASSERT_SCRIPT="${ASSERT_SCRIPT:-${CMP_SCRIPTS_DIR}/assert-jbr-skia-window-screenshot.sh}"
+ASSERT_SCRIPT="${ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-mixed-window-screenshot.sh}"
 COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-command-window-screenshot.sh}"
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
+APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
+MIXED_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_MIXED_SCREENSHOT_COUNTS"
 COMMAND_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_COMMAND_SCREENSHOT_COUNTS"
 
 mkdir -p "${OUT_DIR}"
@@ -35,14 +39,17 @@ Environment:
   OUT_DIR                  Report directory. Defaults under out/jbr-skia-interop-report/.
   DURATION_SECONDS         Seconds to keep each sample run alive. Default: 20.
   SAMPLE_INTERVAL_SECONDS  Seconds between ps samples. Default: 1.
+  STARTUP_TIMEOUT_SECONDS  Seconds to wait for the app process before measuring. Default: 45.
   SKIKO_VERSION            Local Skiko version override. Default: 0.0.0-SNAPSHOT.
   JBR_SKIA_RENDER_MODE     New-mode renderer: picture, commands, or diagnostic. Default: picture.
   DESKTOP_PATCH            Patched java.desktop classes. Default: /tmp/jbr-skia-run/desktop.
   JBR_API_SHIM             Public JBR API shim jar. Default: /tmp/jbr-api-shim.jar.
   JBR_SKIA_LIB             Native JBR Skia interop dylib. Default: /tmp/jbr-skia-native/libjbrskiainterop.dylib.
-  CMP_SCRIPTS_DIR          CMP sample scripts directory containing capture/assert helpers.
+  CMP_SCRIPTS_DIR          CMP sample scripts directory containing the capture helper.
+  ASSERT_SCRIPT            Picture/mixed-mode screenshot assertion helper.
   COMMAND_ASSERT_SCRIPT    Command-mode screenshot assertion helper.
   CAPTURE_WINDOW_QUERY     Window title/owner to capture. Default: MagicJewelJbrSkiaWindow.
+  APP_PROCESS_QUERY        Process command substring for the launched app. Default: com.magicjewel.MainKt.
 EOF_USAGE
 }
 
@@ -69,6 +76,7 @@ process_tree() {
   {
     echo "${root_pid}"
     descendants_of "${root_pid}"
+    pgrep -f "${APP_PROCESS_QUERY}" 2>/dev/null || true
   } | sort -u
 }
 
@@ -133,11 +141,23 @@ run_mode() {
   launch_mode "${mode}" > "${log}" 2>&1 &
 
   local root_pid="$!"
-  local end_time=$(( $(date +%s) + DURATION_SECONDS ))
+  local startup_deadline=$(( $(date +%s) + STARTUP_TIMEOUT_SECONDS ))
+  local end_time=0
   local screenshot_done=false
 
   set +e
-  while kill -0 "${root_pid}" 2>/dev/null && [[ "$(date +%s)" -lt "${end_time}" ]]; do
+  while kill -0 "${root_pid}" 2>/dev/null; do
+    local now
+    now="$(date +%s)"
+    if [[ "${end_time}" -eq 0 ]]; then
+      if pgrep -f "${APP_PROCESS_QUERY}" >/dev/null 2>&1 || [[ "${now}" -ge "${startup_deadline}" ]]; then
+        end_time=$(( now + DURATION_SECONDS ))
+      else
+        sleep "${SAMPLE_INTERVAL_SECONDS}"
+        continue
+      fi
+    fi
+    [[ "${now}" -lt "${end_time}" ]] || break
     sample_process_tree "${mode}" "${root_pid}" "${csv}"
     if [[ "${mode}" == "new"
         && "${screenshot_done}" == "false"
@@ -163,13 +183,18 @@ summarize_csv() {
   local csv="$1"
   awk -F, '
     NR > 1 {
-      cpu += $4
-      rss += $5
-      if ($4 > maxCpu) maxCpu = $4
-      if ($5 > maxRss) maxRss = $5
-      count++
+      key = $1 "," $2
+      cpuBySample[key] += $4
+      rssBySample[key] += $5
     }
     END {
+      for (key in cpuBySample) {
+        cpu += cpuBySample[key]
+        rss += rssBySample[key]
+        if (cpuBySample[key] > maxCpu) maxCpu = cpuBySample[key]
+        if (rssBySample[key] > maxRss) maxRss = rssBySample[key]
+        count++
+      }
       if (count == 0) {
         printf "samples=0 avg_cpu=0 max_cpu=0 avg_rss_kb=0 max_rss_kb=0"
       } else {
@@ -183,7 +208,7 @@ payload_marker_summary() {
   local marker="$1"
   local log="$2"
   local key="$3"
-  awk -v marker="${marker}" -v key="${key}" '
+  awk -v marker="${marker}" -v key="${key}" -v duration="${DURATION_SECONDS}" '
     index($0, marker) {
       frames++
       for (i = 1; i <= NF; i++) {
@@ -196,12 +221,28 @@ payload_marker_summary() {
     }
     END {
       if (frames == 0) {
-        printf "frames=0 avg_%s=0 max_%s=0", key, key
+        printf "frames=0 fps=0 avg_%s=0 max_%s=0", key, key
       } else {
-        printf "frames=%d avg_%s=%.0f max_%s=%.0f", frames, key, payload / frames, key, maxPayload
+        printf "frames=%d fps=%.1f avg_%s=%.0f max_%s=%.0f", frames, frames / duration, key, payload / frames, key, maxPayload
       }
     }
   ' "${log}"
+}
+
+frame_marker_summary() {
+  local marker="$1"
+  local log="$2"
+  local frames
+  frames="$(grep -c "${marker}" "${log}" 2>/dev/null || true)"
+  awk -v frames="${frames}" -v duration="${DURATION_SECONDS}" '
+    BEGIN {
+      if (duration <= 0) {
+        printf "frames=%d fps=0", frames
+      } else {
+        printf "frames=%d fps=%.1f", frames, frames / duration
+      }
+    }
+  '
 }
 
 write_report() {
@@ -210,6 +251,8 @@ write_report() {
   local new_summary
   local old_markers
   local new_markers
+  local old_app_frame_summary
+  local new_app_frame_summary
   local skiko_picture_summary
   local jbr_picture_summary
   local skiko_command_summary
@@ -221,11 +264,13 @@ write_report() {
   new_summary="$(summarize_csv "${OUT_DIR}/new-ps.csv")"
   old_markers="$(grep -c "${FALLBACK_MARKER}" "${OUT_DIR}/old.log" 2>/dev/null || true)"
   new_markers="$(grep -c "${FALLBACK_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
+  old_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${OUT_DIR}/old.log")"
+  new_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${OUT_DIR}/new.log")"
   skiko_picture_summary="$(payload_marker_summary "${SKIKO_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
   jbr_picture_summary="$(payload_marker_summary "${JBR_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
   skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
   jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
-  screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
+  screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
   {
@@ -233,9 +278,11 @@ write_report() {
     echo
     echo "- Generated: $(date -Iseconds)"
     echo "- Duration per mode: ${DURATION_SECONDS}s"
+    echo "- Startup timeout per mode: ${STARTUP_TIMEOUT_SECONDS}s"
     echo "- Root: ${ROOT_DIR}"
     echo "- SKIKO_VERSION: ${SKIKO_VERSION}"
     echo "- JBR_SKIA_RENDER_MODE: ${JBR_SKIA_RENDER_MODE:-picture}"
+    echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
     echo
     echo "## Modes"
     echo
@@ -246,6 +293,11 @@ write_report() {
     echo
     echo "- old: ${old_summary}"
     echo "- new: ${new_summary}"
+    echo
+    echo "## App Draw Markers"
+    echo
+    echo "- old: ${old_app_frame_summary}"
+    echo "- new: ${new_app_frame_summary}"
     echo
     echo "## Fallback Markers"
     echo
@@ -282,7 +334,8 @@ write_report() {
     echo
     echo "## Notes"
     echo
-    echo "CPU and RSS samples are coarse process-tree samples from ps. They are useful as a smoke signal only."
+    echo "CPU and RSS samples are coarse ps samples for the Gradle process tree plus the app process matched by APP_PROCESS_QUERY. They are useful as a smoke signal only, especially on a busy development machine."
+    echo "App draw FPS and Skiko/JBR marker FPS count draw/replay calls during the measurement window, not display-presented frames; they can exceed monitor refresh when rendering is not vsync-throttled."
     echo "Picture/command marker counts come from structured Skiko/JBR logs and are the primary signal that the JBR-owned replay path was used."
     echo "The new mode depends on patched local JBR, Skiko, and CMP artifacts; see README.md for the required paths and overrides."
   } > "${report}"
