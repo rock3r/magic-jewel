@@ -16,6 +16,9 @@ val localSkikoVersion = providers.environmentVariable("SKIKO_VERSION")
 val localCmpOut = providers.gradleProperty("localCmpOut")
     .orElse("/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core")
 val jbrSkiaJvmArgs = providers.gradleProperty("jbrSkiaInteropJvmArgs")
+val jbrSkiaRenderMode = providers.gradleProperty("jbrSkiaRenderMode")
+    .orElse(providers.environmentVariable("JBR_SKIA_RENDER_MODE"))
+    .orElse("picture")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -64,7 +67,11 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")
-        systemProperty("skiko.jbr.interop.renderPicture", "true")
+        when (jbrSkiaRenderMode.get()) {
+            "commands" -> systemProperty("skiko.jbr.interop.renderCommands", "true")
+            "diagnostic" -> systemProperty("skiko.jbr.interop.renderDiagnostic", "true")
+            else -> systemProperty("skiko.jbr.interop.renderPicture", "true")
+        }
     }
     jbrSkiaJvmArgs.orNull
         ?.split(Regex("\\s+"))

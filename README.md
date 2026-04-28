@@ -17,6 +17,7 @@ SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/run-jbr-skia.sh
 ```
 
 By default the interop run prepends patched CMP jars from `/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core`. Override that with `-PlocalCmpOut=/path/to/out/compose-multiplatform-core` if the worktree moves.
+Set `JBR_SKIA_RENDER_MODE=commands` to exercise the lower-level command-list probe instead of the default Skia picture replay path.
 
 Old/new process and marker report:
 

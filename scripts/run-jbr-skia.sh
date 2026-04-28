@@ -6,6 +6,7 @@ DESKTOP_PATCH=${DESKTOP_PATCH:-/tmp/jbr-skia-run/desktop}
 JBR_API_SHIM=${JBR_API_SHIM:-/tmp/jbr-api-shim.jar}
 JBR_SKIA_LIB=${JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}
 SKIKO_VERSION=${SKIKO_VERSION:-0.0.0-SNAPSHOT}
+JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
 
 JBR_ARGS=(
   "--patch-module=java.desktop=${DESKTOP_PATCH}"
@@ -17,4 +18,6 @@ JBR_ARGS=(
 
 printf -v JOINED_ARGS "%s " "${JBR_ARGS[@]}"
 cd "$ROOT"
-SKIKO_VERSION="$SKIKO_VERSION" ./gradlew runJbrSkiaInterop -PjbrSkiaInteropJvmArgs="${JOINED_ARGS% }"
+SKIKO_VERSION="$SKIKO_VERSION" ./gradlew runJbrSkiaInterop \
+  -PjbrSkiaInteropJvmArgs="${JOINED_ARGS% }" \
+  -PjbrSkiaRenderMode="${JBR_SKIA_RENDER_MODE}"

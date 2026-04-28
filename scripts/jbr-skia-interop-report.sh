@@ -15,6 +15,8 @@ ASSERT_SCRIPT="${ASSERT_SCRIPT:-${CMP_SCRIPTS_DIR}/assert-jbr-skia-window-screen
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
+SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
+JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
 
 mkdir -p "${OUT_DIR}"
@@ -32,6 +34,7 @@ Environment:
   DURATION_SECONDS         Seconds to keep each sample run alive. Default: 20.
   SAMPLE_INTERVAL_SECONDS  Seconds between ps samples. Default: 1.
   SKIKO_VERSION            Local Skiko version override. Default: 0.0.0-SNAPSHOT.
+  JBR_SKIA_RENDER_MODE     New-mode renderer: picture, commands, or diagnostic. Default: picture.
   DESKTOP_PATCH            Patched java.desktop classes. Default: /tmp/jbr-skia-run/desktop.
   JBR_API_SHIM             Public JBR API shim jar. Default: /tmp/jbr-api-shim.jar.
   JBR_SKIA_LIB             Native JBR Skia interop dylib. Default: /tmp/jbr-skia-native/libjbrskiainterop.dylib.
@@ -166,25 +169,26 @@ summarize_csv() {
   ' "${csv}"
 }
 
-picture_marker_summary() {
+payload_marker_summary() {
   local marker="$1"
   local log="$2"
-  awk -v marker="${marker}" '
+  local key="$3"
+  awk -v marker="${marker}" -v key="${key}" '
     index($0, marker) {
       frames++
       for (i = 1; i <= NF; i++) {
-        if ($i ~ /^bytes=/) {
+        if ($i ~ ("^" key "=")) {
           split($i, value, "=")
-          bytes += value[2]
-          if (value[2] > maxBytes) maxBytes = value[2]
+          payload += value[2]
+          if (value[2] > maxPayload) maxPayload = value[2]
         }
       }
     }
     END {
       if (frames == 0) {
-        printf "frames=0 avg_bytes=0 max_bytes=0"
+        printf "frames=0 avg_%s=0 max_%s=0", key, key
       } else {
-        printf "frames=%d avg_bytes=%.0f max_bytes=%.0f", frames, bytes / frames, maxBytes
+        printf "frames=%d avg_%s=%.0f max_%s=%.0f", frames, key, payload / frames, key, maxPayload
       }
     }
   ' "${log}"
@@ -198,6 +202,8 @@ write_report() {
   local new_markers
   local skiko_picture_summary
   local jbr_picture_summary
+  local skiko_command_summary
+  local jbr_command_summary
   local screenshot_counts
   local screenshot_status
 
@@ -205,8 +211,10 @@ write_report() {
   new_summary="$(summarize_csv "${OUT_DIR}/new-ps.csv")"
   old_markers="$(grep -c "${FALLBACK_MARKER}" "${OUT_DIR}/old.log" 2>/dev/null || true)"
   new_markers="$(grep -c "${FALLBACK_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
-  skiko_picture_summary="$(picture_marker_summary "${SKIKO_PICTURE_MARKER}" "${OUT_DIR}/new.log")"
-  jbr_picture_summary="$(picture_marker_summary "${JBR_PICTURE_MARKER}" "${OUT_DIR}/new.log")"
+  skiko_picture_summary="$(payload_marker_summary "${SKIKO_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
+  jbr_picture_summary="$(payload_marker_summary "${JBR_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
+  skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
+  jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
   screenshot_counts="$(grep "${SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
@@ -217,6 +225,7 @@ write_report() {
     echo "- Duration per mode: ${DURATION_SECONDS}s"
     echo "- Root: ${ROOT_DIR}"
     echo "- SKIKO_VERSION: ${SKIKO_VERSION}"
+    echo "- JBR_SKIA_RENDER_MODE: ${JBR_SKIA_RENDER_MODE:-picture}"
     echo
     echo "## Modes"
     echo
@@ -237,6 +246,11 @@ write_report() {
     echo
     echo "- Skiko picture frames: ${skiko_picture_summary}"
     echo "- JBR picture replays: ${jbr_picture_summary}"
+    echo
+    echo "## Command Replay Markers"
+    echo
+    echo "- Skiko command frames: ${skiko_command_summary}"
+    echo "- JBR command frames: ${jbr_command_summary}"
     echo
     echo "## Screenshot Assertion"
     echo
