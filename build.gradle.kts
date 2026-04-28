@@ -25,6 +25,12 @@ val composeTextEnabled = providers.gradleProperty("magicJewelComposeText")
 val composeImageEnabled = providers.gradleProperty("magicJewelComposeImage")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_IMAGE"))
     .orElse("false")
+val composeTransformEnabled = providers.gradleProperty("magicJewelComposeTransform")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_TRANSFORM"))
+    .orElse("false")
+val composeSaveLayerEnabled = providers.gradleProperty("magicJewelComposeSaveLayer")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_SAVELAYER"))
+    .orElse("false")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -72,6 +78,8 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("apple.awt.application.name", "Magic Jewel")
     systemProperty("magic.jewel.compose.text", composeTextEnabled.get())
     systemProperty("magic.jewel.compose.image", composeImageEnabled.get())
+    systemProperty("magic.jewel.compose.transform", composeTransformEnabled.get())
+    systemProperty("magic.jewel.compose.saveLayer", composeSaveLayerEnabled.get())
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")

@@ -31,11 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import java.awt.BorderLayout
@@ -68,6 +71,8 @@ private const val FrameMarker = "MAGIC_JEWEL_COMPOSE_FRAME"
 private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
+private const val ComposeTransformProperty = "magic.jewel.compose.transform"
+private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 
@@ -103,6 +108,12 @@ private fun MagicJewelApp() {
     }
     val composeImageEnabled = remember {
         System.getProperty(ComposeImageProperty, "false").toBoolean()
+    }
+    val composeTransformEnabled = remember {
+        System.getProperty(ComposeTransformProperty, "false").toBoolean()
+    }
+    val composeSaveLayerEnabled = remember {
+        System.getProperty(ComposeSaveLayerProperty, "false").toBoolean()
     }
     val imageProbe = remember(composeImageEnabled) {
         if (composeImageEnabled) createImageProbe() else null
@@ -195,6 +206,25 @@ private fun MagicJewelApp() {
                 drawCircle(Color.White.copy(alpha = 0.55f), radius = 190f, center = center, style = Stroke(width = 5f))
                 imageProbe?.let {
                     drawImage(it, topLeft = Offset(size.width - 212f, size.height - 126f))
+                }
+                if (composeTransformEnabled) {
+                    rotate(degrees = 18f, pivot = Offset(160f, size.height - 96f)) {
+                        drawRect(
+                            color = Color(0xFF22D3EE),
+                            topLeft = Offset(112f, size.height - 128f),
+                            size = Size(96f, 54f),
+                        )
+                    }
+                }
+                if (composeSaveLayerEnabled) {
+                    val layerPaint = Paint().apply {
+                        color = Color.White.copy(alpha = 0.6f)
+                    }
+                    drawIntoCanvas { canvas ->
+                        canvas.saveLayer(Rect(24f, size.height - 144f, 132f, size.height - 36f), layerPaint)
+                        canvas.drawRect(44f, size.height - 124f, 112f, size.height - 56f, layerPaint)
+                        canvas.restore()
+                    }
                 }
             }
 
