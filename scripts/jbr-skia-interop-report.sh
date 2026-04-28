@@ -93,6 +93,10 @@ if [[ "${1:-}" == "--dry-run" ]]; then
   DRY_RUN=true
 fi
 
+if [[ "${1:-}" == "--validate-only" ]]; then
+  VALIDATE_ONLY=true
+fi
+
 descendants_of() {
   local parent="$1"
   local child
@@ -508,6 +512,11 @@ validate_report() {
     return 1
   fi
 }
+
+if [[ "${VALIDATE_ONLY:-false}" == "true" ]]; then
+  validate_report
+  exit $?
+fi
 
 run_mode old
 run_mode new
