@@ -174,6 +174,7 @@ run_mode() {
   local screenshot_status="${OUT_DIR}/${mode}-screenshot-status.txt"
   local ready_marker="${SKIKO_PICTURE_MARKER}"
   local assert_script="${ASSERT_SCRIPT}"
+  local startup_marker="${APP_FRAME_MARKER}"
 
   if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" ]]; then
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
@@ -187,6 +188,9 @@ run_mode() {
       ready_marker="${SKIKO_COMMAND_MARKER}"
       assert_script="${COMMAND_ASSERT_SCRIPT}"
     fi
+  fi
+  if [[ "${mode}" == "new" ]]; then
+    startup_marker="${ready_marker}"
   fi
 
   printf 'timestamp,mode,pid,cpu_percent,rss_kb\n' > "${csv}"
@@ -208,7 +212,7 @@ run_mode() {
     local now
     now="$(date +%s)"
     if [[ "${end_time}" -eq 0 ]]; then
-      if pgrep -f "${APP_PROCESS_QUERY}" >/dev/null 2>&1 || [[ "${now}" -ge "${startup_deadline}" ]]; then
+      if grep -q "${startup_marker}" "${log}" 2>/dev/null || [[ "${now}" -ge "${startup_deadline}" ]]; then
         end_time=$(( now + DURATION_SECONDS ))
       else
         sleep "${SAMPLE_INTERVAL_SECONDS}"
