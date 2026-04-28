@@ -61,8 +61,22 @@ expected_fallback_requires_reason() {
   fi
 }
 
+command_stream_invalid_fallback_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=false"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=command-stream-invalid"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
+}
+
 strict_command_passes
 expected_image_fallback_passes
 expected_fallback_requires_reason
+command_stream_invalid_fallback_passes
 
 echo "JBR_SKIA_REPORT_VALIDATION_TESTS passed"

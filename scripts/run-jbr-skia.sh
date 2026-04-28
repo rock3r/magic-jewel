@@ -7,6 +7,7 @@ JBR_API_SHIM=${JBR_API_SHIM:-/tmp/jbr-api-shim.jar}
 JBR_SKIA_LIB=${JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}
 SKIKO_VERSION=${SKIKO_VERSION:-0.0.0-SNAPSHOT}
 JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
+MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM:-false}
 
 JBR_ARGS=(
   "--patch-module=java.desktop=${DESKTOP_PATCH}"
@@ -20,6 +21,9 @@ case "${JBR_SKIA_RENDER_MODE}" in
   commands)
     JBR_ARGS+=("-Dskiko.jbr.interop.renderCommands=true")
     JBR_ARGS+=("-Dcompose.jbr.skia.command.strict=true")
+    if [[ "${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}" == "true" ]]; then
+      JBR_ARGS+=("-Dskiko.jbr.interop.corruptCommandStream=true")
+    fi
     ;;
   diagnostic)
     JBR_ARGS+=("-Dskiko.jbr.interop.renderDiagnostic=true")

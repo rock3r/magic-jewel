@@ -39,12 +39,16 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_CLIP_OUT+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_CLIP_OUT=false
 fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=false
+fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_TRANSFORM
 export MAGIC_JEWEL_COMPOSE_SAVELAYER
 export MAGIC_JEWEL_COMPOSE_CLIP
 export MAGIC_JEWEL_COMPOSE_CLIP_OUT
+export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
@@ -173,7 +177,11 @@ run_mode() {
 
   if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" ]]; then
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
-      ready_marker="${SKIKO_PICTURE_MARKER}"
+      if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ]]; then
+        ready_marker="${FALLBACK_MARKER}"
+      else
+        ready_marker="${SKIKO_PICTURE_MARKER}"
+      fi
       assert_script="${ASSERT_SCRIPT}"
     else
       ready_marker="${SKIKO_COMMAND_MARKER}"
@@ -393,6 +401,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_SAVELAYER: ${MAGIC_JEWEL_COMPOSE_SAVELAYER}"
     echo "- MAGIC_JEWEL_COMPOSE_CLIP: ${MAGIC_JEWEL_COMPOSE_CLIP}"
     echo "- MAGIC_JEWEL_COMPOSE_CLIP_OUT: ${MAGIC_JEWEL_COMPOSE_CLIP_OUT}"
+    echo "- MAGIC_JEWEL_CORRUPT_COMMAND_STREAM: ${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
@@ -485,12 +494,20 @@ validate_report() {
 
     [[ "${recorder_frames}" -gt 0 ]] || failures+=("no CMP command recorder frames")
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
-      [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")
-      [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during expected fallback: ${jbr_command_frames}")
-      [[ "${skiko_picture_frames}" -gt 0 ]] || failures+=("no Skiko picture frames during expected fallback")
-      [[ "${jbr_picture_frames}" -gt 0 ]] || failures+=("no JBR picture frames during expected fallback")
-      if ! grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*.*${EXPECT_COMMAND_FALLBACK_REASON}=" "${OUT_DIR}/new.log" 2>/dev/null; then
-        failures+=("CMP recorder did not report ${EXPECT_COMMAND_FALLBACK_REASON} as an unsupported command operation")
+      if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ]]; then
+        [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames before invalid-stream fallback")
+        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during invalid-stream fallback: ${jbr_command_frames}")
+        if ! grep -q "${FALLBACK_MARKER} reason=command-stream-invalid" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("missing command-stream-invalid fallback marker")
+        fi
+      else
+        [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")
+        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during expected fallback: ${jbr_command_frames}")
+        [[ "${skiko_picture_frames}" -gt 0 ]] || failures+=("no Skiko picture frames during expected fallback")
+        [[ "${jbr_picture_frames}" -gt 0 ]] || failures+=("no JBR picture frames during expected fallback")
+        if ! grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*.*${EXPECT_COMMAND_FALLBACK_REASON}=" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("CMP recorder did not report ${EXPECT_COMMAND_FALLBACK_REASON} as an unsupported command operation")
+        fi
       fi
     else
       [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames")
@@ -502,7 +519,9 @@ validate_report() {
         failures+=("CMP recorder reported unsupported command operations")
       fi
     fi
-    [[ "${screenshot_status}" == "passed" ]] || failures+=("screenshot assertion did not pass")
+    if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" != "command-stream-invalid" ]]; then
+      [[ "${screenshot_status}" == "passed" ]] || failures+=("screenshot assertion did not pass")
+    fi
   fi
 
   {
