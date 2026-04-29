@@ -90,6 +90,7 @@ private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
 private const val ComposeClipPathProperty = "magic.jewel.compose.clipPath"
 private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
 private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
+private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -149,6 +150,9 @@ private fun MagicJewelApp() {
     }
     val composeDrawArcEnabled = remember {
         System.getProperty(ComposeDrawArcProperty, "false").toBoolean()
+    }
+    val composeDrawRoundRectEnabled = remember {
+        System.getProperty(ComposeDrawRoundRectProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -339,6 +343,21 @@ private fun MagicJewelApp() {
                         useCenter = true,
                         topLeft = Offset(size.width - 132f, size.height - 222f),
                         size = Size(84f, 84f),
+                        style = Stroke(width = 3f),
+                    )
+                }
+                if (composeDrawRoundRectEnabled) {
+                    drawRoundRect(
+                        color = Color(0xFF824EDF),
+                        topLeft = Offset(size.width - 372f, size.height - 238f),
+                        size = Size(96f, 64f),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(18f, 10f),
+                    )
+                    drawRoundRect(
+                        color = Color.White,
+                        topLeft = Offset(size.width - 372f, size.height - 238f),
+                        size = Size(96f, 64f),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(18f, 10f),
                         style = Stroke(width = 3f),
                     )
                 }
