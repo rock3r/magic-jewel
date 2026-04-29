@@ -47,6 +47,8 @@ var yellow = 0
 var swingPanel = 0
 var overlayPurple = 0
 var orangeProgress = 0
+var popupPink = 0
+var popupCyan = 0
 
 for y in 0..<height {
     for x in 0..<width {
@@ -76,10 +78,16 @@ for y in 0..<height {
         if r > 200 && g > 110 && g < 190 && b < 120 {
             orangeProgress += 1
         }
+        if r > 190 && g < 120 && b > 120 {
+            popupPink += 1
+        }
+        if r < 80 && g > 170 && b > 170 {
+            popupCyan += 1
+        }
     }
 }
 
-print("JBR_SKIA_MIXED_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) swingPanel=\(swingPanel) overlayPurple=\(overlayPurple) orangeProgress=\(orangeProgress)")
+print("JBR_SKIA_MIXED_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) swingPanel=\(swingPanel) overlayPurple=\(overlayPurple) orangeProgress=\(orangeProgress) popupPink=\(popupPink) popupCyan=\(popupCyan)")
 
 let checks: [(String, Int, Int)] = [
     ("green", green, 10000),
@@ -91,7 +99,19 @@ let checks: [(String, Int, Int)] = [
     ("orangeProgress", orangeProgress, 500),
 ]
 
+let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
+let popupChecks: [(String, Int, Int)] = popupStress
+    ? [
+        ("popupPink", popupPink, 200),
+        ("popupCyan", popupCyan, 80),
+      ]
+    : []
+
 for (name, count, minimum) in checks where count < minimum {
+    fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
+    exit(1)
+}
+for (name, count, minimum) in popupChecks where count < minimum {
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
     exit(1)
 }

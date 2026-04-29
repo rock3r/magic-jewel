@@ -29,6 +29,7 @@ EXPECT_MIN_IMAGE_CACHE_EVICTS="${EXPECT_MIN_IMAGE_CACHE_EVICTS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS="${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS:-0}"
+EXPECT_MIN_POPUP_FRAMES="${EXPECT_MIN_POPUP_FRAMES:-0}"
 EXPECT_MAX_IMAGE_DEFINES="${EXPECT_MAX_IMAGE_DEFINES:--1}"
 EXPECT_MAX_IMAGE_CACHE_CLEARS="${EXPECT_MAX_IMAGE_CACHE_CLEARS:--1}"
 EXPECT_MIN_SURFACE_CHANGES="${EXPECT_MIN_SURFACE_CHANGES:-0}"
@@ -117,6 +118,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_AUTO_RESIZE+x}" ]]; then
   MAGIC_JEWEL_AUTO_RESIZE=false
 fi
+if [[ -z "${MAGIC_JEWEL_POPUP_STRESS+x}" ]]; then
+  MAGIC_JEWEL_POPUP_STRESS=false
+fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
@@ -144,6 +148,7 @@ export MAGIC_JEWEL_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_INVALID_SWEEP_GRADIENT
 export MAGIC_JEWEL_AUTO_RESIZE
+export MAGIC_JEWEL_POPUP_STRESS
 export JBR_SKIA_NATIVE_TEXT
 export SKIKO_EXPECTED_ABI_ID_FOR_TEST
 export SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST
@@ -151,6 +156,8 @@ export SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
+POPUP_FRAME_MARKER="MAGIC_JEWEL_POPUP_FRAME"
+POPUP_SHOWN_MARKER="MAGIC_JEWEL_POPUP_SHOWN"
 SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
@@ -205,6 +212,7 @@ Environment:
   EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers. Default: 0.
   EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers with contextId=0x. Default: 0.
   EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS In strict command mode, require at least this many JBR-side image cache evict markers. Default: 0.
+  EXPECT_MIN_POPUP_FRAMES In strict command mode, require at least this many Swing popup paint markers. Default: 0.
   EXPECT_MAX_IMAGE_DEFINES In strict command mode, require CMP recorder max imageDefines at or below this value. Default: disabled.
   EXPECT_MAX_IMAGE_CACHE_CLEARS In strict command mode, require CMP recorder max imageCacheClears at or below this value. Default: disabled.
   EXPECT_MIN_SURFACE_CHANGES In strict command mode, require at least this many Skiko surface-change markers. Default: 0.
@@ -237,6 +245,7 @@ Environment:
   MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN Makes image cache churn images independent of frame ticks. Default: false.
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT Enables an invalid sweep-gradient stop probe. Default: false.
   MAGIC_JEWEL_AUTO_RESIZE Resizes the JFrame once after startup to exercise surface invalidation. Default: false.
+  MAGIC_JEWEL_POPUP_STRESS Shows an animated Swing popup over the ComposePanel. Default: false.
   SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
   SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST Forces Skiko's expected native metadata ABI for fallback validation. Empty by default.
   SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST Forces Skiko's required command capability mask for fallback validation. Empty by default.
@@ -449,6 +458,11 @@ run_mode() {
         && -x "${CAPTURE_SCRIPT}"
         && -x "${assert_script}"
         && $(grep -c "${ready_marker}" "${log}" 2>/dev/null) -gt 0 ]]; then
+      if [[ "${MAGIC_JEWEL_POPUP_STRESS}" == "true" &&
+          $(grep -c "${POPUP_SHOWN_MARKER}" "${log}" 2>/dev/null) -eq 0 ]]; then
+        sleep "${SAMPLE_INTERVAL_SECONDS}"
+        continue
+      fi
       if "${CAPTURE_SCRIPT}" "${CAPTURE_WINDOW_QUERY}" "${screenshot}" > "${OUT_DIR}/${mode}-capture.log" 2>&1; then
         if "${assert_script}" "${screenshot}" > "${screenshot_assertion}" 2>&1; then
           echo "passed" > "${screenshot_status}"
@@ -733,6 +747,9 @@ write_machine_summary() {
     echo "app_new_frames=$(grep -c "${APP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "swing_old_frames=$(grep -c "${SWING_FRAME_MARKER}" "${old_log}" 2>/dev/null || true)"
     echo "swing_new_frames=$(grep -c "${SWING_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "popup_old_frames=$(grep -c "${POPUP_FRAME_MARKER}" "${old_log}" 2>/dev/null || true)"
+    echo "popup_new_frames=$(grep -c "${POPUP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "popup_new_shown=$(grep -c "${POPUP_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "cmp_recorder_frames=$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "cmp_unsupported_max=$(max_command_recorder_field "${new_log}" "unsupported")"
     echo "cmp_unsupported_reasons=$(command_recorder_reasons "${new_log}")"
@@ -764,6 +781,8 @@ write_report() {
   local new_app_frame_summary
   local old_swing_frame_summary
   local new_swing_frame_summary
+  local old_popup_frame_summary
+  local new_popup_frame_summary
   local skiko_picture_summary
   local jbr_picture_summary
   local skiko_command_summary
@@ -792,6 +811,8 @@ write_report() {
   new_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${new_log}")"
   old_swing_frame_summary="$(frame_marker_summary "${SWING_FRAME_MARKER}" "${old_log}")"
   new_swing_frame_summary="$(frame_marker_summary "${SWING_FRAME_MARKER}" "${new_log}")"
+  old_popup_frame_summary="$(frame_marker_summary "${POPUP_FRAME_MARKER}" "${old_log}")"
+  new_popup_frame_summary="$(frame_marker_summary "${POPUP_FRAME_MARKER}" "${new_log}")"
   skiko_picture_summary="$(payload_marker_summary "${SKIKO_PICTURE_MARKER}" "${new_log}" "bytes")"
   jbr_picture_summary="$(payload_marker_summary "${JBR_PICTURE_MARKER}" "${new_log}" "bytes")"
   skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${new_log}" "commands")"
@@ -843,6 +864,7 @@ write_report() {
     echo "- MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN}"
     echo "- MAGIC_JEWEL_INVALID_SWEEP_GRADIENT: ${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT}"
     echo "- MAGIC_JEWEL_AUTO_RESIZE: ${MAGIC_JEWEL_AUTO_RESIZE}"
+    echo "- MAGIC_JEWEL_POPUP_STRESS: ${MAGIC_JEWEL_POPUP_STRESS}"
     echo "- JBR_SKIA_NATIVE_TEXT: ${JBR_SKIA_NATIVE_TEXT}"
     echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
     echo "- SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST: ${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-<unset>}"
@@ -857,6 +879,7 @@ write_report() {
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}"
+    echo "- EXPECT_MIN_POPUP_FRAMES: ${EXPECT_MIN_POPUP_FRAMES}"
     echo "- EXPECT_MAX_IMAGE_DEFINES: ${EXPECT_MAX_IMAGE_DEFINES}"
     echo "- EXPECT_MAX_IMAGE_CACHE_CLEARS: ${EXPECT_MAX_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_SURFACE_CHANGES: ${EXPECT_MIN_SURFACE_CHANGES}"
@@ -883,6 +906,11 @@ write_report() {
     echo
     echo "- old: ${old_swing_frame_summary}"
     echo "- new: ${new_swing_frame_summary}"
+    echo
+    echo "## Swing Popup Paint Markers"
+    echo
+    echo "- old: ${old_popup_frame_summary}"
+    echo "- new: ${new_popup_frame_summary}"
     echo
     echo "## Fallback Markers"
     echo
@@ -1091,6 +1119,12 @@ validate_report() {
         jbr_image_cache_evicts="$(grep -c "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}" 2>/dev/null || true)"
         [[ "${jbr_image_cache_evicts}" -ge "${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}" ]] ||
           failures+=("JBR image cache evict markers ${jbr_image_cache_evicts} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}")
+      fi
+      if [[ "${EXPECT_MIN_POPUP_FRAMES}" -gt 0 ]]; then
+        local popup_frames
+        popup_frames="$(grep -c "${POPUP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
+        [[ "${popup_frames}" -ge "${EXPECT_MIN_POPUP_FRAMES}" ]] ||
+          failures+=("Swing popup paint markers ${popup_frames} below expected ${EXPECT_MIN_POPUP_FRAMES}")
       fi
       if [[ "${EXPECT_MIN_SURFACE_CHANGES}" -gt 0 ]]; then
         local surface_changes

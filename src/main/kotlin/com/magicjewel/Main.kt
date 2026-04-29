@@ -109,9 +109,14 @@ private const val StableImageCacheChurnProperty = "magic.jewel.stableImageCacheC
 private const val InvalidSweepGradientProperty = "magic.jewel.invalidSweepGradient"
 private const val AutoResizeProperty = "magic.jewel.autoResize"
 private const val AutoResizeDelayMillisProperty = "magic.jewel.autoResizeDelayMillis"
+private const val PopupStressProperty = "magic.jewel.popupStress"
+private const val PopupStressDelayMillisProperty = "magic.jewel.popupStressDelayMillis"
 private const val ResizeMarker = "MAGIC_JEWEL_WINDOW_RESIZE"
+private const val PopupShownMarker = "MAGIC_JEWEL_POPUP_SHOWN"
+private const val PopupFrameMarker = "MAGIC_JEWEL_POPUP_FRAME"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
+private val PopupFrameCounter = AtomicLong()
 
 fun main() {
     SwingUtilities.invokeLater(::showMagicJewel)
@@ -134,7 +139,33 @@ private fun showMagicJewel() {
         pack()
         setLocationRelativeTo(null)
         isVisible = true
+        panel.schedulePopupStressIfNeeded()
         scheduleAutoResizeIfNeeded()
+    }
+}
+
+private fun ComposePanel.schedulePopupStressIfNeeded() {
+    if (!System.getProperty(PopupStressProperty, "false").toBoolean()) return
+
+    val delayMillis = System.getProperty(PopupStressDelayMillisProperty, "1600").toIntOrNull() ?: 1600
+    Timer(delayMillis) {
+        val panel = PopupStressPanel().apply {
+            name = "MagicJewelPopupStress"
+            bounds = java.awt.Rectangle(96, 214, 266, 88)
+        }
+        val rootPane = SwingUtilities.getRootPane(this) ?: return@Timer
+        val glassPane = JPanel(null).apply {
+            isOpaque = false
+            add(panel)
+        }
+        rootPane.glassPane = glassPane
+        glassPane.isVisible = true
+        glassPane.revalidate()
+        glassPane.repaint(panel.bounds)
+        System.err.println("$PopupShownMarker x=96 y=214 width=${panel.width} height=${panel.height}")
+    }.apply {
+        isRepeats = false
+        start()
     }
 }
 
@@ -872,6 +903,63 @@ private class MovingSwingProgressBar : JComponent() {
             g2.fillRoundRect(x, 4, blockWidth, height - 8, 8, 8)
             g2.color = AwtColor(255, 211, 61, 180)
             g2.fillRoundRect(x + blockWidth / 3, 5, blockWidth / 3, height - 10, 7, 7)
+        } finally {
+            g2.dispose()
+        }
+    }
+}
+
+private class PopupStressPanel : JPanel(BorderLayout(8, 6)) {
+    private val progress = PopupPulseBar()
+
+    init {
+        name = "MagicJewelPopupStressPanel"
+        background = AwtColor(255, 255, 255)
+        border = BorderFactory.createEmptyBorder(10, 12, 10, 12)
+        preferredSize = Dimension(260, 82)
+        add(
+            JLabel("Swing popup over Compose").apply {
+                foreground = AwtColor(17, 24, 39)
+                font = Font(Font.SANS_SERIF, Font.BOLD, 13)
+            },
+            BorderLayout.NORTH,
+        )
+        add(progress, BorderLayout.CENTER)
+    }
+}
+
+private class PopupPulseBar : JComponent() {
+    private val timer = Timer(33) {
+        repaint()
+        parent?.repaint()
+    }.apply {
+        isRepeats = true
+        start()
+    }
+
+    init {
+        preferredSize = Dimension(220, 28)
+        isOpaque = false
+    }
+
+    override fun removeNotify() {
+        timer.stop()
+        super.removeNotify()
+    }
+
+    override fun paintComponent(g: Graphics) {
+        val g2 = g.create() as Graphics2D
+        try {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+            g2.color = AwtColor(219, 234, 254)
+            g2.fillRoundRect(0, 6, width, height - 12, 12, 12)
+            g2.color = AwtColor(236, 72, 153)
+            val blockWidth = (width * 0.28).toInt().coerceAtLeast(42)
+            val x = movingProgressX(width, blockWidth, System.nanoTime())
+            g2.fillRoundRect(x, 7, blockWidth, height - 14, 11, 11)
+            g2.color = AwtColor(34, 211, 238, 210)
+            g2.fillOval(width - 34, 2, 28, 28)
+            System.err.println("$PopupFrameMarker frame=${PopupFrameCounter.incrementAndGet()}")
         } finally {
             g2.dispose()
         }
