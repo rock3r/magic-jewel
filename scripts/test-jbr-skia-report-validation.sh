@@ -224,6 +224,18 @@ command_stream_invalid_fallback_passes() {
   run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
 }
 
+abi_mismatch_fallback_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=abi-mismatch"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=abi-mismatch
+}
+
 native_abi_mismatch_fallback_passes() {
   local dir
   dir="$(make_report_dir)"
@@ -234,6 +246,47 @@ native_abi_mismatch_fallback_passes() {
   } > "${dir}/new.log"
 
   run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=native-abi-mismatch
+}
+
+command_capability_mismatch_fallback_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=command-capability-mismatch"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch
+}
+
+public_api_missing_fallback_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=public-api-missing"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=public-api-missing
+}
+
+handshake_fallback_fails_with_command_frames() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=abi-mismatch"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=abi-mismatch 2>/dev/null; then
+    echo "Expected handshake fallback validation to fail when command frames are present" >&2
+    return 1
+  fi
 }
 
 strict_command_passes
@@ -251,6 +304,10 @@ strict_command_fails_without_min_jbr_image_cache_clears
 expected_image_fallback_passes
 expected_fallback_requires_reason
 command_stream_invalid_fallback_passes
+abi_mismatch_fallback_passes
 native_abi_mismatch_fallback_passes
+command_capability_mismatch_fallback_passes
+public_api_missing_fallback_passes
+handshake_fallback_fails_with_command_frames
 
 echo "JBR_SKIA_REPORT_VALIDATION_TESTS passed"
