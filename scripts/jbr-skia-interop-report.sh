@@ -719,6 +719,7 @@ write_machine_summary() {
     echo "jbr_command_frames=$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_scoped_image_cache_clear_frames=$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
     echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_context_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_same_context_surface_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=false.*surfaceChanged=true" "${new_full_log}" 2>/dev/null || true)"
@@ -867,6 +868,7 @@ write_report() {
     echo "- JBR command frames: ${jbr_command_summary}"
     echo "- JBR command timing: ${jbr_command_timing_summary}"
     echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
+    echo "- JBR scoped image cache clears: $(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
     echo
     echo "## Surface Identity Markers"
     echo

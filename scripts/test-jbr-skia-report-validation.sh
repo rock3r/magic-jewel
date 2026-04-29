@@ -227,7 +227,7 @@ strict_command_requires_min_jbr_image_cache_clears() {
     echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0 imageCacheClears=1"
     echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
     echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
-    echo "JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR backend=native"
+    echo "JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR backend=native contextId=0x1234 cleared=3"
   } > "${dir}/new.log"
 
   run_validate_only "${dir}" EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1
