@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ROOT_DIR="${ROOT_DIR:-$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)}"
 OUT_DIR="${OUT_DIR:-${ROOT_DIR}/out/jbr-skia-interop-report/$(date +%Y%m%d-%H%M%S)}"
 DURATION_SECONDS="${DURATION_SECONDS:-20}"
+WARMUP_SECONDS="${WARMUP_SECONDS:-0}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 STARTUP_TIMEOUT_SECONDS="${STARTUP_TIMEOUT_SECONDS:-45}"
 GRADLE="${GRADLE:-${ROOT_DIR}/gradlew}"
@@ -73,6 +74,7 @@ CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
 MIXED_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_MIXED_SCREENSHOT_COUNTS"
 COMMAND_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_COMMAND_SCREENSHOT_COUNTS"
+SAMPLE_BEGIN_MARKER="MAGIC_JEWEL_REPORT_SAMPLE_BEGIN"
 
 mkdir -p "${OUT_DIR}"
 
@@ -87,6 +89,7 @@ and writes a Markdown report.
 Environment:
   OUT_DIR                  Report directory. Defaults under out/jbr-skia-interop-report/.
   DURATION_SECONDS         Seconds to keep each sample run alive. Default: 20.
+  WARMUP_SECONDS           Seconds to wait after startup marker before sampling/report window. Default: 0.
   SAMPLE_INTERVAL_SECONDS  Seconds between ps samples. Default: 1.
   STARTUP_TIMEOUT_SECONDS  Seconds to wait for the app process before measuring. Default: 45.
   SKIKO_VERSION            Local Skiko version override. Default: 0.0.0-SNAPSHOT.
@@ -226,6 +229,9 @@ run_mode() {
   local root_pid="$!"
   local startup_deadline=$(( $(date +%s) + STARTUP_TIMEOUT_SECONDS ))
   local end_time=0
+  local sample_start_time=0
+  local sample_start_line=0
+  local sample_started=false
   local screenshot_done=false
 
   set +e
@@ -234,14 +240,21 @@ run_mode() {
     now="$(date +%s)"
     if [[ "${end_time}" -eq 0 ]]; then
       if grep -q "${startup_marker}" "${log}" 2>/dev/null || [[ "${now}" -ge "${startup_deadline}" ]]; then
-        end_time=$(( now + DURATION_SECONDS ))
+        sample_start_time=$(( now + WARMUP_SECONDS ))
+        end_time=$(( sample_start_time + DURATION_SECONDS ))
       else
         sleep "${SAMPLE_INTERVAL_SECONDS}"
         continue
       fi
     fi
     [[ "${now}" -lt "${end_time}" ]] || break
-    sample_process_tree "${mode}" "${root_pid}" "${csv}"
+    if [[ "${now}" -ge "${sample_start_time}" ]]; then
+      if [[ "${sample_started}" == "false" ]]; then
+        sample_start_line=$(( $(wc -l < "${log}" 2>/dev/null || echo 0) + 1 ))
+        sample_started=true
+      fi
+      sample_process_tree "${mode}" "${root_pid}" "${csv}"
+    fi
     if [[ "${mode}" == "new"
         && "${screenshot_done}" == "false"
         && -x "${CAPTURE_SCRIPT}"
@@ -271,6 +284,14 @@ run_mode() {
 
   kill_process_tree "${root_pid}"
   wait "${root_pid}" >/dev/null 2>&1
+  if [[ "${sample_start_line}" -gt 0 ]]; then
+    {
+      echo "${SAMPLE_BEGIN_MARKER} mode=${mode} warmupSeconds=${WARMUP_SECONDS}"
+      tail -n +"${sample_start_line}" "${log}" 2>/dev/null || true
+    } > "${OUT_DIR}/${mode}-sampled.log"
+  else
+    cp "${log}" "${OUT_DIR}/${mode}-sampled.log"
+  fi
   set -e
 }
 
@@ -474,22 +495,26 @@ write_report() {
   local jbr_image_cache_clear_summary
   local screenshot_counts
   local screenshot_status
+  local old_log="${OUT_DIR}/old-sampled.log"
+  local new_log="${OUT_DIR}/new-sampled.log"
+  [[ -f "${old_log}" ]] || old_log="${OUT_DIR}/old.log"
+  [[ -f "${new_log}" ]] || new_log="${OUT_DIR}/new.log"
 
   old_summary="$(summarize_csv "${OUT_DIR}/old-ps.csv")"
   new_summary="$(summarize_csv "${OUT_DIR}/new-ps.csv")"
-  old_markers="$(grep -c "${FALLBACK_MARKER}" "${OUT_DIR}/old.log" 2>/dev/null || true)"
-  new_markers="$(grep -c "${FALLBACK_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
-  old_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${OUT_DIR}/old.log")"
-  new_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${OUT_DIR}/new.log")"
-  old_swing_frame_summary="$(frame_marker_summary "${SWING_FRAME_MARKER}" "${OUT_DIR}/old.log")"
-  new_swing_frame_summary="$(frame_marker_summary "${SWING_FRAME_MARKER}" "${OUT_DIR}/new.log")"
-  skiko_picture_summary="$(payload_marker_summary "${SKIKO_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
-  jbr_picture_summary="$(payload_marker_summary "${JBR_PICTURE_MARKER}" "${OUT_DIR}/new.log" "bytes")"
-  skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
-  jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
-  cmp_command_recorder_summary="$(command_recorder_summary "${OUT_DIR}/new.log")"
-  jbr_command_timing_summary="$(jbr_command_timing_summary "${OUT_DIR}/new.log")"
-  jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${OUT_DIR}/new.log")"
+  old_markers="$(grep -c "${FALLBACK_MARKER}" "${old_log}" 2>/dev/null || true)"
+  new_markers="$(grep -c "${FALLBACK_MARKER}" "${new_log}" 2>/dev/null || true)"
+  old_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${old_log}")"
+  new_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${new_log}")"
+  old_swing_frame_summary="$(frame_marker_summary "${SWING_FRAME_MARKER}" "${old_log}")"
+  new_swing_frame_summary="$(frame_marker_summary "${SWING_FRAME_MARKER}" "${new_log}")"
+  skiko_picture_summary="$(payload_marker_summary "${SKIKO_PICTURE_MARKER}" "${new_log}" "bytes")"
+  jbr_picture_summary="$(payload_marker_summary "${JBR_PICTURE_MARKER}" "${new_log}" "bytes")"
+  skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${new_log}" "commands")"
+  jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${new_log}" "commands")"
+  cmp_command_recorder_summary="$(command_recorder_summary "${new_log}")"
+  jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
+  jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
@@ -498,6 +523,7 @@ write_report() {
     echo
     echo "- Generated: $(date -Iseconds)"
     echo "- Duration per mode: ${DURATION_SECONDS}s"
+    echo "- Warmup per mode: ${WARMUP_SECONDS}s"
     echo "- Startup timeout per mode: ${STARTUP_TIMEOUT_SECONDS}s"
     echo "- Root: ${ROOT_DIR}"
     echo "- SKIKO_VERSION: ${SKIKO_VERSION}"
@@ -574,6 +600,8 @@ write_report() {
     echo
     echo "- old log: old.log"
     echo "- new log: new.log"
+    echo "- old sampled log: old-sampled.log"
+    echo "- new sampled log: new-sampled.log"
     echo "- old ps samples: old-ps.csv"
     echo "- new ps samples: new-ps.csv"
     echo
@@ -593,6 +621,8 @@ validate_report() {
   local mode="${JBR_SKIA_RENDER_MODE:-picture}"
   local expect_strict="${EXPECT_STRICT_COMMANDS:-true}"
   local failures=()
+  local new_log="${OUT_DIR}/new-sampled.log"
+  [[ -f "${new_log}" ]] || new_log="${OUT_DIR}/new.log"
 
   if [[ "${mode}" == "commands" && "${expect_strict}" == "true" ]]; then
     local recorder_frames
@@ -602,11 +632,11 @@ validate_report() {
     local jbr_picture_frames
     local screenshot_status
 
-    recorder_frames="$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
-    skiko_command_frames="$(grep -c "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
-    jbr_command_frames="$(grep -c "${JBR_COMMAND_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
-    skiko_picture_frames="$(grep -c "${SKIKO_PICTURE_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
-    jbr_picture_frames="$(grep -c "${JBR_PICTURE_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
+    recorder_frames="$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${new_log}" 2>/dev/null || true)"
+    skiko_command_frames="$(grep -c "${SKIKO_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
+    jbr_command_frames="$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
+    skiko_picture_frames="$(grep -c "${SKIKO_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
+    jbr_picture_frames="$(grep -c "${JBR_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
     [[ "${recorder_frames}" -gt 0 ]] || failures+=("no CMP command recorder frames")
@@ -614,7 +644,7 @@ validate_report() {
       if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ]]; then
         [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames before invalid-stream fallback")
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during invalid-stream fallback: ${jbr_command_frames}")
-        if ! grep -q "${FALLBACK_MARKER} reason=command-stream-invalid" "${OUT_DIR}/new.log" 2>/dev/null; then
+        if ! grep -q "${FALLBACK_MARKER} reason=command-stream-invalid" "${new_log}" 2>/dev/null; then
           failures+=("missing command-stream-invalid fallback marker")
         fi
       else
@@ -622,7 +652,7 @@ validate_report() {
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during expected fallback: ${jbr_command_frames}")
         [[ "${skiko_picture_frames}" -gt 0 ]] || failures+=("no Skiko picture frames during expected fallback")
         [[ "${jbr_picture_frames}" -gt 0 ]] || failures+=("no JBR picture frames during expected fallback")
-        if ! grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*.*${EXPECT_COMMAND_FALLBACK_REASON}=" "${OUT_DIR}/new.log" 2>/dev/null; then
+        if ! grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*.*${EXPECT_COMMAND_FALLBACK_REASON}=" "${new_log}" 2>/dev/null; then
           failures+=("CMP recorder did not report ${EXPECT_COMMAND_FALLBACK_REASON} as an unsupported command operation")
         fi
       fi
@@ -636,36 +666,36 @@ validate_report() {
       [[ "${command_frame_delta}" -le 1 ]] || failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames}")
       [[ "${skiko_picture_frames}" -eq 0 ]] || failures+=("unexpected Skiko picture frames in strict command mode: ${skiko_picture_frames}")
       [[ "${jbr_picture_frames}" -eq 0 ]] || failures+=("unexpected JBR picture frames in strict command mode: ${jbr_picture_frames}")
-      if grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*" "${OUT_DIR}/new.log" 2>/dev/null; then
+      if grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*" "${new_log}" 2>/dev/null; then
         failures+=("CMP recorder reported unsupported command operations")
       fi
       if [[ "${EXPECT_MIN_TEXT_COMMANDS}" -gt 0 ]]; then
         local max_text_commands
-        max_text_commands="$(max_command_recorder_field "${OUT_DIR}/new.log" "textCommands")"
+        max_text_commands="$(max_command_recorder_field "${new_log}" "textCommands")"
         [[ "${max_text_commands}" -ge "${EXPECT_MIN_TEXT_COMMANDS}" ]] ||
           failures+=("CMP recorder max textCommands ${max_text_commands} below expected ${EXPECT_MIN_TEXT_COMMANDS}")
       fi
       if [[ "${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}" -gt 0 ]]; then
         local max_paragraph_text_commands
-        max_paragraph_text_commands="$(max_command_recorder_field "${OUT_DIR}/new.log" "paragraphTextCommands")"
+        max_paragraph_text_commands="$(max_command_recorder_field "${new_log}" "paragraphTextCommands")"
         [[ "${max_paragraph_text_commands}" -ge "${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}" ]] ||
           failures+=("CMP recorder max paragraphTextCommands ${max_paragraph_text_commands} below expected ${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}")
       fi
       if [[ "${EXPECT_MIN_IMAGE_REFS}" -gt 0 ]]; then
         local max_image_refs
-        max_image_refs="$(max_command_recorder_field "${OUT_DIR}/new.log" "imageRefs")"
+        max_image_refs="$(max_command_recorder_field "${new_log}" "imageRefs")"
         [[ "${max_image_refs}" -ge "${EXPECT_MIN_IMAGE_REFS}" ]] ||
           failures+=("CMP recorder max imageRefs ${max_image_refs} below expected ${EXPECT_MIN_IMAGE_REFS}")
       fi
       if [[ "${EXPECT_MIN_IMAGE_CACHE_CLEARS}" -gt 0 ]]; then
         local max_image_cache_clears
-        max_image_cache_clears="$(max_command_recorder_field "${OUT_DIR}/new.log" "imageCacheClears")"
+        max_image_cache_clears="$(max_command_recorder_field "${new_log}" "imageCacheClears")"
         [[ "${max_image_cache_clears}" -ge "${EXPECT_MIN_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("CMP recorder max imageCacheClears ${max_image_cache_clears} below expected ${EXPECT_MIN_IMAGE_CACHE_CLEARS}")
       fi
       if [[ "${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}" -gt 0 ]]; then
         local jbr_image_cache_clears
-        jbr_image_cache_clears="$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null || true)"
+        jbr_image_cache_clears="$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
         [[ "${jbr_image_cache_clears}" -ge "${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("JBR image cache clear markers ${jbr_image_cache_clears} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}")
       fi
