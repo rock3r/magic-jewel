@@ -259,6 +259,38 @@ native_abi_mismatch_fallback_passes() {
   grep -q "^jbr_command_frames=0$" "${dir}/summary.properties"
 }
 
+new_skiko_old_jbr_fallback_matrix_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=native-abi-mismatch"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=native-abi-mismatch
+  grep -q "^validation_status=passed$" "${dir}/summary.properties"
+  grep -q "^fallback_new_count=1$" "${dir}/summary.properties"
+  grep -q "^skiko_command_frames=0$" "${dir}/summary.properties"
+  grep -q "^jbr_command_frames=0$" "${dir}/summary.properties"
+}
+
+old_skiko_new_jbr_without_structured_marker_fails() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=public-api-missing 2>/dev/null; then
+    echo "Expected old-Skiko/new-JBR validation to fail without a structured fallback marker" >&2
+    return 1
+  fi
+  grep -q "^validation_status=failed$" "${dir}/summary.properties"
+  grep -q "validation_failures=.*missing public-api-missing fallback marker" "${dir}/summary.properties"
+}
+
 command_capability_mismatch_fallback_passes() {
   local dir
   dir="$(make_report_dir)"
@@ -317,6 +349,8 @@ expected_fallback_requires_reason
 command_stream_invalid_fallback_passes
 abi_mismatch_fallback_passes
 native_abi_mismatch_fallback_passes
+new_skiko_old_jbr_fallback_matrix_passes
+old_skiko_new_jbr_without_structured_marker_fails
 command_capability_mismatch_fallback_passes
 public_api_missing_fallback_passes
 handshake_fallback_fails_with_command_frames
