@@ -42,7 +42,7 @@ surface_change_summary_is_machine_readable() {
   dir="$(make_report_dir)"
   {
     echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
-    echo "SKIKO_JBR_INTEROP_SURFACE_CHANGED oldSurfaceId=0x1 newSurfaceId=0x2 oldMetalTexture=0x3 newMetalTexture=0x4"
+    echo "SKIKO_JBR_INTEROP_SURFACE_CHANGED oldContextId=0x1 newContextId=0x1 oldSurfaceId=0x2 newSurfaceId=0x3 oldMetalTexture=0x4 newMetalTexture=0x5"
     echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
     echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
   } > "${dir}/new.log"
@@ -57,7 +57,7 @@ strict_command_requires_min_surface_changes() {
   dir="$(make_report_dir)"
   {
     echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
-    echo "SKIKO_JBR_INTEROP_SURFACE_CHANGED oldSurfaceId=0x1 newSurfaceId=0x2 oldMetalTexture=0x3 newMetalTexture=0x4"
+    echo "SKIKO_JBR_INTEROP_SURFACE_CHANGED oldContextId=0x1 newContextId=0x1 oldSurfaceId=0x2 newSurfaceId=0x3 oldMetalTexture=0x4 newMetalTexture=0x5"
     echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
     echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
   } > "${dir}/new.log"
