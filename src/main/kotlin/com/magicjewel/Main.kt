@@ -94,6 +94,7 @@ private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
 private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
+private const val ComposeLinearGradientPathProperty = "magic.jewel.compose.linearGradientPath"
 private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
 private const val ComposeRadialGradientRoundRectProperty = "magic.jewel.compose.radialGradientRoundRect"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
@@ -164,6 +165,9 @@ private fun MagicJewelApp() {
     }
     val composeLinearGradientRoundRectEnabled = remember {
         System.getProperty(ComposeLinearGradientRoundRectProperty, "false").toBoolean()
+    }
+    val composeLinearGradientPathEnabled = remember {
+        System.getProperty(ComposeLinearGradientPathProperty, "false").toBoolean()
     }
     val composeRadialGradientEnabled = remember {
         System.getProperty(ComposeRadialGradientProperty, "false").toBoolean()
@@ -413,6 +417,31 @@ private fun MagicJewelApp() {
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(26f, 16f),
                         style = Stroke(width = 3f),
                     )
+                }
+                if (composeLinearGradientPathEnabled) {
+                    val path = Path().apply {
+                        moveTo(size.width - 342f, size.height - 320f)
+                        cubicTo(
+                            size.width - 310f,
+                            size.height - 366f,
+                            size.width - 246f,
+                            size.height - 356f,
+                            size.width - 222f,
+                            size.height - 306f,
+                        )
+                        lineTo(size.width - 276f, size.height - 258f)
+                        lineTo(size.width - 344f, size.height - 276f)
+                        close()
+                    }
+                    drawPath(
+                        path = path,
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF14B8A6), Color(0xFFFDE047), Color(0xFFEC4899)),
+                            start = Offset(size.width - 350f, size.height - 360f),
+                            end = Offset(size.width - 216f, size.height - 254f),
+                        ),
+                    )
+                    drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
                 }
                 if (composeRadialGradientEnabled) {
                     val topLeft = Offset(size.width - 164f, size.height - 198f)
