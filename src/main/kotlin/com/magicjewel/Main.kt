@@ -94,6 +94,7 @@ private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
 private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
+private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -162,6 +163,9 @@ private fun MagicJewelApp() {
     }
     val composeLinearGradientRoundRectEnabled = remember {
         System.getProperty(ComposeLinearGradientRoundRectProperty, "false").toBoolean()
+    }
+    val composeRadialGradientEnabled = remember {
+        System.getProperty(ComposeRadialGradientProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -403,6 +407,24 @@ private fun MagicJewelApp() {
                         topLeft = Offset(size.width - 348f, size.height - 112f),
                         size = Size(136f, 74f),
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(26f, 16f),
+                        style = Stroke(width = 3f),
+                    )
+                }
+                if (composeRadialGradientEnabled) {
+                    val topLeft = Offset(size.width - 164f, size.height - 198f)
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0xFFFFF7ED), Color(0xFFF97316), Color(0xFF7C3AED)),
+                            center = topLeft + Offset(64f, 48f),
+                            radius = 72f,
+                        ),
+                        topLeft = topLeft,
+                        size = Size(128f, 96f),
+                    )
+                    drawRect(
+                        color = Color.White,
+                        topLeft = topLeft,
+                        size = Size(128f, 96f),
                         style = Stroke(width = 3f),
                     )
                 }
