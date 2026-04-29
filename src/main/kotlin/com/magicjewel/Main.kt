@@ -368,6 +368,7 @@ private fun MagicJewelApp() {
                         style = TextStyle(
                             color = Color.Black,
                             fontSize = 17.sp,
+                            letterSpacing = 1.5.sp,
                             textDecoration = TextDecoration.Underline + TextDecoration.LineThrough,
                         ),
                     )
