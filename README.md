@@ -67,6 +67,14 @@ SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-compatibility-matrix.sh
 
 The matrix runs the command-mode happy path plus forced `abi-mismatch`, `native-abi-mismatch`, `command-capability-mismatch`, and `public-api-missing` fallbacks. It validates that happy path gets JBR command frames, while each forced mismatch emits one structured fallback marker and produces no JBR command frames.
 
+Command rendering probe suite:
+
+```bash
+SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-command-probe-suite.sh
+```
+
+The suite groups the manual command-mode probes into repeatable cases for core primitives, gradient surfaces, gradient paths, popup layering, text-as-image replay, native text opt-in, shader fallback, and invalid-gradient fallback. Use `CASES="commands-core-primitives commands-popup"` to run a subset.
+
 Quiet-machine benchmark collection suite:
 
 ```bash
