@@ -39,9 +39,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -85,6 +87,7 @@ private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
 private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
+private const val ComposeClipPathProperty = "magic.jewel.compose.clipPath"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -135,6 +138,9 @@ private fun MagicJewelApp() {
     }
     val composeClipOutEnabled = remember {
         System.getProperty(ComposeClipOutProperty, "false").toBoolean()
+    }
+    val composeClipPathEnabled = remember {
+        System.getProperty(ComposeClipPathProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -279,6 +285,22 @@ private fun MagicJewelApp() {
                             color = Color(0xFFE879F9),
                             topLeft = Offset(18f, 38f),
                             size = Size(176f, 120f),
+                        )
+                    }
+                }
+                if (composeClipPathEnabled) {
+                    val path = Path().apply {
+                        moveTo(size.width - 248f, size.height - 84f)
+                        lineTo(size.width - 156f, size.height - 132f)
+                        lineTo(size.width - 68f, size.height - 84f)
+                        lineTo(size.width - 156f, size.height - 36f)
+                        close()
+                    }
+                    clipPath(path) {
+                        drawRect(
+                            color = Color(0xFF22D3EE),
+                            topLeft = Offset(size.width - 260f, size.height - 140f),
+                            size = Size(208f, 116f),
                         )
                     }
                 }
