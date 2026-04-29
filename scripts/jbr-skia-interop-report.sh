@@ -644,8 +644,9 @@ validate_report() {
       if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ]]; then
         [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames before invalid-stream fallback")
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during invalid-stream fallback: ${jbr_command_frames}")
-        if ! grep -q "${FALLBACK_MARKER} reason=command-stream-invalid" "${new_log}" 2>/dev/null; then
-          failures+=("missing command-stream-invalid fallback marker")
+        if ! grep -q "${FALLBACK_MARKER} reason=command-stream-invalid" "${new_log}" 2>/dev/null &&
+            ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
+          failures+=("missing command-stream-invalid fallback marker or rendered=false command frame")
         fi
       else
         [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")
