@@ -97,6 +97,7 @@ private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.
 private const val ComposeLinearGradientPathProperty = "magic.jewel.compose.linearGradientPath"
 private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
 private const val ComposeRadialGradientRoundRectProperty = "magic.jewel.compose.radialGradientRoundRect"
+private const val ComposeRadialGradientPathProperty = "magic.jewel.compose.radialGradientPath"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -174,6 +175,9 @@ private fun MagicJewelApp() {
     }
     val composeRadialGradientRoundRectEnabled = remember {
         System.getProperty(ComposeRadialGradientRoundRectProperty, "false").toBoolean()
+    }
+    val composeRadialGradientPathEnabled = remember {
+        System.getProperty(ComposeRadialGradientPathProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -480,6 +484,31 @@ private fun MagicJewelApp() {
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(28f, 18f),
                         style = Stroke(width = 3f),
                     )
+                }
+                if (composeRadialGradientPathEnabled) {
+                    val path = Path().apply {
+                        moveTo(size.width - 492f, size.height - 318f)
+                        cubicTo(
+                            size.width - 452f,
+                            size.height - 366f,
+                            size.width - 390f,
+                            size.height - 344f,
+                            size.width - 370f,
+                            size.height - 294f,
+                        )
+                        lineTo(size.width - 434f, size.height - 250f)
+                        lineTo(size.width - 500f, size.height - 276f)
+                        close()
+                    }
+                    drawPath(
+                        path = path,
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0xFFFFFBEB), Color(0xFFF97316), Color(0xFF7C3AED)),
+                            center = Offset(size.width - 438f, size.height - 304f),
+                            radius = 86f,
+                        ),
+                    )
+                    drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
                 }
             }
 
