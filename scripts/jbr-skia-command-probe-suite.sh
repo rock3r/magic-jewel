@@ -11,6 +11,14 @@ SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 CASES="${CASES:-commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image commands-native-text commands-shader-fallback commands-color-filter-fallback commands-path-effect-fallback commands-invalid-gradient-fallback}"
 
 mkdir -p "${OUT_ROOT}"
+SUITE_TSV="${OUT_ROOT}/suite.tsv"
+printf "case\tstatus\tfallbacks\tunsupported\tjbr_picture_frames\tjbr_command_frames\tjbr_command_fps\treport\n" > "${SUITE_TSV}"
+
+summary_value() {
+  local file="$1"
+  local key="$2"
+  grep -E "^${key}=" "${file}" | head -n 1 | cut -d= -f2-
+}
 
 run_case() {
   local name="$1"
@@ -39,6 +47,10 @@ run_case() {
   fallback="$(grep -E '^fallback_new_count=' "${out_dir}/summary.properties" | cut -d= -f2-)"
   local reasons
   reasons="$(grep -E '^cmp_unsupported_reasons=' "${out_dir}/summary.properties" | cut -d= -f2-)"
+  local command_fps
+  command_fps="$(summary_value "${out_dir}/summary.properties" jbr_command_fps)"
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+    "${name}" "${status}" "${fallback}" "${reasons}" "${picture_frames}" "${command_frames}" "${command_fps}" "${report}" >> "${SUITE_TSV}"
   echo "status=${status} fallback_new_count=${fallback} unsupported=${reasons} jbr_picture_frames=${picture_frames} jbr_command_frames=${command_frames} report=${report}"
   [[ "${status}" == "passed" ]]
 }
@@ -137,3 +149,4 @@ for case_name in ${CASES}; do
 done
 
 echo "JBR_SKIA_COMMAND_PROBE_SUITE passed out_root=${OUT_ROOT}"
+echo "suite=${SUITE_TSV}"
