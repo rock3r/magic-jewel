@@ -26,6 +26,7 @@ EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS="${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS:-0}"
 EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
 EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
+EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_SURFACE_CHANGES="${EXPECT_MIN_SURFACE_CHANGES:-0}"
 EXPECT_SURFACE_CONTEXT_CHANGED="${EXPECT_SURFACE_CONTEXT_CHANGED:-}"
 EXPECT_SURFACE_CHANGED="${EXPECT_SURFACE_CHANGED:-}"
@@ -190,6 +191,7 @@ Environment:
   EXPECT_MIN_IMAGE_REFS In strict command mode, require at least this many image refs in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_CACHE_CLEARS In strict command mode, require at least this many image cache clears in one CMP recorder frame. Default: 0.
   EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers. Default: 0.
+  EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers with contextId=0x. Default: 0.
   EXPECT_MIN_SURFACE_CHANGES In strict command mode, require at least this many Skiko surface-change markers. Default: 0.
   EXPECT_SURFACE_CONTEXT_CHANGED When set to true/false, require a surface-change marker with contextChanged=<value>.
   EXPECT_SURFACE_CHANGED When set to true/false, require a surface-change marker with surfaceChanged=<value>.
@@ -826,6 +828,7 @@ write_report() {
     echo "- EXPECT_MIN_IMAGE_REFS: ${EXPECT_MIN_IMAGE_REFS}"
     echo "- EXPECT_MIN_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
+    echo "- EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_SURFACE_CHANGES: ${EXPECT_MIN_SURFACE_CHANGES}"
     echo "- EXPECT_SURFACE_CONTEXT_CHANGED: ${EXPECT_SURFACE_CONTEXT_CHANGED:-<unset>}"
     echo "- EXPECT_SURFACE_CHANGED: ${EXPECT_SURFACE_CHANGED:-<unset>}"
@@ -1027,6 +1030,12 @@ validate_report() {
         jbr_image_cache_clears="$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
         [[ "${jbr_image_cache_clears}" -ge "${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("JBR image cache clear markers ${jbr_image_cache_clears} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}")
+      fi
+      if [[ "${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}" -gt 0 ]]; then
+        local jbr_scoped_image_cache_clears
+        jbr_scoped_image_cache_clears="$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
+        [[ "${jbr_scoped_image_cache_clears}" -ge "${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}" ]] ||
+          failures+=("JBR scoped image cache clear markers ${jbr_scoped_image_cache_clears} below expected ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}")
       fi
       if [[ "${EXPECT_MIN_SURFACE_CHANGES}" -gt 0 ]]; then
         local surface_changes
