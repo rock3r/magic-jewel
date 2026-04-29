@@ -65,6 +65,37 @@ strict_command_requires_min_surface_changes() {
   run_validate_only "${dir}" EXPECT_MIN_SURFACE_CHANGES=1
 }
 
+strict_command_requires_surface_change_shape() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_SURFACE_CHANGED oldContextId=0x1 newContextId=0x1 contextChanged=false surfaceChanged=true oldSurfaceId=0x2 newSurfaceId=0x3 oldMetalTexture=0x4 newMetalTexture=0x5"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_SURFACE_CHANGES=1 EXPECT_SURFACE_CONTEXT_CHANGED=false EXPECT_SURFACE_CHANGED=true
+  grep -q "^skiko_context_change_markers=0$" "${dir}/summary.properties"
+  grep -q "^skiko_same_context_surface_change_markers=1$" "${dir}/summary.properties"
+}
+
+strict_command_fails_without_expected_surface_change_shape() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_SURFACE_CHANGED oldContextId=0x1 newContextId=0x2 contextChanged=true surfaceChanged=true oldSurfaceId=0x3 newSurfaceId=0x4 oldMetalTexture=0x5 newMetalTexture=0x6"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MIN_SURFACE_CHANGES=1 EXPECT_SURFACE_CONTEXT_CHANGED=false EXPECT_SURFACE_CHANGED=true 2>/dev/null; then
+    echo "Expected strict command validation to fail for wrong surface-change shape" >&2
+    return 1
+  fi
+}
+
 strict_command_fails_without_min_surface_changes() {
   local dir
   dir="$(make_report_dir)"
@@ -378,6 +409,8 @@ handshake_fallback_fails_with_command_frames() {
 strict_command_passes
 surface_change_summary_is_machine_readable
 strict_command_requires_min_surface_changes
+strict_command_requires_surface_change_shape
+strict_command_fails_without_expected_surface_change_shape
 strict_command_fails_without_min_surface_changes
 strict_command_allows_teardown_marker_drift
 strict_command_requires_min_text_commands

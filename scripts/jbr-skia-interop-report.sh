@@ -27,6 +27,8 @@ EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
 EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_SURFACE_CHANGES="${EXPECT_MIN_SURFACE_CHANGES:-0}"
+EXPECT_SURFACE_CONTEXT_CHANGED="${EXPECT_SURFACE_CONTEXT_CHANGED:-}"
+EXPECT_SURFACE_CHANGED="${EXPECT_SURFACE_CHANGED:-}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 SKIKO_EXPECTED_ABI_ID_FOR_TEST="${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-}"
 SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST="${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-}"
@@ -189,6 +191,8 @@ Environment:
   EXPECT_MIN_IMAGE_CACHE_CLEARS In strict command mode, require at least this many image cache clears in one CMP recorder frame. Default: 0.
   EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers. Default: 0.
   EXPECT_MIN_SURFACE_CHANGES In strict command mode, require at least this many Skiko surface-change markers. Default: 0.
+  EXPECT_SURFACE_CONTEXT_CHANGED When set to true/false, require a surface-change marker with contextChanged=<value>.
+  EXPECT_SURFACE_CHANGED When set to true/false, require a surface-change marker with surfaceChanged=<value>.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader fallback probe. Default: false.
@@ -716,6 +720,8 @@ write_machine_summary() {
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "skiko_context_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=true" "${new_full_log}" 2>/dev/null || true)"
+    echo "skiko_same_context_surface_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=false.*surfaceChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "screenshot_status=$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_old_status=$(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_new_status=$(cat "${OUT_DIR}/new-asprof-status.txt" 2>/dev/null || echo not-run)"
@@ -820,6 +826,8 @@ write_report() {
     echo "- EXPECT_MIN_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_SURFACE_CHANGES: ${EXPECT_MIN_SURFACE_CHANGES}"
+    echo "- EXPECT_SURFACE_CONTEXT_CHANGED: ${EXPECT_SURFACE_CONTEXT_CHANGED:-<unset>}"
+    echo "- EXPECT_SURFACE_CHANGED: ${EXPECT_SURFACE_CHANGED:-<unset>}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
     echo
     echo "## Modes"
@@ -1023,6 +1031,16 @@ validate_report() {
         surface_changes="$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${surface_changes}" -ge "${EXPECT_MIN_SURFACE_CHANGES}" ]] ||
           failures+=("Skiko surface-change markers ${surface_changes} below expected ${EXPECT_MIN_SURFACE_CHANGES}")
+      fi
+      if [[ -n "${EXPECT_SURFACE_CONTEXT_CHANGED}" ]]; then
+        if ! grep -Eq "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=${EXPECT_SURFACE_CONTEXT_CHANGED}" "${new_full_log}" 2>/dev/null; then
+          failures+=("missing Skiko surface-change marker with contextChanged=${EXPECT_SURFACE_CONTEXT_CHANGED}")
+        fi
+      fi
+      if [[ -n "${EXPECT_SURFACE_CHANGED}" ]]; then
+        if ! grep -Eq "${SKIKO_SURFACE_CHANGE_MARKER}.*surfaceChanged=${EXPECT_SURFACE_CHANGED}" "${new_full_log}" 2>/dev/null; then
+          failures+=("missing Skiko surface-change marker with surfaceChanged=${EXPECT_SURFACE_CHANGED}")
+        fi
       fi
     fi
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" != "true" ||
