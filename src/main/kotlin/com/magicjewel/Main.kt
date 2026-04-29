@@ -98,6 +98,7 @@ private const val ComposeLinearGradientPathProperty = "magic.jewel.compose.linea
 private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
 private const val ComposeRadialGradientRoundRectProperty = "magic.jewel.compose.radialGradientRoundRect"
 private const val ComposeRadialGradientPathProperty = "magic.jewel.compose.radialGradientPath"
+private const val ComposeSweepGradientProperty = "magic.jewel.compose.sweepGradient"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -178,6 +179,9 @@ private fun MagicJewelApp() {
     }
     val composeRadialGradientPathEnabled = remember {
         System.getProperty(ComposeRadialGradientPathProperty, "false").toBoolean()
+    }
+    val composeSweepGradientEnabled = remember {
+        System.getProperty(ComposeSweepGradientProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -509,6 +513,23 @@ private fun MagicJewelApp() {
                         ),
                     )
                     drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
+                }
+                if (composeSweepGradientEnabled) {
+                    val topLeft = Offset(size.width - 518f, size.height - 126f)
+                    drawRect(
+                        brush = Brush.sweepGradient(
+                            colors = listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6)),
+                            center = topLeft + Offset(72f, 42f),
+                        ),
+                        topLeft = topLeft,
+                        size = Size(144f, 84f),
+                    )
+                    drawRect(
+                        color = Color.White,
+                        topLeft = topLeft,
+                        size = Size(144f, 84f),
+                        style = Stroke(width = 3f),
+                    )
                 }
             }
 
