@@ -89,6 +89,7 @@ private const val ComposeClipProperty = "magic.jewel.compose.clip"
 private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
 private const val ComposeClipPathProperty = "magic.jewel.compose.clipPath"
 private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
+private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -145,6 +146,9 @@ private fun MagicJewelApp() {
     }
     val composeDrawPathEnabled = remember {
         System.getProperty(ComposeDrawPathProperty, "false").toBoolean()
+    }
+    val composeDrawArcEnabled = remember {
+        System.getProperty(ComposeDrawArcProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -318,6 +322,25 @@ private fun MagicJewelApp() {
                     }
                     drawPath(path = path, color = Color(0xFFF59E0B))
                     drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
+                }
+                if (composeDrawArcEnabled) {
+                    drawArc(
+                        color = Color(0xFF22D3EE),
+                        startAngle = 210f,
+                        sweepAngle = 290f,
+                        useCenter = true,
+                        topLeft = Offset(size.width - 132f, size.height - 222f),
+                        size = Size(84f, 84f),
+                    )
+                    drawArc(
+                        color = Color.White,
+                        startAngle = 210f,
+                        sweepAngle = 290f,
+                        useCenter = true,
+                        topLeft = Offset(size.width - 132f, size.height - 222f),
+                        size = Size(84f, 84f),
+                        style = Stroke(width = 3f),
+                    )
                 }
             }
 
