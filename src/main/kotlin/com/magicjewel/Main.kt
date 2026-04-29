@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -348,6 +349,17 @@ private fun MagicJewelApp() {
                             textDirection = TextDirection.Rtl,
                         ),
                     )
+                    MagicLabel(
+                        "Overflow \uD83D\uDE80 paragraph text that must ellipsize at the edge",
+                        composeTextEnabled,
+                        width = 180.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            textAlign = TextAlign.Left,
+                        ),
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         }
@@ -405,12 +417,14 @@ private fun MagicLabel(
         color = Color.Black,
         fontSize = 16.sp,
     ),
+    overflow: TextOverflow = TextOverflow.Clip,
 ) {
     if (composeTextEnabled) {
         BasicText(
             text = text,
             modifier = modifier.width(width),
             maxLines = 1,
+            overflow = overflow,
             style = style,
         )
     } else {
