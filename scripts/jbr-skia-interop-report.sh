@@ -10,6 +10,9 @@ SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 STARTUP_TIMEOUT_SECONDS="${STARTUP_TIMEOUT_SECONDS:-45}"
 GRADLE="${GRADLE:-${ROOT_DIR}/gradlew}"
 SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
+ENABLE_ASPROF="${ENABLE_ASPROF:-false}"
+ASPROF="${ASPROF:-}"
+ASPROF_EVENT="${ASPROF_EVENT:-cpu}"
 CAPTURE_WINDOW_QUERY="${CAPTURE_WINDOW_QUERY:-MagicJewelJbrSkiaWindow}"
 APP_PROCESS_QUERY="${APP_PROCESS_QUERY:-com.magicjewel.MainKt}"
 CMP_SCRIPTS_DIR="${CMP_SCRIPTS_DIR:-/Users/rock3r/src/cmp-jbr-skia-poc/compose/desktop/desktop/samples/scripts}"
@@ -159,6 +162,9 @@ Environment:
   SAMPLE_INTERVAL_SECONDS  Seconds between ps samples. Default: 1.
   STARTUP_TIMEOUT_SECONDS  Seconds to wait for the app process before measuring. Default: 45.
   SKIKO_VERSION            Local Skiko version override. Default: 0.0.0-SNAPSHOT.
+  ENABLE_ASPROF            Collect async-profiler output when true. Default: false.
+  ASPROF                   Explicit path to async-profiler's asprof executable. Defaults to PATH lookup.
+  ASPROF_EVENT             async-profiler event. Default: cpu.
   JBR_SKIA_RENDER_MODE     New-mode renderer: picture, commands, or diagnostic. Default: picture.
   DESKTOP_PATCH            Patched java.desktop classes. Default: /tmp/jbr-skia-run/desktop.
   JBR_API_SHIM             Public JBR API shim jar. Default: /tmp/jbr-api-shim.jar.
@@ -235,6 +241,63 @@ process_tree() {
     descendants_of "${root_pid}"
     pgrep -f "${APP_PROCESS_QUERY}" 2>/dev/null || true
   } | sort -u
+}
+
+app_pid() {
+  pgrep -f "${APP_PROCESS_QUERY}" 2>/dev/null | head -n 1 || true
+}
+
+resolve_asprof() {
+  if [[ -n "${ASPROF}" ]]; then
+    [[ -x "${ASPROF}" ]] && echo "${ASPROF}"
+    return
+  fi
+  command -v asprof 2>/dev/null || true
+}
+
+start_profiler() {
+  local mode="$1"
+  local pid="$2"
+  local profiler="$3"
+  local output="${OUT_DIR}/${mode}-asprof-${ASPROF_EVENT}.html"
+  local status="${OUT_DIR}/${mode}-asprof-status.txt"
+
+  if [[ "${ENABLE_ASPROF}" != "true" ]]; then
+    echo "disabled" > "${status}"
+    return
+  fi
+  if [[ -z "${profiler}" ]]; then
+    echo "unavailable" > "${status}"
+    return
+  fi
+  if [[ -z "${pid}" ]]; then
+    echo "missing-pid" > "${status}"
+    return
+  fi
+  if "${profiler}" start -e "${ASPROF_EVENT}" -f "${output}" "${pid}" > "${OUT_DIR}/${mode}-asprof-start.log" 2>&1; then
+    echo "started pid=${pid} event=${ASPROF_EVENT} file=$(basename "${output}")" > "${status}"
+  else
+    echo "start-failed" > "${status}"
+  fi
+}
+
+stop_profiler() {
+  local mode="$1"
+  local pid="$2"
+  local profiler="$3"
+  local output="${OUT_DIR}/${mode}-asprof-${ASPROF_EVENT}.html"
+  local status="${OUT_DIR}/${mode}-asprof-status.txt"
+
+  if [[ "${ENABLE_ASPROF}" != "true" || -z "${profiler}" || -z "${pid}" ]]; then
+    return
+  fi
+  if grep -q "^started " "${status}" 2>/dev/null; then
+    if "${profiler}" stop -f "${output}" "${pid}" > "${OUT_DIR}/${mode}-asprof-stop.log" 2>&1; then
+      echo "collected pid=${pid} event=${ASPROF_EVENT} file=$(basename "${output}")" > "${status}"
+    else
+      echo "stop-failed" > "${status}"
+    fi
+  fi
 }
 
 kill_process_tree() {
@@ -320,6 +383,11 @@ run_mode() {
   local sample_start_line=0
   local sample_started=false
   local screenshot_done=false
+  local profiler_path=""
+  local profiler_pid=""
+  local profiler_started=false
+
+  profiler_path="$(resolve_asprof)"
 
   set +e
   while kill -0 "${root_pid}" 2>/dev/null; do
@@ -339,6 +407,9 @@ run_mode() {
       if [[ "${sample_started}" == "false" ]]; then
         sample_start_line=$(( $(wc -l < "${log}" 2>/dev/null || echo 0) + 1 ))
         sample_started=true
+        profiler_pid="$(app_pid)"
+        start_profiler "${mode}" "${profiler_pid}" "${profiler_path}"
+        profiler_started=true
       fi
       sample_process_tree "${mode}" "${root_pid}" "${csv}"
     fi
@@ -367,6 +438,10 @@ run_mode() {
         echo "passed" > "${screenshot_status}"
       fi
     fi
+  fi
+
+  if [[ "${profiler_started}" == "true" ]]; then
+    stop_profiler "${mode}" "${profiler_pid}" "${profiler_path}"
   fi
 
   kill_process_tree "${root_pid}"
@@ -633,6 +708,8 @@ write_machine_summary() {
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "screenshot_status=$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || echo not-run)"
+    echo "asprof_old_status=$(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not-run)"
+    echo "asprof_new_status=$(cat "${OUT_DIR}/new-asprof-status.txt" 2>/dev/null || echo not-run)"
     echo "report_path=${OUT_DIR}/report.md"
   } > "${summary}"
 }
@@ -692,6 +769,8 @@ write_report() {
     echo "- Startup timeout per mode: ${STARTUP_TIMEOUT_SECONDS}s"
     echo "- Root: ${ROOT_DIR}"
     echo "- SKIKO_VERSION: ${SKIKO_VERSION}"
+    echo "- ENABLE_ASPROF: ${ENABLE_ASPROF}"
+    echo "- ASPROF_EVENT: ${ASPROF_EVENT}"
     echo "- JBR_SKIA_RENDER_MODE: ${JBR_SKIA_RENDER_MODE:-picture}"
     echo "- MAGIC_JEWEL_COMPOSE_TEXT: ${MAGIC_JEWEL_COMPOSE_TEXT}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE: ${MAGIC_JEWEL_COMPOSE_IMAGE}"
@@ -768,6 +847,11 @@ write_report() {
     echo "- JBR command timing: ${jbr_command_timing_summary}"
     echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
     echo
+    echo "## Async Profiler"
+    echo
+    echo "- old: $(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not run)"
+    echo "- new: $(cat "${OUT_DIR}/new-asprof-status.txt" 2>/dev/null || echo not run)"
+    echo
     echo "## Screenshot Assertion"
     echo
     if [[ -n "${screenshot_counts}" ]]; then
@@ -787,6 +871,12 @@ write_report() {
     echo "- new sampled log: new-sampled.log"
     echo "- old ps samples: old-ps.csv"
     echo "- new ps samples: new-ps.csv"
+    if [[ -f "${OUT_DIR}/old-asprof-${ASPROF_EVENT}.html" ]]; then
+      echo "- old async-profiler html: old-asprof-${ASPROF_EVENT}.html"
+    fi
+    if [[ -f "${OUT_DIR}/new-asprof-${ASPROF_EVENT}.html" ]]; then
+      echo "- new async-profiler html: new-asprof-${ASPROF_EVENT}.html"
+    fi
     echo "- machine summary: summary.properties"
     echo
     echo "## Notes"
