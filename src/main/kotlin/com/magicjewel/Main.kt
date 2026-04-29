@@ -84,6 +84,7 @@ private const val FrameMarker = "MAGIC_JEWEL_COMPOSE_FRAME"
 private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
+private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
@@ -140,6 +141,9 @@ private fun MagicJewelApp() {
     }
     val composeImageEnabled = remember {
         System.getProperty(ComposeImageProperty, "false").toBoolean()
+    }
+    val composeImageShaderEnabled = remember {
+        System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -205,7 +209,7 @@ private fun MagicJewelApp() {
         System.getProperty(InvalidSweepGradientProperty, "false").toBoolean()
     }
     val imageProbe = remember(composeImageEnabled) {
-        if (composeImageEnabled) createImageProbe() else null
+        if (composeImageEnabled || composeImageShaderEnabled) createImageProbe() else null
     }
     val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
     val phase by infiniteTransition.animateFloat(
@@ -293,8 +297,16 @@ private fun MagicJewelApp() {
                     drawCircle(Color.White, radius = 10f, center = outer)
                 }
                 drawCircle(Color.White.copy(alpha = 0.55f), radius = 190f, center = center, style = Stroke(width = 5f))
-                imageProbe?.let {
-                    drawImage(it, topLeft = Offset(size.width - 212f, size.height - 126f))
+                if (composeImageEnabled) {
+                    imageProbe?.let {
+                        drawImage(it, topLeft = Offset(size.width - 212f, size.height - 126f))
+                    }
+                }
+                if (composeImageShaderEnabled) {
+                    imageProbe?.let {
+                        drawImage(it, topLeft = Offset(size.width - 206f, size.height - 210f))
+                        markJbrSkiaUnsupported("shader")
+                    }
                 }
                 if (imageCacheChurnEnabled) {
                     repeat(260) { index ->
@@ -723,6 +735,14 @@ private fun createImageProbe(): ImageBitmap {
     canvas.drawCircle(Offset(36f, 36f), 20f, paint)
 
     return bitmap
+}
+
+private fun markJbrSkiaUnsupported(reason: String) {
+    runCatching {
+        val type = Class.forName("androidx.compose.ui.graphics.JbrSkiaCommandRecorder")
+        val instance = type.getField("INSTANCE").get(null)
+        type.getMethod("markUnsupportedDraw", String::class.java).invoke(instance, reason)
+    }
 }
 
 private fun createChurnImage(index: Int, ticks: Int): ImageBitmap {

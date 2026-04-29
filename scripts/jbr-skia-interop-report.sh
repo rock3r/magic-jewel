@@ -30,6 +30,9 @@ SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST="${SKIKO_REQUIRED_COMMAND_CAPABILIT
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_IMAGE_SHADER=false
+fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_TRANSFORM+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_TRANSFORM=false
 fi
@@ -98,6 +101,7 @@ if [[ -z "${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT+x}" ]]; then
 fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
+export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
 export MAGIC_JEWEL_COMPOSE_TRANSFORM
 export MAGIC_JEWEL_COMPOSE_SAVELAYER
 export MAGIC_JEWEL_COMPOSE_CLIP
@@ -174,6 +178,7 @@ Environment:
   EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers. Default: 0.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP Enables the Compose clipRect probe. Default: false.
@@ -616,6 +621,7 @@ write_report() {
     echo "- JBR_SKIA_RENDER_MODE: ${JBR_SKIA_RENDER_MODE:-picture}"
     echo "- MAGIC_JEWEL_COMPOSE_TEXT: ${MAGIC_JEWEL_COMPOSE_TEXT}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE: ${MAGIC_JEWEL_COMPOSE_IMAGE}"
+    echo "- MAGIC_JEWEL_COMPOSE_IMAGE_SHADER: ${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER}"
     echo "- MAGIC_JEWEL_COMPOSE_TRANSFORM: ${MAGIC_JEWEL_COMPOSE_TRANSFORM}"
     echo "- MAGIC_JEWEL_COMPOSE_SAVELAYER: ${MAGIC_JEWEL_COMPOSE_SAVELAYER}"
     echo "- MAGIC_JEWEL_COMPOSE_CLIP: ${MAGIC_JEWEL_COMPOSE_CLIP}"
