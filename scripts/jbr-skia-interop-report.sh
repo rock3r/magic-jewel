@@ -566,6 +566,18 @@ summarize_csv() {
   ' "${csv}"
 }
 
+csv_summary_field() {
+  local csv="$1"
+  local key="$2"
+  if [[ ! -f "${csv}" ]]; then
+    echo "0"
+    return
+  fi
+  summarize_csv "${csv}" |
+    tr ' ' '\n' |
+    awk -F= -v key="${key}" '$1 == key { print $2; found = 1 } END { if (!found) print "0" }'
+}
+
 payload_marker_summary() {
   local marker="$1"
   local log="$2"
@@ -798,6 +810,16 @@ write_machine_summary() {
     echo "expect_command_fallback_reason=${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "fallback_old_count=$(grep -c "${FALLBACK_MARKER}" "${old_full_log}" 2>/dev/null || true)"
     echo "fallback_new_count=$(grep -c "${FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "old_samples=$(csv_summary_field "${OUT_DIR}/old-ps.csv" samples)"
+    echo "old_avg_cpu=$(csv_summary_field "${OUT_DIR}/old-ps.csv" avg_cpu)"
+    echo "old_max_cpu=$(csv_summary_field "${OUT_DIR}/old-ps.csv" max_cpu)"
+    echo "old_avg_rss_kb=$(csv_summary_field "${OUT_DIR}/old-ps.csv" avg_rss_kb)"
+    echo "old_max_rss_kb=$(csv_summary_field "${OUT_DIR}/old-ps.csv" max_rss_kb)"
+    echo "new_samples=$(csv_summary_field "${OUT_DIR}/new-ps.csv" samples)"
+    echo "new_avg_cpu=$(csv_summary_field "${OUT_DIR}/new-ps.csv" avg_cpu)"
+    echo "new_max_cpu=$(csv_summary_field "${OUT_DIR}/new-ps.csv" max_cpu)"
+    echo "new_avg_rss_kb=$(csv_summary_field "${OUT_DIR}/new-ps.csv" avg_rss_kb)"
+    echo "new_max_rss_kb=$(csv_summary_field "${OUT_DIR}/new-ps.csv" max_rss_kb)"
     echo "app_old_frames=$(grep -c "${APP_FRAME_MARKER}" "${old_log}" 2>/dev/null || true)"
     echo "app_new_frames=$(grep -c "${APP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "app_old_fps=$(frame_marker_fps "${APP_FRAME_MARKER}" "${old_log}")"
