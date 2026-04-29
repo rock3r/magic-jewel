@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -76,6 +75,7 @@ import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 import org.jetbrains.jewel.ui.component.DefaultButton
 import org.jetbrains.jewel.ui.component.OutlinedButton
+import org.jetbrains.jewel.ui.component.Text
 import java.awt.Color as AwtColor
 import java.util.concurrent.atomic.AtomicLong
 
@@ -741,19 +741,16 @@ private fun MagicLabel(
     composeTextEnabled: Boolean,
     modifier: Modifier = Modifier,
     width: androidx.compose.ui.unit.Dp,
-    style: TextStyle = TextStyle(
-        color = Color.Black,
-        fontSize = 16.sp,
-    ),
+    style: TextStyle = TextStyle(color = Color.Black),
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
     if (composeTextEnabled) {
-        BasicText(
+        Text(
             text = text,
             modifier = modifier.width(width),
             maxLines = 1,
             overflow = overflow,
-            style = style,
+            style = JewelTheme.defaultTextStyle.merge(style),
         )
     } else {
         Box(
