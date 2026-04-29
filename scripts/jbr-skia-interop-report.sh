@@ -124,7 +124,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP Enables the Compose clipRect probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP_OUT Enables the Compose clip-out probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_CLIP_PATH Enables the Compose clipPath unsupported-operation probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_CLIP_PATH Enables the Compose clipPath command replay probe. Default: false.
   MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use the paragraph text command. Default: false.
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
