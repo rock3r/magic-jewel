@@ -139,6 +139,7 @@ SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_TIMING_MARKER="JBR_SKIA_INTEROP_COMMAND_TIMING"
 JBR_IMAGE_CACHE_CLEAR_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR"
+SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
 MIXED_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_MIXED_SCREENSHOT_COUNTS"
@@ -707,6 +708,7 @@ write_machine_summary() {
     echo "jbr_command_frames=$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "screenshot_status=$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_old_status=$(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_new_status=$(cat "${OUT_DIR}/new-asprof-status.txt" 2>/dev/null || echo not-run)"
@@ -731,6 +733,7 @@ write_report() {
   local cmp_command_recorder_summary
   local jbr_command_timing_summary
   local jbr_image_cache_clear_summary
+  local skiko_surface_change_summary
   local screenshot_counts
   local screenshot_status
   local old_log="${OUT_DIR}/old-sampled.log"
@@ -757,6 +760,7 @@ write_report() {
   cmp_command_recorder_summary="$(command_recorder_summary "${new_log}")"
   jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
   jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}")"
+  skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_log}")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
@@ -847,6 +851,10 @@ write_report() {
     echo "- JBR command timing: ${jbr_command_timing_summary}"
     echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
     echo
+    echo "## Surface Identity Markers"
+    echo
+    echo "- Skiko surface changes: ${skiko_surface_change_summary}"
+    echo
     echo "## Async Profiler"
     echo
     echo "- old: $(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not run)"
@@ -884,6 +892,7 @@ write_report() {
     echo "CPU and RSS samples are coarse ps samples for the Gradle process tree plus the app process matched by APP_PROCESS_QUERY. They are useful as a smoke signal only, especially on a busy development machine."
     echo "App draw FPS and Skiko/JBR marker FPS count draw/replay calls during the measurement window, not display-presented frames; they can exceed monitor refresh when rendering is not vsync-throttled."
     echo "Picture/command marker counts come from structured Skiko/JBR logs and are the primary signal that the JBR-owned replay path was used."
+    echo "Surface identity markers show when Skiko observed a different JBR destination surface and discarded cached surface-bound state."
     echo "The new mode depends on patched local JBR, Skiko, and CMP artifacts; see README.md for the required paths and overrides."
   } > "${report}"
 
