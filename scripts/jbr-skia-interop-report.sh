@@ -67,6 +67,7 @@ SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
+JBR_COMMAND_TIMING_MARKER="JBR_SKIA_INTEROP_COMMAND_TIMING"
 JBR_IMAGE_CACHE_CLEAR_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
@@ -395,6 +396,47 @@ command_recorder_summary() {
   ' "${log}"
 }
 
+jbr_command_timing_summary() {
+  local log="$1"
+  awk -v marker="${JBR_COMMAND_TIMING_MARKER}" '
+    index($0, marker) {
+      frames++
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] == "totalNanos") {
+          total += value[2]
+          if (value[2] > maxTotal) maxTotal = value[2]
+        } else if (value[1] == "drawNanos") {
+          draw += value[2]
+          if (value[2] > maxDraw) maxDraw = value[2]
+        } else if (value[1] == "flushNanos") {
+          flush += value[2]
+          if (value[2] > maxFlush) maxFlush = value[2]
+        } else if (value[1] == "paragraphCommands") {
+          paragraphCommands += value[2]
+          if (value[2] > maxParagraphCommands) maxParagraphCommands = value[2]
+        } else if (value[1] == "paragraphNanos") {
+          paragraph += value[2]
+          if (value[2] > maxParagraph) maxParagraph = value[2]
+        }
+      }
+    }
+    END {
+      if (frames == 0) {
+        printf "frames=0 avg_total_ms=0 max_total_ms=0 avg_draw_ms=0 max_draw_ms=0 avg_flush_ms=0 max_flush_ms=0 avg_paragraph_ms=0 max_paragraph_ms=0 avg_paragraph_commands=0 max_paragraph_commands=0"
+        exit
+      }
+      printf "frames=%d avg_total_ms=%.3f max_total_ms=%.3f avg_draw_ms=%.3f max_draw_ms=%.3f avg_flush_ms=%.3f max_flush_ms=%.3f avg_paragraph_ms=%.3f max_paragraph_ms=%.3f avg_paragraph_commands=%.1f max_paragraph_commands=%.0f",
+        frames,
+        total / frames / 1000000.0, maxTotal / 1000000.0,
+        draw / frames / 1000000.0, maxDraw / 1000000.0,
+        flush / frames / 1000000.0, maxFlush / 1000000.0,
+        paragraph / frames / 1000000.0, maxParagraph / 1000000.0,
+        paragraphCommands / frames, maxParagraphCommands
+    }
+  ' "${log}"
+}
+
 max_command_recorder_field() {
   local log="$1"
   local field="$2"
@@ -428,6 +470,7 @@ write_report() {
   local skiko_command_summary
   local jbr_command_summary
   local cmp_command_recorder_summary
+  local jbr_command_timing_summary
   local jbr_image_cache_clear_summary
   local screenshot_counts
   local screenshot_status
@@ -445,6 +488,7 @@ write_report() {
   skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
   jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${OUT_DIR}/new.log" "commands")"
   cmp_command_recorder_summary="$(command_recorder_summary "${OUT_DIR}/new.log")"
+  jbr_command_timing_summary="$(jbr_command_timing_summary "${OUT_DIR}/new.log")"
   jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${OUT_DIR}/new.log")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
@@ -512,6 +556,7 @@ write_report() {
     echo "- CMP command recorder: ${cmp_command_recorder_summary}"
     echo "- Skiko command frames: ${skiko_command_summary}"
     echo "- JBR command frames: ${jbr_command_summary}"
+    echo "- JBR command timing: ${jbr_command_timing_summary}"
     echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
     echo
     echo "## Screenshot Assertion"
