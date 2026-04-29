@@ -478,11 +478,9 @@ private fun createSwingStatusPanel(): JPanel {
 }
 
 private class MovingSwingProgressBar : JComponent() {
-    private var phase = 0
     private val timer = Timer(33) {
-        phase = (phase + 7) % 280
-        System.err.println("$SwingFrameMarker frame=${SwingFrameCounter.incrementAndGet()}")
         repaint()
+        parent?.repaint()
     }.apply {
         isRepeats = true
         start()
@@ -510,9 +508,9 @@ private class MovingSwingProgressBar : JComponent() {
             g2.color = AwtColor(218, 224, 232)
             g2.drawRoundRect(0, 3, width - 1, height - 7, 9, 9)
 
+            System.err.println("$SwingFrameMarker frame=${SwingFrameCounter.incrementAndGet()}")
             val blockWidth = (width * 0.34).toInt().coerceAtLeast(48)
-            val travel = (width + blockWidth).coerceAtLeast(1)
-            val x = ((phase * travel) / 280) - blockWidth
+            val x = movingProgressX(width, blockWidth, System.nanoTime())
             g2.color = AwtColor(255, 166, 87)
             g2.fillRoundRect(x, 4, blockWidth, height - 8, 8, 8)
             g2.color = AwtColor(255, 211, 61, 180)
@@ -521,4 +519,16 @@ private class MovingSwingProgressBar : JComponent() {
             g2.dispose()
         }
     }
+}
+
+private fun movingProgressX(width: Int, blockWidth: Int, nowNanos: Long): Int {
+    val travel = (width + blockWidth).coerceAtLeast(1)
+    val periodNanos = 900_000_000L
+    val phase = (nowNanos.floorMod(periodNanos)).toDouble() / periodNanos.toDouble()
+    return (phase * travel).toInt() - blockWidth
+}
+
+private fun Long.floorMod(modulus: Long): Long {
+    val value = this % modulus
+    return if (value >= 0) value else value + modulus
 }

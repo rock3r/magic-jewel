@@ -576,7 +576,7 @@ write_report() {
     echo "- old: ${old_app_frame_summary}"
     echo "- new: ${new_app_frame_summary}"
     echo
-    echo "## Swing Repaint Markers"
+    echo "## Swing Progress Paint Markers"
     echo
     echo "- old: ${old_swing_frame_summary}"
     echo "- new: ${new_swing_frame_summary}"
