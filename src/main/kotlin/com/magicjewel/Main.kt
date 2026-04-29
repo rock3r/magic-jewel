@@ -106,6 +106,9 @@ private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
 private const val InvalidSweepGradientProperty = "magic.jewel.invalidSweepGradient"
+private const val AutoResizeProperty = "magic.jewel.autoResize"
+private const val AutoResizeDelayMillisProperty = "magic.jewel.autoResizeDelayMillis"
+private const val ResizeMarker = "MAGIC_JEWEL_WINDOW_RESIZE"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 
@@ -130,6 +133,23 @@ private fun showMagicJewel() {
         pack()
         setLocationRelativeTo(null)
         isVisible = true
+        scheduleAutoResizeIfNeeded()
+    }
+}
+
+private fun JFrame.scheduleAutoResizeIfNeeded() {
+    if (!System.getProperty(AutoResizeProperty, "false").toBoolean()) return
+
+    val delayMillis = System.getProperty(AutoResizeDelayMillisProperty, "2500").toIntOrNull() ?: 2500
+    Timer(delayMillis) {
+        val expanded = Dimension(width + 96, height + 64)
+        size = expanded
+        revalidate()
+        repaint()
+        System.err.println("$ResizeMarker width=${expanded.width} height=${expanded.height}")
+    }.apply {
+        isRepeats = false
+        start()
     }
 }
 

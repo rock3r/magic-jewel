@@ -26,6 +26,7 @@ EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS="${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS:-0}"
 EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
 EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
+EXPECT_MIN_SURFACE_CHANGES="${EXPECT_MIN_SURFACE_CHANGES:-0}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 SKIKO_EXPECTED_ABI_ID_FOR_TEST="${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-}"
 SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST="${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-}"
@@ -102,6 +103,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT+x}" ]]; then
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT=false
 fi
+if [[ -z "${MAGIC_JEWEL_AUTO_RESIZE+x}" ]]; then
+  MAGIC_JEWEL_AUTO_RESIZE=false
+fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
@@ -127,6 +131,7 @@ export MAGIC_JEWEL_UNSUPPORTED_TEXT
 export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
 export MAGIC_JEWEL_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_INVALID_SWEEP_GRADIENT
+export MAGIC_JEWEL_AUTO_RESIZE
 export SKIKO_EXPECTED_ABI_ID_FOR_TEST
 export SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST
 export SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST
@@ -183,6 +188,7 @@ Environment:
   EXPECT_MIN_IMAGE_REFS In strict command mode, require at least this many image refs in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_CACHE_CLEARS In strict command mode, require at least this many image cache clears in one CMP recorder frame. Default: 0.
   EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers. Default: 0.
+  EXPECT_MIN_SURFACE_CHANGES In strict command mode, require at least this many Skiko surface-change markers. Default: 0.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader fallback probe. Default: false.
@@ -207,6 +213,7 @@ Environment:
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT Enables an invalid sweep-gradient stop probe. Default: false.
+  MAGIC_JEWEL_AUTO_RESIZE Resizes the JFrame once after startup to exercise surface invalidation. Default: false.
   SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
   SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST Forces Skiko's expected native metadata ABI for fallback validation. Empty by default.
   SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST Forces Skiko's required command capability mask for fallback validation. Empty by default.
@@ -708,7 +715,7 @@ write_machine_summary() {
     echo "jbr_command_frames=$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
-    echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "screenshot_status=$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_old_status=$(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_new_status=$(cat "${OUT_DIR}/new-asprof-status.txt" 2>/dev/null || echo not-run)"
@@ -760,7 +767,7 @@ write_report() {
   cmp_command_recorder_summary="$(command_recorder_summary "${new_log}")"
   jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
   jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}")"
-  skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_log}")"
+  skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
 
@@ -801,6 +808,7 @@ write_report() {
     echo "- MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT: ${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT}"
     echo "- MAGIC_JEWEL_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_IMAGE_CACHE_CHURN}"
     echo "- MAGIC_JEWEL_INVALID_SWEEP_GRADIENT: ${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT}"
+    echo "- MAGIC_JEWEL_AUTO_RESIZE: ${MAGIC_JEWEL_AUTO_RESIZE}"
     echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
     echo "- SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST: ${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-<unset>}"
     echo "- SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST: ${SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST:-<unset>}"
@@ -811,6 +819,7 @@ write_report() {
     echo "- EXPECT_MIN_IMAGE_REFS: ${EXPECT_MIN_IMAGE_REFS}"
     echo "- EXPECT_MIN_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
+    echo "- EXPECT_MIN_SURFACE_CHANGES: ${EXPECT_MIN_SURFACE_CHANGES}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
     echo
     echo "## Modes"
@@ -905,7 +914,9 @@ validate_report() {
   local expect_strict="${EXPECT_STRICT_COMMANDS:-true}"
   local failures=()
   local new_log="${OUT_DIR}/new-sampled.log"
+  local new_full_log="${OUT_DIR}/new.log"
   [[ -f "${new_log}" ]] || new_log="${OUT_DIR}/new.log"
+  [[ -f "${new_full_log}" ]] || new_full_log="${new_log}"
 
   if [[ "${mode}" == "commands" && "${expect_strict}" == "true" ]]; then
     local recorder_frames
@@ -1006,6 +1017,12 @@ validate_report() {
         jbr_image_cache_clears="$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
         [[ "${jbr_image_cache_clears}" -ge "${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("JBR image cache clear markers ${jbr_image_cache_clears} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}")
+      fi
+      if [[ "${EXPECT_MIN_SURFACE_CHANGES}" -gt 0 ]]; then
+        local surface_changes
+        surface_changes="$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${surface_changes}" -ge "${EXPECT_MIN_SURFACE_CHANGES}" ]] ||
+          failures+=("Skiko surface-change markers ${surface_changes} below expected ${EXPECT_MIN_SURFACE_CHANGES}")
       fi
     fi
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" != "true" ||

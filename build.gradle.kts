@@ -91,6 +91,9 @@ val imageCacheChurnEnabled = providers.gradleProperty("magicJewelImageCacheChurn
 val invalidSweepGradientEnabled = providers.gradleProperty("magicJewelInvalidSweepGradient")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_INVALID_SWEEP_GRADIENT"))
     .orElse("false")
+val autoResizeEnabled = providers.gradleProperty("magicJewelAutoResize")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_AUTO_RESIZE"))
+    .orElse("false")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -160,6 +163,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.paragraphLayoutText", paragraphLayoutTextEnabled.get())
     systemProperty("magic.jewel.imageCacheChurn", imageCacheChurnEnabled.get())
     systemProperty("magic.jewel.invalidSweepGradient", invalidSweepGradientEnabled.get())
+    systemProperty("magic.jewel.autoResize", autoResizeEnabled.get())
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")

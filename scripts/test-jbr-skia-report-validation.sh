@@ -52,6 +52,34 @@ surface_change_summary_is_machine_readable() {
   grep -q "^skiko_surface_change_markers=1$" "${dir}/summary.properties"
 }
 
+strict_command_requires_min_surface_changes() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_SURFACE_CHANGED oldSurfaceId=0x1 newSurfaceId=0x2 oldMetalTexture=0x3 newMetalTexture=0x4"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_SURFACE_CHANGES=1
+}
+
+strict_command_fails_without_min_surface_changes() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MIN_SURFACE_CHANGES=1 2>/dev/null; then
+    echo "Expected strict command validation to fail below minimum surface-change count" >&2
+    return 1
+  fi
+}
+
 strict_command_allows_teardown_marker_drift() {
   local dir
   dir="$(make_report_dir)"
@@ -349,6 +377,8 @@ handshake_fallback_fails_with_command_frames() {
 
 strict_command_passes
 surface_change_summary_is_machine_readable
+strict_command_requires_min_surface_changes
+strict_command_fails_without_min_surface_changes
 strict_command_allows_teardown_marker_drift
 strict_command_requires_min_text_commands
 strict_command_fails_without_min_text_commands
