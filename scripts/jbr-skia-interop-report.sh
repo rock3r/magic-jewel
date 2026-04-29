@@ -210,7 +210,8 @@ run_mode() {
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
       if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ||
           "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "abi-mismatch" ||
-          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-capability-mismatch" ]]; then
+          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-capability-mismatch" ||
+          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "public-api-missing" ]]; then
         ready_marker="${FALLBACK_MARKER}"
       else
         ready_marker="${SKIKO_PICTURE_MARKER}"
@@ -673,6 +674,12 @@ validate_report() {
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during command-capability fallback: ${jbr_command_frames}")
         if ! grep -q "${FALLBACK_MARKER} reason=command-capability-mismatch" "${OUT_DIR}/new.log" 2>/dev/null; then
           failures+=("missing command-capability-mismatch fallback marker")
+        fi
+      elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "public-api-missing" ]]; then
+        [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during public-API fallback: ${skiko_command_frames}")
+        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during public-API fallback: ${jbr_command_frames}")
+        if ! grep -q "${FALLBACK_MARKER} reason=public-api-missing" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("missing public-api-missing fallback marker")
         fi
       else
         [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")
