@@ -100,6 +100,9 @@ val autoResizeEnabled = providers.gradleProperty("magicJewelAutoResize")
 val popupStressEnabled = providers.gradleProperty("magicJewelPopupStress")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_POPUP_STRESS"))
     .orElse("false")
+val popupWindowStressEnabled = providers.gradleProperty("magicJewelPopupWindowStress")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_POPUP_WINDOW_STRESS"))
+    .orElse("false")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -172,6 +175,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.invalidSweepGradient", invalidSweepGradientEnabled.get())
     systemProperty("magic.jewel.autoResize", autoResizeEnabled.get())
     systemProperty("magic.jewel.popupStress", popupStressEnabled.get())
+    systemProperty("magic.jewel.popupWindowStress", popupWindowStressEnabled.get())
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")

@@ -8,7 +8,7 @@ SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 DURATION_SECONDS="${DURATION_SECONDS:-8}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-2}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
-CASES="${CASES:-commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-text-image commands-native-text commands-shader-fallback commands-invalid-gradient-fallback}"
+CASES="${CASES:-commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-text-image commands-native-text commands-shader-fallback commands-invalid-gradient-fallback}"
 
 mkdir -p "${OUT_ROOT}"
 
@@ -76,6 +76,11 @@ run_named_case() {
     commands-popup)
       run_case "$1" \
         MAGIC_JEWEL_POPUP_STRESS=true \
+        EXPECT_MIN_POPUP_FRAMES=5
+      ;;
+    commands-popup-window)
+      run_case "$1" \
+        MAGIC_JEWEL_POPUP_WINDOW_STRESS=true \
         EXPECT_MIN_POPUP_FRAMES=5
       ;;
     commands-text-image)

@@ -62,6 +62,7 @@ import java.awt.Graphics2D
 import java.awt.RenderingHints
 import javax.swing.BorderFactory
 import javax.swing.JComponent
+import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -111,8 +112,12 @@ private const val AutoResizeProperty = "magic.jewel.autoResize"
 private const val AutoResizeDelayMillisProperty = "magic.jewel.autoResizeDelayMillis"
 private const val PopupStressProperty = "magic.jewel.popupStress"
 private const val PopupStressDelayMillisProperty = "magic.jewel.popupStressDelayMillis"
+private const val PopupWindowStressProperty = "magic.jewel.popupWindowStress"
+private const val PopupWindowStressDelayMillisProperty = "magic.jewel.popupWindowStressDelayMillis"
 private const val ResizeMarker = "MAGIC_JEWEL_WINDOW_RESIZE"
 private const val PopupShownMarker = "MAGIC_JEWEL_POPUP_SHOWN"
+private const val PopupWindowTitle = "MagicJewelPopupWindow"
+private const val PopupWindowShownMarker = "MAGIC_JEWEL_POPUP_WINDOW_SHOWN"
 private const val PopupFrameMarker = "MAGIC_JEWEL_POPUP_FRAME"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
@@ -140,6 +145,7 @@ private fun showMagicJewel() {
         setLocationRelativeTo(null)
         isVisible = true
         panel.schedulePopupStressIfNeeded()
+        schedulePopupWindowStressIfNeeded()
         scheduleAutoResizeIfNeeded()
     }
 }
@@ -163,6 +169,28 @@ private fun ComposePanel.schedulePopupStressIfNeeded() {
         glassPane.revalidate()
         glassPane.repaint(panel.bounds)
         System.err.println("$PopupShownMarker x=96 y=214 width=${panel.width} height=${panel.height}")
+    }.apply {
+        isRepeats = false
+        start()
+    }
+}
+
+private fun JFrame.schedulePopupWindowStressIfNeeded() {
+    if (!System.getProperty(PopupWindowStressProperty, "false").toBoolean()) return
+
+    val delayMillis = System.getProperty(PopupWindowStressDelayMillisProperty, "1700").toIntOrNull() ?: 1700
+    Timer(delayMillis) {
+        val dialog = JDialog(this, PopupWindowTitle).apply {
+            isUndecorated = true
+            contentPane.add(PopupStressPanel())
+            pack()
+            val anchor = location
+            setLocation(anchor.x + 96, anchor.y + 214)
+            isVisible = true
+        }
+        System.err.println(
+            "$PopupWindowShownMarker x=${dialog.x} y=${dialog.y} width=${dialog.width} height=${dialog.height}",
+        )
     }.apply {
         isRepeats = false
         start()

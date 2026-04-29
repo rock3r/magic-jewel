@@ -19,6 +19,8 @@ CMP_SCRIPTS_DIR="${CMP_SCRIPTS_DIR:-/Users/rock3r/src/cmp-jbr-skia-poc/compose/d
 CAPTURE_SCRIPT="${CAPTURE_SCRIPT:-${CMP_SCRIPTS_DIR}/capture-macos-window.sh}"
 ASSERT_SCRIPT="${ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-mixed-window-screenshot.sh}"
 COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-command-window-screenshot.sh}"
+POPUP_WINDOW_ASSERT_SCRIPT="${POPUP_WINDOW_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-popup-window-screenshot.sh}"
+CAPTURE_POPUP_WINDOW_QUERY="${CAPTURE_POPUP_WINDOW_QUERY:-MagicJewelPopupWindow}"
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
 EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
@@ -121,6 +123,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_POPUP_STRESS+x}" ]]; then
   MAGIC_JEWEL_POPUP_STRESS=false
 fi
+if [[ -z "${MAGIC_JEWEL_POPUP_WINDOW_STRESS+x}" ]]; then
+  MAGIC_JEWEL_POPUP_WINDOW_STRESS=false
+fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
@@ -149,6 +154,7 @@ export MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_INVALID_SWEEP_GRADIENT
 export MAGIC_JEWEL_AUTO_RESIZE
 export MAGIC_JEWEL_POPUP_STRESS
+export MAGIC_JEWEL_POPUP_WINDOW_STRESS
 export JBR_SKIA_NATIVE_TEXT
 export SKIKO_EXPECTED_ABI_ID_FOR_TEST
 export SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST
@@ -158,6 +164,7 @@ APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
 POPUP_FRAME_MARKER="MAGIC_JEWEL_POPUP_FRAME"
 POPUP_SHOWN_MARKER="MAGIC_JEWEL_POPUP_SHOWN"
+POPUP_WINDOW_SHOWN_MARKER="MAGIC_JEWEL_POPUP_WINDOW_SHOWN"
 SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
@@ -170,6 +177,7 @@ CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
 MIXED_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_MIXED_SCREENSHOT_COUNTS"
 COMMAND_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_COMMAND_SCREENSHOT_COUNTS"
+POPUP_WINDOW_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_POPUP_WINDOW_SCREENSHOT_COUNTS"
 SAMPLE_BEGIN_MARKER="MAGIC_JEWEL_REPORT_SAMPLE_BEGIN"
 
 mkdir -p "${OUT_DIR}"
@@ -199,7 +207,9 @@ Environment:
   CMP_SCRIPTS_DIR          CMP sample scripts directory containing the capture helper.
   ASSERT_SCRIPT            Picture/mixed-mode screenshot assertion helper.
   COMMAND_ASSERT_SCRIPT    Command-mode screenshot assertion helper.
+  POPUP_WINDOW_ASSERT_SCRIPT Popup-window screenshot assertion helper.
   CAPTURE_WINDOW_QUERY     Window title/owner to capture. Default: MagicJewelJbrSkiaWindow.
+  CAPTURE_POPUP_WINDOW_QUERY Popup window title/owner to capture. Default: MagicJewelPopupWindow.
   APP_PROCESS_QUERY        Process command substring for the launched app. Default: com.magicjewel.MainKt.
   EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
@@ -246,6 +256,7 @@ Environment:
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT Enables an invalid sweep-gradient stop probe. Default: false.
   MAGIC_JEWEL_AUTO_RESIZE Resizes the JFrame once after startup to exercise surface invalidation. Default: false.
   MAGIC_JEWEL_POPUP_STRESS Shows an animated Swing popup over the ComposePanel. Default: false.
+  MAGIC_JEWEL_POPUP_WINDOW_STRESS Shows an animated undecorated Swing popup window over the ComposePanel. Default: false.
   SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
   SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST Forces Skiko's expected native metadata ABI for fallback validation. Empty by default.
   SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST Forces Skiko's required command capability mask for fallback validation. Empty by default.
@@ -383,6 +394,9 @@ run_mode() {
   local screenshot="${OUT_DIR}/${mode}-window.png"
   local screenshot_assertion="${OUT_DIR}/${mode}-screenshot-assertion.log"
   local screenshot_status="${OUT_DIR}/${mode}-screenshot-status.txt"
+  local popup_screenshot="${OUT_DIR}/${mode}-popup-window.png"
+  local popup_screenshot_assertion="${OUT_DIR}/${mode}-popup-window-screenshot-assertion.log"
+  local popup_screenshot_status="${OUT_DIR}/${mode}-popup-window-screenshot-status.txt"
   local ready_marker="${SKIKO_PICTURE_MARKER}"
   local assert_script="${ASSERT_SCRIPT}"
   local startup_marker="${APP_FRAME_MARKER}"
@@ -423,6 +437,7 @@ run_mode() {
   local sample_start_line=0
   local sample_started=false
   local screenshot_done=false
+  local popup_screenshot_done=false
   local profiler_path=""
   local profiler_pid=""
   local profiler_started=false
@@ -467,6 +482,19 @@ run_mode() {
         if "${assert_script}" "${screenshot}" > "${screenshot_assertion}" 2>&1; then
           echo "passed" > "${screenshot_status}"
           screenshot_done=true
+        fi
+      fi
+    fi
+    if [[ "${mode}" == "new"
+        && "${MAGIC_JEWEL_POPUP_WINDOW_STRESS}" == "true"
+        && "${popup_screenshot_done}" == "false"
+        && -x "${CAPTURE_SCRIPT}"
+        && -x "${POPUP_WINDOW_ASSERT_SCRIPT}"
+        && $(grep -c "${POPUP_WINDOW_SHOWN_MARKER}" "${log}" 2>/dev/null) -gt 0 ]]; then
+      if "${CAPTURE_SCRIPT}" "${CAPTURE_POPUP_WINDOW_QUERY}" "${popup_screenshot}" > "${OUT_DIR}/${mode}-popup-window-capture.log" 2>&1; then
+        if "${POPUP_WINDOW_ASSERT_SCRIPT}" "${popup_screenshot}" > "${popup_screenshot_assertion}" 2>&1; then
+          echo "passed" > "${popup_screenshot_status}"
+          popup_screenshot_done=true
         fi
       fi
     fi
@@ -750,6 +778,7 @@ write_machine_summary() {
     echo "popup_old_frames=$(grep -c "${POPUP_FRAME_MARKER}" "${old_log}" 2>/dev/null || true)"
     echo "popup_new_frames=$(grep -c "${POPUP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "popup_new_shown=$(grep -c "${POPUP_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "popup_window_new_shown=$(grep -c "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "cmp_recorder_frames=$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "cmp_unsupported_max=$(max_command_recorder_field "${new_log}" "unsupported")"
     echo "cmp_unsupported_reasons=$(command_recorder_reasons "${new_log}")"
@@ -765,6 +794,7 @@ write_machine_summary() {
     echo "skiko_context_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_same_context_surface_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=false.*surfaceChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "screenshot_status=$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || echo not-run)"
+    echo "popup_window_screenshot_status=$(cat "${OUT_DIR}/new-popup-window-screenshot-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_old_status=$(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_new_status=$(cat "${OUT_DIR}/new-asprof-status.txt" 2>/dev/null || echo not-run)"
     echo "report_path=${OUT_DIR}/report.md"
@@ -794,6 +824,8 @@ write_report() {
   local skiko_surface_change_summary
   local screenshot_counts
   local screenshot_status
+  local popup_screenshot_counts
+  local popup_screenshot_status
   local old_log="${OUT_DIR}/old-sampled.log"
   local new_log="${OUT_DIR}/new-sampled.log"
   local old_full_log="${OUT_DIR}/old.log"
@@ -824,6 +856,8 @@ write_report() {
   skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
+  popup_screenshot_counts="$(grep -E "${POPUP_WINDOW_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-popup-window-screenshot-assertion.log" 2>/dev/null || true)"
+  popup_screenshot_status="$(cat "${OUT_DIR}/new-popup-window-screenshot-status.txt" 2>/dev/null || true)"
 
   {
     echo "# Magic Jewel JBR Skia Interop Report"
@@ -865,6 +899,7 @@ write_report() {
     echo "- MAGIC_JEWEL_INVALID_SWEEP_GRADIENT: ${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT}"
     echo "- MAGIC_JEWEL_AUTO_RESIZE: ${MAGIC_JEWEL_AUTO_RESIZE}"
     echo "- MAGIC_JEWEL_POPUP_STRESS: ${MAGIC_JEWEL_POPUP_STRESS}"
+    echo "- MAGIC_JEWEL_POPUP_WINDOW_STRESS: ${MAGIC_JEWEL_POPUP_WINDOW_STRESS}"
     echo "- JBR_SKIA_NATIVE_TEXT: ${JBR_SKIA_NATIVE_TEXT}"
     echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
     echo "- SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST: ${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-<unset>}"
@@ -886,6 +921,7 @@ write_report() {
     echo "- EXPECT_SURFACE_CONTEXT_CHANGED: ${EXPECT_SURFACE_CONTEXT_CHANGED:-<unset>}"
     echo "- EXPECT_SURFACE_CHANGED: ${EXPECT_SURFACE_CHANGED:-<unset>}"
     echo "- APP_PROCESS_QUERY: ${APP_PROCESS_QUERY}"
+    echo "- CAPTURE_POPUP_WINDOW_QUERY: ${CAPTURE_POPUP_WINDOW_QUERY}"
     echo
     echo "## Modes"
     echo
@@ -952,6 +988,17 @@ write_report() {
       echo "- not run"
     fi
     echo
+    echo "## Popup Window Screenshot Assertion"
+    echo
+    if [[ -n "${popup_screenshot_counts}" ]]; then
+      echo "- status: ${popup_screenshot_status:-unknown}"
+      echo "- ${popup_screenshot_counts}"
+      echo "- screenshot: new-popup-window.png"
+      echo "- assertion log: new-popup-window-screenshot-assertion.log"
+    else
+      echo "- not run"
+    fi
+    echo
     echo "## Files"
     echo
     echo "- old log: old.log"
@@ -997,6 +1044,7 @@ validate_report() {
     local skiko_picture_frames
     local jbr_picture_frames
     local screenshot_status
+    local popup_screenshot_status
 
     recorder_frames="$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${new_log}" 2>/dev/null || true)"
     skiko_command_frames="$(grep -c "${SKIKO_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
@@ -1004,6 +1052,7 @@ validate_report() {
     skiko_picture_frames="$(grep -c "${SKIKO_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     jbr_picture_frames="$(grep -c "${JBR_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
+    popup_screenshot_status="$(cat "${OUT_DIR}/new-popup-window-screenshot-status.txt" 2>/dev/null || true)"
 
     [[ "${recorder_frames}" -gt 0 ]] || failures+=("no CMP command recorder frames")
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
@@ -1125,6 +1174,12 @@ validate_report() {
         popup_frames="$(grep -c "${POPUP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
         [[ "${popup_frames}" -ge "${EXPECT_MIN_POPUP_FRAMES}" ]] ||
           failures+=("Swing popup paint markers ${popup_frames} below expected ${EXPECT_MIN_POPUP_FRAMES}")
+      fi
+      if [[ "${MAGIC_JEWEL_POPUP_WINDOW_STRESS}" == "true" ]]; then
+        if ! grep -q "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null; then
+          failures+=("missing Swing popup window shown marker")
+        fi
+        [[ "${popup_screenshot_status}" == "passed" ]] || failures+=("popup window screenshot assertion did not pass")
       fi
       if [[ "${EXPECT_MIN_SURFACE_CHANGES}" -gt 0 ]]; then
         local surface_changes
