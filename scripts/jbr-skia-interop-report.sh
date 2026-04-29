@@ -25,6 +25,7 @@ EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 SKIKO_EXPECTED_ABI_ID_FOR_TEST="${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-}"
+SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST="${SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST:-}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
 fi
@@ -63,6 +64,7 @@ export MAGIC_JEWEL_UNSUPPORTED_TEXT
 export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
 export MAGIC_JEWEL_IMAGE_CACHE_CHURN
 export SKIKO_EXPECTED_ABI_ID_FOR_TEST
+export SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
@@ -122,6 +124,7 @@ Environment:
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
   SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
+  SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST Forces Skiko's required command capability mask for fallback validation. Empty by default.
 EOF_USAGE
 }
 
@@ -206,7 +209,8 @@ run_mode() {
   if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" ]]; then
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
       if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ||
-          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "abi-mismatch" ]]; then
+          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "abi-mismatch" ||
+          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-capability-mismatch" ]]; then
         ready_marker="${FALLBACK_MARKER}"
       else
         ready_marker="${SKIKO_PICTURE_MARKER}"
@@ -547,6 +551,7 @@ write_report() {
     echo "- MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT: ${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT}"
     echo "- MAGIC_JEWEL_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_IMAGE_CACHE_CHURN}"
     echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
+    echo "- SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST: ${SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST:-<unset>}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
@@ -662,6 +667,12 @@ validate_report() {
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during ABI-mismatch fallback: ${jbr_command_frames}")
         if ! grep -q "${FALLBACK_MARKER} reason=abi-mismatch" "${OUT_DIR}/new.log" 2>/dev/null; then
           failures+=("missing abi-mismatch fallback marker")
+        fi
+      elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-capability-mismatch" ]]; then
+        [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during command-capability fallback: ${skiko_command_frames}")
+        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during command-capability fallback: ${jbr_command_frames}")
+        if ! grep -q "${FALLBACK_MARKER} reason=command-capability-mismatch" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("missing command-capability-mismatch fallback marker")
         fi
       else
         [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")
