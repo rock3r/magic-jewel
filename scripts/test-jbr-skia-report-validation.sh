@@ -224,6 +224,18 @@ command_stream_invalid_fallback_passes() {
   run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
 }
 
+native_abi_mismatch_fallback_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=native-abi-mismatch"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=native-abi-mismatch
+}
+
 strict_command_passes
 strict_command_allows_teardown_marker_drift
 strict_command_requires_min_text_commands
@@ -239,5 +251,6 @@ strict_command_fails_without_min_jbr_image_cache_clears
 expected_image_fallback_passes
 expected_fallback_requires_reason
 command_stream_invalid_fallback_passes
+native_abi_mismatch_fallback_passes
 
 echo "JBR_SKIA_REPORT_VALIDATION_TESTS passed"

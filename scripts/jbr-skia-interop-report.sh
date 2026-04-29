@@ -25,6 +25,7 @@ EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 SKIKO_EXPECTED_ABI_ID_FOR_TEST="${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-}"
+SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST="${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-}"
 SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST="${SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST:-}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
@@ -120,6 +121,7 @@ export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
 export MAGIC_JEWEL_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_INVALID_SWEEP_GRADIENT
 export SKIKO_EXPECTED_ABI_ID_FOR_TEST
+export SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST
 export SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
@@ -194,6 +196,7 @@ Environment:
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT Enables an invalid sweep-gradient stop probe. Default: false.
   SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
+  SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST Forces Skiko's expected native metadata ABI for fallback validation. Empty by default.
   SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST Forces Skiko's required command capability mask for fallback validation. Empty by default.
 EOF_USAGE
 }
@@ -636,6 +639,7 @@ write_report() {
     echo "- MAGIC_JEWEL_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_IMAGE_CACHE_CHURN}"
     echo "- MAGIC_JEWEL_INVALID_SWEEP_GRADIENT: ${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT}"
     echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
+    echo "- SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST: ${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-<unset>}"
     echo "- SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST: ${SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST:-<unset>}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
@@ -759,6 +763,12 @@ validate_report() {
         if ! grep -q "${FALLBACK_MARKER} reason=command-capability-mismatch" "${OUT_DIR}/new.log" 2>/dev/null; then
           failures+=("missing command-capability-mismatch fallback marker")
         fi
+      elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "native-abi-mismatch" ]]; then
+        [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during native-ABI fallback: ${skiko_command_frames}")
+        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during native-ABI fallback: ${jbr_command_frames}")
+        if ! grep -q "${FALLBACK_MARKER} reason=native-abi-mismatch" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("missing native-abi-mismatch fallback marker")
+        fi
       elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "public-api-missing" ]]; then
         [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during public-API fallback: ${skiko_command_frames}")
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during public-API fallback: ${jbr_command_frames}")
@@ -818,7 +828,8 @@ validate_report() {
           failures+=("JBR image cache clear markers ${jbr_image_cache_clears} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}")
       fi
     fi
-    if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" != "command-stream-invalid" ]]; then
+    if [[ "${EXPECT_COMMAND_FALLBACK:-false}" != "true" ||
+        ! "${EXPECT_COMMAND_FALLBACK_REASON:-}" =~ ^(abi-mismatch|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing)$ ]]; then
       [[ "${screenshot_status}" == "passed" ]] || failures+=("screenshot assertion did not pass")
     fi
   fi
