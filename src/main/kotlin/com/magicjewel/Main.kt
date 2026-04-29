@@ -100,6 +100,7 @@ private const val ComposeRadialGradientRoundRectProperty = "magic.jewel.compose.
 private const val ComposeRadialGradientPathProperty = "magic.jewel.compose.radialGradientPath"
 private const val ComposeSweepGradientProperty = "magic.jewel.compose.sweepGradient"
 private const val ComposeSweepGradientRoundRectProperty = "magic.jewel.compose.sweepGradientRoundRect"
+private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepGradientPath"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -186,6 +187,9 @@ private fun MagicJewelApp() {
     }
     val composeSweepGradientRoundRectEnabled = remember {
         System.getProperty(ComposeSweepGradientRoundRectProperty, "false").toBoolean()
+    }
+    val composeSweepGradientPathEnabled = remember {
+        System.getProperty(ComposeSweepGradientPathProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -553,6 +557,30 @@ private fun MagicJewelApp() {
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(28f, 18f),
                         style = Stroke(width = 3f),
                     )
+                }
+                if (composeSweepGradientPathEnabled) {
+                    val path = Path().apply {
+                        moveTo(size.width - 250f, size.height - 238f)
+                        cubicTo(
+                            size.width - 208f,
+                            size.height - 282f,
+                            size.width - 152f,
+                            size.height - 256f,
+                            size.width - 162f,
+                            size.height - 198f,
+                        )
+                        lineTo(size.width - 214f, size.height - 158f)
+                        lineTo(size.width - 280f, size.height - 186f)
+                        close()
+                    }
+                    drawPath(
+                        path = path,
+                        brush = Brush.sweepGradient(
+                            colors = listOf(Color(0xFFEF4444), Color(0xFFF59E0B), Color(0xFF22D3EE), Color(0xFF7C3AED)),
+                            center = Offset(size.width - 216f, size.height - 212f),
+                        ),
+                    )
+                    drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
                 }
             }
 
