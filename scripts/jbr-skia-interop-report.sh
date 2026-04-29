@@ -18,6 +18,7 @@ COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-co
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
 EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
+EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS="${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS:-0}"
 EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
 EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
@@ -96,7 +97,8 @@ Environment:
   EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
   EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
-  EXPECT_MIN_TEXT_COMMANDS In strict command mode, require at least this many text commands in one CMP recorder frame. Default: 0.
+  EXPECT_MIN_TEXT_COMMANDS In strict command mode, require at least this many simple text commands in one CMP recorder frame. Default: 0.
+  EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS In strict command mode, require at least this many paragraph text commands in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_REFS In strict command mode, require at least this many image refs in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_CACHE_CLEARS In strict command mode, require at least this many image cache clears in one CMP recorder frame. Default: 0.
   EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers. Default: 0.
@@ -106,7 +108,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP Enables the Compose clipRect probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP_OUT Enables the Compose clip-out probe. Default: false.
-  MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use cached-image command fallback. Default: false.
+  MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use the paragraph text command. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
 EOF_USAGE
 }
@@ -350,6 +352,9 @@ command_recorder_summary() {
         } else if (value[1] == "textCommands") {
           textCommands += value[2]
           if (value[2] > maxTextCommands) maxTextCommands = value[2]
+        } else if (value[1] == "paragraphTextCommands") {
+          paragraphTextCommands += value[2]
+          if (value[2] > maxParagraphTextCommands) maxParagraphTextCommands = value[2]
         } else if (value[1] == "imageDefines") {
           imageDefines += value[2]
           if (value[2] > maxImageDefines) maxImageDefines = value[2]
@@ -367,7 +372,7 @@ command_recorder_summary() {
     }
     END {
       if (frames == 0) {
-        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_refs=0 max_image_refs=0 avg_image_cache_clears=0 max_image_cache_clears=0 reasons=none"
+        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_paragraph_text_commands=0 max_paragraph_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_refs=0 max_image_refs=0 avg_image_cache_clears=0 max_image_cache_clears=0 reasons=none"
         exit
       }
       reasonSummary = "none"
@@ -375,9 +380,10 @@ command_recorder_summary() {
         item = reason ":" reasons[reason]
         reasonSummary = reasonSummary == "none" ? item : reasonSummary "," item
       }
-      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_refs=%.1f max_image_refs=%.0f avg_image_cache_clears=%.1f max_image_cache_clears=%.0f reasons=%s",
+      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_paragraph_text_commands=%.1f max_paragraph_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_refs=%.1f max_image_refs=%.0f avg_image_cache_clears=%.1f max_image_cache_clears=%.0f reasons=%s",
         frames, frames / duration, commands / frames, maxCommands, unsupportedFrames, unsupported / frames, maxUnsupported,
-        textCommands / frames, maxTextCommands, imageDefines / frames, maxImageDefines, imageRefs / frames, maxImageRefs,
+        textCommands / frames, maxTextCommands, paragraphTextCommands / frames, maxParagraphTextCommands,
+        imageDefines / frames, maxImageDefines, imageRefs / frames, maxImageRefs,
         imageCacheClears / frames, maxImageCacheClears,
         reasonSummary
     }
@@ -459,6 +465,7 @@ write_report() {
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
+    echo "- EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS: ${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}"
     echo "- EXPECT_MIN_IMAGE_REFS: ${EXPECT_MIN_IMAGE_REFS}"
     echo "- EXPECT_MIN_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
@@ -586,6 +593,12 @@ validate_report() {
         max_text_commands="$(max_command_recorder_field "${OUT_DIR}/new.log" "textCommands")"
         [[ "${max_text_commands}" -ge "${EXPECT_MIN_TEXT_COMMANDS}" ]] ||
           failures+=("CMP recorder max textCommands ${max_text_commands} below expected ${EXPECT_MIN_TEXT_COMMANDS}")
+      fi
+      if [[ "${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}" -gt 0 ]]; then
+        local max_paragraph_text_commands
+        max_paragraph_text_commands="$(max_command_recorder_field "${OUT_DIR}/new.log" "paragraphTextCommands")"
+        [[ "${max_paragraph_text_commands}" -ge "${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}" ]] ||
+          failures+=("CMP recorder max paragraphTextCommands ${max_paragraph_text_commands} below expected ${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}")
       fi
       if [[ "${EXPECT_MIN_IMAGE_REFS}" -gt 0 ]]; then
         local max_image_refs
