@@ -32,6 +32,9 @@ strict_command_passes() {
   } > "${dir}/new.log"
 
   run_validate_only "${dir}"
+  grep -q "^validation_status=passed$" "${dir}/summary.properties"
+  grep -q "^skiko_command_frames=1$" "${dir}/summary.properties"
+  grep -q "^jbr_command_frames=1$" "${dir}/summary.properties"
 }
 
 strict_command_allows_teardown_marker_drift() {
@@ -73,6 +76,8 @@ strict_command_fails_without_min_text_commands() {
     echo "Expected strict command validation to fail below minimum text command count" >&2
     return 1
   fi
+  grep -q "^validation_status=failed$" "${dir}/summary.properties"
+  grep -q "validation_failures=.*below expected 1" "${dir}/summary.properties"
 }
 
 strict_command_requires_min_paragraph_text_commands() {
@@ -194,6 +199,9 @@ expected_image_fallback_passes() {
   } > "${dir}/new.log"
 
   run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=image
+  grep -q "^cmp_unsupported_reasons=image:1$" "${dir}/summary.properties"
+  grep -q "^skiko_picture_frames=1$" "${dir}/summary.properties"
+  grep -q "^jbr_picture_frames=1$" "${dir}/summary.properties"
 }
 
 expected_fallback_requires_reason() {
@@ -246,6 +254,9 @@ native_abi_mismatch_fallback_passes() {
   } > "${dir}/new.log"
 
   run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=native-abi-mismatch
+  grep -q "^fallback_new_count=1$" "${dir}/summary.properties"
+  grep -q "^skiko_command_frames=0$" "${dir}/summary.properties"
+  grep -q "^jbr_command_frames=0$" "${dir}/summary.properties"
 }
 
 command_capability_mismatch_fallback_passes() {

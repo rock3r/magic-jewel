@@ -563,6 +563,80 @@ max_command_recorder_field() {
   ' "${log}"
 }
 
+command_recorder_reasons() {
+  local log="$1"
+  awk -v marker="${CMP_COMMAND_RECORDER_MARKER}" '
+    index($0, marker) {
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[2] ~ /^[0-9]+$/ &&
+            value[1] != "commands" &&
+            value[1] != "unsupported" &&
+            value[1] != "textCommands" &&
+            value[1] != "paragraphTextCommands" &&
+            value[1] != "imageDefines" &&
+            value[1] != "imageRefs" &&
+            value[1] != "imageCacheClears") {
+          reasons[value[1]] += value[2]
+        }
+      }
+    }
+    END {
+      summary = "none"
+      for (reason in reasons) {
+        item = reason ":" reasons[reason]
+        summary = summary == "none" ? item : summary "," item
+      }
+      printf "%s", summary
+    }
+  ' "${log}"
+}
+
+write_machine_summary() {
+  local validation_status="$1"
+  shift
+  local summary="${OUT_DIR}/summary.properties"
+  local old_log="${OUT_DIR}/old-sampled.log"
+  local new_log="${OUT_DIR}/new-sampled.log"
+  local old_full_log="${OUT_DIR}/old.log"
+  local new_full_log="${OUT_DIR}/new.log"
+  [[ -f "${old_log}" ]] || old_log="${OUT_DIR}/old.log"
+  [[ -f "${new_log}" ]] || new_log="${OUT_DIR}/new.log"
+  [[ -f "${old_full_log}" ]] || old_full_log="${old_log}"
+  [[ -f "${new_full_log}" ]] || new_full_log="${new_log}"
+
+  local failures="none"
+  if [[ "$#" -gt 0 ]]; then
+    failures="$(printf '%s\n' "$@" | paste -sd '|' -)"
+  fi
+
+  {
+    echo "schema_version=1"
+    echo "validation_status=${validation_status}"
+    echo "validation_failures=${failures}"
+    echo "render_mode=${JBR_SKIA_RENDER_MODE:-picture}"
+    echo "expect_command_fallback=${EXPECT_COMMAND_FALLBACK}"
+    echo "expect_command_fallback_reason=${EXPECT_COMMAND_FALLBACK_REASON}"
+    echo "fallback_old_count=$(grep -c "${FALLBACK_MARKER}" "${old_full_log}" 2>/dev/null || true)"
+    echo "fallback_new_count=$(grep -c "${FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "app_old_frames=$(grep -c "${APP_FRAME_MARKER}" "${old_log}" 2>/dev/null || true)"
+    echo "app_new_frames=$(grep -c "${APP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "swing_old_frames=$(grep -c "${SWING_FRAME_MARKER}" "${old_log}" 2>/dev/null || true)"
+    echo "swing_new_frames=$(grep -c "${SWING_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "cmp_recorder_frames=$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "cmp_unsupported_max=$(max_command_recorder_field "${new_log}" "unsupported")"
+    echo "cmp_unsupported_reasons=$(command_recorder_reasons "${new_log}")"
+    echo "skiko_picture_frames=$(grep -c "${SKIKO_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_picture_frames=$(grep -c "${JBR_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "skiko_command_frames=$(grep -c "${SKIKO_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_command_frames=$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "screenshot_status=$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || echo not-run)"
+    echo "report_path=${OUT_DIR}/report.md"
+  } > "${summary}"
+}
+
 write_report() {
   local report="${OUT_DIR}/report.md"
   local old_summary
@@ -713,6 +787,7 @@ write_report() {
     echo "- new sampled log: new-sampled.log"
     echo "- old ps samples: old-ps.csv"
     echo "- new ps samples: new-ps.csv"
+    echo "- machine summary: summary.properties"
     echo
     echo "## Notes"
     echo
@@ -853,6 +928,12 @@ validate_report() {
       done
     fi
   } >> "${report}"
+
+  if [[ "${#failures[@]}" -eq 0 ]]; then
+    write_machine_summary "passed"
+  else
+    write_machine_summary "failed" "${failures[@]}"
+  fi
 
   if [[ "${#failures[@]}" -ne 0 ]]; then
     printf 'Strict command validation failed; see %s\n' "${report}" >&2
