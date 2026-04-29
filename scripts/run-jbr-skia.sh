@@ -7,6 +7,7 @@ JBR_API_SHIM=${JBR_API_SHIM:-/tmp/jbr-api-shim.jar}
 JBR_SKIA_LIB=${JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}
 SKIKO_VERSION=${SKIKO_VERSION:-0.0.0-SNAPSHOT}
 JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
+JBR_SKIA_NATIVE_TEXT=${JBR_SKIA_NATIVE_TEXT:-false}
 MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM:-false}
 SKIKO_EXPECTED_ABI_ID_FOR_TEST=${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-}
 SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST=${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-}
@@ -24,6 +25,9 @@ case "${JBR_SKIA_RENDER_MODE}" in
   commands)
     JBR_ARGS+=("-Dskiko.jbr.interop.renderCommands=true")
     JBR_ARGS+=("-Dcompose.jbr.skia.command.strict=true")
+    if [[ "${JBR_SKIA_NATIVE_TEXT}" == "true" ]]; then
+      JBR_ARGS+=("-Dcompose.jbr.skia.command.nativeText=true")
+    fi
     if [[ "${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}" == "true" ]]; then
       JBR_ARGS+=("-Dskiko.jbr.interop.corruptCommandStream=true")
     fi
