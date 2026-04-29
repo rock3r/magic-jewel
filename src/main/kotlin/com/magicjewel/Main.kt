@@ -34,6 +34,7 @@ import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -91,6 +92,7 @@ private const val ComposeClipPathProperty = "magic.jewel.compose.clipPath"
 private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
 private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
+private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -153,6 +155,9 @@ private fun MagicJewelApp() {
     }
     val composeDrawRoundRectEnabled = remember {
         System.getProperty(ComposeDrawRoundRectProperty, "false").toBoolean()
+    }
+    val composeLinearGradientEnabled = remember {
+        System.getProperty(ComposeLinearGradientProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -358,6 +363,23 @@ private fun MagicJewelApp() {
                         topLeft = Offset(size.width - 372f, size.height - 238f),
                         size = Size(96f, 64f),
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(18f, 10f),
+                        style = Stroke(width = 3f),
+                    )
+                }
+                if (composeLinearGradientEnabled) {
+                    drawRect(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6), Color(0xFFA855F7)),
+                            start = Offset(size.width - 188f, size.height - 106f),
+                            end = Offset(size.width - 48f, size.height - 34f),
+                        ),
+                        topLeft = Offset(size.width - 188f, size.height - 106f),
+                        size = Size(140f, 72f),
+                    )
+                    drawRect(
+                        color = Color.White,
+                        topLeft = Offset(size.width - 188f, size.height - 106f),
+                        size = Size(140f, 72f),
                         style = Stroke(width = 3f),
                     )
                 }
