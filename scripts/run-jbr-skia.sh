@@ -6,6 +6,7 @@ DESKTOP_PATCH=${DESKTOP_PATCH:-/tmp/jbr-skia-run/desktop}
 JBR_API_SHIM=${JBR_API_SHIM:-/tmp/jbr-api-shim.jar}
 JBR_SKIA_LIB=${JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}
 SKIKO_VERSION=${SKIKO_VERSION:-0.0.0-SNAPSHOT}
+LOCAL_CMP_OUT=${LOCAL_CMP_OUT:-}
 JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
 JBR_SKIA_NATIVE_TEXT=${JBR_SKIA_NATIVE_TEXT:-false}
 MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM:-false}
@@ -52,6 +53,13 @@ fi
 
 printf -v JOINED_ARGS "%s " "${JBR_ARGS[@]}"
 cd "$ROOT"
-SKIKO_VERSION="$SKIKO_VERSION" ./gradlew runJbrSkiaInterop \
-  -PjbrSkiaInteropJvmArgs="${JOINED_ARGS% }" \
-  -PjbrSkiaRenderMode="${JBR_SKIA_RENDER_MODE}"
+GRADLE_ARGS=(
+  runJbrSkiaInterop
+  "-PjbrSkiaInteropJvmArgs=${JOINED_ARGS% }"
+  "-PjbrSkiaRenderMode=${JBR_SKIA_RENDER_MODE}"
+)
+if [[ -n "${LOCAL_CMP_OUT}" ]]; then
+  GRADLE_ARGS+=("-PlocalCmpOut=${LOCAL_CMP_OUT}")
+fi
+
+SKIKO_VERSION="$SKIKO_VERSION" ./gradlew "${GRADLE_ARGS[@]}"

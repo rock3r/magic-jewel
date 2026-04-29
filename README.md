@@ -18,7 +18,7 @@ JBR Skia interop path, using the same patched module/native-library flags as the
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/run-jbr-skia.sh
 ```
 
-By default the interop run prepends patched CMP jars from `/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core`. Override that with `-PlocalCmpOut=/path/to/out/compose-multiplatform-core` if the worktree moves.
+By default the interop run prepends patched CMP jars from `/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core`. Override that with `LOCAL_CMP_OUT=/path/to/out/compose-multiplatform-core` or `-PlocalCmpOut=/path/to/out/compose-multiplatform-core` if the worktree moves.
 Set `JBR_SKIA_RENDER_MODE=commands` to exercise the lower-level command-list probe instead of the default Skia picture replay path.
 Command mode currently supports Magic Jewel text through a temporary text-as-inline-ARGB bridge by default: CMP rasterizes Skia Paragraph output into the existing image command so the sample stays on JBR command replay while preserving the resolved Jewel font, size, and alignment. This is useful for mixed-content validation, but it is not the final JBR-owned font/typeface solution. Set `JBR_SKIA_NATIVE_TEXT=true` only when deliberately probing the experimental native text commands.
 To validate deliberate fallback paths, run with `EXPECT_COMMAND_FALLBACK=true` and set `EXPECT_COMMAND_FALLBACK_REASON` to the unsupported operation being probed.
@@ -67,6 +67,14 @@ SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-compatibility-matrix.sh
 ```
 
 The matrix runs the command-mode happy path plus forced `abi-mismatch`, `native-abi-mismatch`, `command-capability-mismatch`, and `public-api-missing` fallbacks. It validates that happy path gets JBR command frames, while each forced mismatch emits one structured fallback marker and produces no JBR command frames.
+
+Launch-level artifact matrix smoke:
+
+```bash
+SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-artifact-matrix.sh
+```
+
+The artifact matrix uses named local artifact roots instead of test-only mismatch properties. The required `current-all` row validates the current JBR desktop patch, public API shim, native dylib, Skiko version, and CMP output root together; `missing-public-api` validates one real missing-artifact fallback. Optional rows run only when `OLD_JBR_API_SHIM`, `OLD_JBR_SKIA_LIB`, `OLD_DESKTOP_PATCH`, `OLD_SKIKO_VERSION`, or `OLD_CMP_OUT` are provided. Results are written to `matrix.tsv` with stable columns for row status, expected fallback, actual fallback count, JBR command frames, and report path.
 
 Command rendering probe suite:
 

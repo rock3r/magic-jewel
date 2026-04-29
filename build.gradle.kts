@@ -14,6 +14,7 @@ kotlin {
 
 val localSkikoVersion = providers.environmentVariable("SKIKO_VERSION")
 val localCmpOut = providers.gradleProperty("localCmpOut")
+    .orElse(providers.environmentVariable("LOCAL_CMP_OUT"))
     .orElse("/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core")
 val jbrSkiaJvmArgs = providers.gradleProperty("jbrSkiaInteropJvmArgs")
 val jbrSkiaRenderMode = providers.gradleProperty("jbrSkiaRenderMode")
