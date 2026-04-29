@@ -27,6 +27,8 @@ EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
 EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS:-0}"
+EXPECT_MAX_IMAGE_DEFINES="${EXPECT_MAX_IMAGE_DEFINES:--1}"
+EXPECT_MAX_IMAGE_CACHE_CLEARS="${EXPECT_MAX_IMAGE_CACHE_CLEARS:--1}"
 EXPECT_MIN_SURFACE_CHANGES="${EXPECT_MIN_SURFACE_CHANGES:-0}"
 EXPECT_SURFACE_CONTEXT_CHANGED="${EXPECT_SURFACE_CONTEXT_CHANGED:-}"
 EXPECT_SURFACE_CHANGED="${EXPECT_SURFACE_CHANGED:-}"
@@ -103,6 +105,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_IMAGE_CACHE_CHURN+x}" ]]; then
   MAGIC_JEWEL_IMAGE_CACHE_CHURN=false
 fi
+if [[ -z "${MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN+x}" ]]; then
+  MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN=false
+fi
 if [[ -z "${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT+x}" ]]; then
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT=false
 fi
@@ -133,6 +138,7 @@ export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 export MAGIC_JEWEL_UNSUPPORTED_TEXT
 export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
 export MAGIC_JEWEL_IMAGE_CACHE_CHURN
+export MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_INVALID_SWEEP_GRADIENT
 export MAGIC_JEWEL_AUTO_RESIZE
 export SKIKO_EXPECTED_ABI_ID_FOR_TEST
@@ -192,6 +198,8 @@ Environment:
   EXPECT_MIN_IMAGE_CACHE_CLEARS In strict command mode, require at least this many image cache clears in one CMP recorder frame. Default: 0.
   EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers. Default: 0.
   EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers with contextId=0x. Default: 0.
+  EXPECT_MAX_IMAGE_DEFINES In strict command mode, require CMP recorder max imageDefines at or below this value. Default: disabled.
+  EXPECT_MAX_IMAGE_CACHE_CLEARS In strict command mode, require CMP recorder max imageCacheClears at or below this value. Default: disabled.
   EXPECT_MIN_SURFACE_CHANGES In strict command mode, require at least this many Skiko surface-change markers. Default: 0.
   EXPECT_SURFACE_CONTEXT_CHANGED When set to true/false, require a surface-change marker with contextChanged=<value>.
   EXPECT_SURFACE_CHANGED When set to true/false, require a surface-change marker with surfaceChanged=<value>.
@@ -218,6 +226,7 @@ Environment:
   MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use the paragraph text command. Default: false.
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
+  MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN Makes image cache churn images independent of frame ticks. Default: false.
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT Enables an invalid sweep-gradient stop probe. Default: false.
   MAGIC_JEWEL_AUTO_RESIZE Resizes the JFrame once after startup to exercise surface invalidation. Default: false.
   SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
@@ -816,6 +825,7 @@ write_report() {
     echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
     echo "- MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT: ${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT}"
     echo "- MAGIC_JEWEL_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_IMAGE_CACHE_CHURN}"
+    echo "- MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN}"
     echo "- MAGIC_JEWEL_INVALID_SWEEP_GRADIENT: ${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT}"
     echo "- MAGIC_JEWEL_AUTO_RESIZE: ${MAGIC_JEWEL_AUTO_RESIZE}"
     echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
@@ -829,6 +839,8 @@ write_report() {
     echo "- EXPECT_MIN_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}"
+    echo "- EXPECT_MAX_IMAGE_DEFINES: ${EXPECT_MAX_IMAGE_DEFINES}"
+    echo "- EXPECT_MAX_IMAGE_CACHE_CLEARS: ${EXPECT_MAX_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_SURFACE_CHANGES: ${EXPECT_MIN_SURFACE_CHANGES}"
     echo "- EXPECT_SURFACE_CONTEXT_CHANGED: ${EXPECT_SURFACE_CONTEXT_CHANGED:-<unset>}"
     echo "- EXPECT_SURFACE_CHANGED: ${EXPECT_SURFACE_CHANGED:-<unset>}"
@@ -1024,6 +1036,18 @@ validate_report() {
         max_image_cache_clears="$(max_command_recorder_field "${new_log}" "imageCacheClears")"
         [[ "${max_image_cache_clears}" -ge "${EXPECT_MIN_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("CMP recorder max imageCacheClears ${max_image_cache_clears} below expected ${EXPECT_MIN_IMAGE_CACHE_CLEARS}")
+      fi
+      if [[ "${EXPECT_MAX_IMAGE_DEFINES}" -ge 0 ]]; then
+        local max_image_defines
+        max_image_defines="$(max_command_recorder_field "${new_log}" "imageDefines")"
+        [[ "${max_image_defines}" -le "${EXPECT_MAX_IMAGE_DEFINES}" ]] ||
+          failures+=("CMP recorder max imageDefines ${max_image_defines} above expected ${EXPECT_MAX_IMAGE_DEFINES}")
+      fi
+      if [[ "${EXPECT_MAX_IMAGE_CACHE_CLEARS}" -ge 0 ]]; then
+        local max_image_cache_clears
+        max_image_cache_clears="$(max_command_recorder_field "${new_log}" "imageCacheClears")"
+        [[ "${max_image_cache_clears}" -le "${EXPECT_MAX_IMAGE_CACHE_CLEARS}" ]] ||
+          failures+=("CMP recorder max imageCacheClears ${max_image_cache_clears} above expected ${EXPECT_MAX_IMAGE_CACHE_CLEARS}")
       fi
       if [[ "${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}" -gt 0 ]]; then
         local jbr_image_cache_clears

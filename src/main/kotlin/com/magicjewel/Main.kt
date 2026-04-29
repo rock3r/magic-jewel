@@ -105,6 +105,7 @@ private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepG
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
+private const val StableImageCacheChurnProperty = "magic.jewel.stableImageCacheChurn"
 private const val InvalidSweepGradientProperty = "magic.jewel.invalidSweepGradient"
 private const val AutoResizeProperty = "magic.jewel.autoResize"
 private const val AutoResizeDelayMillisProperty = "magic.jewel.autoResizeDelayMillis"
@@ -225,6 +226,9 @@ private fun MagicJewelApp() {
     val imageCacheChurnEnabled = remember {
         System.getProperty(ImageCacheChurnProperty, "false").toBoolean()
     }
+    val stableImageCacheChurnEnabled = remember {
+        System.getProperty(StableImageCacheChurnProperty, "false").toBoolean()
+    }
     val invalidSweepGradientEnabled = remember {
         System.getProperty(InvalidSweepGradientProperty, "false").toBoolean()
     }
@@ -330,8 +334,9 @@ private fun MagicJewelApp() {
                 }
                 if (imageCacheChurnEnabled) {
                     repeat(260) { index ->
+                        val imageTicks = if (stableImageCacheChurnEnabled) 0 else ticks
                         drawImage(
-                            createChurnImage(index, ticks),
+                            createChurnImage(index, imageTicks),
                             topLeft = Offset(12f + (index % 26) * 4f, size.height - 22f - (index / 26) * 4f),
                         )
                     }
