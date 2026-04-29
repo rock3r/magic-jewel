@@ -50,6 +50,8 @@ var topText = 0
 var bottomText = 0
 var popupPink = 0
 var popupCyan = 0
+var menuWhite = 0
+var menuYellow = 0
 
 func isDarkText(r: Int, g: Int, b: Int) -> Bool {
     return r < 55 && g < 55 && b < 55
@@ -70,6 +72,12 @@ let bottomTextRect = (
     top: height * 7 / 10,
     right: width / 2,
     bottom: height * 17 / 20
+)
+let menuRect = (
+    left: width * 11 / 20,
+    top: height / 5,
+    right: width * 39 / 40,
+    bottom: height / 2
 )
 
 for y in 0..<height {
@@ -103,6 +111,14 @@ for y in 0..<height {
         if r < 80 && g > 170 && b > 170 {
             popupCyan += 1
         }
+        if inRect(x: x, y: y, left: menuRect.left, top: menuRect.top, right: menuRect.right, bottom: menuRect.bottom) {
+            if r > 240 && g > 240 && b > 240 {
+                menuWhite += 1
+            }
+            if r > 220 && g > 160 && b < 90 {
+                menuYellow += 1
+            }
+        }
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: topTextRect.left, top: topTextRect.top, right: topTextRect.right, bottom: topTextRect.bottom) {
                 topText += 1
@@ -114,7 +130,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) popupPink=\(popupPink) popupCyan=\(popupCyan)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow)")
 
 let checks: [(String, Int, Int)] = [
     ("green", green, 10000),
@@ -128,10 +144,17 @@ let checks: [(String, Int, Int)] = [
 ]
 
 let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
+let menuStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_MENU_STRESS"] == "true"
 let popupChecks: [(String, Int, Int)] = popupStress
     ? [
         ("popupPink", popupPink, 200),
         ("popupCyan", popupCyan, 80),
+      ]
+    : []
+let menuChecks: [(String, Int, Int)] = menuStress
+    ? [
+        ("menuWhite", menuWhite, 8000),
+        ("menuYellow", menuYellow, 500),
       ]
     : []
 
@@ -140,6 +163,10 @@ for (name, count, minimum) in checks where count < minimum {
     exit(1)
 }
 for (name, count, minimum) in popupChecks where count < minimum {
+    fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
+    exit(1)
+}
+for (name, count, minimum) in menuChecks where count < minimum {
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
     exit(1)
 }

@@ -66,6 +66,7 @@ import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JPopupMenu
 import javax.swing.SwingUtilities
 import javax.swing.Timer
 import kotlin.math.PI
@@ -114,10 +115,13 @@ private const val PopupStressProperty = "magic.jewel.popupStress"
 private const val PopupStressDelayMillisProperty = "magic.jewel.popupStressDelayMillis"
 private const val PopupWindowStressProperty = "magic.jewel.popupWindowStress"
 private const val PopupWindowStressDelayMillisProperty = "magic.jewel.popupWindowStressDelayMillis"
+private const val MenuStressProperty = "magic.jewel.menuStress"
+private const val MenuStressDelayMillisProperty = "magic.jewel.menuStressDelayMillis"
 private const val ResizeMarker = "MAGIC_JEWEL_WINDOW_RESIZE"
 private const val PopupShownMarker = "MAGIC_JEWEL_POPUP_SHOWN"
 private const val PopupWindowTitle = "MagicJewelPopupWindow"
 private const val PopupWindowShownMarker = "MAGIC_JEWEL_POPUP_WINDOW_SHOWN"
+private const val MenuShownMarker = "MAGIC_JEWEL_MENU_SHOWN"
 private const val PopupFrameMarker = "MAGIC_JEWEL_POPUP_FRAME"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
@@ -145,6 +149,7 @@ private fun showMagicJewel() {
         setLocationRelativeTo(null)
         isVisible = true
         panel.schedulePopupStressIfNeeded()
+        panel.scheduleMenuStressIfNeeded()
         schedulePopupWindowStressIfNeeded()
         scheduleAutoResizeIfNeeded()
     }
@@ -169,6 +174,29 @@ private fun ComposePanel.schedulePopupStressIfNeeded() {
         glassPane.revalidate()
         glassPane.repaint(panel.bounds)
         System.err.println("$PopupShownMarker x=96 y=214 width=${panel.width} height=${panel.height}")
+    }.apply {
+        isRepeats = false
+        start()
+    }
+}
+
+private fun ComposePanel.scheduleMenuStressIfNeeded() {
+    if (!System.getProperty(MenuStressProperty, "false").toBoolean()) return
+
+    val delayMillis = System.getProperty(MenuStressDelayMillisProperty, "1650").toIntOrNull() ?: 1650
+    Timer(delayMillis) {
+        val menu = JPopupMenu("MagicJewelMenuStress").apply {
+            name = "MagicJewelMenuStress"
+            isLightWeightPopupEnabled = true
+            border = BorderFactory.createLineBorder(AwtColor(255, 211, 61), 3)
+            add(PopupStressPanel())
+        }
+        val x = (width - 372).coerceAtLeast(80)
+        val y = 156
+        menu.show(this, x, y)
+        menu.revalidate()
+        menu.repaint()
+        System.err.println("$MenuShownMarker x=$x y=$y width=${menu.width} height=${menu.height}")
     }.apply {
         isRepeats = false
         start()

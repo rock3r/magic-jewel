@@ -126,6 +126,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_POPUP_WINDOW_STRESS+x}" ]]; then
   MAGIC_JEWEL_POPUP_WINDOW_STRESS=false
 fi
+if [[ -z "${MAGIC_JEWEL_MENU_STRESS+x}" ]]; then
+  MAGIC_JEWEL_MENU_STRESS=false
+fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
@@ -155,6 +158,7 @@ export MAGIC_JEWEL_INVALID_SWEEP_GRADIENT
 export MAGIC_JEWEL_AUTO_RESIZE
 export MAGIC_JEWEL_POPUP_STRESS
 export MAGIC_JEWEL_POPUP_WINDOW_STRESS
+export MAGIC_JEWEL_MENU_STRESS
 export JBR_SKIA_NATIVE_TEXT
 export SKIKO_EXPECTED_ABI_ID_FOR_TEST
 export SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST
@@ -165,6 +169,7 @@ SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
 POPUP_FRAME_MARKER="MAGIC_JEWEL_POPUP_FRAME"
 POPUP_SHOWN_MARKER="MAGIC_JEWEL_POPUP_SHOWN"
 POPUP_WINDOW_SHOWN_MARKER="MAGIC_JEWEL_POPUP_WINDOW_SHOWN"
+MENU_SHOWN_MARKER="MAGIC_JEWEL_MENU_SHOWN"
 SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
@@ -257,6 +262,7 @@ Environment:
   MAGIC_JEWEL_AUTO_RESIZE Resizes the JFrame once after startup to exercise surface invalidation. Default: false.
   MAGIC_JEWEL_POPUP_STRESS Shows an animated Swing popup over the ComposePanel. Default: false.
   MAGIC_JEWEL_POPUP_WINDOW_STRESS Shows an animated undecorated Swing popup window over the ComposePanel. Default: false.
+  MAGIC_JEWEL_MENU_STRESS Shows an animated Swing JPopupMenu over the ComposePanel. Default: false.
   SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
   SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST Forces Skiko's expected native metadata ABI for fallback validation. Empty by default.
   SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST Forces Skiko's required command capability mask for fallback validation. Empty by default.
@@ -475,6 +481,11 @@ run_mode() {
         && $(grep -c "${ready_marker}" "${log}" 2>/dev/null) -gt 0 ]]; then
       if [[ "${MAGIC_JEWEL_POPUP_STRESS}" == "true" &&
           $(grep -c "${POPUP_SHOWN_MARKER}" "${log}" 2>/dev/null) -eq 0 ]]; then
+        sleep "${SAMPLE_INTERVAL_SECONDS}"
+        continue
+      fi
+      if [[ "${MAGIC_JEWEL_MENU_STRESS}" == "true" &&
+          $(grep -c "${MENU_SHOWN_MARKER}" "${log}" 2>/dev/null) -eq 0 ]]; then
         sleep "${SAMPLE_INTERVAL_SECONDS}"
         continue
       fi
@@ -779,6 +790,7 @@ write_machine_summary() {
     echo "popup_new_frames=$(grep -c "${POPUP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "popup_new_shown=$(grep -c "${POPUP_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "popup_window_new_shown=$(grep -c "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "menu_new_shown=$(grep -c "${MENU_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "cmp_recorder_frames=$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "cmp_unsupported_max=$(max_command_recorder_field "${new_log}" "unsupported")"
     echo "cmp_unsupported_reasons=$(command_recorder_reasons "${new_log}")"
@@ -900,6 +912,7 @@ write_report() {
     echo "- MAGIC_JEWEL_AUTO_RESIZE: ${MAGIC_JEWEL_AUTO_RESIZE}"
     echo "- MAGIC_JEWEL_POPUP_STRESS: ${MAGIC_JEWEL_POPUP_STRESS}"
     echo "- MAGIC_JEWEL_POPUP_WINDOW_STRESS: ${MAGIC_JEWEL_POPUP_WINDOW_STRESS}"
+    echo "- MAGIC_JEWEL_MENU_STRESS: ${MAGIC_JEWEL_MENU_STRESS}"
     echo "- JBR_SKIA_NATIVE_TEXT: ${JBR_SKIA_NATIVE_TEXT}"
     echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
     echo "- SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST: ${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-<unset>}"
@@ -1180,6 +1193,11 @@ validate_report() {
           failures+=("missing Swing popup window shown marker")
         fi
         [[ "${popup_screenshot_status}" == "passed" ]] || failures+=("popup window screenshot assertion did not pass")
+      fi
+      if [[ "${MAGIC_JEWEL_MENU_STRESS}" == "true" ]]; then
+        if ! grep -q "${MENU_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null; then
+          failures+=("missing Swing menu shown marker")
+        fi
       fi
       if [[ "${EXPECT_MIN_SURFACE_CHANGES}" -gt 0 ]]; then
         local surface_changes
