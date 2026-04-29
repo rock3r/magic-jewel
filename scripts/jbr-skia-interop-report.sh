@@ -25,8 +25,10 @@ EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
 EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS="${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS:-0}"
 EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
 EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
+EXPECT_MIN_IMAGE_CACHE_EVICTS="${EXPECT_MIN_IMAGE_CACHE_EVICTS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS:-0}"
+EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS="${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS:-0}"
 EXPECT_MAX_IMAGE_DEFINES="${EXPECT_MAX_IMAGE_DEFINES:--1}"
 EXPECT_MAX_IMAGE_CACHE_CLEARS="${EXPECT_MAX_IMAGE_CACHE_CLEARS:--1}"
 EXPECT_MIN_SURFACE_CHANGES="${EXPECT_MIN_SURFACE_CHANGES:-0}"
@@ -153,6 +155,7 @@ SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_TIMING_MARKER="JBR_SKIA_INTEROP_COMMAND_TIMING"
 JBR_IMAGE_CACHE_CLEAR_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR"
+JBR_IMAGE_CACHE_EVICT_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_EVICT"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
@@ -196,8 +199,10 @@ Environment:
   EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS In strict command mode, require at least this many paragraph text commands in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_REFS In strict command mode, require at least this many image refs in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_CACHE_CLEARS In strict command mode, require at least this many image cache clears in one CMP recorder frame. Default: 0.
+  EXPECT_MIN_IMAGE_CACHE_EVICTS In strict command mode, require at least this many image cache evicts in one CMP recorder frame. Default: 0.
   EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers. Default: 0.
   EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers with contextId=0x. Default: 0.
+  EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS In strict command mode, require at least this many JBR-side image cache evict markers. Default: 0.
   EXPECT_MAX_IMAGE_DEFINES In strict command mode, require CMP recorder max imageDefines at or below this value. Default: disabled.
   EXPECT_MAX_IMAGE_CACHE_CLEARS In strict command mode, require CMP recorder max imageCacheClears at or below this value. Default: disabled.
   EXPECT_MIN_SURFACE_CHANGES In strict command mode, require at least this many Skiko surface-change markers. Default: 0.
@@ -576,6 +581,9 @@ command_recorder_summary() {
         } else if (value[1] == "imageCacheClears") {
           imageCacheClears += value[2]
           if (value[2] > maxImageCacheClears) maxImageCacheClears = value[2]
+        } else if (value[1] == "imageCacheEvicts") {
+          imageCacheEvicts += value[2]
+          if (value[2] > maxImageCacheEvicts) maxImageCacheEvicts = value[2]
         } else if (value[2] ~ /^[0-9]+$/) {
           reasons[value[1]] += value[2]
         }
@@ -584,7 +592,7 @@ command_recorder_summary() {
     }
     END {
       if (frames == 0) {
-        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_paragraph_text_commands=0 max_paragraph_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_refs=0 max_image_refs=0 avg_image_cache_clears=0 max_image_cache_clears=0 reasons=none"
+        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_paragraph_text_commands=0 max_paragraph_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_refs=0 max_image_refs=0 avg_image_cache_clears=0 max_image_cache_clears=0 avg_image_cache_evicts=0 max_image_cache_evicts=0 reasons=none"
         exit
       }
       reasonSummary = "none"
@@ -592,11 +600,11 @@ command_recorder_summary() {
         item = reason ":" reasons[reason]
         reasonSummary = reasonSummary == "none" ? item : reasonSummary "," item
       }
-      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_paragraph_text_commands=%.1f max_paragraph_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_refs=%.1f max_image_refs=%.0f avg_image_cache_clears=%.1f max_image_cache_clears=%.0f reasons=%s",
+      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_paragraph_text_commands=%.1f max_paragraph_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_refs=%.1f max_image_refs=%.0f avg_image_cache_clears=%.1f max_image_cache_clears=%.0f avg_image_cache_evicts=%.1f max_image_cache_evicts=%.0f reasons=%s",
         frames, frames / duration, commands / frames, maxCommands, unsupportedFrames, unsupported / frames, maxUnsupported,
         textCommands / frames, maxTextCommands, paragraphTextCommands / frames, maxParagraphTextCommands,
         imageDefines / frames, maxImageDefines, imageRefs / frames, maxImageRefs,
-        imageCacheClears / frames, maxImageCacheClears,
+        imageCacheClears / frames, maxImageCacheClears, imageCacheEvicts / frames, maxImageCacheEvicts,
         reasonSummary
     }
   ' "${log}"
@@ -674,7 +682,8 @@ command_recorder_reasons() {
             value[1] != "paragraphTextCommands" &&
             value[1] != "imageDefines" &&
             value[1] != "imageRefs" &&
-            value[1] != "imageCacheClears") {
+            value[1] != "imageCacheClears" &&
+            value[1] != "imageCacheEvicts") {
           reasons[value[1]] += value[2]
         }
       }
@@ -731,6 +740,7 @@ write_machine_summary() {
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_scoped_image_cache_clear_frames=$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_image_cache_evict_frames=$(grep -c "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_context_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_same_context_surface_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=false.*surfaceChanged=true" "${new_full_log}" 2>/dev/null || true)"
@@ -758,6 +768,7 @@ write_report() {
   local cmp_command_recorder_summary
   local jbr_command_timing_summary
   local jbr_image_cache_clear_summary
+  local jbr_image_cache_evict_summary
   local skiko_surface_change_summary
   local screenshot_counts
   local screenshot_status
@@ -785,6 +796,7 @@ write_report() {
   cmp_command_recorder_summary="$(command_recorder_summary "${new_log}")"
   jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
   jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}")"
+  jbr_image_cache_evict_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}")"
   skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
@@ -837,8 +849,10 @@ write_report() {
     echo "- EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS: ${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}"
     echo "- EXPECT_MIN_IMAGE_REFS: ${EXPECT_MIN_IMAGE_REFS}"
     echo "- EXPECT_MIN_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_IMAGE_CACHE_CLEARS}"
+    echo "- EXPECT_MIN_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_IMAGE_CACHE_EVICTS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}"
+    echo "- EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}"
     echo "- EXPECT_MAX_IMAGE_DEFINES: ${EXPECT_MAX_IMAGE_DEFINES}"
     echo "- EXPECT_MAX_IMAGE_CACHE_CLEARS: ${EXPECT_MAX_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_SURFACE_CHANGES: ${EXPECT_MIN_SURFACE_CHANGES}"
@@ -884,6 +898,7 @@ write_report() {
     echo "- JBR command timing: ${jbr_command_timing_summary}"
     echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
     echo "- JBR scoped image cache clears: $(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
+    echo "- JBR image cache evicts: ${jbr_image_cache_evict_summary}"
     echo
     echo "## Surface Identity Markers"
     echo
@@ -1037,6 +1052,12 @@ validate_report() {
         [[ "${max_image_cache_clears}" -ge "${EXPECT_MIN_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("CMP recorder max imageCacheClears ${max_image_cache_clears} below expected ${EXPECT_MIN_IMAGE_CACHE_CLEARS}")
       fi
+      if [[ "${EXPECT_MIN_IMAGE_CACHE_EVICTS}" -gt 0 ]]; then
+        local max_image_cache_evicts
+        max_image_cache_evicts="$(max_command_recorder_field "${new_log}" "imageCacheEvicts")"
+        [[ "${max_image_cache_evicts}" -ge "${EXPECT_MIN_IMAGE_CACHE_EVICTS}" ]] ||
+          failures+=("CMP recorder max imageCacheEvicts ${max_image_cache_evicts} below expected ${EXPECT_MIN_IMAGE_CACHE_EVICTS}")
+      fi
       if [[ "${EXPECT_MAX_IMAGE_DEFINES}" -ge 0 ]]; then
         local max_image_defines
         max_image_defines="$(max_command_recorder_field "${new_log}" "imageDefines")"
@@ -1060,6 +1081,12 @@ validate_report() {
         jbr_scoped_image_cache_clears="$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
         [[ "${jbr_scoped_image_cache_clears}" -ge "${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("JBR scoped image cache clear markers ${jbr_scoped_image_cache_clears} below expected ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}")
+      fi
+      if [[ "${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}" -gt 0 ]]; then
+        local jbr_image_cache_evicts
+        jbr_image_cache_evicts="$(grep -c "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}" 2>/dev/null || true)"
+        [[ "${jbr_image_cache_evicts}" -ge "${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}" ]] ||
+          failures+=("JBR image cache evict markers ${jbr_image_cache_evicts} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}")
       fi
       if [[ "${EXPECT_MIN_SURFACE_CHANGES}" -gt 0 ]]; then
         local surface_changes

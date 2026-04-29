@@ -346,6 +346,31 @@ strict_command_fails_above_max_image_cache_clears() {
   fi
 }
 
+strict_command_requires_min_image_cache_evicts() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0 imageCacheEvicts=1"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_IMAGE_CACHE_EVICTS=1
+}
+
+strict_command_requires_min_jbr_image_cache_evicts() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0 imageCacheEvicts=1"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_IMAGE_CACHE_EVICT backend=native contextId=0x1234 key=0x5678 removed=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS=1
+}
+
 expected_image_fallback_passes() {
   local dir
   dir="$(make_report_dir)"
@@ -512,6 +537,8 @@ strict_command_requires_max_image_defines
 strict_command_fails_above_max_image_defines
 strict_command_requires_max_image_cache_clears
 strict_command_fails_above_max_image_cache_clears
+strict_command_requires_min_image_cache_evicts
+strict_command_requires_min_jbr_image_cache_evicts
 expected_image_fallback_passes
 expected_fallback_requires_reason
 command_stream_invalid_fallback_passes
