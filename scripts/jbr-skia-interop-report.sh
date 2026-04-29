@@ -24,6 +24,7 @@ EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
 EXPECT_MIN_IMAGE_CACHE_CLEARS="${EXPECT_MIN_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
+SKIKO_EXPECTED_ABI_ID_FOR_TEST="${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
 fi
@@ -61,6 +62,7 @@ export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 export MAGIC_JEWEL_UNSUPPORTED_TEXT
 export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
 export MAGIC_JEWEL_IMAGE_CACHE_CHURN
+export SKIKO_EXPECTED_ABI_ID_FOR_TEST
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
@@ -119,6 +121,7 @@ Environment:
   MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use the paragraph text command. Default: false.
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
+  SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
 EOF_USAGE
 }
 
@@ -202,7 +205,8 @@ run_mode() {
 
   if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" ]]; then
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
-      if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ]]; then
+      if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ||
+          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "abi-mismatch" ]]; then
         ready_marker="${FALLBACK_MARKER}"
       else
         ready_marker="${SKIKO_PICTURE_MARKER}"
@@ -497,13 +501,17 @@ write_report() {
   local screenshot_status
   local old_log="${OUT_DIR}/old-sampled.log"
   local new_log="${OUT_DIR}/new-sampled.log"
+  local old_full_log="${OUT_DIR}/old.log"
+  local new_full_log="${OUT_DIR}/new.log"
   [[ -f "${old_log}" ]] || old_log="${OUT_DIR}/old.log"
   [[ -f "${new_log}" ]] || new_log="${OUT_DIR}/new.log"
+  [[ -f "${old_full_log}" ]] || old_full_log="${old_log}"
+  [[ -f "${new_full_log}" ]] || new_full_log="${new_log}"
 
   old_summary="$(summarize_csv "${OUT_DIR}/old-ps.csv")"
   new_summary="$(summarize_csv "${OUT_DIR}/new-ps.csv")"
-  old_markers="$(grep -c "${FALLBACK_MARKER}" "${old_log}" 2>/dev/null || true)"
-  new_markers="$(grep -c "${FALLBACK_MARKER}" "${new_log}" 2>/dev/null || true)"
+  old_markers="$(grep -c "${FALLBACK_MARKER}" "${old_full_log}" 2>/dev/null || true)"
+  new_markers="$(grep -c "${FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null || true)"
   old_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${old_log}")"
   new_app_frame_summary="$(frame_marker_summary "${APP_FRAME_MARKER}" "${new_log}")"
   old_swing_frame_summary="$(frame_marker_summary "${SWING_FRAME_MARKER}" "${old_log}")"
@@ -538,6 +546,7 @@ write_report() {
     echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
     echo "- MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT: ${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT}"
     echo "- MAGIC_JEWEL_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_IMAGE_CACHE_CHURN}"
+    echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
@@ -647,6 +656,12 @@ validate_report() {
         if ! grep -q "${FALLBACK_MARKER} reason=command-stream-invalid" "${new_log}" 2>/dev/null &&
             ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
           failures+=("missing command-stream-invalid fallback marker or rendered=false command frame")
+        fi
+      elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "abi-mismatch" ]]; then
+        [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during ABI-mismatch fallback: ${skiko_command_frames}")
+        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during ABI-mismatch fallback: ${jbr_command_frames}")
+        if ! grep -q "${FALLBACK_MARKER} reason=abi-mismatch" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("missing abi-mismatch fallback marker")
         fi
       else
         [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")

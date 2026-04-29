@@ -8,6 +8,7 @@ JBR_SKIA_LIB=${JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}
 SKIKO_VERSION=${SKIKO_VERSION:-0.0.0-SNAPSHOT}
 JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
 MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM:-false}
+SKIKO_EXPECTED_ABI_ID_FOR_TEST=${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-}
 
 JBR_ARGS=(
   "--patch-module=java.desktop=${DESKTOP_PATCH}"
@@ -32,6 +33,10 @@ case "${JBR_SKIA_RENDER_MODE}" in
     JBR_ARGS+=("-Dskiko.jbr.interop.renderPicture=true")
     ;;
 esac
+
+if [[ -n "${SKIKO_EXPECTED_ABI_ID_FOR_TEST}" ]]; then
+  JBR_ARGS+=("-Dskiko.jbr.interop.expectedAbiIdForTest=${SKIKO_EXPECTED_ABI_ID_FOR_TEST}")
+fi
 
 printf -v JOINED_ARGS "%s " "${JBR_ARGS[@]}"
 cd "$ROOT"
