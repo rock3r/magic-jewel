@@ -104,6 +104,7 @@ private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepG
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
+private const val InvalidSweepGradientProperty = "magic.jewel.invalidSweepGradient"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 
@@ -199,6 +200,9 @@ private fun MagicJewelApp() {
     }
     val imageCacheChurnEnabled = remember {
         System.getProperty(ImageCacheChurnProperty, "false").toBoolean()
+    }
+    val invalidSweepGradientEnabled = remember {
+        System.getProperty(InvalidSweepGradientProperty, "false").toBoolean()
     }
     val imageProbe = remember(composeImageEnabled) {
         if (composeImageEnabled) createImageProbe() else null
@@ -581,6 +585,17 @@ private fun MagicJewelApp() {
                         ),
                     )
                     drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
+                }
+                if (invalidSweepGradientEnabled) {
+                    drawRect(
+                        brush = Brush.sweepGradient(
+                            0.5f to Color.Red,
+                            0.5f to Color.Blue,
+                            center = Offset(size.width - 100f, size.height - 100f),
+                        ),
+                        topLeft = Offset(size.width - 172f, size.height - 142f),
+                        size = Size(144f, 84f),
+                    )
                 }
             }
 

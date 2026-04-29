@@ -85,6 +85,9 @@ val paragraphLayoutTextEnabled = providers.gradleProperty("magicJewelParagraphLa
 val imageCacheChurnEnabled = providers.gradleProperty("magicJewelImageCacheChurn")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_IMAGE_CACHE_CHURN"))
     .orElse("false")
+val invalidSweepGradientEnabled = providers.gradleProperty("magicJewelInvalidSweepGradient")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_INVALID_SWEEP_GRADIENT"))
+    .orElse("false")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -152,6 +155,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.unsupportedText", unsupportedTextEnabled.get())
     systemProperty("magic.jewel.paragraphLayoutText", paragraphLayoutTextEnabled.get())
     systemProperty("magic.jewel.imageCacheChurn", imageCacheChurnEnabled.get())
+    systemProperty("magic.jewel.invalidSweepGradient", invalidSweepGradientEnabled.get())
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")
