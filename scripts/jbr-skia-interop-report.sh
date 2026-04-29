@@ -607,6 +607,22 @@ frame_marker_summary() {
   '
 }
 
+frame_marker_fps() {
+  local marker="$1"
+  local log="$2"
+  local frames
+  frames="$(grep -c "${marker}" "${log}" 2>/dev/null || true)"
+  awk -v frames="${frames}" -v duration="${DURATION_SECONDS}" '
+    BEGIN {
+      if (duration <= 0) {
+        printf "0.0"
+      } else {
+        printf "%.1f", frames / duration
+      }
+    }
+  '
+}
+
 command_recorder_summary() {
   local log="$1"
   awk -v marker="${CMP_COMMAND_RECORDER_MARKER}" -v duration="${DURATION_SECONDS}" '
@@ -784,10 +800,16 @@ write_machine_summary() {
     echo "fallback_new_count=$(grep -c "${FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "app_old_frames=$(grep -c "${APP_FRAME_MARKER}" "${old_log}" 2>/dev/null || true)"
     echo "app_new_frames=$(grep -c "${APP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "app_old_fps=$(frame_marker_fps "${APP_FRAME_MARKER}" "${old_log}")"
+    echo "app_new_fps=$(frame_marker_fps "${APP_FRAME_MARKER}" "${new_log}")"
     echo "swing_old_frames=$(grep -c "${SWING_FRAME_MARKER}" "${old_log}" 2>/dev/null || true)"
     echo "swing_new_frames=$(grep -c "${SWING_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "swing_old_fps=$(frame_marker_fps "${SWING_FRAME_MARKER}" "${old_log}")"
+    echo "swing_new_fps=$(frame_marker_fps "${SWING_FRAME_MARKER}" "${new_log}")"
     echo "popup_old_frames=$(grep -c "${POPUP_FRAME_MARKER}" "${old_log}" 2>/dev/null || true)"
     echo "popup_new_frames=$(grep -c "${POPUP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "popup_old_fps=$(frame_marker_fps "${POPUP_FRAME_MARKER}" "${old_log}")"
+    echo "popup_new_fps=$(frame_marker_fps "${POPUP_FRAME_MARKER}" "${new_log}")"
     echo "popup_new_shown=$(grep -c "${POPUP_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "popup_window_new_shown=$(grep -c "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "menu_new_shown=$(grep -c "${MENU_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
@@ -798,6 +820,10 @@ write_machine_summary() {
     echo "jbr_picture_frames=$(grep -c "${JBR_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_command_frames=$(grep -c "${SKIKO_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_command_frames=$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "skiko_picture_fps=$(frame_marker_fps "${SKIKO_PICTURE_MARKER}" "${new_log}")"
+    echo "jbr_picture_fps=$(frame_marker_fps "${JBR_PICTURE_MARKER}" "${new_log}")"
+    echo "skiko_command_fps=$(frame_marker_fps "${SKIKO_COMMAND_MARKER}" "${new_log}")"
+    echo "jbr_command_fps=$(frame_marker_fps "${JBR_COMMAND_MARKER}" "${new_log}")"
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_scoped_image_cache_clear_frames=$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"

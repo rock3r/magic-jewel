@@ -35,6 +35,8 @@ strict_command_passes() {
   grep -q "^validation_status=passed$" "${dir}/summary.properties"
   grep -q "^skiko_command_frames=1$" "${dir}/summary.properties"
   grep -q "^jbr_command_frames=1$" "${dir}/summary.properties"
+  grep -q "^skiko_command_fps=0.1$" "${dir}/summary.properties"
+  grep -q "^jbr_command_fps=0.1$" "${dir}/summary.properties"
 }
 
 surface_change_summary_is_machine_readable() {
