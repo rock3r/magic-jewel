@@ -56,6 +56,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=false
 fi
@@ -79,6 +82,7 @@ export MAGIC_JEWEL_COMPOSE_DRAW_PATH
 export MAGIC_JEWEL_COMPOSE_DRAW_ARC
 export MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT
 export MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT
+export MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT
 export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 export MAGIC_JEWEL_UNSUPPORTED_TEXT
 export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
@@ -145,6 +149,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_DRAW_ARC Enables the Compose drawArc command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT Enables the Compose drawRoundRect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT Enables the Compose linear-gradient command replay probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT Enables the Compose linear-gradient round-rect command replay probe. Default: false.
   MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use the paragraph text command. Default: false.
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
@@ -577,6 +582,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_DRAW_ARC: ${MAGIC_JEWEL_COMPOSE_DRAW_ARC}"
     echo "- MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT: ${MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT}"
     echo "- MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT: ${MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT}"
+    echo "- MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT: ${MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_STREAM: ${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}"
     echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
     echo "- MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT: ${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT}"

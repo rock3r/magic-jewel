@@ -93,6 +93,7 @@ private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
 private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
+private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -158,6 +159,9 @@ private fun MagicJewelApp() {
     }
     val composeLinearGradientEnabled = remember {
         System.getProperty(ComposeLinearGradientProperty, "false").toBoolean()
+    }
+    val composeLinearGradientRoundRectEnabled = remember {
+        System.getProperty(ComposeLinearGradientRoundRectProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -380,6 +384,25 @@ private fun MagicJewelApp() {
                         color = Color.White,
                         topLeft = Offset(size.width - 188f, size.height - 106f),
                         size = Size(140f, 72f),
+                        style = Stroke(width = 3f),
+                    )
+                }
+                if (composeLinearGradientRoundRectEnabled) {
+                    drawRoundRect(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFFF97316), Color(0xFFEC4899), Color(0xFF06B6D4)),
+                            start = Offset(size.width - 348f, size.height - 112f),
+                            end = Offset(size.width - 212f, size.height - 38f),
+                        ),
+                        topLeft = Offset(size.width - 348f, size.height - 112f),
+                        size = Size(136f, 74f),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(26f, 16f),
+                    )
+                    drawRoundRect(
+                        color = Color.White,
+                        topLeft = Offset(size.width - 348f, size.height - 112f),
+                        size = Size(136f, 74f),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(26f, 16f),
                         style = Stroke(width = 3f),
                     )
                 }
