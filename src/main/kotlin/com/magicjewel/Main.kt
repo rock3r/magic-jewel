@@ -36,8 +36,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -87,6 +89,8 @@ private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
+private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
+private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
@@ -253,6 +257,12 @@ private fun MagicJewelApp() {
     val composeImageShaderEnabled = remember {
         System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
     }
+    val composeColorFilterEnabled = remember {
+        System.getProperty(ComposeColorFilterProperty, "false").toBoolean()
+    }
+    val composePathEffectEnabled = remember {
+        System.getProperty(ComposePathEffectProperty, "false").toBoolean()
+    }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
     }
@@ -417,6 +427,33 @@ private fun MagicJewelApp() {
                     imageProbe?.let {
                         drawImage(it, topLeft = Offset(size.width - 206f, size.height - 210f))
                         markJbrSkiaUnsupported("shader")
+                    }
+                }
+                if (composeColorFilterEnabled) {
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 380f,
+                            top = 34f,
+                            right = size.width - 268f,
+                            bottom = 112f,
+                            paint = Paint().apply {
+                                color = Color(0xFFE879F9)
+                                colorFilter = ColorFilter.tint(Color(0xFF22D3EE))
+                            },
+                        )
+                    }
+                }
+                if (composePathEffectEnabled) {
+                    drawIntoCanvas { canvas ->
+                        canvas.drawLine(
+                            p1 = Offset(size.width - 404f, 142f),
+                            p2 = Offset(size.width - 236f, 142f),
+                            paint = Paint().apply {
+                                color = Color(0xFFFFFFFF)
+                                strokeWidth = 8f
+                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(16f, 10f), 0f)
+                            },
+                        )
                     }
                 }
                 if (imageCacheChurnEnabled) {
