@@ -46,6 +46,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -359,6 +360,16 @@ private fun MagicJewelApp() {
                             textAlign = TextAlign.Left,
                         ),
                         overflow = TextOverflow.Ellipsis,
+                    )
+                    MagicLabel(
+                        "Decorated \uD83D\uDE80 paragraph line",
+                        composeTextEnabled,
+                        width = 260.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            textDecoration = TextDecoration.Underline + TextDecoration.LineThrough,
+                        ),
                     )
                 }
             }
