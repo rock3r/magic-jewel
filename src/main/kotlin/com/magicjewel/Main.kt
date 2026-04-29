@@ -43,6 +43,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -80,6 +84,7 @@ private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
 private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
+private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
@@ -131,6 +136,9 @@ private fun MagicJewelApp() {
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
+    }
+    val paragraphLayoutTextEnabled = remember {
+        System.getProperty(ParagraphLayoutTextProperty, "false").toBoolean()
     }
     val imageCacheChurnEnabled = remember {
         System.getProperty(ImageCacheChurnProperty, "false").toBoolean()
@@ -305,6 +313,41 @@ private fun MagicJewelApp() {
                 if (unsupportedTextEnabled) {
                     MagicLabel("Unsupported text: \uD83D\uDE80", composeTextEnabled, width = 180.dp)
                 }
+                if (paragraphLayoutTextEnabled) {
+                    MagicLabel(
+                        "Centered bold \uD83D\uDE80 paragraph",
+                        composeTextEnabled,
+                        width = 260.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                        ),
+                    )
+                    MagicLabel(
+                        "Italic right aligned \uD83D\uDE80",
+                        composeTextEnabled,
+                        width = 260.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            fontStyle = FontStyle.Italic,
+                            textAlign = TextAlign.Right,
+                        ),
+                    )
+                    MagicLabel(
+                        "\u0633\u0644\u0627\u0645 RTL paragraph",
+                        composeTextEnabled,
+                        width = 260.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            textAlign = TextAlign.End,
+                            textDirection = TextDirection.Rtl,
+                        ),
+                    )
+                }
             }
         }
 
@@ -357,16 +400,17 @@ private fun MagicLabel(
     composeTextEnabled: Boolean,
     modifier: Modifier = Modifier,
     width: androidx.compose.ui.unit.Dp,
+    style: TextStyle = TextStyle(
+        color = Color.Black,
+        fontSize = 16.sp,
+    ),
 ) {
     if (composeTextEnabled) {
         BasicText(
             text = text,
             modifier = modifier.width(width),
             maxLines = 1,
-            style = TextStyle(
-                color = Color.Black,
-                fontSize = 16.sp,
-            ),
+            style = style,
         )
     } else {
         Box(
