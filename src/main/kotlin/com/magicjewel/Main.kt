@@ -367,6 +367,7 @@ private fun MagicJewelApp() {
                         width = 260.dp,
                         style = TextStyle(
                             color = Color.Black,
+                            background = Color(0x33FFE05C),
                             fontSize = 17.sp,
                             letterSpacing = 1.5.sp,
                             textDecoration = TextDecoration.Underline + TextDecoration.LineThrough,
