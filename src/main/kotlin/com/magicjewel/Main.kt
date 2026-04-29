@@ -88,6 +88,7 @@ private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
 private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
 private const val ComposeClipPathProperty = "magic.jewel.compose.clipPath"
+private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -141,6 +142,9 @@ private fun MagicJewelApp() {
     }
     val composeClipPathEnabled = remember {
         System.getProperty(ComposeClipPathProperty, "false").toBoolean()
+    }
+    val composeDrawPathEnabled = remember {
+        System.getProperty(ComposeDrawPathProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -303,6 +307,17 @@ private fun MagicJewelApp() {
                             size = Size(208f, 116f),
                         )
                     }
+                }
+                if (composeDrawPathEnabled) {
+                    val path = Path().apply {
+                        moveTo(size.width - 304f, size.height - 170f)
+                        lineTo(size.width - 260f, size.height - 222f)
+                        lineTo(size.width - 208f, size.height - 166f)
+                        lineTo(size.width - 246f, size.height - 152f)
+                        close()
+                    }
+                    drawPath(path = path, color = Color(0xFFF59E0B))
+                    drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
                 }
             }
 

@@ -44,6 +44,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_CLIP_PATH+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_CLIP_PATH=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_DRAW_PATH+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_DRAW_PATH=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=false
 fi
@@ -63,6 +66,7 @@ export MAGIC_JEWEL_COMPOSE_SAVELAYER
 export MAGIC_JEWEL_COMPOSE_CLIP
 export MAGIC_JEWEL_COMPOSE_CLIP_OUT
 export MAGIC_JEWEL_COMPOSE_CLIP_PATH
+export MAGIC_JEWEL_COMPOSE_DRAW_PATH
 export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 export MAGIC_JEWEL_UNSUPPORTED_TEXT
 export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
@@ -125,6 +129,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_CLIP Enables the Compose clipRect probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP_OUT Enables the Compose clip-out probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP_PATH Enables the Compose clipPath command replay probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_DRAW_PATH Enables the Compose drawPath command replay probe. Default: false.
   MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use the paragraph text command. Default: false.
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
@@ -553,6 +558,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_CLIP: ${MAGIC_JEWEL_COMPOSE_CLIP}"
     echo "- MAGIC_JEWEL_COMPOSE_CLIP_OUT: ${MAGIC_JEWEL_COMPOSE_CLIP_OUT}"
     echo "- MAGIC_JEWEL_COMPOSE_CLIP_PATH: ${MAGIC_JEWEL_COMPOSE_CLIP_PATH}"
+    echo "- MAGIC_JEWEL_COMPOSE_DRAW_PATH: ${MAGIC_JEWEL_COMPOSE_DRAW_PATH}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_STREAM: ${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}"
     echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
     echo "- MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT: ${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT}"
