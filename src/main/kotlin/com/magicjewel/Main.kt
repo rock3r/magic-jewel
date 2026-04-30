@@ -105,6 +105,7 @@ private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLa
 private const val ComposeGraphicsLayerClipProperty = "magic.jewel.compose.graphicsLayerClip"
 private const val ComposeGraphicsLayerRoundClipProperty = "magic.jewel.compose.graphicsLayerRoundClip"
 private const val ComposeGraphicsLayerPathClipProperty = "magic.jewel.compose.graphicsLayerPathClip"
+private const val ComposeGraphicsLayerBlendModeProperty = "magic.jewel.compose.graphicsLayerBlendMode"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -303,6 +304,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerPathClipEnabled = remember {
         System.getProperty(ComposeGraphicsLayerPathClipProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerBlendModeEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerBlendModeProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -1227,6 +1231,9 @@ private fun MagicJewelApp() {
                         .graphicsLayer {
                             alpha = 0.64f
                             rotationZ = -4f
+                            if (composeGraphicsLayerBlendModeEnabled) {
+                                blendMode = BlendMode.Plus
+                            }
                             clip = composeGraphicsLayerClipEnabled ||
                                 composeGraphicsLayerRoundClipEnabled ||
                                 composeGraphicsLayerPathClipEnabled
