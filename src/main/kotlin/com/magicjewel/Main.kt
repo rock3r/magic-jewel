@@ -674,11 +674,15 @@ private fun MagicJewelApp() {
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(26f, 16f),
                     )
                     drawRoundRect(
-                        color = Color.White,
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316)),
+                            start = Offset(size.width - 348f, size.height - 112f),
+                            end = Offset(size.width - 212f, size.height - 38f),
+                        ),
                         topLeft = Offset(size.width - 348f, size.height - 112f),
                         size = Size(136f, 74f),
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(26f, 16f),
-                        style = Stroke(width = 3f),
+                        style = Stroke(width = 6f),
                     )
                 }
                 if (composeLinearGradientPathEnabled) {
