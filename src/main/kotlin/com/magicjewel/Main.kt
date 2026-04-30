@@ -104,6 +104,7 @@ private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
 private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
+private const val ComposeLinearGradientStrokeProperty = "magic.jewel.compose.linearGradientStroke"
 private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
 private const val ComposeLinearGradientPathProperty = "magic.jewel.compose.linearGradientPath"
 private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
@@ -302,6 +303,9 @@ private fun MagicJewelApp() {
     }
     val composeLinearGradientEnabled = remember {
         System.getProperty(ComposeLinearGradientProperty, "false").toBoolean()
+    }
+    val composeLinearGradientStrokeEnabled = remember {
+        System.getProperty(ComposeLinearGradientStrokeProperty, "false").toBoolean()
     }
     val composeLinearGradientRoundRectEnabled = remember {
         System.getProperty(ComposeLinearGradientRoundRectProperty, "false").toBoolean()
@@ -637,6 +641,18 @@ private fun MagicJewelApp() {
                         topLeft = Offset(size.width - 188f, size.height - 106f),
                         size = Size(140f, 72f),
                         style = Stroke(width = 3f),
+                    )
+                }
+                if (composeLinearGradientStrokeEnabled) {
+                    drawRect(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316)),
+                            start = Offset(size.width - 534f, size.height - 128f),
+                            end = Offset(size.width - 410f, size.height - 48f),
+                        ),
+                        topLeft = Offset(size.width - 534f, size.height - 128f),
+                        size = Size(124f, 80f),
+                        style = Stroke(width = 12f),
                     )
                 }
                 if (composeLinearGradientRoundRectEnabled) {

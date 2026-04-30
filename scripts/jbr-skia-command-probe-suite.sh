@@ -8,7 +8,7 @@ SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 DURATION_SECONDS="${DURATION_SECONDS:-8}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-2}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
-CASES="${CASES:-commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image commands-native-text commands-shader-fallback commands-image-filter-fallback commands-color-filter-fallback commands-path-effect-fallback commands-blend-mode-fallback commands-save-layer-filter-fallback commands-invalid-gradient-fallback}"
+CASES="${CASES:-commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image commands-native-text commands-shader-fallback commands-image-filter-fallback commands-gradient-stroke-fallback commands-color-filter-fallback commands-path-effect-fallback commands-blend-mode-fallback commands-save-layer-filter-fallback commands-invalid-gradient-fallback}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -124,6 +124,12 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=image
+      ;;
+    commands-gradient-stroke-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_STROKE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=linearGradientPaint
       ;;
     commands-color-filter-fallback)
       run_case "$1" \
