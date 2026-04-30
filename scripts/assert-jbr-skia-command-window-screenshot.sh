@@ -48,6 +48,14 @@ var orange = 0
 var white = 0
 var topText = 0
 var bottomText = 0
+var topTextMinX = width
+var topTextMinY = height
+var topTextMaxX = 0
+var topTextMaxY = 0
+var bottomTextMinX = width
+var bottomTextMinY = height
+var bottomTextMaxX = 0
+var bottomTextMaxY = 0
 var popupPink = 0
 var popupCyan = 0
 var menuWhite = 0
@@ -166,15 +174,23 @@ for y in 0..<height {
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: topTextRect.left, top: topTextRect.top, right: topTextRect.right, bottom: topTextRect.bottom) {
                 topText += 1
+                topTextMinX = min(topTextMinX, x)
+                topTextMinY = min(topTextMinY, y)
+                topTextMaxX = max(topTextMaxX, x)
+                topTextMaxY = max(topTextMaxY, y)
             }
             if inRect(x: x, y: y, left: bottomTextRect.left, top: bottomTextRect.top, right: bottomTextRect.right, bottom: bottomTextRect.bottom) {
                 bottomText += 1
+                bottomTextMinX = min(bottomTextMinX, x)
+                bottomTextMinY = min(bottomTextMinY, y)
+                bottomTextMaxX = max(bottomTextMaxX, x)
+                bottomTextMaxY = max(bottomTextMaxY, y)
             }
         }
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan)")
 
 let checks: [(String, Int, Int)] = [
     ("green", green, 10000),
@@ -185,6 +201,15 @@ let checks: [(String, Int, Int)] = [
     ("white", white, 500),
     ("topText", topText, 900),
     ("bottomText", bottomText, 1200),
+]
+
+let textBoxChecks: [(String, Bool)] = [
+    ("topTextWidth", topTextMaxX - topTextMinX >= width / 5),
+    ("topTextHeight", topTextMaxY - topTextMinY >= 30),
+    ("topTextVerticalAnchor", topTextMinY <= topTextRect.top + height / 12 && topTextMaxY >= topTextRect.top + height / 24),
+    ("bottomTextWidth", bottomTextMaxX - bottomTextMinX >= width / 5),
+    ("bottomTextHeight", bottomTextMaxY - bottomTextMinY >= 40),
+    ("bottomTextVerticalAnchor", bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.bottom - height / 15),
 ]
 
 let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
@@ -257,6 +282,10 @@ if sweepGradientPathProbe {
 
 for (name, count, minimum) in checks where count < minimum {
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
+    exit(1)
+}
+for (name, passed) in textBoxChecks where !passed {
+    fputs("Text placement check failed: \(name) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY)\n", stderr)
     exit(1)
 }
 for (name, count, minimum) in popupChecks where count < minimum {
