@@ -52,6 +52,11 @@ var popupPink = 0
 var popupCyan = 0
 var menuWhite = 0
 var menuYellow = 0
+var probeTopLeftCyan = 0
+var probeBottomLeftCyan = 0
+var probeRightPurple = 0
+var probeRightOrange = 0
+var probeRightCyan = 0
 
 func isDarkText(r: Int, g: Int, b: Int) -> Bool {
     return r < 55 && g < 55 && b < 55
@@ -78,6 +83,24 @@ let menuRect = (
     top: height / 5,
     right: width * 39 / 40,
     bottom: height / 2
+)
+let probeTopLeftRect = (
+    left: width / 12,
+    top: height / 5,
+    right: width / 5,
+    bottom: height * 2 / 5
+)
+let probeBottomLeftRect = (
+    left: width / 10,
+    top: height * 7 / 10,
+    right: width / 5,
+    bottom: height * 17 / 20
+)
+let probeRightRect = (
+    left: width * 3 / 4,
+    top: height * 13 / 20,
+    right: width * 39 / 40,
+    bottom: height * 17 / 20
 )
 
 for y in 0..<height {
@@ -119,6 +142,27 @@ for y in 0..<height {
                 menuYellow += 1
             }
         }
+        if inRect(x: x, y: y, left: probeTopLeftRect.left, top: probeTopLeftRect.top, right: probeTopLeftRect.right, bottom: probeTopLeftRect.bottom) {
+            if r < 80 && g > 170 && b > 170 {
+                probeTopLeftCyan += 1
+            }
+        }
+        if inRect(x: x, y: y, left: probeBottomLeftRect.left, top: probeBottomLeftRect.top, right: probeBottomLeftRect.right, bottom: probeBottomLeftRect.bottom) {
+            if r < 80 && g > 170 && b > 170 {
+                probeBottomLeftCyan += 1
+            }
+        }
+        if inRect(x: x, y: y, left: probeRightRect.left, top: probeRightRect.top, right: probeRightRect.right, bottom: probeRightRect.bottom) {
+            if r > 90 && b > 140 && g < 120 {
+                probeRightPurple += 1
+            }
+            if r > 200 && g > 110 && g < 190 && b < 120 {
+                probeRightOrange += 1
+            }
+            if r < 80 && g > 170 && b > 170 {
+                probeRightCyan += 1
+            }
+        }
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: topTextRect.left, top: topTextRect.top, right: topTextRect.right, bottom: topTextRect.bottom) {
                 topText += 1
@@ -130,7 +174,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan)")
 
 let checks: [(String, Int, Int)] = [
     ("green", green, 10000),
@@ -145,6 +189,13 @@ let checks: [(String, Int, Int)] = [
 
 let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
 let menuStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_MENU_STRESS"] == "true"
+let transformProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_TRANSFORM"] == "true"
+let clipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP"] == "true"
+let clipOutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP_OUT"] == "true"
+let clipPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP_PATH"] == "true"
+let drawPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_PATH"] == "true"
+let drawArcProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ARC"] == "true"
+let drawRoundRectProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT"] == "true"
 let popupChecks: [(String, Int, Int)] = popupStress
     ? [
         ("popupPink", popupPink, 200),
@@ -157,6 +208,25 @@ let menuChecks: [(String, Int, Int)] = menuStress
         ("menuYellow", menuYellow, 500),
       ]
     : []
+var probeChecks: [(String, Int, Int)] = []
+if transformProbe {
+    probeChecks.append(("probeBottomLeftCyan", probeBottomLeftCyan, 500))
+}
+if clipProbe || clipOutProbe {
+    probeChecks.append(("probeTopLeftCyan", probeTopLeftCyan, 2000))
+}
+if clipPathProbe {
+    probeChecks.append(("probeRightCyan", probeRightCyan, 5000))
+}
+if drawPathProbe {
+    probeChecks.append(("probeRightOrange", probeRightOrange, 2000))
+}
+if drawArcProbe {
+    probeChecks.append(("probeRightCyan", probeRightCyan, 5000))
+}
+if drawRoundRectProbe {
+    probeChecks.append(("probeRightPurple", probeRightPurple, 3000))
+}
 
 for (name, count, minimum) in checks where count < minimum {
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
@@ -167,6 +237,10 @@ for (name, count, minimum) in popupChecks where count < minimum {
     exit(1)
 }
 for (name, count, minimum) in menuChecks where count < minimum {
+    fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
+    exit(1)
+}
+for (name, count, minimum) in probeChecks where count < minimum {
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
     exit(1)
 }
