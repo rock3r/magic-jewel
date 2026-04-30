@@ -142,6 +142,7 @@ configurations.configureEach {
 }
 
 dependencies {
+    implementation(patchedComposeRuntimeJars())
     implementation(compose.desktop.currentOs) {
         exclude(group = "org.jetbrains.compose.material")
     }

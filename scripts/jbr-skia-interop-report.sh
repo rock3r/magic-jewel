@@ -260,7 +260,7 @@ Environment:
   JBR_SKIA_NATIVE_TEXT Opt into experimental native text command recording instead of fidelity-first text image replay. Default: false.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader rendering probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_FILTER Enables an image color-filter fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER Enables a color-filter fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_PATH_EFFECT Enables a path-effect fallback probe. Default: false.

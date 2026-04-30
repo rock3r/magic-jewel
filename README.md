@@ -18,7 +18,7 @@ JBR Skia interop path, using the same patched module/native-library flags as the
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/run-jbr-skia.sh
 ```
 
-By default the interop run prepends patched CMP jars from `/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core`. Override that with `LOCAL_CMP_OUT=/path/to/out/compose-multiplatform-core` or `-PlocalCmpOut=/path/to/out/compose-multiplatform-core` if the worktree moves.
+By default Magic Jewel compiles against and the interop run prepends patched CMP jars from `/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core`. Override that with `LOCAL_CMP_OUT=/path/to/out/compose-multiplatform-core` or `-PlocalCmpOut=/path/to/out/compose-multiplatform-core` if the worktree moves. Keeping those jars on both classpaths is intentional: command probes that exercise new Compose APIs must not compile against published Compose jars and run against the patched local ABI.
 Set `JBR_SKIA_RENDER_MODE=commands` to exercise the lower-level command-list probe instead of the default Skia picture replay path.
 Command mode currently supports Magic Jewel text through a temporary text-as-inline-ARGB bridge by default: CMP rasterizes Skia Paragraph output into the existing image command so the sample stays on JBR command replay while preserving the resolved Jewel font, size, and alignment. This is useful for mixed-content validation, but it is not the final JBR-owned font/typeface solution. Set `JBR_SKIA_NATIVE_TEXT=true` to probe the ABI 43 native text commands, which now carry font-family metadata and are covered by the native-text report row below; the default remains text-as-image until broader typography parity is proven.
 To validate deliberate fallback paths, run with `EXPECT_COMMAND_FALLBACK=true` and set `EXPECT_COMMAND_FALLBACK_REASON` to the unsupported operation being probed.
@@ -29,7 +29,7 @@ Old/new process and marker report:
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_IMAGE=true MAGIC_JEWEL_COMPOSE_TRANSFORM=true MAGIC_JEWEL_COMPOSE_SAVELAYER=true MAGIC_JEWEL_COMPOSE_CLIP=true MAGIC_JEWEL_COMPOSE_CLIP_OUT=true SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
-JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_IMAGE_SHADER=true EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=shader SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
+JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_IMAGE_SHADER=true EXPECT_MIN_IMAGE_REFS=1 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=true EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=image SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_STROKE=true EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=linearGradientPaint SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_COLOR_FILTER=true EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=colorFilter SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
@@ -89,7 +89,7 @@ Command rendering probe suite:
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-command-probe-suite.sh
 ```
 
-The suite groups the manual command-mode probes into repeatable cases for core primitives, gradient surfaces, gradient paths, glass-pane popup layering, real popup-window capture, Swing menu popup layering, text-as-image replay, native text opt-in, shader/image-filter/gradient-stroke/color-filter/path-effect/blend-mode/saveLayer-filter fallback, and invalid-gradient fallback. Use `CASES="commands-core-primitives commands-popup"` to run a subset. It writes `suite.tsv` with one row per case, including validation status, fallback count, unsupported reasons, picture/command frame counts, command FPS, and report path.
+The suite groups the manual command-mode probes into repeatable cases for core primitives, gradient surfaces, gradient paths, glass-pane popup layering, real popup-window capture, Swing menu popup layering, text-as-image replay, native text opt-in, image-shader rendering, image-filter/gradient-stroke/color-filter/path-effect/blend-mode/saveLayer-filter fallback, and invalid-gradient fallback. Use `CASES="commands-core-primitives commands-popup"` to run a subset. It writes `suite.tsv` with one row per case, including validation status, fallback count, unsupported reasons, picture/command frame counts, command FPS, and report path.
 
 Quiet-machine benchmark collection suite:
 
@@ -102,7 +102,7 @@ The suite writes one report directory per scenario under `out/jbr-skia-benchmark
 The image-cache churn report records both generic JBR clear markers and scoped clear markers. New scoped markers have the form
 `JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR backend=native contextId=0x... cleared=N`, which verifies that JBR clears the current destination context namespace instead of dropping one process-global image cache.
 Use `MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN=true` with `EXPECT_MAX_IMAGE_DEFINES=0 EXPECT_MAX_IMAGE_CACHE_CLEARS=0` to validate that stable cached images are defined during warmup and then reused without steady-state cache churn.
-ABI 43 dynamic churn should prefer single-key eviction over whole-cache clears; use `EXPECT_MIN_IMAGE_CACHE_EVICTS=1 EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS=1 EXPECT_MAX_IMAGE_CACHE_CLEARS=0` to validate that path.
+Current ABI dynamic churn should prefer single-key eviction over whole-cache clears; use `EXPECT_MIN_IMAGE_CACHE_EVICTS=1 EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS=1 EXPECT_MAX_IMAGE_CACHE_CLEARS=0` to validate that path.
 Set `MAGIC_JEWEL_POPUP_STRESS=true EXPECT_MIN_POPUP_FRAMES=5` to add an animated Swing glass-pane popup over the ComposePanel. In command mode the report asserts popup paint markers, a captured popup color signature, zero picture replay, and zero fallback markers.
 Set `MAGIC_JEWEL_POPUP_WINDOW_STRESS=true EXPECT_MIN_POPUP_FRAMES=5` to show an animated undecorated Swing popup window over the ComposePanel. The report captures the main window and the popup window separately by window id and asserts both screenshots.
 Set `MAGIC_JEWEL_MENU_STRESS=true EXPECT_MIN_POPUP_FRAMES=5` to show an animated Swing `JPopupMenu` over the ComposePanel. The report asserts the menu-shown marker, popup repaint markers, and the same main-window popup color signature used by the glass-pane case.

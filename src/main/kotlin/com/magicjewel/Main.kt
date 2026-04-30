@@ -39,8 +39,11 @@ import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -442,8 +445,12 @@ private fun MagicJewelApp() {
                 }
                 if (composeImageShaderEnabled) {
                     imageProbe?.let {
-                        drawImage(it, topLeft = Offset(size.width - 206f, size.height - 210f))
-                        markJbrSkiaUnsupported("shader")
+                        drawRect(
+                            brush = ShaderBrush(ImageShader(it, TileMode.Repeated, TileMode.Mirror)),
+                            topLeft = Offset(size.width - 224f, size.height - 224f),
+                            size = Size(140f, 116f),
+                            alpha = 0.92f,
+                        )
                     }
                 }
                 if (composeImageFilterEnabled) {

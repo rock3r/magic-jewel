@@ -65,6 +65,8 @@ var probeBottomLeftCyan = 0
 var probeRightPurple = 0
 var probeRightOrange = 0
 var probeRightCyan = 0
+var probeRightYellow = 0
+var probeRightDark = 0
 
 func isDarkText(r: Int, g: Int, b: Int) -> Bool {
     return r < 55 && g < 55 && b < 55
@@ -170,6 +172,12 @@ for y in 0..<height {
             if r < 80 && g > 170 && b > 170 {
                 probeRightCyan += 1
             }
+            if r > 180 && g > 130 && b < 90 {
+                probeRightYellow += 1
+            }
+            if r < 60 && g < 60 && b < 60 {
+                probeRightDark += 1
+            }
         }
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: topTextRect.left, top: topTextRect.top, right: topTextRect.right, bottom: topTextRect.bottom) {
@@ -190,7 +198,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark)")
 
 let checks: [(String, Int, Int)] = [
     ("green", green, 10000),
@@ -226,6 +234,7 @@ let clipPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLI
 let drawPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_PATH"] == "true"
 let drawArcProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ARC"] == "true"
 let drawRoundRectProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT"] == "true"
+let imageShaderProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_IMAGE_SHADER"] == "true"
 let linearGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT"] == "true"
     || ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT"] == "true"
 let radialGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT"] == "true"
@@ -265,6 +274,10 @@ if drawArcProbe {
 }
 if drawRoundRectProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 3000))
+}
+if imageShaderProbe {
+    probeChecks.append(("probeRightYellow", probeRightYellow, 1500))
+    probeChecks.append(("probeRightDark", probeRightDark, 5000))
 }
 if linearGradientSurfaceProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 5000))
