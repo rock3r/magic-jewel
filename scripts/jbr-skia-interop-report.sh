@@ -261,7 +261,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader rendering probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_IMAGE_FILTER Enables an image color-filter fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_IMAGE_FILTER Enables an image tint color-filter command probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER Enables a tint color-filter command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_PATH_EFFECT Enables a dashed-line path-effect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_BLEND_MODE Enables a Plus blend-mode command replay probe. Default: false.
