@@ -22,6 +22,8 @@ OLD_API_EXPECTED_REASON="${OLD_API_EXPECTED_REASON:-public-api-missing}"
 OLD_SKIKO_EXPECTED_REASON="${OLD_SKIKO_EXPECTED_REASON:-native-abi-mismatch}"
 OLD_CMP_EXPECTED_REASON="${OLD_CMP_EXPECTED_REASON:-public-api-missing}"
 DRY_RUN="${DRY_RUN:-false}"
+REQUIRE_OLD_ARTIFACT_ROWS="${REQUIRE_OLD_ARTIFACT_ROWS:-false}"
+SKIPPED_OPTIONAL_ROWS=0
 
 mkdir -p "${OUT_ROOT}"
 MATRIX_TSV="${OUT_ROOT}/matrix.tsv"
@@ -54,6 +56,9 @@ Expected fallback variables for optional rows:
   OLD_API_EXPECTED_REASON     Default: public-api-missing
   OLD_SKIKO_EXPECTED_REASON   Default: native-abi-mismatch
   OLD_CMP_EXPECTED_REASON     Default: public-api-missing
+
+Validation controls:
+  REQUIRE_OLD_ARTIFACT_ROWS   When true, fail if any optional old-artifact row is skipped. Default: false
 EOF_USAGE
 }
 
@@ -166,6 +171,7 @@ skip_case() {
   local name="$1"
   local reason="$2"
   echo "== ${name} skipped: ${reason} =="
+  SKIPPED_OPTIONAL_ROWS=$((SKIPPED_OPTIONAL_ROWS + 1))
   append_row "${name}" "skipped" "-" "-" "-" "-" "${reason}"
 }
 
@@ -224,6 +230,12 @@ if [[ -n "${OLD_CMP_OUT}" ]]; then
   run_case old-cmp-current-jbr "${CURRENT_DESKTOP_PATCH}" "${CURRENT_JBR_API_SHIM}" "${CURRENT_JBR_SKIA_LIB}" "${CURRENT_SKIKO_VERSION}" "${OLD_CMP_OUT}" "${OLD_CMP_EXPECTED_REASON}"
 else
   skip_case old-cmp-current-jbr "set OLD_CMP_OUT to run"
+fi
+
+if [[ "${REQUIRE_OLD_ARTIFACT_ROWS}" == "true" && "${SKIPPED_OPTIONAL_ROWS}" -gt 0 ]]; then
+  echo "JBR_SKIA_ARTIFACT_MATRIX failed: ${SKIPPED_OPTIONAL_ROWS} optional old-artifact rows were skipped" >&2
+  echo "matrix=${MATRIX_TSV}" >&2
+  exit 1
 fi
 
 echo "JBR_SKIA_ARTIFACT_MATRIX passed out_root=${OUT_ROOT}"
