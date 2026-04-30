@@ -52,6 +52,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_FILTER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER=false
+fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_COLOR_FILTER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false
 fi
@@ -182,6 +185,7 @@ export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
 export MAGIC_JEWEL_COMPOSE_IMAGE_FILTER
+export MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER
 export MAGIC_JEWEL_COMPOSE_COLOR_FILTER
 export MAGIC_JEWEL_COMPOSE_COLOR_MATRIX_FILTER
 export MAGIC_JEWEL_COMPOSE_LIGHTING_FILTER
@@ -305,6 +309,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader rendering probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_FILTER Enables an image tint color-filter command probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER Enables an image color-matrix descriptor command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER Enables a tint color-filter command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_MATRIX_FILTER Enables a color-matrix descriptor command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_LIGHTING_FILTER Enables a lighting descriptor command replay probe. Default: false.

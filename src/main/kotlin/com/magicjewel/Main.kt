@@ -99,6 +99,7 @@ private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
+private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
 private const val ComposeColorMatrixFilterProperty = "magic.jewel.compose.colorMatrixFilter"
 private const val ComposeLightingFilterProperty = "magic.jewel.compose.lightingFilter"
@@ -289,6 +290,9 @@ private fun MagicJewelApp() {
     val composeImageFilterEnabled = remember {
         System.getProperty(ComposeImageFilterProperty, "false").toBoolean()
     }
+    val composeImageColorMatrixFilterEnabled = remember {
+        System.getProperty(ComposeImageColorMatrixFilterProperty, "false").toBoolean()
+    }
     val composeColorFilterEnabled = remember {
         System.getProperty(ComposeColorFilterProperty, "false").toBoolean()
     }
@@ -397,8 +401,17 @@ private fun MagicJewelApp() {
     val invalidSweepGradientEnabled = remember {
         System.getProperty(InvalidSweepGradientProperty, "false").toBoolean()
     }
-    val imageProbe = remember(composeImageEnabled, composeImageShaderEnabled, composeImageFilterEnabled) {
-        if (composeImageEnabled || composeImageShaderEnabled || composeImageFilterEnabled) createImageProbe() else null
+    val imageProbe = remember(
+        composeImageEnabled,
+        composeImageShaderEnabled,
+        composeImageFilterEnabled,
+        composeImageColorMatrixFilterEnabled,
+    ) {
+        if (composeImageEnabled || composeImageShaderEnabled || composeImageFilterEnabled || composeImageColorMatrixFilterEnabled) {
+            createImageProbe()
+        } else {
+            null
+        }
     }
     val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
     val animatedPhase by infiniteTransition.animateFloat(
@@ -520,6 +533,20 @@ private fun MagicJewelApp() {
                             image = it,
                             topLeft = Offset(size.width - 332f, size.height - 210f),
                             colorFilter = ColorFilter.tint(Color(0xFF22D3EE)),
+                        )
+                    }
+                }
+                if (composeImageColorMatrixFilterEnabled) {
+                    imageProbe?.let {
+                        val matrix = ColorMatrix().apply {
+                            this[0, 4] = 64f
+                            this[1, 1] = 0.85f
+                            this[2, 2] = 1.2f
+                        }
+                        drawImage(
+                            image = it,
+                            topLeft = Offset(size.width - 444f, size.height - 210f),
+                            colorFilter = ColorFilter.colorMatrix(matrix),
                         )
                     }
                 }
