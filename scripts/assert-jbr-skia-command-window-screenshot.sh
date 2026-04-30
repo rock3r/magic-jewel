@@ -289,7 +289,7 @@ let linearGradientStrokeProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL
 let linearGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT"] == "true"
 let linearGradientRoundRectSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT"] == "true"
 let radialGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT"] == "true"
-    || ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT"] == "true"
+let radialGradientRoundRectSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT"] == "true"
 let sweepGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT"] == "true"
     || ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT"] == "true"
 let linearGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH"] == "true"
@@ -350,6 +350,10 @@ if linearGradientRoundRectSurfaceProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 500))
 }
 if radialGradientSurfaceProbe {
+    probeChecks.append(("probeRightOrange", probeRightOrange, 500))
+    probeChecks.append(("probeRightCyan", probeRightCyan, 500))
+}
+if radialGradientRoundRectSurfaceProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 1500))
 }
 if sweepGradientSurfaceProbe {
