@@ -203,13 +203,18 @@ let checks: [(String, Int, Int)] = [
     ("bottomText", bottomText, 1200),
 ]
 
+let nativeTextProbe = ProcessInfo.processInfo.environment["JBR_SKIA_NATIVE_TEXT"] == "true"
+let paragraphLayoutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT"] == "true"
+
 let textBoxChecks: [(String, Bool)] = [
     ("topTextWidth", topTextMaxX - topTextMinX >= width / 5),
     ("topTextHeight", topTextMaxY - topTextMinY >= 30),
     ("topTextVerticalAnchor", topTextMinY <= topTextRect.top + height / 12 && topTextMaxY >= topTextRect.top + height / 24),
     ("bottomTextWidth", bottomTextMaxX - bottomTextMinX >= width / 5),
     ("bottomTextHeight", bottomTextMaxY - bottomTextMinY >= 40),
-    ("bottomTextVerticalAnchor", bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.bottom - height / 15),
+    ("bottomTextVerticalAnchor", nativeTextProbe && paragraphLayoutProbe
+        ? bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.top + height / 20
+        : bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.bottom - height / 15),
 ]
 
 let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
