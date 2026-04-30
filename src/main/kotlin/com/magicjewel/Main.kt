@@ -100,6 +100,7 @@ private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
 private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
 private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLayer"
+private const val ComposeGraphicsLayerClipProperty = "magic.jewel.compose.graphicsLayerClip"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -289,6 +290,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerEnabled = remember {
         System.getProperty(ComposeGraphicsLayerProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerClipEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerClipProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -1210,10 +1214,23 @@ private fun MagicJewelApp() {
                         .align(Alignment.BottomEnd)
                         .offset(x = (-72).dp, y = (-72).dp)
                         .size(width = 132.dp, height = 72.dp)
-                        .graphicsLayer(alpha = 0.64f, rotationZ = -4f)
+                        .graphicsLayer {
+                            alpha = 0.64f
+                            rotationZ = -4f
+                            clip = composeGraphicsLayerClipEnabled
+                        }
                         .background(Color(0xFFE879F9))
                         .zIndex(2f),
-                )
+                ) {
+                    if (composeGraphicsLayerClipEnabled) {
+                        Box(
+                            modifier = Modifier
+                                .offset(x = (-24).dp, y = (-14).dp)
+                                .size(width = 180.dp, height = 96.dp)
+                                .background(Color(0xFF22D3EE)),
+                        )
+                    }
+                }
             }
 
             Column(

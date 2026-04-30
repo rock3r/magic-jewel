@@ -67,6 +67,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP=false
+fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_TRANSFORM+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_TRANSFORM=false
 fi
@@ -163,6 +166,7 @@ export MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE
 export MAGIC_JEWEL_COMPOSE_PATH_EFFECT
 export MAGIC_JEWEL_COMPOSE_BLEND_MODE
 export MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER
+export MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP
 export MAGIC_JEWEL_COMPOSE_TRANSFORM
 export MAGIC_JEWEL_COMPOSE_SAVELAYER
 export MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER
@@ -278,6 +282,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_PATH_EFFECT Enables a dashed-line path-effect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_BLEND_MODE Enables Plus/Multiply/Screen/Overlay/Darken/Lighten/Difference/Exclusion/ColorDodge/ColorBurn/Hardlight/Softlight/Hue/Saturation/Color/Luminosity blend-mode command replay probes. Default: false.
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER Enables a graphics-layer command replay probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP Adds a rectangular clip to the graphics-layer command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER Enables a saveLayer tint color-filter command probe. Default: false.
@@ -1060,6 +1065,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_PATH_EFFECT: ${MAGIC_JEWEL_COMPOSE_PATH_EFFECT}"
     echo "- MAGIC_JEWEL_COMPOSE_BLEND_MODE: ${MAGIC_JEWEL_COMPOSE_BLEND_MODE}"
     echo "- MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER: ${MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER}"
+    echo "- MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP: ${MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP}"
     echo "- MAGIC_JEWEL_COMPOSE_TRANSFORM: ${MAGIC_JEWEL_COMPOSE_TRANSFORM}"
     echo "- MAGIC_JEWEL_COMPOSE_SAVELAYER: ${MAGIC_JEWEL_COMPOSE_SAVELAYER}"
     echo "- MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER: ${MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER}"
