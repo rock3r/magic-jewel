@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.Paint
@@ -99,6 +100,7 @@ private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
+private const val ComposeColorMatrixFilterProperty = "magic.jewel.compose.colorMatrixFilter"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
 private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
 private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLayer"
@@ -287,6 +289,9 @@ private fun MagicJewelApp() {
     }
     val composeColorFilterEnabled = remember {
         System.getProperty(ComposeColorFilterProperty, "false").toBoolean()
+    }
+    val composeColorMatrixFilterEnabled = remember {
+        System.getProperty(ComposeColorMatrixFilterProperty, "false").toBoolean()
     }
     val composePathEffectEnabled = remember {
         System.getProperty(ComposePathEffectProperty, "false").toBoolean()
@@ -520,6 +525,25 @@ private fun MagicJewelApp() {
                             paint = Paint().apply {
                                 color = Color(0xFFE879F9)
                                 colorFilter = ColorFilter.tint(Color(0xFF22D3EE))
+                            },
+                        )
+                    }
+                }
+                if (composeColorMatrixFilterEnabled) {
+                    val matrix = ColorMatrix().apply {
+                        this[0, 4] = 64f
+                        this[1, 1] = 0.78f
+                        this[2, 2] = 1.14f
+                    }
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 516f,
+                            top = 34f,
+                            right = size.width - 404f,
+                            bottom = 112f,
+                            paint = Paint().apply {
+                                color = Color(0xFF38BDF8)
+                                colorFilter = ColorFilter.colorMatrix(matrix)
                             },
                         )
                     }
