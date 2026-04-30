@@ -67,6 +67,11 @@ var probeRightOrange = 0
 var probeRightCyan = 0
 var probeRightYellow = 0
 var probeRightDark = 0
+var paragraphCentered = 0
+var paragraphItalicRight = 0
+var paragraphRtl = 0
+var paragraphOverflow = 0
+var paragraphDecorated = 0
 
 func isDarkText(r: Int, g: Int, b: Int) -> Bool {
     return r < 55 && g < 55 && b < 55
@@ -111,6 +116,36 @@ let probeRightRect = (
     top: height * 13 / 20,
     right: width * 39 / 40,
     bottom: height * 17 / 20
+)
+let paragraphCenteredRect = (
+    left: width / 14,
+    top: height * 63 / 100,
+    right: width * 7 / 20,
+    bottom: height * 67 / 100
+)
+let paragraphItalicRightRect = (
+    left: width / 7,
+    top: height * 66 / 100,
+    right: width * 7 / 20,
+    bottom: height * 70 / 100
+)
+let paragraphRtlRect = (
+    left: width / 14,
+    top: height * 70 / 100,
+    right: width * 7 / 20,
+    bottom: height * 74 / 100
+)
+let paragraphOverflowRect = (
+    left: width / 14,
+    top: height * 74 / 100,
+    right: width * 7 / 20,
+    bottom: height * 78 / 100
+)
+let paragraphDecoratedRect = (
+    left: width / 14,
+    top: height * 78 / 100,
+    right: width * 7 / 20,
+    bottom: height * 82 / 100
 )
 
 for y in 0..<height {
@@ -180,6 +215,21 @@ for y in 0..<height {
             }
         }
         if isDarkText(r: r, g: g, b: b) {
+            if inRect(x: x, y: y, left: paragraphCenteredRect.left, top: paragraphCenteredRect.top, right: paragraphCenteredRect.right, bottom: paragraphCenteredRect.bottom) {
+                paragraphCentered += 1
+            }
+            if inRect(x: x, y: y, left: paragraphItalicRightRect.left, top: paragraphItalicRightRect.top, right: paragraphItalicRightRect.right, bottom: paragraphItalicRightRect.bottom) {
+                paragraphItalicRight += 1
+            }
+            if inRect(x: x, y: y, left: paragraphRtlRect.left, top: paragraphRtlRect.top, right: paragraphRtlRect.right, bottom: paragraphRtlRect.bottom) {
+                paragraphRtl += 1
+            }
+            if inRect(x: x, y: y, left: paragraphOverflowRect.left, top: paragraphOverflowRect.top, right: paragraphOverflowRect.right, bottom: paragraphOverflowRect.bottom) {
+                paragraphOverflow += 1
+            }
+            if inRect(x: x, y: y, left: paragraphDecoratedRect.left, top: paragraphDecoratedRect.top, right: paragraphDecoratedRect.right, bottom: paragraphDecoratedRect.bottom) {
+                paragraphDecorated += 1
+            }
             if inRect(x: x, y: y, left: topTextRect.left, top: topTextRect.top, right: topTextRect.right, bottom: topTextRect.bottom) {
                 topText += 1
                 topTextMinX = min(topTextMinX, x)
@@ -198,7 +248,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
 
 let checks: [(String, Int, Int)] = [
     ("green", green, 10000),
@@ -257,6 +307,13 @@ let menuChecks: [(String, Int, Int)] = menuStress
       ]
     : []
 var probeChecks: [(String, Int, Int)] = []
+if paragraphLayoutProbe {
+    probeChecks.append(("paragraphCentered", paragraphCentered, 2500))
+    probeChecks.append(("paragraphItalicRight", paragraphItalicRight, 1500))
+    probeChecks.append(("paragraphRtl", paragraphRtl, 1500))
+    probeChecks.append(("paragraphOverflow", paragraphOverflow, 2200))
+    probeChecks.append(("paragraphDecorated", paragraphDecorated, 700))
+}
 if transformProbe {
     probeChecks.append(("probeBottomLeftCyan", probeBottomLeftCyan, 500))
 }
