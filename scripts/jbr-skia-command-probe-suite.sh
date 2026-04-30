@@ -130,9 +130,7 @@ run_named_case() {
       ;;
     commands-color-filter-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilter
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=true
       ;;
     commands-path-effect-fallback)
       run_case "$1" \

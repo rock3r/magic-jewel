@@ -262,9 +262,9 @@ Environment:
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader rendering probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_FILTER Enables an image color-filter fallback probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_COLOR_FILTER Enables a color-filter fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_COLOR_FILTER Enables a tint color-filter command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_PATH_EFFECT Enables a path-effect fallback probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_BLEND_MODE Enables an unsupported blend-mode fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_BLEND_MODE Enables a Plus blend-mode command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER Enables an unsupported saveLayer paint fallback probe. Default: false.
