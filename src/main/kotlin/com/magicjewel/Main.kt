@@ -772,6 +772,25 @@ private fun MagicJewelApp() {
                                 blendMode = BlendMode.Color
                             },
                         )
+                        canvas.drawRect(
+                            left = size.width - 64f,
+                            top = 854f,
+                            right = size.width - 4f,
+                            bottom = 918f,
+                            paint = Paint().apply {
+                                color = Color(0xFFFDE047)
+                            },
+                        )
+                        canvas.drawRect(
+                            left = size.width - 54f,
+                            top = 842f,
+                            right = size.width,
+                            bottom = 928f,
+                            paint = Paint().apply {
+                                color = Color(0xFF1D4ED8)
+                                blendMode = BlendMode.Luminosity
+                            },
+                        )
                     }
                 }
                 if (imageCacheChurnEnabled) {
