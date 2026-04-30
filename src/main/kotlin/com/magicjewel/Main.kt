@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -101,6 +102,7 @@ private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
 private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
 private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLayer"
 private const val ComposeGraphicsLayerClipProperty = "magic.jewel.compose.graphicsLayerClip"
+private const val ComposeGraphicsLayerRoundClipProperty = "magic.jewel.compose.graphicsLayerRoundClip"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -293,6 +295,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerClipEnabled = remember {
         System.getProperty(ComposeGraphicsLayerClipProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerRoundClipEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerRoundClipProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -1217,12 +1222,15 @@ private fun MagicJewelApp() {
                         .graphicsLayer {
                             alpha = 0.64f
                             rotationZ = -4f
-                            clip = composeGraphicsLayerClipEnabled
+                            clip = composeGraphicsLayerClipEnabled || composeGraphicsLayerRoundClipEnabled
+                            if (composeGraphicsLayerRoundClipEnabled) {
+                                shape = RoundedCornerShape(20.dp)
+                            }
                         }
                         .background(Color(0xFFE879F9))
                         .zIndex(2f),
                 ) {
-                    if (composeGraphicsLayerClipEnabled) {
+                    if (composeGraphicsLayerClipEnabled || composeGraphicsLayerRoundClipEnabled) {
                         Box(
                             modifier = Modifier
                                 .offset(x = (-24).dp, y = (-14).dp)
