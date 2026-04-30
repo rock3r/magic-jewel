@@ -267,7 +267,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_BLEND_MODE Enables a Plus blend-mode command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER Enables an unsupported saveLayer paint fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER Enables a saveLayer tint color-filter command probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP Enables the Compose clipRect probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP_OUT Enables the Compose clip-out probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP_PATH Enables the Compose clipPath command replay probe. Default: false.
