@@ -77,6 +77,7 @@ var blendModeDifference = 0
 var blendModeExclusion = 0
 var blendModeColorDodge = 0
 var blendModeColorBurn = 0
+var blendModeHardlight = 0
 var paragraphCentered = 0
 var paragraphItalicRight = 0
 var paragraphRtl = 0
@@ -131,7 +132,7 @@ let blendModeRect = (
     left: width / 2,
     top: height / 5,
     right: width * 49 / 50,
-    bottom: height * 19 / 50
+    bottom: height * 9 / 20
 )
 let paragraphCenteredRect = (
     left: width / 14,
@@ -261,6 +262,9 @@ for y in 0..<height {
             if r >= 230 && g >= 90 && g <= 150 && b >= 35 && b <= 95 {
                 blendModeColorBurn += 1
             }
+            if r >= 15 && r <= 55 && g >= 20 && g <= 70 && b >= 225 {
+                blendModeHardlight += 1
+            }
         }
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: paragraphCenteredRect.left, top: paragraphCenteredRect.top, right: paragraphCenteredRect.right, bottom: paragraphCenteredRect.bottom) {
@@ -296,7 +300,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
 
 let checks: [(String, Int, Int)] = [
     ("green", green, 10000),
@@ -434,6 +438,7 @@ if blendModeProbe {
     probeChecks.append(("blendModeExclusion", blendModeExclusion, 500))
     probeChecks.append(("blendModeColorDodge", blendModeColorDodge, 500))
     probeChecks.append(("blendModeColorBurn", blendModeColorBurn, 500))
+    probeChecks.append(("blendModeHardlight", blendModeHardlight, 500))
 }
 
 for (name, count, minimum) in checks where count < minimum {
