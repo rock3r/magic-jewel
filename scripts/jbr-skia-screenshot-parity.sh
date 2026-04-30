@@ -36,11 +36,54 @@ SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}" \
 "${COMPARE_SCRIPT}" \
   "${OUT_DIR}/report/old-window.png" \
   "${OUT_DIR}/report/new-window.png" \
+  "${OUT_DIR}/report/parity-diff.png" \
   > "${OUT_DIR}/parity.log" 2>&1
 
+{
+  echo
+  echo "## Screenshot Parity Diff"
+  echo
+  echo "- diff image: parity-diff.png"
+  echo "- parity log: ../parity.log"
+  echo
+  echo '```text'
+  cat "${OUT_DIR}/parity.log"
+  echo '```'
+} >> "${OUT_DIR}/report/report.md"
+
+awk '
+  function sanitize(value) {
+    gsub(/[^A-Za-z0-9_]/, "_", value)
+    return value
+  }
+  /^JBR_SKIA_SCREENSHOT_PARITY / {
+    for (i = 2; i <= NF; i++) {
+      split($i, value, "=")
+      if (value[1] != "diffImage") {
+        printf "screenshot_parity_%s=%s\n", value[1], value[2]
+      }
+    }
+  }
+  /^JBR_SKIA_SCREENSHOT_PARITY_REGION / {
+    region = "unknown"
+    for (i = 2; i <= NF; i++) {
+      split($i, value, "=")
+      if (value[1] == "name") {
+        region = sanitize(value[2])
+      }
+    }
+    for (i = 2; i <= NF; i++) {
+      split($i, value, "=")
+      if (value[1] != "name") {
+        printf "screenshot_parity_region_%s_%s=%s\n", region, value[1], value[2]
+      }
+    }
+  }
+' "${OUT_DIR}/parity.log" >> "${OUT_DIR}/report/summary.properties"
+
 cat > "${OUT_DIR}/summary.tsv" <<EOF_SUMMARY
-status	report	parity
-passed	${OUT_DIR}/report/report.md	${OUT_DIR}/parity.log
+status	report	parity	diff
+passed	${OUT_DIR}/report/report.md	${OUT_DIR}/parity.log	${OUT_DIR}/report/parity-diff.png
 EOF_SUMMARY
 
 echo "JBR_SKIA_SCREENSHOT_PARITY_SUITE passed out_dir=${OUT_DIR}"
