@@ -355,6 +355,7 @@ let clipOutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP
 let clipPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP_PATH"] == "true"
 let graphicsLayerClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP"] == "true"
 let graphicsLayerRoundClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROUND_CLIP"] == "true"
+let graphicsLayerPathClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_PATH_CLIP"] == "true"
 let drawPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_PATH"] == "true"
 let drawArcProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ARC"] == "true"
 let drawRoundRectProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT"] == "true"
@@ -399,7 +400,7 @@ if clipProbe || clipOutProbe {
 if clipPathProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 5000))
 }
-if graphicsLayerClipProbe || graphicsLayerRoundClipProbe {
+if graphicsLayerClipProbe || graphicsLayerRoundClipProbe || graphicsLayerPathClipProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 1000))
     probeChecks.append(("probeRightPurple", probeRightPurple, 1000))
 }

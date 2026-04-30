@@ -8,6 +8,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -103,6 +104,7 @@ private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
 private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLayer"
 private const val ComposeGraphicsLayerClipProperty = "magic.jewel.compose.graphicsLayerClip"
 private const val ComposeGraphicsLayerRoundClipProperty = "magic.jewel.compose.graphicsLayerRoundClip"
+private const val ComposeGraphicsLayerPathClipProperty = "magic.jewel.compose.graphicsLayerPathClip"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -298,6 +300,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerRoundClipEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRoundClipProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerPathClipEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerPathClipProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -1222,15 +1227,31 @@ private fun MagicJewelApp() {
                         .graphicsLayer {
                             alpha = 0.64f
                             rotationZ = -4f
-                            clip = composeGraphicsLayerClipEnabled || composeGraphicsLayerRoundClipEnabled
-                            if (composeGraphicsLayerRoundClipEnabled) {
-                                shape = RoundedCornerShape(20.dp)
+                            clip = composeGraphicsLayerClipEnabled ||
+                                composeGraphicsLayerRoundClipEnabled ||
+                                composeGraphicsLayerPathClipEnabled
+                            when {
+                                composeGraphicsLayerPathClipEnabled -> {
+                                    shape = GenericShape { outlineSize, _ ->
+                                        moveTo(0f, 0f)
+                                        lineTo(outlineSize.width, 0f)
+                                        lineTo(outlineSize.width * 0.82f, outlineSize.height)
+                                        lineTo(0f, outlineSize.height * 0.78f)
+                                        close()
+                                    }
+                                }
+                                composeGraphicsLayerRoundClipEnabled -> {
+                                    shape = RoundedCornerShape(20.dp)
+                                }
                             }
                         }
                         .background(Color(0xFFE879F9))
                         .zIndex(2f),
                 ) {
-                    if (composeGraphicsLayerClipEnabled || composeGraphicsLayerRoundClipEnabled) {
+                    if (composeGraphicsLayerClipEnabled ||
+                        composeGraphicsLayerRoundClipEnabled ||
+                        composeGraphicsLayerPathClipEnabled
+                    ) {
                         Box(
                             modifier = Modifier
                                 .offset(x = (-24).dp, y = (-14).dp)
