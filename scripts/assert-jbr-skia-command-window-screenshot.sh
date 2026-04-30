@@ -74,6 +74,7 @@ var blendModeOverlay = 0
 var blendModeDarken = 0
 var blendModeLighten = 0
 var blendModeDifference = 0
+var blendModeExclusion = 0
 var paragraphCentered = 0
 var paragraphItalicRight = 0
 var paragraphRtl = 0
@@ -127,7 +128,7 @@ let probeRightRect = (
 let blendModeRect = (
     left: width / 2,
     top: height / 5,
-    right: width * 9 / 10,
+    right: width * 49 / 50,
     bottom: height * 19 / 50
 )
 let paragraphCenteredRect = (
@@ -249,6 +250,9 @@ for y in 0..<height {
             if r >= 95 && r <= 170 && g >= 120 && g <= 200 && b >= 145 && b <= 230 {
                 blendModeDifference += 1
             }
+            if r >= 190 && r <= 245 && g >= 135 && g <= 195 && b >= 135 && b <= 205 {
+                blendModeExclusion += 1
+            }
         }
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: paragraphCenteredRect.left, top: paragraphCenteredRect.top, right: paragraphCenteredRect.right, bottom: paragraphCenteredRect.bottom) {
@@ -284,7 +288,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
 
 let checks: [(String, Int, Int)] = [
     ("green", green, 10000),
@@ -419,6 +423,7 @@ if blendModeProbe {
     probeChecks.append(("blendModeDarken", blendModeDarken, 500))
     probeChecks.append(("blendModeLighten", blendModeLighten, 500))
     probeChecks.append(("blendModeDifference", blendModeDifference, 500))
+    probeChecks.append(("blendModeExclusion", blendModeExclusion, 500))
 }
 
 for (name, count, minimum) in checks where count < minimum {
