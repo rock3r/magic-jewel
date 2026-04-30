@@ -37,6 +37,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
@@ -112,6 +113,7 @@ private const val ComposeGraphicsLayerPathClipProperty = "magic.jewel.compose.gr
 private const val ComposeGraphicsLayerBlendModeProperty = "magic.jewel.compose.graphicsLayerBlendMode"
 private const val ComposeGraphicsLayerColorFilterProperty = "magic.jewel.compose.graphicsLayerColorFilter"
 private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.compose.graphicsLayerColorMatrixFilter"
+private const val ComposeGraphicsLayerRenderEffectProperty = "magic.jewel.compose.graphicsLayerRenderEffect"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -328,6 +330,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerColorMatrixFilterEnabled = remember {
         System.getProperty(ComposeGraphicsLayerColorMatrixFilterProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerRenderEffectEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerRenderEffectProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -1326,6 +1331,9 @@ private fun MagicJewelApp() {
                                         this[0, 4] = 24f
                                     }
                                 )
+                            }
+                            if (composeGraphicsLayerRenderEffectEnabled) {
+                                renderEffect = BlurEffect(radiusX = 7f, radiusY = 5f)
                             }
                             clip = composeGraphicsLayerClipEnabled ||
                                 composeGraphicsLayerRoundClipEnabled ||
