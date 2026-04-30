@@ -277,7 +277,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE Enables the descriptor-handle color-filter replay variant. Default: false.
   MAGIC_JEWEL_COMPOSE_PATH_EFFECT Enables a dashed-line path-effect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_BLEND_MODE Enables Plus/Multiply/Screen/Overlay/Darken/Lighten/Difference/Exclusion/ColorDodge/ColorBurn/Hardlight/Softlight/Hue/Saturation/Color/Luminosity blend-mode command replay probes. Default: false.
-  MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER Enables a graphics-layer fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER Enables a graphics-layer command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER Enables a saveLayer tint color-filter command probe. Default: false.
