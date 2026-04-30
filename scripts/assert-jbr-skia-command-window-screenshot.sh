@@ -362,7 +362,8 @@ if sweepGradientRectProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 200))
 }
 if sweepGradientRoundRectSurfaceProbe {
-    probeChecks.append(("probeRightOrange", probeRightOrange, 2500))
+    probeChecks.append(("probeRightCyan", probeRightCyan, 200))
+    probeChecks.append(("probeRightPurple", probeRightPurple, 500))
 }
 if linearGradientPathProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 800))
