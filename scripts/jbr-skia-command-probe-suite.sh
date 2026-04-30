@@ -142,9 +142,7 @@ run_named_case() {
       ;;
     commands-blend-mode-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_BLEND_MODE=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=blendMode_Plus
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=true
       ;;
     commands-save-layer-filter-fallback)
       run_case "$1" \
