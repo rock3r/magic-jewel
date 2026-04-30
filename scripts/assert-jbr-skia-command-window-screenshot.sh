@@ -196,6 +196,15 @@ let clipPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLI
 let drawPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_PATH"] == "true"
 let drawArcProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ARC"] == "true"
 let drawRoundRectProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT"] == "true"
+let linearGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT"] == "true"
+    || ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT"] == "true"
+let radialGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT"] == "true"
+    || ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT"] == "true"
+let sweepGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT"] == "true"
+    || ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT"] == "true"
+let linearGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH"] == "true"
+let radialGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_PATH"] == "true"
+let sweepGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH"] == "true"
 let popupChecks: [(String, Int, Int)] = popupStress
     ? [
         ("popupPink", popupPink, 200),
@@ -226,6 +235,24 @@ if drawArcProbe {
 }
 if drawRoundRectProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 3000))
+}
+if linearGradientSurfaceProbe {
+    probeChecks.append(("probeRightPurple", probeRightPurple, 5000))
+}
+if radialGradientSurfaceProbe {
+    probeChecks.append(("probeRightCyan", probeRightCyan, 1500))
+}
+if sweepGradientSurfaceProbe {
+    probeChecks.append(("probeRightOrange", probeRightOrange, 2500))
+}
+if linearGradientPathProbe {
+    probeChecks.append(("probeRightPurple", probeRightPurple, 800))
+}
+if radialGradientPathProbe {
+    probeChecks.append(("probeRightOrange", probeRightOrange, 1500))
+}
+if sweepGradientPathProbe {
+    probeChecks.append(("probeRightCyan", probeRightCyan, 500))
 }
 
 for (name, count, minimum) in checks where count < minimum {
