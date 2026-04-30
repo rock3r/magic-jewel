@@ -608,6 +608,19 @@ csv_summary_field() {
     awk -F= -v key="${key}" '$1 == key { print $2; found = 1 } END { if (!found) print "0" }'
 }
 
+host_cpu_count() {
+  getconf _NPROCESSORS_ONLN 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo unknown
+}
+
+host_load_field() {
+  local load_index="$1"
+  if [[ -r /proc/loadavg ]]; then
+    awk -v load_index="${load_index}" '{ print $load_index }' /proc/loadavg
+    return
+  fi
+  sysctl -n vm.loadavg 2>/dev/null | awk -v load_index="${load_index}" '{ print $(load_index + 1) }'
+}
+
 payload_marker_summary() {
   local marker="$1"
   local log="$2"
@@ -836,6 +849,10 @@ write_machine_summary() {
     echo "validation_status=${validation_status}"
     echo "validation_failures=${failures}"
     echo "render_mode=${JBR_SKIA_RENDER_MODE:-picture}"
+    echo "host_cpu_count=$(host_cpu_count)"
+    echo "host_load_1m=$(host_load_field 1)"
+    echo "host_load_5m=$(host_load_field 2)"
+    echo "host_load_15m=$(host_load_field 3)"
     echo "expect_command_fallback=${EXPECT_COMMAND_FALLBACK}"
     echo "expect_command_fallback_reason=${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "fallback_old_count=$(grep -c "${FALLBACK_MARKER}" "${old_full_log}" 2>/dev/null || true)"
@@ -957,6 +974,8 @@ write_report() {
     echo "- Warmup per mode: ${WARMUP_SECONDS}s"
     echo "- Startup timeout per mode: ${STARTUP_TIMEOUT_SECONDS}s"
     echo "- Root: ${ROOT_DIR}"
+    echo "- Host CPU count: $(host_cpu_count)"
+    echo "- Host load average: $(host_load_field 1) $(host_load_field 2) $(host_load_field 3)"
     echo "- SKIKO_VERSION: ${SKIKO_VERSION}"
     echo "- ENABLE_ASPROF: ${ENABLE_ASPROF}"
     echo "- ASPROF_EVENT: ${ASPROF_EVENT}"
