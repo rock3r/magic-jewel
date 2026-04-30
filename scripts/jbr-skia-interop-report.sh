@@ -212,6 +212,7 @@ JBR_IMAGE_CACHE_CLEAR_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR"
 JBR_IMAGE_CACHE_EVICT_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_EVICT"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
+CMP_COMMAND_FRAME_KIND_MARKER="CMP_JBR_COMMAND_FRAME_KIND"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
 MIXED_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_MIXED_SCREENSHOT_COUNTS"
 COMMAND_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_COMMAND_SCREENSHOT_COUNTS"
@@ -843,6 +844,33 @@ command_recorder_reasons() {
   ' "${log}"
 }
 
+command_frame_kind_summary() {
+  local log="$1"
+  awk -v marker="${CMP_COMMAND_FRAME_KIND_MARKER}" -v duration="${DURATION_SECONDS}" '
+    index($0, marker) {
+      frames++
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] == "kind") {
+          kinds[value[2]]++
+        } else if (value[1] == "commands") {
+          commands += value[2]
+          if (value[2] > maxCommands) maxCommands = value[2]
+        }
+      }
+    }
+    END {
+      if (frames == 0) {
+        printf "frames=0 fps=0 FullScene=0 InteropOnly=0 Unknown=0 avg_commands=0 max_commands=0"
+        exit
+      }
+      printf "frames=%d fps=%.1f FullScene=%d InteropOnly=%d Unknown=%d avg_commands=%.0f max_commands=%.0f",
+        frames, frames / duration, kinds["FullScene"], kinds["InteropOnly"], kinds["Unknown"],
+        commands / frames, maxCommands
+    }
+  ' "${log}"
+}
+
 write_screenshot_count_properties() {
   local assertion_log="$1"
   local key_prefix="$2"
@@ -918,6 +946,10 @@ write_machine_summary() {
     echo "popup_window_new_shown=$(grep -c "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "menu_new_shown=$(grep -c "${MENU_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "cmp_recorder_frames=$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "cmp_frame_kind_frames=$(grep -c "${CMP_COMMAND_FRAME_KIND_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "cmp_frame_kind_full_scene=$(grep -c "${CMP_COMMAND_FRAME_KIND_MARKER}.*kind=FullScene" "${new_log}" 2>/dev/null || true)"
+    echo "cmp_frame_kind_interop_only=$(grep -c "${CMP_COMMAND_FRAME_KIND_MARKER}.*kind=InteropOnly" "${new_log}" 2>/dev/null || true)"
+    echo "cmp_frame_kind_unknown=$(grep -c "${CMP_COMMAND_FRAME_KIND_MARKER}.*kind=Unknown" "${new_log}" 2>/dev/null || true)"
     echo "cmp_unsupported_max=$(max_command_recorder_field "${new_log}" "unsupported")"
     echo "cmp_unsupported_reasons=$(command_recorder_reasons "${new_log}")"
     echo "skiko_picture_frames=$(grep -c "${SKIKO_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
@@ -963,6 +995,7 @@ write_report() {
   local jbr_command_summary
   local cmp_command_recorder_summary
   local jbr_command_timing_summary
+  local cmp_command_frame_kind_summary
   local jbr_image_cache_clear_summary
   local jbr_image_cache_evict_summary
   local skiko_surface_change_summary
@@ -994,6 +1027,7 @@ write_report() {
   skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${new_log}" "commands")"
   jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${new_log}" "commands")"
   cmp_command_recorder_summary="$(command_recorder_summary "${new_log}")"
+  cmp_command_frame_kind_summary="$(command_frame_kind_summary "${new_log}")"
   jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
   jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}")"
   jbr_image_cache_evict_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}")"
@@ -1116,6 +1150,7 @@ write_report() {
     echo "## Command Replay Markers"
     echo
     echo "- CMP command recorder: ${cmp_command_recorder_summary}"
+    echo "- CMP command frame kinds: ${cmp_command_frame_kind_summary}"
     echo "- Skiko command frames: ${skiko_command_summary}"
     echo "- JBR command frames: ${jbr_command_summary}"
     echo "- JBR command timing: ${jbr_command_timing_summary}"
