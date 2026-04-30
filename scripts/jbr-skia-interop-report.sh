@@ -48,6 +48,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_FILTER+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=false
+fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_COLOR_FILTER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false
 fi
@@ -144,6 +147,7 @@ fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
+export MAGIC_JEWEL_COMPOSE_IMAGE_FILTER
 export MAGIC_JEWEL_COMPOSE_COLOR_FILTER
 export MAGIC_JEWEL_COMPOSE_PATH_EFFECT
 export MAGIC_JEWEL_COMPOSE_BLEND_MODE
@@ -253,6 +257,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_IMAGE_FILTER Enables an image color-filter fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER Enables a color-filter fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_PATH_EFFECT Enables a path-effect fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_BLEND_MODE Enables an unsupported blend-mode fallback probe. Default: false.
@@ -954,6 +959,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_TEXT: ${MAGIC_JEWEL_COMPOSE_TEXT}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE: ${MAGIC_JEWEL_COMPOSE_IMAGE}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE_SHADER: ${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER}"
+    echo "- MAGIC_JEWEL_COMPOSE_IMAGE_FILTER: ${MAGIC_JEWEL_COMPOSE_IMAGE_FILTER}"
     echo "- MAGIC_JEWEL_COMPOSE_COLOR_FILTER: ${MAGIC_JEWEL_COMPOSE_COLOR_FILTER}"
     echo "- MAGIC_JEWEL_COMPOSE_PATH_EFFECT: ${MAGIC_JEWEL_COMPOSE_PATH_EFFECT}"
     echo "- MAGIC_JEWEL_COMPOSE_BLEND_MODE: ${MAGIC_JEWEL_COMPOSE_BLEND_MODE}"

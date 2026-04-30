@@ -90,6 +90,7 @@ private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
+private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
 private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
@@ -260,6 +261,9 @@ private fun MagicJewelApp() {
     val composeImageShaderEnabled = remember {
         System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
     }
+    val composeImageFilterEnabled = remember {
+        System.getProperty(ComposeImageFilterProperty, "false").toBoolean()
+    }
     val composeColorFilterEnabled = remember {
         System.getProperty(ComposeColorFilterProperty, "false").toBoolean()
     }
@@ -338,8 +342,8 @@ private fun MagicJewelApp() {
     val invalidSweepGradientEnabled = remember {
         System.getProperty(InvalidSweepGradientProperty, "false").toBoolean()
     }
-    val imageProbe = remember(composeImageEnabled) {
-        if (composeImageEnabled || composeImageShaderEnabled) createImageProbe() else null
+    val imageProbe = remember(composeImageEnabled, composeImageShaderEnabled, composeImageFilterEnabled) {
+        if (composeImageEnabled || composeImageShaderEnabled || composeImageFilterEnabled) createImageProbe() else null
     }
     val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
     val phase by infiniteTransition.animateFloat(
@@ -436,6 +440,15 @@ private fun MagicJewelApp() {
                     imageProbe?.let {
                         drawImage(it, topLeft = Offset(size.width - 206f, size.height - 210f))
                         markJbrSkiaUnsupported("shader")
+                    }
+                }
+                if (composeImageFilterEnabled) {
+                    imageProbe?.let {
+                        drawImage(
+                            image = it,
+                            topLeft = Offset(size.width - 332f, size.height - 210f),
+                            colorFilter = ColorFilter.tint(Color(0xFF22D3EE)),
+                        )
                     }
                 }
                 if (composeColorFilterEnabled) {

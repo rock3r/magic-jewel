@@ -30,6 +30,7 @@ SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_IMAGE=true MAGIC_JEWEL_COMPOSE_TRANSFORM=true MAGIC_JEWEL_COMPOSE_SAVELAYER=true MAGIC_JEWEL_COMPOSE_CLIP=true MAGIC_JEWEL_COMPOSE_CLIP_OUT=true SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_IMAGE_SHADER=true EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=shader SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
+JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=true EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=image SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_COLOR_FILTER=true EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=colorFilter SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_PATH_EFFECT=true EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=pathEffect SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
 JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_COMPOSE_BLEND_MODE=true EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=blendMode_Plus SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-interop-report.sh
@@ -87,7 +88,7 @@ Command rendering probe suite:
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-command-probe-suite.sh
 ```
 
-The suite groups the manual command-mode probes into repeatable cases for core primitives, gradient surfaces, gradient paths, glass-pane popup layering, real popup-window capture, Swing menu popup layering, text-as-image replay, native text opt-in, shader/color-filter/path-effect/blend-mode/saveLayer-filter fallback, and invalid-gradient fallback. Use `CASES="commands-core-primitives commands-popup"` to run a subset. It writes `suite.tsv` with one row per case, including validation status, fallback count, unsupported reasons, picture/command frame counts, command FPS, and report path.
+The suite groups the manual command-mode probes into repeatable cases for core primitives, gradient surfaces, gradient paths, glass-pane popup layering, real popup-window capture, Swing menu popup layering, text-as-image replay, native text opt-in, shader/image-filter/color-filter/path-effect/blend-mode/saveLayer-filter fallback, and invalid-gradient fallback. Use `CASES="commands-core-primitives commands-popup"` to run a subset. It writes `suite.tsv` with one row per case, including validation status, fallback count, unsupported reasons, picture/command frame counts, command FPS, and report path.
 
 Quiet-machine benchmark collection suite:
 
