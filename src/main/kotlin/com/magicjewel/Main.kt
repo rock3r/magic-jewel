@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -97,6 +98,7 @@ private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
 private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
+private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLayer"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -276,6 +278,9 @@ private fun MagicJewelApp() {
     }
     val composeBlendModeEnabled = remember {
         System.getProperty(ComposeBlendModeProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -929,6 +934,18 @@ private fun MagicJewelApp() {
                 contentAlignment = Alignment.Center,
             ) {
                 MagicLabel("Compose overlay", composeTextEnabled, width = 116.dp)
+            }
+
+            if (composeGraphicsLayerEnabled) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = (-72).dp, y = (-72).dp)
+                        .size(width = 132.dp, height = 72.dp)
+                        .graphicsLayer(alpha = 0.64f, rotationZ = -4f)
+                        .background(Color(0xFFE879F9))
+                        .zIndex(2f),
+                )
             }
 
             Column(
