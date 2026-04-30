@@ -9,6 +9,7 @@ DURATION_SECONDS="${DURATION_SECONDS:-20}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-5}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 ENABLE_ASPROF="${ENABLE_ASPROF:-false}"
+CASES="${CASES:-picture commands commands-stable-images commands-dynamic-images commands-resize-dynamic-images}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -75,11 +76,33 @@ run_case() {
   [[ "${status}" == "passed" ]]
 }
 
-run_case picture JBR_SKIA_RENDER_MODE=picture
-run_case commands JBR_SKIA_RENDER_MODE=commands EXPECT_MIN_IMAGE_REFS=1
-run_case commands-stable-images JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_IMAGE_CACHE_CHURN=true MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN=true EXPECT_MIN_IMAGE_REFS=1 EXPECT_MAX_IMAGE_CACHE_CLEARS=0
-run_case commands-dynamic-images JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_IMAGE_CACHE_CHURN=true EXPECT_MIN_IMAGE_REFS=1 EXPECT_MIN_IMAGE_CACHE_EVICTS=1 EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS=1 EXPECT_MAX_IMAGE_CACHE_CLEARS=0
-run_case commands-resize-dynamic-images JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_IMAGE_CACHE_CHURN=true MAGIC_JEWEL_AUTO_RESIZE=true EXPECT_MIN_IMAGE_REFS=1 EXPECT_MIN_IMAGE_CACHE_EVICTS=1 EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS=1 EXPECT_MAX_IMAGE_CACHE_CLEARS=0 EXPECT_MIN_SURFACE_CHANGES=1 EXPECT_SURFACE_CONTEXT_CHANGED=false EXPECT_SURFACE_CHANGED=true
+run_named_case() {
+  case "$1" in
+    picture)
+      run_case "$1" JBR_SKIA_RENDER_MODE=picture
+      ;;
+    commands)
+      run_case "$1" JBR_SKIA_RENDER_MODE=commands EXPECT_MIN_IMAGE_REFS=1
+      ;;
+    commands-stable-images)
+      run_case "$1" JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_IMAGE_CACHE_CHURN=true MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN=true EXPECT_MIN_IMAGE_REFS=1 EXPECT_MAX_IMAGE_CACHE_CLEARS=0
+      ;;
+    commands-dynamic-images)
+      run_case "$1" JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_IMAGE_CACHE_CHURN=true EXPECT_MIN_IMAGE_REFS=1 EXPECT_MIN_IMAGE_CACHE_EVICTS=1 EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS=1 EXPECT_MAX_IMAGE_CACHE_CLEARS=0
+      ;;
+    commands-resize-dynamic-images)
+      run_case "$1" JBR_SKIA_RENDER_MODE=commands MAGIC_JEWEL_IMAGE_CACHE_CHURN=true MAGIC_JEWEL_AUTO_RESIZE=true EXPECT_MIN_IMAGE_REFS=1 EXPECT_MIN_IMAGE_CACHE_EVICTS=1 EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS=1 EXPECT_MAX_IMAGE_CACHE_CLEARS=0 EXPECT_MIN_SURFACE_CHANGES=1 EXPECT_SURFACE_CONTEXT_CHANGED=false EXPECT_SURFACE_CHANGED=true
+      ;;
+    *)
+      echo "Unknown benchmark case: $1" >&2
+      return 2
+      ;;
+  esac
+}
+
+for case_name in ${CASES}; do
+  run_named_case "${case_name}"
+done
 
 echo "JBR_SKIA_BENCHMARK_SUITE passed out_root=${OUT_ROOT}"
 echo "suite=${SUITE_TSV}"
