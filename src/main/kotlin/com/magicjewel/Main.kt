@@ -492,6 +492,25 @@ private fun MagicJewelApp() {
                 if (composeBlendModeEnabled) {
                     drawIntoCanvas { canvas ->
                         canvas.drawRect(
+                            left = size.width - 624f,
+                            top = 54f,
+                            right = size.width - 536f,
+                            bottom = 118f,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFD166)
+                            },
+                        )
+                        canvas.drawRect(
+                            left = size.width - 604f,
+                            top = 42f,
+                            right = size.width - 514f,
+                            bottom = 128f,
+                            paint = Paint().apply {
+                                color = Color(0xFF7C3AED)
+                                blendMode = BlendMode.Multiply
+                            },
+                        )
+                        canvas.drawRect(
                             left = size.width - 520f,
                             top = 42f,
                             right = size.width - 430f,
