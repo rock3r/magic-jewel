@@ -826,6 +826,24 @@ command_recorder_reasons() {
   ' "${log}"
 }
 
+write_screenshot_count_properties() {
+  local assertion_log="$1"
+  local key_prefix="$2"
+  local line
+  line="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}|${POPUP_WINDOW_SCREENSHOT_COUNTS_MARKER}" "${assertion_log}" 2>/dev/null | tail -1 || true)"
+  [[ -n "${line}" ]] || return 0
+  awk -v prefix="${key_prefix}" '
+    {
+      for (i = 2; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] ~ /^[A-Za-z0-9_]+$/ && value[2] ~ /^-?[0-9]+$/) {
+          printf "%s%s=%s\n", prefix, value[1], value[2]
+        }
+      }
+    }
+  ' <<< "${line}"
+}
+
 write_machine_summary() {
   local validation_status="$1"
   shift
@@ -902,6 +920,8 @@ write_machine_summary() {
     echo "skiko_same_context_surface_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=false.*surfaceChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "screenshot_status=$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || echo not-run)"
     echo "popup_window_screenshot_status=$(cat "${OUT_DIR}/new-popup-window-screenshot-status.txt" 2>/dev/null || echo not-run)"
+    write_screenshot_count_properties "${OUT_DIR}/new-screenshot-assertion.log" "screenshot_"
+    write_screenshot_count_properties "${OUT_DIR}/new-popup-window-screenshot-assertion.log" "popup_window_screenshot_"
     echo "asprof_old_status=$(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_new_status=$(cat "${OUT_DIR}/new-asprof-status.txt" 2>/dev/null || echo not-run)"
     echo "report_path=${OUT_DIR}/report.md"

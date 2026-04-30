@@ -45,6 +45,30 @@ strict_command_passes() {
   grep -q "^host_load_15m=" "${dir}/summary.properties"
 }
 
+summary_includes_screenshot_counts() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+  {
+    echo "JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=10 topText=20 topTextBox=1,2,3,4 paragraphCentered=30 probeRightDark=40"
+  } > "${dir}/new-screenshot-assertion.log"
+
+  run_validate_only "${dir}"
+  grep -q "^validation_status=passed$" "${dir}/summary.properties"
+  grep -q "^screenshot_green=10$" "${dir}/summary.properties"
+  grep -q "^screenshot_topText=20$" "${dir}/summary.properties"
+  grep -q "^screenshot_paragraphCentered=30$" "${dir}/summary.properties"
+  grep -q "^screenshot_probeRightDark=40$" "${dir}/summary.properties"
+  if grep -q "^screenshot_topTextBox=" "${dir}/summary.properties"; then
+    echo "Expected screenshot bbox fields to stay out of scalar summary properties" >&2
+    return 1
+  fi
+}
+
 surface_change_summary_is_machine_readable() {
   local dir
   dir="$(make_report_dir)"
@@ -633,6 +657,7 @@ handshake_fallback_fails_with_command_frames() {
 }
 
 strict_command_passes
+summary_includes_screenshot_counts
 surface_change_summary_is_machine_readable
 strict_command_requires_min_surface_changes
 strict_command_requires_surface_change_shape
