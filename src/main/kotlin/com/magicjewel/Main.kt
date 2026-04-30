@@ -654,11 +654,11 @@ private fun MagicJewelApp() {
                     drawRect(
                         brush = Brush.linearGradient(
                             colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316)),
-                            start = Offset(size.width - 534f, size.height - 128f),
-                            end = Offset(size.width - 410f, size.height - 48f),
+                            start = Offset(size.width - 244f, size.height - 146f),
+                            end = Offset(size.width - 92f, size.height - 42f),
                         ),
-                        topLeft = Offset(size.width - 534f, size.height - 128f),
-                        size = Size(124f, 80f),
+                        topLeft = Offset(size.width - 244f, size.height - 146f),
+                        size = Size(152f, 104f),
                         style = Stroke(width = 12f),
                     )
                 }

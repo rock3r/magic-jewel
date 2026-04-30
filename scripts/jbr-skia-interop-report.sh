@@ -275,7 +275,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_DRAW_ARC Enables the Compose drawArc command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT Enables the Compose drawRoundRect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT Enables the Compose linear-gradient command replay probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_STROKE Enables an unsupported linear-gradient stroke fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_STROKE Enables a linear-gradient stroked-rect command probe. Default: false.
   MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT Enables the Compose linear-gradient round-rect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH Enables the Compose linear-gradient path command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT Enables the Compose radial-gradient command replay probe. Default: false.
