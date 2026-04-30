@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
 import androidx.compose.ui.awt.SwingPanel
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -131,6 +132,9 @@ private const val PopupWindowStressProperty = "magic.jewel.popupWindowStress"
 private const val PopupWindowStressDelayMillisProperty = "magic.jewel.popupWindowStressDelayMillis"
 private const val MenuStressProperty = "magic.jewel.menuStress"
 private const val MenuStressDelayMillisProperty = "magic.jewel.menuStressDelayMillis"
+private const val FixedAnimationPhaseProperty = "magic.jewel.fixedAnimationPhase"
+private const val FixedFrameTicksProperty = "magic.jewel.fixedFrameTicks"
+private const val PauseSwingAnimationProperty = "magic.jewel.pauseSwingAnimation"
 private const val ResizeMarker = "MAGIC_JEWEL_WINDOW_RESIZE"
 private const val PopupShownMarker = "MAGIC_JEWEL_POPUP_SHOWN"
 private const val PopupWindowTitle = "MagicJewelPopupWindow"
@@ -257,7 +261,11 @@ private fun JFrame.scheduleAutoResizeIfNeeded() {
 
 @Composable
 private fun MagicJewelApp() {
-    var ticks by remember { mutableIntStateOf(0) }
+    val fixedFrameTicks = remember {
+        System.getProperty(FixedFrameTicksProperty)?.toIntOrNull()
+    }
+    var ticks by remember { mutableIntStateOf(fixedFrameTicks ?: 0) }
+    var repaintPulse by remember { mutableIntStateOf(0) }
     val composeTextEnabled = remember {
         System.getProperty(ComposeTextProperty, "true").toBoolean()
     }
@@ -358,7 +366,7 @@ private fun MagicJewelApp() {
         if (composeImageEnabled || composeImageShaderEnabled || composeImageFilterEnabled) createImageProbe() else null
     }
     val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
-    val phase by infiniteTransition.animateFloat(
+    val animatedPhase by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
@@ -367,11 +375,19 @@ private fun MagicJewelApp() {
         ),
         label = "always-on-progress-phase",
     )
+    val phase = fixedAnimationPhase() ?: animatedPhase
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(250)
-            ticks++
+    LaunchedEffect(fixedFrameTicks) {
+        if (fixedFrameTicks == null) {
+            while (true) {
+                delay(250)
+                ticks++
+            }
+        } else {
+            while (true) {
+                delay(33)
+                repaintPulse++
+            }
         }
     }
 
@@ -392,7 +408,12 @@ private fun MagicJewelApp() {
         }
 
         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
+            Canvas(
+                modifier = Modifier.fillMaxSize().drawWithContent {
+                    repaintPulse.hashCode()
+                    drawContent()
+                }
+            ) {
                 System.err.println("$FrameMarker frame=${FrameCounter.incrementAndGet()}")
                 val stripeHeight = size.height / 5f
                 drawRect(Color(0xFF2DA44E), size = Size(size.width, stripeHeight * 2f))
@@ -1345,6 +1366,7 @@ private fun MagicLabel(
 }
 
 private fun createSwingStatusPanel(): JPanel {
+    val pauseSwingAnimation = System.getProperty(PauseSwingAnimationProperty, "false").toBoolean()
     val title = JLabel("Swing island").apply {
         font = Font(Font.SANS_SERIF, Font.BOLD, 13)
         foreground = AwtColor(255, 255, 255)
@@ -1354,10 +1376,14 @@ private fun createSwingStatusPanel(): JPanel {
     }
     val progress = MovingSwingProgressBar()
     var swingTicks = 0
-    Timer(80) {
-        swingTicks++
-        counter.text = "Swing timer ticks=$swingTicks"
-    }.start()
+    if (pauseSwingAnimation) {
+        counter.text = "Swing timer ticks=fixed"
+    } else {
+        Timer(80) {
+            swingTicks++
+            counter.text = "Swing timer ticks=$swingTicks"
+        }.start()
+    }
 
     return JPanel(BorderLayout(10, 8)).apply {
         name = "MagicJewelSwingIsland"
@@ -1373,12 +1399,15 @@ private fun createSwingStatusPanel(): JPanel {
 }
 
 private class MovingSwingProgressBar : JComponent() {
+    private val pauseAnimation = System.getProperty(PauseSwingAnimationProperty, "false").toBoolean()
     private val timer = Timer(33) {
         repaint()
         parent?.repaint()
     }.apply {
         isRepeats = true
-        start()
+        if (!pauseAnimation) {
+            start()
+        }
     }
 
     init {
@@ -1476,9 +1505,14 @@ private class PopupPulseBar : JComponent() {
 private fun movingProgressX(width: Int, blockWidth: Int, nowNanos: Long): Int {
     val travel = (width + blockWidth).coerceAtLeast(1)
     val periodNanos = 900_000_000L
-    val phase = (nowNanos.floorMod(periodNanos)).toDouble() / periodNanos.toDouble()
+    val phase = fixedAnimationPhase()?.toDouble() ?: ((nowNanos.floorMod(periodNanos)).toDouble() / periodNanos.toDouble())
     return (phase * travel).toInt() - blockWidth
 }
+
+private fun fixedAnimationPhase(): Float? =
+    System.getProperty(FixedAnimationPhaseProperty)
+        ?.toFloatOrNull()
+        ?.coerceIn(0f, 1f)
 
 private fun Long.floorMod(modulus: Long): Long {
     val value = this % modulus

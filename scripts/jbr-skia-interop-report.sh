@@ -21,6 +21,7 @@ ASSERT_SCRIPT="${ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-mixed-window-scree
 COMMAND_ASSERT_SCRIPT="${COMMAND_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-command-window-screenshot.sh}"
 POPUP_WINDOW_ASSERT_SCRIPT="${POPUP_WINDOW_ASSERT_SCRIPT:-${SCRIPT_DIR}/assert-jbr-skia-popup-window-screenshot.sh}"
 CAPTURE_POPUP_WINDOW_QUERY="${CAPTURE_POPUP_WINDOW_QUERY:-MagicJewelPopupWindow}"
+CAPTURE_OLD_SCREENSHOT="${CAPTURE_OLD_SCREENSHOT:-false}"
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
 EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
@@ -247,6 +248,7 @@ Environment:
   POPUP_WINDOW_ASSERT_SCRIPT Popup-window screenshot assertion helper.
   CAPTURE_WINDOW_QUERY     Window title/owner to capture. Default: MagicJewelJbrSkiaWindow.
   CAPTURE_POPUP_WINDOW_QUERY Popup window title/owner to capture. Default: MagicJewelPopupWindow.
+  CAPTURE_OLD_SCREENSHOT   Capture and assert the old renderer window too, useful for parity runs. Default: false.
   APP_PROCESS_QUERY        Process command substring for the launched app. Default: com.magicjewel.MainKt.
   EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
@@ -303,6 +305,9 @@ Environment:
   MAGIC_JEWEL_POPUP_STRESS Shows an animated Swing popup over the ComposePanel. Default: false.
   MAGIC_JEWEL_POPUP_WINDOW_STRESS Shows an animated undecorated Swing popup window over the ComposePanel. Default: false.
   MAGIC_JEWEL_MENU_STRESS Shows an animated Swing JPopupMenu over the ComposePanel. Default: false.
+  MAGIC_JEWEL_FIXED_ANIMATION_PHASE Freezes Compose/Swing animation phase to [0,1] for screenshot parity.
+  MAGIC_JEWEL_FIXED_FRAME_TICKS Freezes the Compose frame counter used by deterministic probes.
+  MAGIC_JEWEL_PAUSE_SWING_ANIMATION Pauses Swing timer repaint animation for stable screenshot parity.
   SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
   SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST Forces Skiko's expected native metadata ABI for fallback validation. Empty by default.
   SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST Forces Skiko's required command capability mask for fallback validation. Empty by default.
@@ -446,6 +451,7 @@ run_mode() {
   local ready_marker="${SKIKO_PICTURE_MARKER}"
   local assert_script="${ASSERT_SCRIPT}"
   local startup_marker="${APP_FRAME_MARKER}"
+  local capture_marker="${APP_FRAME_MARKER}"
 
   if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" ]]; then
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
@@ -465,6 +471,7 @@ run_mode() {
   fi
   if [[ "${mode}" == "new" ]]; then
     startup_marker="${ready_marker}"
+    capture_marker="${ready_marker}"
   fi
 
   printf 'timestamp,mode,pid,cpu_percent,rss_kb\n' > "${csv}"
@@ -514,11 +521,11 @@ run_mode() {
       fi
       sample_process_tree "${mode}" "${root_pid}" "${csv}"
     fi
-    if [[ "${mode}" == "new"
+    if [[ ( "${mode}" == "new" || "${CAPTURE_OLD_SCREENSHOT}" == "true" )
         && "${screenshot_done}" == "false"
         && -x "${CAPTURE_SCRIPT}"
         && -x "${assert_script}"
-        && $(grep -c "${ready_marker}" "${log}" 2>/dev/null) -gt 0 ]]; then
+        && $(grep -c "${capture_marker}" "${log}" 2>/dev/null) -gt 0 ]]; then
       if [[ "${MAGIC_JEWEL_POPUP_STRESS}" == "true" &&
           $(grep -c "${POPUP_SHOWN_MARKER}" "${log}" 2>/dev/null) -eq 0 ]]; then
         sleep "${SAMPLE_INTERVAL_SECONDS}"
@@ -552,11 +559,11 @@ run_mode() {
     sleep "${SAMPLE_INTERVAL_SECONDS}"
   done
 
-  if [[ "${mode}" == "new"
+  if [[ ( "${mode}" == "new" || "${CAPTURE_OLD_SCREENSHOT}" == "true" )
       && "${screenshot_done}" == "false"
       && -x "${CAPTURE_SCRIPT}"
       && -x "${assert_script}"
-      && $(grep -c "${ready_marker}" "${log}" 2>/dev/null) -gt 0 ]]; then
+      && $(grep -c "${capture_marker}" "${log}" 2>/dev/null) -gt 0 ]]; then
     if "${CAPTURE_SCRIPT}" "${CAPTURE_WINDOW_QUERY}" "${screenshot}" > "${OUT_DIR}/${mode}-capture.log" 2>&1; then
       if "${assert_script}" "${screenshot}" > "${screenshot_assertion}" 2>&1; then
         echo "passed" > "${screenshot_status}"

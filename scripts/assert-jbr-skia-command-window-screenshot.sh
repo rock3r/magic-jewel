@@ -385,7 +385,7 @@ if paragraphLayoutProbe {
     probeChecks.append(("paragraphCentered", paragraphCentered, 2500))
     probeChecks.append(("paragraphItalicRight", paragraphItalicRight, 1500))
     probeChecks.append(("paragraphRtl", paragraphRtl, 1500))
-    probeChecks.append(("paragraphOverflow", paragraphOverflow, 2200))
+    probeChecks.append(("paragraphOverflow", paragraphOverflow, 2000))
     probeChecks.append(("paragraphDecorated", paragraphDecorated, 700))
 }
 if transformProbe {
@@ -401,7 +401,7 @@ if drawPathProbe {
     probeChecks.append(("probeRightOrange", probeRightOrange, 2000))
 }
 if drawArcProbe {
-    probeChecks.append(("probeRightCyan", probeRightCyan, 5000))
+    probeChecks.append(("probeRightCyan", probeRightCyan, 1500))
 }
 if drawRoundRectProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 3000))

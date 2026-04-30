@@ -128,6 +128,13 @@ val popupWindowStressEnabled = providers.gradleProperty("magicJewelPopupWindowSt
 val menuStressEnabled = providers.gradleProperty("magicJewelMenuStress")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_MENU_STRESS"))
     .orElse("false")
+val fixedAnimationPhase = providers.gradleProperty("magicJewelFixedAnimationPhase")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_FIXED_ANIMATION_PHASE"))
+val fixedFrameTicks = providers.gradleProperty("magicJewelFixedFrameTicks")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_FIXED_FRAME_TICKS"))
+val pauseSwingAnimation = providers.gradleProperty("magicJewelPauseSwingAnimation")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_PAUSE_SWING_ANIMATION"))
+    .orElse("false")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -210,6 +217,9 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.popupStress", popupStressEnabled.get())
     systemProperty("magic.jewel.popupWindowStress", popupWindowStressEnabled.get())
     systemProperty("magic.jewel.menuStress", menuStressEnabled.get())
+    fixedAnimationPhase.orNull?.let { systemProperty("magic.jewel.fixedAnimationPhase", it) }
+    fixedFrameTicks.orNull?.let { systemProperty("magic.jewel.fixedFrameTicks", it) }
+    systemProperty("magic.jewel.pauseSwingAnimation", pauseSwingAnimation.get())
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")
