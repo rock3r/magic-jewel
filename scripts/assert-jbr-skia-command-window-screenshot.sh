@@ -357,6 +357,7 @@ let graphicsLayerClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_CO
 let graphicsLayerRoundClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROUND_CLIP"] == "true"
 let graphicsLayerPathClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_PATH_CLIP"] == "true"
 let graphicsLayerColorFilterProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_FILTER"] == "true"
+let graphicsLayerColorMatrixFilterProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER"] == "true"
 let drawPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_PATH"] == "true"
 let drawArcProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ARC"] == "true"
 let drawRoundRectProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT"] == "true"
@@ -405,7 +406,7 @@ if graphicsLayerClipProbe || graphicsLayerRoundClipProbe || graphicsLayerPathCli
     probeChecks.append(("probeRightCyan", probeRightCyan, 1000))
     probeChecks.append(("probeRightPurple", probeRightPurple, 1000))
 }
-if graphicsLayerColorFilterProbe {
+if graphicsLayerColorFilterProbe || graphicsLayerColorMatrixFilterProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 1000))
 }
 if drawPathProbe {
