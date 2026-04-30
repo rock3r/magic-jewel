@@ -67,6 +67,8 @@ var probeRightOrange = 0
 var probeRightCyan = 0
 var probeRightYellow = 0
 var probeRightDark = 0
+var blendModeYellow = 0
+var blendModeMultiply = 0
 var paragraphCentered = 0
 var paragraphItalicRight = 0
 var paragraphRtl = 0
@@ -116,6 +118,12 @@ let probeRightRect = (
     top: height * 13 / 20,
     right: width * 39 / 40,
     bottom: height * 17 / 20
+)
+let blendModeRect = (
+    left: width * 29 / 50,
+    top: height / 5,
+    right: width * 7 / 10,
+    bottom: height * 19 / 50
 )
 let paragraphCenteredRect = (
     left: width / 14,
@@ -214,6 +222,14 @@ for y in 0..<height {
                 probeRightDark += 1
             }
         }
+        if inRect(x: x, y: y, left: blendModeRect.left, top: blendModeRect.top, right: blendModeRect.right, bottom: blendModeRect.bottom) {
+            if r > 220 && g > 150 && b < 120 {
+                blendModeYellow += 1
+            }
+            if r > 80 && r < 170 && g < 90 && b < 120 {
+                blendModeMultiply += 1
+            }
+        }
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: paragraphCenteredRect.left, top: paragraphCenteredRect.top, right: paragraphCenteredRect.right, bottom: paragraphCenteredRect.bottom) {
                 paragraphCentered += 1
@@ -248,7 +264,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
 
 let checks: [(String, Int, Int)] = [
     ("green", green, 10000),
@@ -295,6 +311,7 @@ let sweepGradientRoundRectSurfaceProbe = ProcessInfo.processInfo.environment["MA
 let linearGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH"] == "true"
 let radialGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_PATH"] == "true"
 let sweepGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH"] == "true"
+let blendModeProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_BLEND_MODE"] == "true"
 let popupChecks: [(String, Int, Int)] = popupStress
     ? [
         ("popupPink", popupPink, 200),
@@ -373,6 +390,10 @@ if radialGradientPathProbe {
 }
 if sweepGradientPathProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 500))
+}
+if blendModeProbe {
+    probeChecks.append(("blendModeYellow", blendModeYellow, 500))
+    probeChecks.append(("blendModeMultiply", blendModeMultiply, 500))
 }
 
 for (name, count, minimum) in checks where count < minimum {
