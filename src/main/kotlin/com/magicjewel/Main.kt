@@ -792,10 +792,19 @@ private fun MagicJewelApp() {
                         size = Size(144f, 84f),
                     )
                     drawRect(
-                        color = Color.White,
+                        brush = Brush.sweepGradient(
+                            colors =
+                                listOf(
+                                    Color(0xFF22D3EE),
+                                    Color(0xFFF97316),
+                                    Color(0xFF22C55E),
+                                    Color(0xFF8B5CF6),
+                                ),
+                            center = topLeft + Offset(72f, 42f),
+                        ),
                         topLeft = topLeft,
                         size = Size(144f, 84f),
-                        style = Stroke(width = 3f),
+                        style = Stroke(width = 8f),
                     )
                 }
                 if (composeSweepGradientRoundRectEnabled) {
