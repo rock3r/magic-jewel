@@ -101,6 +101,7 @@ private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
 private const val ComposeColorMatrixFilterProperty = "magic.jewel.compose.colorMatrixFilter"
+private const val ComposeLightingFilterProperty = "magic.jewel.compose.lightingFilter"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
 private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
 private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLayer"
@@ -292,6 +293,9 @@ private fun MagicJewelApp() {
     }
     val composeColorMatrixFilterEnabled = remember {
         System.getProperty(ComposeColorMatrixFilterProperty, "false").toBoolean()
+    }
+    val composeLightingFilterEnabled = remember {
+        System.getProperty(ComposeLightingFilterProperty, "false").toBoolean()
     }
     val composePathEffectEnabled = remember {
         System.getProperty(ComposePathEffectProperty, "false").toBoolean()
@@ -544,6 +548,23 @@ private fun MagicJewelApp() {
                             paint = Paint().apply {
                                 color = Color(0xFF38BDF8)
                                 colorFilter = ColorFilter.colorMatrix(matrix)
+                            },
+                        )
+                    }
+                }
+                if (composeLightingFilterEnabled) {
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 652f,
+                            top = 34f,
+                            right = size.width - 540f,
+                            bottom = 112f,
+                            paint = Paint().apply {
+                                color = Color(0xFFF97316)
+                                colorFilter = ColorFilter.lighting(
+                                    multiply = Color(0xFFB0D0FF),
+                                    add = Color(0xFF101820),
+                                )
                             },
                         )
                     }

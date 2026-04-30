@@ -8,7 +8,7 @@ SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 DURATION_SECONDS="${DURATION_SECONDS:-8}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-2}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
-CASES="${CASES:-commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image commands-native-text commands-image-shader commands-gradient-stroke commands-image-filter commands-color-filter-fallback commands-color-filter-handle commands-color-matrix-filter commands-path-effect-fallback commands-blend-mode commands-graphics-layer commands-graphics-layer-clip commands-graphics-layer-round-clip commands-graphics-layer-path-clip commands-graphics-layer-blend-mode commands-graphics-layer-color-filter commands-graphics-layer-blend-color-filter commands-save-layer-filter commands-invalid-gradient-fallback}"
+CASES="${CASES:-commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image commands-native-text commands-image-shader commands-gradient-stroke commands-image-filter commands-color-filter-fallback commands-color-filter-handle commands-color-matrix-filter commands-lighting-filter commands-path-effect-fallback commands-blend-mode commands-graphics-layer commands-graphics-layer-clip commands-graphics-layer-round-clip commands-graphics-layer-path-clip commands-graphics-layer-blend-mode commands-graphics-layer-color-filter commands-graphics-layer-blend-color-filter commands-save-layer-filter commands-invalid-gradient-fallback}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -138,6 +138,10 @@ run_named_case() {
     commands-color-matrix-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_COLOR_MATRIX_FILTER=true
+      ;;
+    commands-lighting-filter)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_LIGHTING_FILTER=true
       ;;
     commands-path-effect-fallback)
       run_case "$1" \
