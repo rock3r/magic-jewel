@@ -33,6 +33,7 @@ import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
@@ -91,6 +92,7 @@ private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
+private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
@@ -262,6 +264,9 @@ private fun MagicJewelApp() {
     }
     val composePathEffectEnabled = remember {
         System.getProperty(ComposePathEffectProperty, "false").toBoolean()
+    }
+    val composeBlendModeEnabled = remember {
+        System.getProperty(ComposeBlendModeProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -452,6 +457,20 @@ private fun MagicJewelApp() {
                                 color = Color(0xFFFFFFFF)
                                 strokeWidth = 8f
                                 pathEffect = PathEffect.dashPathEffect(floatArrayOf(16f, 10f), 0f)
+                            },
+                        )
+                    }
+                }
+                if (composeBlendModeEnabled) {
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 520f,
+                            top = 42f,
+                            right = size.width - 430f,
+                            bottom = 128f,
+                            paint = Paint().apply {
+                                color = Color(0xFF14B8A6)
+                                blendMode = BlendMode.Plus
                             },
                         )
                     }
