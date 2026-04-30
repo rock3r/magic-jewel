@@ -355,6 +355,7 @@ if radialGradientSurfaceProbe {
 }
 if radialGradientRoundRectSurfaceProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 1500))
+    probeChecks.append(("probeRightOrange", probeRightOrange, 10))
 }
 if sweepGradientSurfaceProbe {
     probeChecks.append(("probeRightOrange", probeRightOrange, 2500))
