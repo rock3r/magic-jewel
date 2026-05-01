@@ -243,7 +243,8 @@ run_named_case() {
         EXPECT_SURFACE_CONTEXT_CHANGED=false \
         EXPECT_SURFACE_CHANGED=true \
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
       ;;
     commands-path-effect-fallback)
       run_case "$1" \
