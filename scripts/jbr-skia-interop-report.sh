@@ -33,6 +33,7 @@ EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS:-0}"
 EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS="${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS:-0}"
 EXPECT_MIN_POPUP_FRAMES="${EXPECT_MIN_POPUP_FRAMES:-0}"
+EXPECT_MIN_APP_NEW_FRAMES="${EXPECT_MIN_APP_NEW_FRAMES:-0}"
 EXPECT_MAX_IMAGE_DEFINES="${EXPECT_MAX_IMAGE_DEFINES:--1}"
 EXPECT_MAX_IMAGE_CACHE_CLEARS="${EXPECT_MAX_IMAGE_CACHE_CLEARS:--1}"
 EXPECT_MIN_SURFACE_CHANGES="${EXPECT_MIN_SURFACE_CHANGES:-0}"
@@ -337,6 +338,7 @@ Environment:
   EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS In strict command mode, require at least this many JBR-side image cache clear markers with contextId=0x. Default: 0.
   EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS In strict command mode, require at least this many JBR-side image cache evict markers. Default: 0.
   EXPECT_MIN_POPUP_FRAMES In strict command mode, require at least this many Swing popup paint markers. Default: 0.
+  EXPECT_MIN_APP_NEW_FRAMES In strict command mode, require at least this many Magic Jewel Compose frame markers in the new renderer. Default: 0.
   EXPECT_MAX_IMAGE_DEFINES In strict command mode, require CMP recorder max imageDefines at or below this value. Default: disabled.
   EXPECT_MAX_IMAGE_CACHE_CLEARS In strict command mode, require CMP recorder max imageCacheClears at or below this value. Default: disabled.
   EXPECT_MIN_SURFACE_CHANGES In strict command mode, require at least this many Skiko surface-change markers. Default: 0.
@@ -1219,6 +1221,7 @@ write_report() {
     echo "- EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}"
     echo "- EXPECT_MIN_POPUP_FRAMES: ${EXPECT_MIN_POPUP_FRAMES}"
+    echo "- EXPECT_MIN_APP_NEW_FRAMES: ${EXPECT_MIN_APP_NEW_FRAMES}"
     echo "- EXPECT_MAX_IMAGE_DEFINES: ${EXPECT_MAX_IMAGE_DEFINES}"
     echo "- EXPECT_MAX_IMAGE_CACHE_CLEARS: ${EXPECT_MAX_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_SURFACE_CHANGES: ${EXPECT_MIN_SURFACE_CHANGES}"
@@ -1499,6 +1502,12 @@ validate_report() {
         popup_frames="$(grep -c "${POPUP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
         [[ "${popup_frames}" -ge "${EXPECT_MIN_POPUP_FRAMES}" ]] ||
           failures+=("Swing popup paint markers ${popup_frames} below expected ${EXPECT_MIN_POPUP_FRAMES}")
+      fi
+      if [[ "${EXPECT_MIN_APP_NEW_FRAMES}" -gt 0 ]]; then
+        local app_new_frames
+        app_new_frames="$(grep -c "${APP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
+        [[ "${app_new_frames}" -ge "${EXPECT_MIN_APP_NEW_FRAMES}" ]] ||
+          failures+=("Magic Jewel Compose frame markers ${app_new_frames} below expected ${EXPECT_MIN_APP_NEW_FRAMES}")
       fi
       if [[ "${MAGIC_JEWEL_POPUP_WINDOW_STRESS}" == "true" ]]; then
         if ! grep -q "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null; then

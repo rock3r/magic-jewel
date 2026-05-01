@@ -45,6 +45,39 @@ strict_command_passes() {
   grep -q "^host_load_15m=" "${dir}/summary.properties"
 }
 
+strict_command_requires_min_app_new_frames() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "MAGIC_JEWEL_COMPOSE_FRAME frame=1"
+    echo "MAGIC_JEWEL_COMPOSE_FRAME frame=2"
+    echo "MAGIC_JEWEL_COMPOSE_FRAME frame=3"
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_APP_NEW_FRAMES=3
+  grep -q "^validation_status=passed$" "${dir}/summary.properties"
+  grep -q "^app_new_frames=3$" "${dir}/summary.properties"
+}
+
+strict_command_fails_without_min_app_new_frames() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "MAGIC_JEWEL_COMPOSE_FRAME frame=1"
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MIN_APP_NEW_FRAMES=2 2>/dev/null; then
+    echo "Expected strict command validation to fail without enough Magic Jewel Compose frames" >&2
+    return 1
+  fi
+}
+
 summary_includes_screenshot_counts() {
   local dir
   dir="$(make_report_dir)"
@@ -685,6 +718,8 @@ handshake_fallback_fails_with_command_frames() {
 }
 
 strict_command_passes
+strict_command_requires_min_app_new_frames
+strict_command_fails_without_min_app_new_frames
 summary_includes_screenshot_counts
 surface_change_summary_is_machine_readable
 strict_command_requires_min_surface_changes
