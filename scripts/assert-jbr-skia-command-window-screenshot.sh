@@ -393,10 +393,10 @@ let menuChecks: [(String, Int, Int)] = menuStress
     : []
 var probeChecks: [(String, Int, Int)] = []
 if paragraphLayoutProbe {
-    probeChecks.append(("paragraphCentered", paragraphCentered, 2500))
+    probeChecks.append(("paragraphCentered", paragraphCentered, nativeTextProbe ? 700 : 1200))
     probeChecks.append(("paragraphItalicRight", paragraphItalicRight, 1500))
     probeChecks.append(("paragraphRtl", paragraphRtl, 1500))
-    probeChecks.append(("paragraphOverflow", paragraphOverflow, 2000))
+    probeChecks.append(("paragraphOverflow", paragraphOverflow, 1400))
     probeChecks.append(("paragraphDecorated", paragraphDecorated, 700))
 }
 if transformProbe {

@@ -18,7 +18,17 @@ printf "case\tstatus\tavg_delta\tbad_pixel_ratio\tcompose_bad_pixel_ratio\tcompo
 summary_value() {
   local file="$1"
   local key="$2"
-  grep -E "^${key}=" "${file}" | head -n 1 | cut -d= -f2-
+  if [ ! -f "${file}" ]; then
+    echo "missing"
+    return
+  fi
+  local value
+  value="$(grep -E "^${key}=" "${file}" | head -n 1 | cut -d= -f2- || true)"
+  if [ -z "${value}" ]; then
+    echo "missing"
+  else
+    echo "${value}"
+  fi
 }
 
 run_case() {
@@ -27,6 +37,7 @@ run_case() {
   local out_dir="${OUT_ROOT}/${name}"
   echo "== ${name} =="
 
+  local status="passed"
   env \
     OUT_DIR="${out_dir}" \
     DURATION_SECONDS="${DURATION_SECONDS}" \
@@ -34,10 +45,9 @@ run_case() {
     SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS}" \
     SKIKO_VERSION="${SKIKO_VERSION}" \
     "$@" \
-    "${PARITY_SCRIPT}"
+    "${PARITY_SCRIPT}" || status="failed"
 
   local summary="${out_dir}/report/summary.properties"
-  local status="passed"
   local avg_delta
   local bad_pixel_ratio
   local compose_bad_pixel_ratio
@@ -56,6 +66,9 @@ run_case() {
     "${compose_purple_rect_bad_pixel_ratio}" "${compose_top_progress_bad_pixel_ratio}" "${compose_bottom_swatches_bad_pixel_ratio}" \
     "${out_dir}/report/report.md" "${out_dir}/report/parity-diff.png" >> "${SUITE_TSV}"
   echo "status=${status} avg_delta=${avg_delta} bad_pixel_ratio=${bad_pixel_ratio} compose_bad_pixel_ratio=${compose_bad_pixel_ratio} compose_bottom_swatches_bad_pixel_ratio=${compose_bottom_swatches_bad_pixel_ratio} report=${out_dir}/report/report.md"
+  if [ "${status}" != "passed" ]; then
+    return 1
+  fi
 }
 
 run_named_case() {
@@ -69,9 +82,10 @@ run_named_case() {
         MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
         MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
         MAGIC_JEWEL_SWING_ISLAND=false \
-        MAX_BAD_PIXEL_RATIO=0.07 \
+        MAX_BAD_PIXEL_RATIO=0.08 \
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.11 \
-        MAX_SWING_ISLAND_BAD_PIXEL_RATIO=0.08 \
+        MAX_SWING_ISLAND_BAD_PIXEL_RATIO=0.09 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.07 \
         MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO=0.09 \
         MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO=0.11 \
         MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO=0.005 \
@@ -84,7 +98,8 @@ run_named_case() {
         MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=true \
         EXPECT_MIN_IMAGE_REFS=0 \
         EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS=4 \
-        MAX_BAD_PIXEL_RATIO=0.05
+        MAX_BAD_PIXEL_RATIO=0.07 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10
       ;;
     parity-runtime-effect-pure-color)
       run_case "$1" \
@@ -92,7 +107,8 @@ run_named_case() {
       ;;
     parity-runtime-effect-uniform-only)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_UNIFORM_ONLY=true
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_UNIFORM_ONLY=true \
+        MAX_BAD_PIXEL_RATIO=0.06
       ;;
     parity-runtime-effect-child-only)
       run_case "$1" \

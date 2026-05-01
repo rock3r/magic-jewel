@@ -33,11 +33,12 @@ WARMUP_SECONDS="${WARMUP_SECONDS:-1}" \
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}" \
 "${REPORT_SCRIPT}"
 
+compare_status=0
 "${COMPARE_SCRIPT}" \
   "${OUT_DIR}/report/old-window.png" \
   "${OUT_DIR}/report/new-window.png" \
   "${OUT_DIR}/report/parity-diff.png" \
-  > "${OUT_DIR}/parity.log" 2>&1
+  > "${OUT_DIR}/parity.log" 2>&1 || compare_status=$?
 
 {
   echo
@@ -83,8 +84,13 @@ awk '
 
 cat > "${OUT_DIR}/summary.tsv" <<EOF_SUMMARY
 status	report	parity	diff
-passed	${OUT_DIR}/report/report.md	${OUT_DIR}/parity.log	${OUT_DIR}/report/parity-diff.png
+$([ "${compare_status}" -eq 0 ] && echo passed || echo failed)	${OUT_DIR}/report/report.md	${OUT_DIR}/parity.log	${OUT_DIR}/report/parity-diff.png
 EOF_SUMMARY
 
-echo "JBR_SKIA_SCREENSHOT_PARITY_SUITE passed out_dir=${OUT_DIR}"
+if [ "${compare_status}" -eq 0 ]; then
+  echo "JBR_SKIA_SCREENSHOT_PARITY_SUITE passed out_dir=${OUT_DIR}"
+else
+  echo "JBR_SKIA_SCREENSHOT_PARITY_SUITE failed status=${compare_status} out_dir=${OUT_DIR}" >&2
+fi
 echo "summary=${OUT_DIR}/summary.tsv"
+exit "${compare_status}"
