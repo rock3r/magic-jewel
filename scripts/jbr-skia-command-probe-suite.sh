@@ -303,17 +303,26 @@ run_named_case() {
     commands-graphics-layer-render-effect)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RENDER_EFFECT=true
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RENDER_EFFECT=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
       ;;
     commands-graphics-layer-offset-effect)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_OFFSET_EFFECT=true
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_OFFSET_EFFECT=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
       ;;
     commands-graphics-layer-chained-render-effect)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHAINED_RENDER_EFFECT=true
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHAINED_RENDER_EFFECT=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
       ;;
     commands-graphics-layer-blend-color-filter)
       run_case "$1" \
