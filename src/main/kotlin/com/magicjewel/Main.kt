@@ -141,6 +141,7 @@ private const val ComposeGraphicsLayerOffsetEffectProperty = "magic.jewel.compos
 private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel.compose.graphicsLayerChainedRenderEffect"
 private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.graphicsLayerShadow"
 private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.graphicsLayerRotationX"
+private const val ComposeGraphicsLayerRotationYProperty = "magic.jewel.compose.graphicsLayerRotationY"
 private const val ComposeGraphicsLayerOffscreenProperty = "magic.jewel.compose.graphicsLayerOffscreen"
 private const val ComposeGraphicsLayerModulateAlphaProperty = "magic.jewel.compose.graphicsLayerModulateAlpha"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
@@ -410,6 +411,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerRotationXEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRotationXProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerRotationYEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerRotationYProperty, "false").toBoolean()
     }
     val composeGraphicsLayerOffscreenEnabled = remember {
         System.getProperty(ComposeGraphicsLayerOffscreenProperty, "false").toBoolean()
@@ -1773,6 +1777,9 @@ private fun MagicJewelApp() {
                             }
                             if (composeGraphicsLayerRotationXEnabled) {
                                 rotationX = 28f
+                            }
+                            if (composeGraphicsLayerRotationYEnabled) {
+                                rotationY = -24f
                             }
                             if (composeGraphicsLayerOffscreenEnabled) {
                                 compositingStrategy = CompositingStrategy.Offscreen
