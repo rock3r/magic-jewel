@@ -322,30 +322,36 @@ for y in 0..<height {
 
 print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
 
-let checks: [(String, Int, Int)] = [
+let composeTextEnabled = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_TEXT"] != "false"
+var checks: [(String, Int, Int)] = [
     ("green", green, 10000),
     ("blue", blue, 10000),
     ("purple", purple, 1000),
     ("yellow", yellow, 500),
     ("orange", orange, 1000),
     ("white", white, 500),
-    ("topText", topText, 900),
-    ("bottomText", bottomText, 1200),
 ]
+if composeTextEnabled {
+    checks.append(("topText", topText, 900))
+    checks.append(("bottomText", bottomText, 1200))
+}
 
 let nativeTextProbe = ProcessInfo.processInfo.environment["JBR_SKIA_NATIVE_TEXT"] == "true"
 let paragraphLayoutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT"] == "true"
 
-let textBoxChecks: [(String, Bool)] = [
-    ("topTextWidth", topTextMaxX - topTextMinX >= width / 5),
-    ("topTextHeight", topTextMaxY - topTextMinY >= 30),
-    ("topTextVerticalAnchor", topTextMinY <= topTextRect.top + height / 12 && topTextMaxY >= topTextRect.top + height / 24),
-    ("bottomTextWidth", bottomTextMaxX - bottomTextMinX >= width / 5),
-    ("bottomTextHeight", bottomTextMaxY - bottomTextMinY >= 40),
-    ("bottomTextVerticalAnchor", nativeTextProbe && paragraphLayoutProbe
-        ? bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.top + height / 20
-        : bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.bottom - height / 15),
-]
+var textBoxChecks: [(String, Bool)] = []
+if composeTextEnabled {
+    textBoxChecks.append(contentsOf: [
+        ("topTextWidth", topTextMaxX - topTextMinX >= width / 5),
+        ("topTextHeight", topTextMaxY - topTextMinY >= 30),
+        ("topTextVerticalAnchor", topTextMinY <= topTextRect.top + height / 12 && topTextMaxY >= topTextRect.top + height / 24),
+        ("bottomTextWidth", bottomTextMaxX - bottomTextMinX >= width / 5),
+        ("bottomTextHeight", bottomTextMaxY - bottomTextMinY >= 40),
+        ("bottomTextVerticalAnchor", nativeTextProbe && paragraphLayoutProbe
+            ? bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.top + height / 20
+            : bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.bottom - height / 15),
+    ])
+}
 
 let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
 let menuStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_MENU_STRESS"] == "true"

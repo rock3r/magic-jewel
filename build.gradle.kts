@@ -192,6 +192,9 @@ val fixedFrameTicks = providers.gradleProperty("magicJewelFixedFrameTicks")
 val pauseSwingAnimation = providers.gradleProperty("magicJewelPauseSwingAnimation")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_PAUSE_SWING_ANIMATION"))
     .orElse("false")
+val swingIslandEnabled = providers.gradleProperty("magicJewelSwingIsland")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_SWING_ISLAND"))
+    .orElse("true")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -295,6 +298,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     fixedAnimationPhase.orNull?.let { systemProperty("magic.jewel.fixedAnimationPhase", it) }
     fixedFrameTicks.orNull?.let { systemProperty("magic.jewel.fixedFrameTicks", it) }
     systemProperty("magic.jewel.pauseSwingAnimation", pauseSwingAnimation.get())
+    systemProperty("magic.jewel.swingIsland", swingIslandEnabled.get())
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")

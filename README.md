@@ -115,6 +115,8 @@ SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-screenshot-parity-suite.sh
 
 The parity suite runs deterministic old/new window captures for the rich baseline scene plus focused RuntimeEffect and graphics-layer effect scenes. Use `CASES="parity-rich parity-runtime-effect-pure-color"` to run a subset. It writes `suite.tsv` with one row per case, including whole-window and Compose-canvas bad-pixel ratios plus the report and diff image paths.
 
+`parity-geometry-clean` disables Compose text and the embedded Swing island with `MAGIC_JEWEL_COMPOSE_TEXT=false` and `MAGIC_JEWEL_SWING_ISLAND=false`. It is useful as a text/Swing-free geometry baseline while the stricter region masks are still being tuned.
+
 Quiet-machine benchmark collection suite:
 
 ```bash

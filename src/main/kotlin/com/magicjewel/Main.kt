@@ -165,6 +165,7 @@ private const val MenuStressDelayMillisProperty = "magic.jewel.menuStressDelayMi
 private const val FixedAnimationPhaseProperty = "magic.jewel.fixedAnimationPhase"
 private const val FixedFrameTicksProperty = "magic.jewel.fixedFrameTicks"
 private const val PauseSwingAnimationProperty = "magic.jewel.pauseSwingAnimation"
+private const val SwingIslandProperty = "magic.jewel.swingIsland"
 private const val ResizeMarker = "MAGIC_JEWEL_WINDOW_RESIZE"
 private const val PopupShownMarker = "MAGIC_JEWEL_POPUP_SHOWN"
 private const val PopupWindowTitle = "MagicJewelPopupWindow"
@@ -374,6 +375,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerChainedRenderEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerChainedRenderEffectProperty, "false").toBoolean()
+    }
+    val swingIslandEnabled = remember {
+        System.getProperty(SwingIslandProperty, "true").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -1459,14 +1463,16 @@ private fun MagicJewelApp() {
                 }
             }
 
-            SwingPanel(
-                factory = ::createSwingStatusPanel,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = (-28).dp, y = 34.dp)
-                    .size(width = 300.dp, height = 118.dp)
-                    .zIndex(1f),
-            )
+            if (swingIslandEnabled) {
+                SwingPanel(
+                    factory = ::createSwingStatusPanel,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = (-28).dp, y = 34.dp)
+                        .size(width = 300.dp, height = 118.dp)
+                        .zIndex(1f),
+                )
+            }
 
             Box(
                 modifier = Modifier
