@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.CompositeShader
+import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.LinearGradientShader
@@ -51,6 +52,7 @@ import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.RadialGradientShader
+import androidx.compose.ui.graphics.RuntimeEffectShader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -104,6 +106,7 @@ private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
+private const val ComposeRuntimeEffectShaderProperty = "magic.jewel.compose.runtimeEffectShader"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
@@ -281,6 +284,7 @@ private fun JFrame.scheduleAutoResizeIfNeeded() {
 }
 
 @Composable
+@OptIn(ExperimentalGraphicsApi::class)
 private fun MagicJewelApp() {
     val fixedFrameTicks = remember {
         System.getProperty(FixedFrameTicksProperty)?.toIntOrNull()
@@ -298,6 +302,9 @@ private fun MagicJewelApp() {
     }
     val composeCompositeShaderEnabled = remember {
         System.getProperty(ComposeCompositeShaderProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectShaderEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectShaderProperty, "false").toBoolean()
     }
     val composeImageFilterEnabled = remember {
         System.getProperty(ComposeImageFilterProperty, "false").toBoolean()
@@ -566,6 +573,31 @@ private fun MagicJewelApp() {
                             tileMode = TileMode.Clamp,
                         ),
                         blendMode = BlendMode.SrcOver,
+                    )
+                    drawRect(
+                        brush = ShaderBrush(shader),
+                        topLeft = topLeft,
+                        size = Size(152f, 112f),
+                    )
+                    drawRect(
+                        color = Color.White,
+                        topLeft = topLeft,
+                        size = Size(152f, 112f),
+                        style = Stroke(width = 3f),
+                    )
+                }
+                if (composeRuntimeEffectShaderEnabled) {
+                    val topLeft = Offset(size.width - 556f, size.height - 360f)
+                    val shader = RuntimeEffectShader(
+                        sksl = """
+                            uniform float phase;
+                            half4 main(float2 p) {
+                                float wave = 0.5 + 0.5 * sin(p.x * 0.045 + phase * 6.28318);
+                                float band = smoothstep(0.15, 0.85, wave);
+                                return half4(band, 0.18 + p.y * 0.003, 1.0 - band, 1.0);
+                            }
+                        """.trimIndent(),
+                        uniforms = floatArrayOf(phase),
                     )
                     drawRect(
                         brush = ShaderBrush(shader),
