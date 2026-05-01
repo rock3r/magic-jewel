@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.ShaderBrush
@@ -114,6 +115,7 @@ private const val ComposeGraphicsLayerBlendModeProperty = "magic.jewel.compose.g
 private const val ComposeGraphicsLayerColorFilterProperty = "magic.jewel.compose.graphicsLayerColorFilter"
 private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.compose.graphicsLayerColorMatrixFilter"
 private const val ComposeGraphicsLayerRenderEffectProperty = "magic.jewel.compose.graphicsLayerRenderEffect"
+private const val ComposeGraphicsLayerOffsetEffectProperty = "magic.jewel.compose.graphicsLayerOffsetEffect"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -333,6 +335,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerRenderEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRenderEffectProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerOffsetEffectEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerOffsetEffectProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -1332,8 +1337,13 @@ private fun MagicJewelApp() {
                                     }
                                 )
                             }
-                            if (composeGraphicsLayerRenderEffectEnabled) {
-                                renderEffect = BlurEffect(radiusX = 7f, radiusY = 5f)
+                            when {
+                                composeGraphicsLayerOffsetEffectEnabled -> {
+                                    renderEffect = OffsetEffect(offsetX = 13f, offsetY = -9f)
+                                }
+                                composeGraphicsLayerRenderEffectEnabled -> {
+                                    renderEffect = BlurEffect(radiusX = 7f, radiusY = 5f)
+                                }
                             }
                             clip = composeGraphicsLayerClipEnabled ||
                                 composeGraphicsLayerRoundClipEnabled ||
