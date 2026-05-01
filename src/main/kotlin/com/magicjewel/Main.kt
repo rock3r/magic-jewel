@@ -116,6 +116,7 @@ private const val ComposeGraphicsLayerColorFilterProperty = "magic.jewel.compose
 private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.compose.graphicsLayerColorMatrixFilter"
 private const val ComposeGraphicsLayerRenderEffectProperty = "magic.jewel.compose.graphicsLayerRenderEffect"
 private const val ComposeGraphicsLayerOffsetEffectProperty = "magic.jewel.compose.graphicsLayerOffsetEffect"
+private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel.compose.graphicsLayerChainedRenderEffect"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -338,6 +339,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerOffsetEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerOffsetEffectProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerChainedRenderEffectEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerChainedRenderEffectProperty, "false").toBoolean()
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
@@ -1338,6 +1342,12 @@ private fun MagicJewelApp() {
                                 )
                             }
                             when {
+                                composeGraphicsLayerChainedRenderEffectEnabled -> {
+                                    renderEffect = OffsetEffect(
+                                        renderEffect = BlurEffect(radiusX = 7f, radiusY = 5f),
+                                        offset = Offset(13f, -9f),
+                                    )
+                                }
                                 composeGraphicsLayerOffsetEffectEnabled -> {
                                     renderEffect = OffsetEffect(offsetX = 13f, offsetY = -9f)
                                 }
