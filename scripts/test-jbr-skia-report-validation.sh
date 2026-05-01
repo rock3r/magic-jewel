@@ -78,6 +78,40 @@ strict_command_fails_without_min_app_new_frames() {
   fi
 }
 
+strict_command_requires_tiny_full_scene_injection_marker() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "MAGIC_JEWEL_COMPOSE_FRAME frame=1"
+    echo "MAGIC_JEWEL_COMPOSE_FRAME frame=2"
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_TINY_FULL_SCENE_INJECTED originalCommands=128"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS=1
+  grep -q "^validation_status=passed$" "${dir}/summary.properties"
+  grep -q "^skiko_tiny_full_scene_injections=1$" "${dir}/summary.properties"
+}
+
+strict_command_fails_without_tiny_full_scene_injection_marker() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "MAGIC_JEWEL_COMPOSE_FRAME frame=1"
+    echo "MAGIC_JEWEL_COMPOSE_FRAME frame=2"
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS=1 2>/dev/null; then
+    echo "Expected strict command validation to fail without tiny FullScene injection marker" >&2
+    return 1
+  fi
+}
+
 summary_includes_screenshot_counts() {
   local dir
   dir="$(make_report_dir)"
@@ -720,6 +754,8 @@ handshake_fallback_fails_with_command_frames() {
 strict_command_passes
 strict_command_requires_min_app_new_frames
 strict_command_fails_without_min_app_new_frames
+strict_command_requires_tiny_full_scene_injection_marker
+strict_command_fails_without_tiny_full_scene_injection_marker
 summary_includes_screenshot_counts
 surface_change_summary_is_machine_readable
 strict_command_requires_min_surface_changes

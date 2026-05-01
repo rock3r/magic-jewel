@@ -59,7 +59,9 @@ run_named_case() {
   case "$1" in
     commands-live-animation)
       run_case "$1" \
-        EXPECT_MIN_APP_NEW_FRAMES=5
+        SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST=true \
+        EXPECT_MIN_APP_NEW_FRAMES=5 \
+        EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS=1
       ;;
     commands-core-primitives)
       run_case "$1" \

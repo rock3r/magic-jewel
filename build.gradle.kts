@@ -20,6 +20,9 @@ val jbrSkiaJvmArgs = providers.gradleProperty("jbrSkiaInteropJvmArgs")
 val jbrSkiaRenderMode = providers.gradleProperty("jbrSkiaRenderMode")
     .orElse(providers.environmentVariable("JBR_SKIA_RENDER_MODE"))
     .orElse("picture")
+val forceTinyFullSceneOnceForTesting = providers.gradleProperty("skikoForceTinyFullSceneOnceForTesting")
+    .orElse(providers.environmentVariable("SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST"))
+    .orElse("false")
 val composeTextEnabled = providers.gradleProperty("magicJewelComposeText")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_TEXT"))
     .orElse("true")
@@ -295,6 +298,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")
+        systemProperty("skiko.jbr.interop.forceTinyFullSceneOnceForTesting", forceTinyFullSceneOnceForTesting.get())
         when (jbrSkiaRenderMode.get()) {
             "commands" -> systemProperty("skiko.jbr.interop.renderCommands", "true")
             "diagnostic" -> systemProperty("skiko.jbr.interop.renderDiagnostic", "true")

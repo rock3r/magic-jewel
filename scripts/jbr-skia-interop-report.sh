@@ -34,6 +34,7 @@ EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS="${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CL
 EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS="${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS:-0}"
 EXPECT_MIN_POPUP_FRAMES="${EXPECT_MIN_POPUP_FRAMES:-0}"
 EXPECT_MIN_APP_NEW_FRAMES="${EXPECT_MIN_APP_NEW_FRAMES:-0}"
+EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS="${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS:-0}"
 EXPECT_MAX_IMAGE_DEFINES="${EXPECT_MAX_IMAGE_DEFINES:--1}"
 EXPECT_MAX_IMAGE_CACHE_CLEARS="${EXPECT_MAX_IMAGE_CACHE_CLEARS:--1}"
 EXPECT_MIN_SURFACE_CHANGES="${EXPECT_MIN_SURFACE_CHANGES:-0}"
@@ -44,6 +45,7 @@ JBR_SKIA_NATIVE_TEXT="${JBR_SKIA_NATIVE_TEXT:-false}"
 SKIKO_EXPECTED_ABI_ID_FOR_TEST="${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-}"
 SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST="${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-}"
 SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST="${SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST:-}"
+SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST="${SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST:-false}"
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
 fi
@@ -269,6 +271,7 @@ export JBR_SKIA_NATIVE_TEXT
 export SKIKO_EXPECTED_ABI_ID_FOR_TEST
 export SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST
 export SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST
+export SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
@@ -286,6 +289,7 @@ JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER="JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FA
 JBR_IMAGE_CACHE_CLEAR_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR"
 JBR_IMAGE_CACHE_EVICT_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_EVICT"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
+SKIKO_TINY_FULL_SCENE_MARKER="SKIKO_JBR_INTEROP_TINY_FULL_SCENE_INJECTED"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 CMP_COMMAND_FRAME_KIND_MARKER="CMP_JBR_COMMAND_FRAME_KIND"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
@@ -339,6 +343,7 @@ Environment:
   EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS In strict command mode, require at least this many JBR-side image cache evict markers. Default: 0.
   EXPECT_MIN_POPUP_FRAMES In strict command mode, require at least this many Swing popup paint markers. Default: 0.
   EXPECT_MIN_APP_NEW_FRAMES In strict command mode, require at least this many Magic Jewel Compose frame markers in the new renderer. Default: 0.
+  EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS In strict command mode, require at least this many test-only tiny full-scene injections. Default: 0.
   EXPECT_MAX_IMAGE_DEFINES In strict command mode, require CMP recorder max imageDefines at or below this value. Default: disabled.
   EXPECT_MAX_IMAGE_CACHE_CLEARS In strict command mode, require CMP recorder max imageCacheClears at or below this value. Default: disabled.
   EXPECT_MIN_SURFACE_CHANGES In strict command mode, require at least this many Skiko surface-change markers. Default: 0.
@@ -406,6 +411,7 @@ Environment:
   SKIKO_EXPECTED_ABI_ID_FOR_TEST Forces Skiko's expected JBR Skia ABI for fallback validation. Empty by default.
   SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST Forces Skiko's expected native metadata ABI for fallback validation. Empty by default.
   SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST Forces Skiko's required command capability mask for fallback validation. Empty by default.
+  SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST Forces one tiny FullScene command stream after a meaningful frame, for animation-preservation validation. Default: false.
 EOF_USAGE
 }
 
@@ -1061,6 +1067,7 @@ write_machine_summary() {
     echo "jbr_scoped_image_cache_clear_frames=$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
     echo "jbr_image_cache_evict_frames=$(grep -c "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "skiko_tiny_full_scene_injections=$(grep -c "${SKIKO_TINY_FULL_SCENE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_context_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_same_context_surface_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=false.*surfaceChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "screenshot_status=$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || echo not-run)"
@@ -1210,6 +1217,7 @@ write_report() {
     echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
     echo "- SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST: ${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-<unset>}"
     echo "- SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST: ${SKIKO_REQUIRED_COMMAND_CAPABILITIES_FOR_TEST:-<unset>}"
+    echo "- SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST: ${SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
@@ -1222,6 +1230,7 @@ write_report() {
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}"
     echo "- EXPECT_MIN_POPUP_FRAMES: ${EXPECT_MIN_POPUP_FRAMES}"
     echo "- EXPECT_MIN_APP_NEW_FRAMES: ${EXPECT_MIN_APP_NEW_FRAMES}"
+    echo "- EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS: ${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS}"
     echo "- EXPECT_MAX_IMAGE_DEFINES: ${EXPECT_MAX_IMAGE_DEFINES}"
     echo "- EXPECT_MAX_IMAGE_CACHE_CLEARS: ${EXPECT_MAX_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_SURFACE_CHANGES: ${EXPECT_MIN_SURFACE_CHANGES}"
@@ -1508,6 +1517,12 @@ validate_report() {
         app_new_frames="$(grep -c "${APP_FRAME_MARKER}" "${new_log}" 2>/dev/null || true)"
         [[ "${app_new_frames}" -ge "${EXPECT_MIN_APP_NEW_FRAMES}" ]] ||
           failures+=("Magic Jewel Compose frame markers ${app_new_frames} below expected ${EXPECT_MIN_APP_NEW_FRAMES}")
+      fi
+      if [[ "${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS}" -gt 0 ]]; then
+        local tiny_full_scene_injections
+        tiny_full_scene_injections="$(grep -c "${SKIKO_TINY_FULL_SCENE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${tiny_full_scene_injections}" -ge "${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS}" ]] ||
+          failures+=("Skiko tiny FullScene injection markers ${tiny_full_scene_injections} below expected ${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS}")
       fi
       if [[ "${MAGIC_JEWEL_POPUP_WINDOW_STRESS}" == "true" ]]; then
         if ! grep -q "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null; then
