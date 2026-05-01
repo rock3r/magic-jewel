@@ -927,6 +927,20 @@ private fun MagicJewelApp() {
                                 pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 8f), 2f)
                             },
                         )
+                        canvas.drawRoundRect(
+                            left = size.width - 408f,
+                            top = 218f,
+                            right = size.width - 238f,
+                            bottom = 272f,
+                            radiusX = 18f,
+                            radiusY = 18f,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFFFFF)
+                                style = PaintingStyle.Stroke
+                                strokeWidth = 6f
+                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 9f), 4f)
+                            },
+                        )
                     }
                 }
                 if (composeBlendModeEnabled) {
