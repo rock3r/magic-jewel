@@ -107,6 +107,14 @@ SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-screenshot-parity.sh
 
 The parity script freezes animation phase, frame ticks, and Swing timer movement so the old SwingGraphics renderer and new JBR Skia command renderer can be captured at the same deterministic point. It captures only the `MagicJewelJbrSkiaWindow` window, runs the strict command screenshot oracle for the new renderer, then compares `old-window.png` and `new-window.png` with `scripts/compare-jbr-skia-window-screenshots.sh`. The comparison writes `parity-diff.png`, appends whole-window and coarse ownership-region metrics to the report, and mirrors scalar `screenshot_parity_*` keys into `summary.properties`. Use `MAGIC_JEWEL_FIXED_ANIMATION_PHASE`, `MAGIC_JEWEL_FIXED_FRAME_TICKS`, and `MAGIC_JEWEL_PAUSE_SWING_ANIMATION=false` to override the default deterministic setup. A frozen parity window is expected not to animate; use a normal `jbr-skia-interop-report.sh` command-mode run for animation/FPS smoke checks.
 
+Named old/new screenshot parity suite:
+
+```bash
+SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-screenshot-parity-suite.sh
+```
+
+The parity suite runs deterministic old/new window captures for the rich baseline scene plus focused RuntimeEffect and graphics-layer effect scenes. Use `CASES="parity-rich parity-runtime-effect-pure-color"` to run a subset. It writes `suite.tsv` with one row per case, including whole-window and Compose-canvas bad-pixel ratios plus the report and diff image paths.
+
 Quiet-machine benchmark collection suite:
 
 ```bash
