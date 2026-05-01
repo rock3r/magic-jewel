@@ -570,6 +570,20 @@ runtime_effect_compile_failure_fallback_passes() {
   grep -q "^jbr_runtime_effect_compile_failures=1$" "${dir}/summary.properties"
 }
 
+runtime_effect_build_failure_fallback_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=false"
+    echo "JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FAILED hash=0x0123456789abcdef skslLength=42 uniforms=1 children=1 namedUniforms=1 namedChildren=1"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed
+  grep -q "^jbr_runtime_effect_build_failures=1$" "${dir}/summary.properties"
+}
+
 abi_mismatch_fallback_passes() {
   local dir
   dir="$(make_report_dir)"
@@ -706,6 +720,7 @@ expected_image_fallback_passes
 expected_fallback_requires_reason
 command_stream_invalid_fallback_passes
 runtime_effect_compile_failure_fallback_passes
+runtime_effect_build_failure_fallback_passes
 abi_mismatch_fallback_passes
 native_abi_mismatch_fallback_passes
 new_skiko_old_jbr_fallback_matrix_passes

@@ -55,6 +55,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD=false
+fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_FILTER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=false
 fi
@@ -201,6 +204,7 @@ export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
 export MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER
 export MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER
+export MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD
 export MAGIC_JEWEL_COMPOSE_IMAGE_FILTER
 export MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER
 export MAGIC_JEWEL_COMPOSE_COLOR_FILTER
@@ -265,6 +269,7 @@ SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_TIMING_MARKER="JBR_SKIA_INTEROP_COMMAND_TIMING"
 JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER="JBR_SKIA_INTEROP_RUNTIME_EFFECT_COMPILE_FAILED"
+JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER="JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FAILED"
 JBR_IMAGE_CACHE_CLEAR_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR"
 JBR_IMAGE_CACHE_EVICT_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_EVICT"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
@@ -331,6 +336,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader rendering probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER Enables a composite linear/radial shader descriptor probe. Default: false.
   MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER Enables a RuntimeEffect/SKSL shader descriptor probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD Uses an intentionally wrong RuntimeEffect child name to exercise JBR builder fallback. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_FILTER Enables an image tint color-filter command probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER Enables an image color-matrix descriptor command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER Enables a tint color-filter command replay probe. Default: false.
@@ -1028,6 +1034,7 @@ write_machine_summary() {
     echo "skiko_command_frames=$(grep -c "${SKIKO_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_command_frames=$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_runtime_effect_compile_failures=$(grep -c "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_runtime_effect_build_failures=$(grep -c "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_picture_fps=$(frame_marker_fps "${SKIKO_PICTURE_MARKER}" "${new_log}")"
     echo "jbr_picture_fps=$(frame_marker_fps "${JBR_PICTURE_MARKER}" "${new_log}")"
     echo "skiko_command_fps=$(frame_marker_fps "${SKIKO_COMMAND_MARKER}" "${new_log}")"
@@ -1103,6 +1110,8 @@ write_report() {
   cmp_command_frame_kind_summary="$(command_frame_kind_summary "${new_log}")"
   jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
   jbr_runtime_effect_compile_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_log}")"
+  local jbr_runtime_effect_build_failure_summary
+  jbr_runtime_effect_build_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${new_log}")"
   jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}")"
   jbr_image_cache_evict_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}")"
   skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}")"
@@ -1130,6 +1139,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE_SHADER: ${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER}"
     echo "- MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER: ${MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER}"
     echo "- MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER: ${MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER}"
+    echo "- MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD: ${MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE_FILTER: ${MAGIC_JEWEL_COMPOSE_IMAGE_FILTER}"
     echo "- MAGIC_JEWEL_COMPOSE_COLOR_FILTER: ${MAGIC_JEWEL_COMPOSE_COLOR_FILTER}"
     echo "- MAGIC_JEWEL_COMPOSE_COLOR_MATRIX_FILTER: ${MAGIC_JEWEL_COMPOSE_COLOR_MATRIX_FILTER}"
@@ -1242,6 +1252,7 @@ write_report() {
     echo "- JBR command frames: ${jbr_command_summary}"
     echo "- JBR command timing: ${jbr_command_timing_summary}"
     echo "- JBR RuntimeEffect compile failures: ${jbr_runtime_effect_compile_failure_summary}"
+    echo "- JBR RuntimeEffect build failures: ${jbr_runtime_effect_build_failure_summary}"
     echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
     echo "- JBR scoped image cache clears: $(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
     echo "- JBR image cache evicts: ${jbr_image_cache_evict_summary}"
@@ -1374,6 +1385,15 @@ validate_report() {
         if ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
           failures+=("missing rendered=false command frame for RuntimeEffect compile fallback")
         fi
+      elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "runtime-effect-build-failed" ]]; then
+        [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames before RuntimeEffect build fallback")
+        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during RuntimeEffect build fallback: ${jbr_command_frames}")
+        if ! grep -q "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("missing RuntimeEffect build-failure marker")
+        fi
+        if ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
+          failures+=("missing rendered=false command frame for RuntimeEffect build fallback")
+        fi
       else
         [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during expected fallback: ${jbr_command_frames}")
@@ -1491,7 +1511,7 @@ validate_report() {
       fi
     fi
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" != "true" ||
-        ! "${EXPECT_COMMAND_FALLBACK_REASON:-}" =~ ^(abi-mismatch|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing|runtime-effect-compile-failed)$ ]]; then
+        ! "${EXPECT_COMMAND_FALLBACK_REASON:-}" =~ ^(abi-mismatch|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing|runtime-effect-compile-failed|runtime-effect-build-failed)$ ]]; then
       [[ "${screenshot_status}" == "passed" ]] || failures+=("screenshot assertion did not pass")
     fi
   fi

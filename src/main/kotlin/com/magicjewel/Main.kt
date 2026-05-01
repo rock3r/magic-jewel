@@ -109,6 +109,7 @@ private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
 private const val ComposeRuntimeEffectShaderProperty = "magic.jewel.compose.runtimeEffectShader"
+private const val ComposeRuntimeEffectBadChildProperty = "magic.jewel.compose.runtimeEffectBadChild"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
@@ -307,6 +308,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectShaderEnabled = remember {
         System.getProperty(ComposeRuntimeEffectShaderProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectBadChildEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectBadChildProperty, "false").toBoolean()
     }
     val composeImageFilterEnabled = remember {
         System.getProperty(ComposeImageFilterProperty, "false").toBoolean()
@@ -610,7 +614,9 @@ private fun MagicJewelApp() {
                         """.trimIndent(),
                         uniforms = floatArrayOf(phase),
                         uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
-                        namedChildren = listOf(RuntimeEffectChild("content", child)),
+                        namedChildren = listOf(
+                            RuntimeEffectChild(if (composeRuntimeEffectBadChildEnabled) "missingContent" else "content", child)
+                        ),
                     )
                     drawRect(
                         brush = ShaderBrush(shader),

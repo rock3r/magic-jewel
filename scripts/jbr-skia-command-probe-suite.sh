@@ -8,7 +8,7 @@ SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 DURATION_SECONDS="${DURATION_SECONDS:-8}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-2}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
-CASES="${CASES:-commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image commands-native-text commands-image-shader commands-composite-shader commands-runtime-effect-shader commands-gradient-stroke commands-image-filter commands-image-color-matrix-filter commands-color-filter-fallback commands-color-filter-handle commands-color-matrix-filter commands-lighting-filter commands-path-effect-fallback commands-blend-mode commands-graphics-layer commands-graphics-layer-clip commands-graphics-layer-round-clip commands-graphics-layer-path-clip commands-graphics-layer-blend-mode commands-graphics-layer-color-filter commands-graphics-layer-color-matrix-filter commands-graphics-layer-render-effect commands-graphics-layer-offset-effect commands-graphics-layer-chained-render-effect commands-graphics-layer-blend-color-filter commands-graphics-layer-blend-color-matrix-filter commands-save-layer-filter commands-invalid-gradient-fallback}"
+CASES="${CASES:-commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image commands-native-text commands-image-shader commands-composite-shader commands-runtime-effect-shader commands-runtime-effect-build-fallback commands-gradient-stroke commands-image-filter commands-image-color-matrix-filter commands-color-filter-fallback commands-color-filter-handle commands-color-matrix-filter commands-lighting-filter commands-path-effect-fallback commands-blend-mode commands-graphics-layer commands-graphics-layer-clip commands-graphics-layer-round-clip commands-graphics-layer-path-clip commands-graphics-layer-blend-mode commands-graphics-layer-color-filter commands-graphics-layer-color-matrix-filter commands-graphics-layer-render-effect commands-graphics-layer-offset-effect commands-graphics-layer-chained-render-effect commands-graphics-layer-blend-color-filter commands-graphics-layer-blend-color-matrix-filter commands-save-layer-filter commands-invalid-gradient-fallback}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -125,6 +125,13 @@ run_named_case() {
     commands-runtime-effect-shader)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER=true
+      ;;
+    commands-runtime-effect-build-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER=true \
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed
       ;;
     commands-image-filter)
       run_case "$1" \
