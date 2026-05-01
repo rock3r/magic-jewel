@@ -142,6 +142,7 @@ private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel
 private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.graphicsLayerShadow"
 private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.graphicsLayerRotationX"
 private const val ComposeGraphicsLayerRotationYProperty = "magic.jewel.compose.graphicsLayerRotationY"
+private const val ComposeGraphicsLayerNearCameraProperty = "magic.jewel.compose.graphicsLayerNearCamera"
 private const val ComposeGraphicsLayerOffscreenProperty = "magic.jewel.compose.graphicsLayerOffscreen"
 private const val ComposeGraphicsLayerModulateAlphaProperty = "magic.jewel.compose.graphicsLayerModulateAlpha"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
@@ -414,6 +415,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerRotationYEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRotationYProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerNearCameraEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerNearCameraProperty, "false").toBoolean()
     }
     val composeGraphicsLayerOffscreenEnabled = remember {
         System.getProperty(ComposeGraphicsLayerOffscreenProperty, "false").toBoolean()
@@ -1780,6 +1784,9 @@ private fun MagicJewelApp() {
                             }
                             if (composeGraphicsLayerRotationYEnabled) {
                                 rotationY = -24f
+                            }
+                            if (composeGraphicsLayerNearCameraEnabled) {
+                                cameraDistance = 180f
                             }
                             if (composeGraphicsLayerOffscreenEnabled) {
                                 compositingStrategy = CompositingStrategy.Offscreen
