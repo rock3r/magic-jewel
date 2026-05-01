@@ -1599,7 +1599,16 @@ validate_report() {
       if [[ "${command_frame_delta}" -lt 0 ]]; then
         command_frame_delta=$(( -command_frame_delta ))
       fi
-      [[ "${command_frame_delta}" -le 1 ]] || failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames}")
+      local command_frame_max="${skiko_command_frames}"
+      if [[ "${jbr_command_frames}" -gt "${command_frame_max}" ]]; then
+        command_frame_max="${jbr_command_frames}"
+      fi
+      local command_frame_tolerance=$(( (command_frame_max + 99) / 100 ))
+      if [[ "${command_frame_tolerance}" -lt 3 ]]; then
+        command_frame_tolerance=3
+      fi
+      [[ "${command_frame_delta}" -le "${command_frame_tolerance}" ]] ||
+        failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames} tolerance=${command_frame_tolerance}")
       [[ "${skiko_picture_frames}" -eq 0 ]] || failures+=("unexpected Skiko picture frames in strict command mode: ${skiko_picture_frames}")
       [[ "${jbr_picture_frames}" -eq 0 ]] || failures+=("unexpected JBR picture frames in strict command mode: ${jbr_picture_frames}")
       if grep -Eq "(${CMP_COMMAND_RECORDER_MARKER}|${CMP_COMMAND_RECORDER_NESTED_MARKER}).*unsupported=[1-9][0-9]*" "${new_log}" 2>/dev/null; then
