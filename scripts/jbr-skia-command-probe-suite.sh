@@ -8,7 +8,7 @@ SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 DURATION_SECONDS="${DURATION_SECONDS:-8}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-2}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
-CASES="${CASES:-commands-live-animation commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image commands-native-text commands-image-shader commands-composite-shader commands-runtime-effect-shader commands-runtime-effect-pure-color commands-runtime-effect-uniform-only commands-runtime-effect-child-only commands-runtime-effect-color-filter commands-runtime-effect-color-filter-child commands-runtime-effect-build-fallback commands-runtime-effect-child-type-fallback commands-invalid-descriptor-use-fallback commands-gradient-stroke commands-image-filter commands-image-color-matrix-filter commands-color-filter-fallback commands-color-filter-handle commands-color-matrix-filter commands-lighting-filter commands-descriptor-eviction commands-resize-descriptor-redefine commands-forced-context-descriptor-redefine commands-path-effect-fallback commands-blend-mode commands-graphics-layer commands-graphics-layer-clip commands-graphics-layer-round-clip commands-graphics-layer-path-clip commands-graphics-layer-blend-mode commands-graphics-layer-color-filter commands-graphics-layer-color-matrix-filter commands-graphics-layer-render-effect commands-graphics-layer-offset-effect commands-graphics-layer-chained-render-effect commands-graphics-layer-shadow commands-graphics-layer-round-shadow commands-graphics-layer-blend-color-filter commands-graphics-layer-blend-color-matrix-filter commands-save-layer-filter commands-invalid-gradient-fallback}"
+CASES="${CASES:-commands-live-animation commands-core-primitives commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image commands-native-text commands-image-shader commands-composite-shader commands-runtime-effect-shader commands-runtime-effect-pure-color commands-runtime-effect-uniform-only commands-runtime-effect-child-only commands-runtime-effect-color-filter commands-runtime-effect-color-filter-child commands-runtime-effect-build-fallback commands-runtime-effect-child-type-fallback commands-invalid-descriptor-use-fallback commands-gradient-stroke commands-image-filter commands-image-color-matrix-filter commands-color-filter-fallback commands-color-filter-handle commands-color-matrix-filter commands-lighting-filter commands-descriptor-eviction commands-resize-descriptor-redefine commands-forced-context-descriptor-redefine commands-path-effect-fallback commands-blend-mode commands-graphics-layer commands-graphics-layer-clip commands-graphics-layer-round-clip commands-graphics-layer-path-clip commands-graphics-layer-blend-mode commands-graphics-layer-color-filter commands-graphics-layer-color-matrix-filter commands-graphics-layer-render-effect commands-graphics-layer-offset-effect commands-graphics-layer-chained-render-effect commands-graphics-layer-shadow commands-graphics-layer-round-shadow commands-graphics-layer-path-shadow commands-graphics-layer-blend-color-filter commands-graphics-layer-blend-color-matrix-filter commands-save-layer-filter commands-invalid-gradient-fallback}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -344,6 +344,15 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROUND_CLIP=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+      ;;
+    commands-graphics-layer-path-shadow)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_PATH_CLIP=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW=true \
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
