@@ -264,6 +264,7 @@ JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_TIMING_MARKER="JBR_SKIA_INTEROP_COMMAND_TIMING"
+JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER="JBR_SKIA_INTEROP_RUNTIME_EFFECT_COMPILE_FAILED"
 JBR_IMAGE_CACHE_CLEAR_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR"
 JBR_IMAGE_CACHE_EVICT_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_EVICT"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
@@ -1026,6 +1027,7 @@ write_machine_summary() {
     echo "jbr_picture_frames=$(grep -c "${JBR_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_command_frames=$(grep -c "${SKIKO_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_command_frames=$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_runtime_effect_compile_failures=$(grep -c "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_picture_fps=$(frame_marker_fps "${SKIKO_PICTURE_MARKER}" "${new_log}")"
     echo "jbr_picture_fps=$(frame_marker_fps "${JBR_PICTURE_MARKER}" "${new_log}")"
     echo "skiko_command_fps=$(frame_marker_fps "${SKIKO_COMMAND_MARKER}" "${new_log}")"
@@ -1065,6 +1067,7 @@ write_report() {
   local jbr_command_summary
   local cmp_command_recorder_summary
   local jbr_command_timing_summary
+  local jbr_runtime_effect_compile_failure_summary
   local cmp_command_frame_kind_summary
   local jbr_image_cache_clear_summary
   local jbr_image_cache_evict_summary
@@ -1099,6 +1102,7 @@ write_report() {
   cmp_command_recorder_summary="$(command_recorder_summary "${new_log}")"
   cmp_command_frame_kind_summary="$(command_frame_kind_summary "${new_log}")"
   jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
+  jbr_runtime_effect_compile_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_log}")"
   jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}")"
   jbr_image_cache_evict_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}")"
   skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}")"
@@ -1237,6 +1241,7 @@ write_report() {
     echo "- Skiko command frames: ${skiko_command_summary}"
     echo "- JBR command frames: ${jbr_command_summary}"
     echo "- JBR command timing: ${jbr_command_timing_summary}"
+    echo "- JBR RuntimeEffect compile failures: ${jbr_runtime_effect_compile_failure_summary}"
     echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
     echo "- JBR scoped image cache clears: $(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
     echo "- JBR image cache evicts: ${jbr_image_cache_evict_summary}"
@@ -1360,6 +1365,15 @@ validate_report() {
         if ! grep -q "${FALLBACK_MARKER} reason=public-api-missing" "${OUT_DIR}/new.log" 2>/dev/null; then
           failures+=("missing public-api-missing fallback marker")
         fi
+      elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "runtime-effect-compile-failed" ]]; then
+        [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames before RuntimeEffect compile fallback")
+        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during RuntimeEffect compile fallback: ${jbr_command_frames}")
+        if ! grep -q "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("missing RuntimeEffect compile-failure marker")
+        fi
+        if ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
+          failures+=("missing rendered=false command frame for RuntimeEffect compile fallback")
+        fi
       else
         [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during expected fallback: ${jbr_command_frames}")
@@ -1477,7 +1491,7 @@ validate_report() {
       fi
     fi
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" != "true" ||
-        ! "${EXPECT_COMMAND_FALLBACK_REASON:-}" =~ ^(abi-mismatch|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing)$ ]]; then
+        ! "${EXPECT_COMMAND_FALLBACK_REASON:-}" =~ ^(abi-mismatch|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing|runtime-effect-compile-failed)$ ]]; then
       [[ "${screenshot_status}" == "passed" ]] || failures+=("screenshot assertion did not pass")
     fi
   fi
