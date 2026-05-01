@@ -118,6 +118,7 @@ private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.i
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
 private const val ComposeColorMatrixFilterProperty = "magic.jewel.compose.colorMatrixFilter"
 private const val ComposeLightingFilterProperty = "magic.jewel.compose.lightingFilter"
+private const val ComposeDescriptorEvictionProperty = "magic.jewel.compose.descriptorEviction"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
 private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
 private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLayer"
@@ -172,9 +173,15 @@ private const val PopupWindowTitle = "MagicJewelPopupWindow"
 private const val PopupWindowShownMarker = "MAGIC_JEWEL_POPUP_WINDOW_SHOWN"
 private const val MenuShownMarker = "MAGIC_JEWEL_MENU_SHOWN"
 private const val PopupFrameMarker = "MAGIC_JEWEL_POPUP_FRAME"
+private const val DescriptorEvictionChurnCount = 1032
 private val FrameCounter = AtomicLong()
 private val SwingFrameCounter = AtomicLong()
 private val PopupFrameCounter = AtomicLong()
+
+private fun churnColor(index: Int): Color {
+    val rgb = (index * 1103515245 + 12345) and 0x00ffffff
+    return Color(0xff000000.toInt() or rgb)
+}
 
 fun main() {
     SwingUtilities.invokeLater(::showMagicJewel)
@@ -339,6 +346,9 @@ private fun MagicJewelApp() {
     }
     val composeLightingFilterEnabled = remember {
         System.getProperty(ComposeLightingFilterProperty, "false").toBoolean()
+    }
+    val composeDescriptorEvictionEnabled = remember {
+        System.getProperty(ComposeDescriptorEvictionProperty, "false").toBoolean()
     }
     val composePathEffectEnabled = remember {
         System.getProperty(ComposePathEffectProperty, "false").toBoolean()
@@ -779,6 +789,53 @@ private fun MagicJewelApp() {
                                     add = Color(0xFF101820),
                                 )
                             },
+                        )
+                    }
+                }
+                if (composeDescriptorEvictionEnabled) {
+                    drawIntoCanvas { canvas ->
+                        repeat(DescriptorEvictionChurnCount) { index ->
+                            val column = index % 86
+                            val row = index / 86
+                            val left = 18f + column * 2f
+                            val top = 154f + row * 2f
+                            canvas.drawRect(
+                                left = left,
+                                top = top,
+                                right = left + 1.5f,
+                                bottom = top + 1.5f,
+                                paint = Paint().apply {
+                                    color = churnColor(index)
+                                    colorFilter = ColorFilter.tint(churnColor(index + 2048))
+                                },
+                            )
+                        }
+                    }
+                    repeat(DescriptorEvictionChurnCount) { index ->
+                        val column = index % 86
+                        val row = index / 86
+                        val topLeft = Offset(220f + column * 2f, 154f + row * 2f)
+                        val shader = CompositeShader(
+                            dst = LinearGradientShader(
+                                from = topLeft,
+                                to = topLeft + Offset(1.5f, 1.5f),
+                                colors = listOf(churnColor(index + 4096), churnColor(index + 8192)),
+                                colorStops = listOf(0f, 1f),
+                                tileMode = TileMode.Clamp,
+                            ),
+                            src = RadialGradientShader(
+                                center = topLeft + Offset(0.75f, 0.75f),
+                                radius = 1.25f,
+                                colors = listOf(churnColor(index + 12288), churnColor(index + 16384)),
+                                colorStops = listOf(0f, 1f),
+                                tileMode = TileMode.Clamp,
+                            ),
+                            blendMode = BlendMode.SrcOver,
+                        )
+                        drawRect(
+                            brush = ShaderBrush(shader),
+                            topLeft = topLeft,
+                            size = Size(1.5f, 1.5f),
                         )
                     }
                 }
