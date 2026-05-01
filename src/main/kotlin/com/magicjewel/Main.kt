@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.RuntimeEffectChild
@@ -912,6 +913,18 @@ private fun MagicJewelApp() {
                                 color = Color(0xFFFFFFFF)
                                 strokeWidth = 8f
                                 pathEffect = PathEffect.dashPathEffect(floatArrayOf(16f, 10f), 0f)
+                            },
+                        )
+                        canvas.drawRect(
+                            left = size.width - 408f,
+                            top = 154f,
+                            right = size.width - 238f,
+                            bottom = 206f,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFFFFF)
+                                style = PaintingStyle.Stroke
+                                strokeWidth = 6f
+                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 8f), 2f)
                             },
                         )
                     }
