@@ -118,17 +118,20 @@ run_named_case() {
     parity-image-shader-color-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE_SHADER_COLOR_FILTER=true \
-        MAX_BAD_PIXEL_RATIO=0.06
+        MAX_BAD_PIXEL_RATIO=0.06 \
+        MAX_COMPOSE_SHADER_IMAGE_BAD_PIXEL_RATIO=0.05
       ;;
     parity-composite-shader-color-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER_COLOR_FILTER=true \
-        MAX_BAD_PIXEL_RATIO=0.06
+        MAX_BAD_PIXEL_RATIO=0.06 \
+        MAX_COMPOSE_SHADER_COMPOSITE_BAD_PIXEL_RATIO=0.07
       ;;
     parity-linear-gradient-shader-color-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_SHADER_COLOR_FILTER=true \
-        MAX_BAD_PIXEL_RATIO=0.06
+        MAX_BAD_PIXEL_RATIO=0.06 \
+        MAX_COMPOSE_SHADER_LINEAR_BAD_PIXEL_RATIO=0.05
       ;;
     parity-runtime-effect-pure-color)
       run_case "$1" \
