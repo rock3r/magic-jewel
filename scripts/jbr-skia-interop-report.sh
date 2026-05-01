@@ -209,6 +209,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE=false
 fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE=false
+fi
 if [[ -z "${MAGIC_JEWEL_FORCE_CONTEXT_CHANGE+x}" ]]; then
   MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=false
 fi
@@ -290,6 +293,7 @@ export MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT
 export MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH
 export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 export MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE
+export MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE
 export MAGIC_JEWEL_FORCE_CONTEXT_CHANGE
 export MAGIC_JEWEL_UNSUPPORTED_TEXT
 export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
@@ -455,6 +459,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT Enables the Compose sweep-gradient rect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT Enables the Compose sweep-gradient round-rect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH Enables the Compose sweep-gradient path command replay probe. Default: false.
+  MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE Corrupts one RuntimeEffect shader descriptor after recording so JBR sees a child type mismatch. Default: false.
   MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use the paragraph text command. Default: false.
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
@@ -1296,6 +1301,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH: ${MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_STREAM: ${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}"
     echo "- MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE: ${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE}"
+    echo "- MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE: ${MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE}"
     echo "- MAGIC_JEWEL_FORCE_CONTEXT_CHANGE: ${MAGIC_JEWEL_FORCE_CONTEXT_CHANGE}"
     echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
     echo "- MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT: ${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT}"
