@@ -461,7 +461,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_OFFSET_EFFECT Adds an offset renderEffect descriptor to the graphics-layer command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHAINED_RENDER_EFFECT Adds an offset-of-blur renderEffect descriptor chain to the graphics-layer command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW Adds a rectangular shadow to the graphics-layer command replay probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROTATION_X Adds unsupported 3D rotation to the graphics-layer command replay probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROTATION_X Adds 3D rotation to the graphics-layer command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_OFFSCREEN Adds supported Offscreen compositingStrategy to the graphics-layer command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_MODULATE_ALPHA Adds supported ModulateAlpha compositingStrategy to the graphics-layer command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
