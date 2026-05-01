@@ -526,6 +526,68 @@ strict_command_requires_min_jbr_shader_handle_evicts() {
   grep -q "^jbr_shader_handle_evict_frames=1$" "${dir}/summary.properties"
 }
 
+strict_command_requires_max_jbr_effect_handle_defines() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_EFFECT_HANDLE_DEFINE backend=java2d contextId=0x1234 handle=0x4567 type=1 version=1 payloadInts=2 legacy=false"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=1
+  grep -q "^validation_status=passed$" "${dir}/summary.properties"
+}
+
+strict_command_fails_above_max_jbr_effect_handle_defines() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_EFFECT_HANDLE_DEFINE backend=java2d contextId=0x1234 handle=0x4567 type=1 version=1 payloadInts=2 legacy=false"
+    echo "JBR_SKIA_INTEROP_EFFECT_HANDLE_DEFINE backend=java2d contextId=0x1234 handle=0x89ab type=1 version=1 payloadInts=2 legacy=false"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=1 2>/dev/null; then
+    echo "Expected strict command validation to fail above max JBR effect handle define markers" >&2
+    return 1
+  fi
+}
+
+strict_command_requires_max_jbr_shader_handle_defines() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_SHADER_HANDLE_DEFINE backend=java2d contextId=0x1234 handle=0x4567 type=6 version=1 payloadInts=12"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=1
+  grep -q "^validation_status=passed$" "${dir}/summary.properties"
+}
+
+strict_command_fails_above_max_jbr_shader_handle_defines() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_SHADER_HANDLE_DEFINE backend=java2d contextId=0x1234 handle=0x4567 type=6 version=1 payloadInts=12"
+    echo "JBR_SKIA_INTEROP_SHADER_HANDLE_DEFINE backend=java2d contextId=0x1234 handle=0x89ab type=6 version=1 payloadInts=12"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=1 2>/dev/null; then
+    echo "Expected strict command validation to fail above max JBR shader handle define markers" >&2
+    return 1
+  fi
+}
+
 strict_command_requires_min_popup_frames() {
   local dir
   dir="$(make_report_dir)"
@@ -856,6 +918,10 @@ strict_command_requires_min_jbr_effect_handle_defines
 strict_command_requires_min_jbr_effect_handle_evicts
 strict_command_requires_min_jbr_shader_handle_defines
 strict_command_requires_min_jbr_shader_handle_evicts
+strict_command_requires_max_jbr_effect_handle_defines
+strict_command_fails_above_max_jbr_effect_handle_defines
+strict_command_requires_max_jbr_shader_handle_defines
+strict_command_fails_above_max_jbr_shader_handle_defines
 strict_command_requires_min_popup_frames
 strict_command_fails_without_min_popup_frames
 strict_command_requires_popup_window_marker_and_screenshot

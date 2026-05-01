@@ -165,6 +165,8 @@ The RuntimeEffect command suite can run the combined probe (`commands-runtime-ef
 
 The descriptor lifecycle probe (`commands-descriptor-eviction`) enables `MAGIC_JEWEL_COMPOSE_DESCRIPTOR_EVICTION=true` and `MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE=true`, then draws enough unique effect and composite-shader descriptors to exceed CMP's 1,024-entry handle caches. It asserts both define and evict markers in the full JBR log.
 
+Stable descriptor rows also assert reuse with max-count gates: tint/color-matrix/lighting/image color-filter rows expect a single effect-handle define, `commands-runtime-effect-pure-color` expects a single shader-handle define, and `commands-composite-shader` expects exactly the three shader handles for its dst/src/composite tree.
+
 Surface identity changes are reported with `SKIKO_JBR_INTEROP_SURFACE_CHANGED oldContextId=... newContextId=... contextChanged=... surfaceChanged=... oldSurfaceId=... newSurfaceId=... oldMetalTexture=... newMetalTexture=...`. A non-zero `skiko_surface_change_markers` count means Skiko observed a different JBR destination surface during the run and discarded cached state tied to the previous surface. `contextChanged=false surfaceChanged=true` means a same-context surface replacement, such as resize.
 
 The report validator also has explicit compatibility-matrix fixtures. A new Skiko build running against an old/pre-native-metadata JBR must emit `SKIKO_JBR_INTEROP_FALLBACK reason=native-abi-mismatch` and produce no command frames. An old or otherwise uninstrumented Skiko-style log that produces neither command frames nor a structured fallback marker is treated as a validation failure instead of a successful fallback.

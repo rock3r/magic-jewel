@@ -36,6 +36,8 @@ EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES="${EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES:-0}
 EXPECT_MIN_JBR_EFFECT_HANDLE_EVICTS="${EXPECT_MIN_JBR_EFFECT_HANDLE_EVICTS:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS="${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS:-0}"
+EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES="${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES:--1}"
+EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES:--1}"
 EXPECT_MIN_POPUP_FRAMES="${EXPECT_MIN_POPUP_FRAMES:-0}"
 EXPECT_MIN_APP_NEW_FRAMES="${EXPECT_MIN_APP_NEW_FRAMES:-0}"
 EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS="${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS:-0}"
@@ -360,6 +362,8 @@ Environment:
   EXPECT_MIN_JBR_EFFECT_HANDLE_EVICTS In strict command mode, require at least this many JBR-side effect handle evict markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES In strict command mode, require at least this many JBR-side shader handle define markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS In strict command mode, require at least this many JBR-side shader handle evict markers. Default: 0.
+  EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side effect handle define markers. Default: disabled.
+  EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side shader handle define markers. Default: disabled.
   EXPECT_MIN_POPUP_FRAMES In strict command mode, require at least this many Swing popup paint markers. Default: 0.
   EXPECT_MIN_APP_NEW_FRAMES In strict command mode, require at least this many Magic Jewel Compose frame markers in the new renderer. Default: 0.
   EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS In strict command mode, require at least this many test-only tiny full-scene injections. Default: 0.
@@ -1568,6 +1572,18 @@ validate_report() {
         jbr_shader_handle_evicts="$(grep -c "${JBR_SHADER_HANDLE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${jbr_shader_handle_evicts}" -ge "${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS}" ]] ||
           failures+=("JBR shader handle evict markers ${jbr_shader_handle_evicts} below expected ${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS}")
+      fi
+      if [[ "${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES}" -ge 0 ]]; then
+        local jbr_effect_handle_defines
+        jbr_effect_handle_defines="$(grep -c "${JBR_EFFECT_HANDLE_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${jbr_effect_handle_defines}" -le "${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES}" ]] ||
+          failures+=("JBR effect handle define markers ${jbr_effect_handle_defines} above expected ${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES}")
+      fi
+      if [[ "${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES}" -ge 0 ]]; then
+        local jbr_shader_handle_defines
+        jbr_shader_handle_defines="$(grep -c "${JBR_SHADER_HANDLE_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${jbr_shader_handle_defines}" -le "${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES}" ]] ||
+          failures+=("JBR shader handle define markers ${jbr_shader_handle_defines} above expected ${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES}")
       fi
       if [[ "${EXPECT_MIN_POPUP_FRAMES}" -gt 0 ]]; then
         local popup_frames
