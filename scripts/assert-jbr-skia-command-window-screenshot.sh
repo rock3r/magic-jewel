@@ -236,7 +236,7 @@ for y in 0..<height {
             if r < 60 && g < 60 && b < 60 {
                 probeRightDark += 1
             }
-            if r < 60 && g < 100 && b < 190 {
+            if r < 80 && g < 115 && b < 205 {
                 probeRightShadow += 1
             }
         }

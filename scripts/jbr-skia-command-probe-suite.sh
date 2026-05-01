@@ -429,28 +429,19 @@ run_named_case() {
     commands-graphics-layer-shadow)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW=true \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW=true
       ;;
     commands-graphics-layer-round-shadow)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROUND_CLIP=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW=true \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW=true
       ;;
     commands-graphics-layer-path-shadow)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_PATH_CLIP=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW=true \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW=true
       ;;
     commands-graphics-layer-rotationx)
       run_case "$1" \
