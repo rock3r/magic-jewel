@@ -43,11 +43,14 @@ import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.CompositeShader
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -100,6 +103,7 @@ private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
+private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
@@ -291,6 +295,9 @@ private fun MagicJewelApp() {
     }
     val composeImageShaderEnabled = remember {
         System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
+    }
+    val composeCompositeShaderEnabled = remember {
+        System.getProperty(ComposeCompositeShaderProperty, "false").toBoolean()
     }
     val composeImageFilterEnabled = remember {
         System.getProperty(ComposeImageFilterProperty, "false").toBoolean()
@@ -540,6 +547,37 @@ private fun MagicJewelApp() {
                             alpha = 0.92f,
                         )
                     }
+                }
+                if (composeCompositeShaderEnabled) {
+                    val topLeft = Offset(size.width - 372f, size.height - 360f)
+                    val shader = CompositeShader(
+                        dst = LinearGradientShader(
+                            from = topLeft,
+                            to = topLeft + Offset(152f, 112f),
+                            colors = listOf(Color(0xFF06B6D4), Color(0xFFFDE047), Color(0xFFEF4444)),
+                            colorStops = listOf(0f, 0.46f, 1f),
+                            tileMode = TileMode.Clamp,
+                        ),
+                        src = RadialGradientShader(
+                            center = topLeft + Offset(112f, 38f),
+                            radius = 92f,
+                            colors = listOf(Color(0xFFFFFFFF), Color(0xAA8B5CF6), Color(0x00000000)),
+                            colorStops = listOf(0f, 0.54f, 1f),
+                            tileMode = TileMode.Clamp,
+                        ),
+                        blendMode = BlendMode.SrcOver,
+                    )
+                    drawRect(
+                        brush = ShaderBrush(shader),
+                        topLeft = topLeft,
+                        size = Size(152f, 112f),
+                    )
+                    drawRect(
+                        color = Color.White,
+                        topLeft = topLeft,
+                        size = Size(152f, 112f),
+                        style = Stroke(width = 3f),
+                    )
                 }
                 if (composeImageFilterEnabled) {
                     imageProbe?.let {

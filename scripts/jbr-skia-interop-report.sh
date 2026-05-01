@@ -49,6 +49,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER=false
+fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_FILTER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=false
 fi
@@ -193,6 +196,7 @@ fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
+export MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER
 export MAGIC_JEWEL_COMPOSE_IMAGE_FILTER
 export MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER
 export MAGIC_JEWEL_COMPOSE_COLOR_FILTER
@@ -320,6 +324,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader rendering probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER Enables a composite linear/radial shader descriptor probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_FILTER Enables an image tint color-filter command probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER Enables an image color-matrix descriptor command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER Enables a tint color-filter command replay probe. Default: false.
@@ -1114,6 +1119,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_TEXT: ${MAGIC_JEWEL_COMPOSE_TEXT}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE: ${MAGIC_JEWEL_COMPOSE_IMAGE}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE_SHADER: ${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER}"
+    echo "- MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER: ${MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE_FILTER: ${MAGIC_JEWEL_COMPOSE_IMAGE_FILTER}"
     echo "- MAGIC_JEWEL_COMPOSE_COLOR_FILTER: ${MAGIC_JEWEL_COMPOSE_COLOR_FILTER}"
     echo "- MAGIC_JEWEL_COMPOSE_COLOR_MATRIX_FILTER: ${MAGIC_JEWEL_COMPOSE_COLOR_MATRIX_FILTER}"
