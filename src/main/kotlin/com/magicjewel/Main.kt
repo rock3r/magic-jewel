@@ -588,16 +588,26 @@ private fun MagicJewelApp() {
                 }
                 if (composeRuntimeEffectShaderEnabled) {
                     val topLeft = Offset(size.width - 556f, size.height - 360f)
+                    val child = LinearGradientShader(
+                        from = topLeft,
+                        to = topLeft + Offset(152f, 112f),
+                        colors = listOf(Color(0xFF22D3EE), Color(0xFFFDE047), Color(0xFFEC4899)),
+                        colorStops = listOf(0f, 0.48f, 1f),
+                        tileMode = TileMode.Clamp,
+                    )
                     val shader = RuntimeEffectShader(
                         sksl = """
+                            uniform shader content;
                             uniform float phase;
                             half4 main(float2 p) {
+                                half4 base = content.eval(p);
                                 float wave = 0.5 + 0.5 * sin(p.x * 0.045 + phase * 6.28318);
                                 float band = smoothstep(0.15, 0.85, wave);
-                                return half4(band, 0.18 + p.y * 0.003, 1.0 - band, 1.0);
+                                return half4(mix(base.rgb, half3(band, 0.18 + p.y * 0.003, 1.0 - band), 0.55), 1.0);
                             }
                         """.trimIndent(),
                         uniforms = floatArrayOf(phase),
+                        children = listOf(child),
                     )
                     drawRect(
                         brush = ShaderBrush(shader),
