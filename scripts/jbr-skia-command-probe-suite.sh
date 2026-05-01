@@ -133,7 +133,8 @@ run_named_case() {
     commands-runtime-effect-shader)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER=true \
-        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1
       ;;
     commands-runtime-effect-pure-color)
       run_case "$1" \
@@ -154,12 +155,14 @@ run_named_case() {
     commands-runtime-effect-color-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER=true \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1
       ;;
     commands-runtime-effect-color-filter-child)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_CHILD=true \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1
       ;;
     commands-runtime-effect-build-fallback)
       run_case "$1" \
