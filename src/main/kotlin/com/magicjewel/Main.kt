@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.RuntimeEffectShader
+import androidx.compose.ui.graphics.RuntimeEffectUniform
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -607,6 +608,7 @@ private fun MagicJewelApp() {
                             }
                         """.trimIndent(),
                         uniforms = floatArrayOf(phase),
+                        uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
                         children = listOf(child),
                     )
                     drawRect(
