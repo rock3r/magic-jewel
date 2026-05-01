@@ -169,6 +169,8 @@ Stable descriptor rows also assert reuse with max-count gates: tint/color-matrix
 
 Surface identity changes are reported with `SKIKO_JBR_INTEROP_SURFACE_CHANGED oldContextId=... newContextId=... contextChanged=... surfaceChanged=... oldSurfaceId=... newSurfaceId=... oldMetalTexture=... newMetalTexture=...`. A non-zero `skiko_surface_change_markers` count means Skiko observed a different JBR destination surface during the run and discarded cached state tied to the previous surface. `contextChanged=false surfaceChanged=true` means a same-context surface replacement, such as resize. The `commands-resize-descriptor-redefine` row also requires `SKIKO_JBR_INTEROP_COMMAND_CACHES_CLEARED reason=...` and a second JBR effect-handle define after resize, proving the CMP recorder cache was invalidated before the new surface reused descriptor refs.
 
+If Skiko cannot reach the CMP command-cache clear hook after a surface change, it emits `SKIKO_JBR_INTEROP_FALLBACK reason=command-cache-clear-unavailable`; the report validator treats that as a structured compatibility fallback.
+
 The report validator also has explicit compatibility-matrix fixtures. A new Skiko build running against an old/pre-native-metadata JBR must emit `SKIKO_JBR_INTEROP_FALLBACK reason=native-abi-mismatch` and produce no command frames. An old or otherwise uninstrumented Skiko-style log that produces neither command frames nor a structured fallback marker is treated as a validation failure instead of a successful fallback.
 
 Async-profiler collection is optional and off by default:

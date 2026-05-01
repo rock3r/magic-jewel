@@ -587,7 +587,8 @@ run_mode() {
       if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ||
           "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "abi-mismatch" ||
           "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-capability-mismatch" ||
-          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "public-api-missing" ]]; then
+          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "public-api-missing" ||
+          "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-cache-clear-unavailable" ]]; then
         ready_marker="${FALLBACK_MARKER}"
       else
         ready_marker="${SKIKO_PICTURE_MARKER}"
@@ -1474,6 +1475,10 @@ validate_report() {
         if ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
           failures+=("missing rendered=false command frame for RuntimeEffect build fallback")
         fi
+      elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-cache-clear-unavailable" ]]; then
+        if ! grep -q "${FALLBACK_MARKER} reason=command-cache-clear-unavailable" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("missing command-cache-clear-unavailable fallback marker")
+        fi
       else
         [[ "${skiko_command_frames}" -eq 0 ]] || failures+=("unexpected Skiko command frames during expected fallback: ${skiko_command_frames}")
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during expected fallback: ${jbr_command_frames}")
@@ -1645,7 +1650,7 @@ validate_report() {
       fi
     fi
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" != "true" ||
-        ! "${EXPECT_COMMAND_FALLBACK_REASON:-}" =~ ^(abi-mismatch|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing|runtime-effect-compile-failed|runtime-effect-build-failed)$ ]]; then
+        ! "${EXPECT_COMMAND_FALLBACK_REASON:-}" =~ ^(abi-mismatch|command-cache-clear-unavailable|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing|runtime-effect-compile-failed|runtime-effect-build-failed)$ ]]; then
       [[ "${screenshot_status}" == "passed" ]] || failures+=("screenshot assertion did not pass")
     fi
   fi

@@ -896,6 +896,21 @@ public_api_missing_fallback_passes() {
   run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=public-api-missing
 }
 
+command_cache_clear_unavailable_fallback_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "MAGIC_JEWEL_COMPOSE_FRAME frame=1"
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=command-cache-clear-unavailable"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-cache-clear-unavailable
+}
+
 handshake_fallback_fails_with_command_frames() {
   local dir
   dir="$(make_report_dir)"
@@ -971,6 +986,7 @@ new_skiko_old_jbr_fallback_matrix_passes
 old_skiko_new_jbr_without_structured_marker_fails
 command_capability_mismatch_fallback_passes
 public_api_missing_fallback_passes
+command_cache_clear_unavailable_fallback_passes
 handshake_fallback_fails_with_command_frames
 
 echo "JBR_SKIA_REPORT_VALIDATION_TESTS passed"
