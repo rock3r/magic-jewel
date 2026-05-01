@@ -115,6 +115,7 @@ private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
 private const val ComposeRuntimeEffectShaderProperty = "magic.jewel.compose.runtimeEffectShader"
+private const val ComposeRuntimeEffectShaderColorFilterProperty = "magic.jewel.compose.runtimeEffectShaderColorFilter"
 private const val ComposeRuntimeEffectPureColorProperty = "magic.jewel.compose.runtimeEffectPureColor"
 private const val ComposeRuntimeEffectUniformOnlyProperty = "magic.jewel.compose.runtimeEffectUniformOnly"
 private const val ComposeRuntimeEffectChildOnlyProperty = "magic.jewel.compose.runtimeEffectChildOnly"
@@ -334,6 +335,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectShaderEnabled = remember {
         System.getProperty(ComposeRuntimeEffectShaderProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectShaderColorFilterEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectShaderColorFilterProperty, "false").toBoolean()
     }
     val composeRuntimeEffectPureColorEnabled = remember {
         System.getProperty(ComposeRuntimeEffectPureColorProperty, "false").toBoolean()
@@ -721,6 +725,33 @@ private fun MagicJewelApp() {
                         topLeft = topLeft,
                         size = Size(152f, 112f),
                     )
+                    drawRect(color = Color.White, topLeft = topLeft, size = Size(152f, 112f), style = Stroke(width = 3f))
+                }
+                if (composeRuntimeEffectShaderColorFilterEnabled) {
+                    val topLeft = Offset(size.width - 556f, size.height - 488f)
+                    val shader = RuntimeEffectShader(
+                        sksl = """
+                            uniform float phase;
+                            half4 main(float2 p) {
+                                float wave = 0.5 + 0.5 * sin((p.x + p.y) * 0.045 + phase * 6.28318);
+                                return half4(wave, 0.22, 1.0 - wave, 1.0);
+                            }
+                        """.trimIndent(),
+                        uniforms = floatArrayOf(phase),
+                        uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
+                    )
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 152f,
+                            bottom = topLeft.y + 112f,
+                            paint = Paint().apply {
+                                this.shader = shader
+                                colorFilter = ColorFilter.tint(Color(0xFFFFD166), BlendMode.SrcIn)
+                            },
+                        )
+                    }
                     drawRect(color = Color.White, topLeft = topLeft, size = Size(152f, 112f), style = Stroke(width = 3f))
                 }
                 if (composeRuntimeEffectShaderEnabled) {
