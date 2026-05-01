@@ -176,6 +176,9 @@ do {
         Region(name: "full", x: 0, y: 0, width: compareWidth, height: compareHeight),
         clampRegion(name: "headerControls", x: 0.05, y: 0.08, width: 0.55, height: 0.15, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeCanvas", x: 0.07, y: 0.21, width: 0.86, height: 0.69, imageWidth: compareWidth, imageHeight: compareHeight),
+        clampRegion(name: "composeBackdropLeft", x: 0.08, y: 0.24, width: 0.32, height: 0.26, imageWidth: compareWidth, imageHeight: compareHeight),
+        clampRegion(name: "composeCenterAnimation", x: 0.42, y: 0.43, width: 0.20, height: 0.28, imageWidth: compareWidth, imageHeight: compareHeight),
+        clampRegion(name: "composeBottomLabels", x: 0.08, y: 0.72, width: 0.40, height: 0.18, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "swingIsland", x: 0.62, y: 0.24, width: 0.33, height: 0.21, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "rightProbeStrip", x: 0.70, y: 0.22, width: 0.26, height: 0.68, imageWidth: compareWidth, imageHeight: compareHeight),
     ]
