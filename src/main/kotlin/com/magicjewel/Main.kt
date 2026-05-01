@@ -141,6 +141,7 @@ private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel
 private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.graphicsLayerShadow"
 private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.graphicsLayerRotationX"
 private const val ComposeGraphicsLayerOffscreenProperty = "magic.jewel.compose.graphicsLayerOffscreen"
+private const val ComposeGraphicsLayerModulateAlphaProperty = "magic.jewel.compose.graphicsLayerModulateAlpha"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -410,6 +411,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerOffscreenEnabled = remember {
         System.getProperty(ComposeGraphicsLayerOffscreenProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerModulateAlphaEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerModulateAlphaProperty, "false").toBoolean()
     }
     val swingIslandEnabled = remember {
         System.getProperty(SwingIslandProperty, "true").toBoolean()
@@ -1745,6 +1749,8 @@ private fun MagicJewelApp() {
                             }
                             if (composeGraphicsLayerOffscreenEnabled) {
                                 compositingStrategy = CompositingStrategy.Offscreen
+                            } else if (composeGraphicsLayerModulateAlphaEnabled) {
+                                compositingStrategy = CompositingStrategy.ModulateAlpha
                             }
                             if (composeGraphicsLayerColorFilterEnabled) {
                                 colorFilter = ColorFilter.tint(Color(0xFF22D3EE))
