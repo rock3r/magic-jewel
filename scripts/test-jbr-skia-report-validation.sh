@@ -541,6 +541,20 @@ strict_command_requires_min_jbr_effect_handle_uses() {
   grep -q "^jbr_effect_handle_use_frames=1$" "${dir}/summary.properties"
 }
 
+strict_command_requires_min_jbr_effect_handle_cache_hits() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_EFFECT_HANDLE_CACHE_HIT backend=java2d contextId=0x1234 handle=0x4567 op=47"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+  grep -q "^jbr_effect_handle_cache_hit_frames=1$" "${dir}/summary.properties"
+}
+
 strict_command_requires_min_jbr_shader_handle_defines() {
   local dir
   dir="$(make_report_dir)"
@@ -581,6 +595,20 @@ strict_command_requires_min_jbr_shader_handle_uses() {
 
   run_validate_only "${dir}" EXPECT_MIN_JBR_SHADER_HANDLE_USES=1
   grep -q "^jbr_shader_handle_use_frames=1$" "${dir}/summary.properties"
+}
+
+strict_command_requires_min_jbr_shader_handle_cache_hits() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_SHADER_HANDLE_CACHE_HIT backend=java2d contextId=0x1234 handle=0x4567 op=58"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1
+  grep -q "^jbr_shader_handle_cache_hit_frames=1$" "${dir}/summary.properties"
 }
 
 strict_command_requires_max_jbr_effect_handle_defines() {
@@ -991,9 +1019,11 @@ strict_command_requires_min_jbr_image_cache_evicts
 strict_command_requires_min_jbr_effect_handle_defines
 strict_command_requires_min_jbr_effect_handle_uses
 strict_command_requires_min_jbr_effect_handle_evicts
+strict_command_requires_min_jbr_effect_handle_cache_hits
 strict_command_requires_min_jbr_shader_handle_defines
 strict_command_requires_min_jbr_shader_handle_uses
 strict_command_requires_min_jbr_shader_handle_evicts
+strict_command_requires_min_jbr_shader_handle_cache_hits
 strict_command_requires_max_jbr_effect_handle_defines
 strict_command_fails_above_max_jbr_effect_handle_defines
 strict_command_requires_max_jbr_shader_handle_defines

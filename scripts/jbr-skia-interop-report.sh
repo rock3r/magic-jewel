@@ -35,9 +35,11 @@ EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS="${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS:-0}"
 EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES="${EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES:-0}"
 EXPECT_MIN_JBR_EFFECT_HANDLE_USES="${EXPECT_MIN_JBR_EFFECT_HANDLE_USES:-0}"
 EXPECT_MIN_JBR_EFFECT_HANDLE_EVICTS="${EXPECT_MIN_JBR_EFFECT_HANDLE_EVICTS:-0}"
+EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS="${EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_USES="${EXPECT_MIN_JBR_SHADER_HANDLE_USES:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS="${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS:-0}"
+EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS="${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS:-0}"
 EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES="${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES:--1}"
 EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES:--1}"
 EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE="${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE:-}"
@@ -319,9 +321,11 @@ JBR_IMAGE_CACHE_EVICT_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_EVICT"
 JBR_EFFECT_HANDLE_DEFINE_MARKER="JBR_SKIA_INTEROP_EFFECT_HANDLE_DEFINE"
 JBR_EFFECT_HANDLE_USE_MARKER="JBR_SKIA_INTEROP_EFFECT_HANDLE_USE"
 JBR_EFFECT_HANDLE_EVICT_MARKER="JBR_SKIA_INTEROP_EFFECT_HANDLE_EVICT"
+JBR_EFFECT_HANDLE_CACHE_HIT_MARKER="JBR_SKIA_INTEROP_EFFECT_HANDLE_CACHE_HIT"
 JBR_SHADER_HANDLE_DEFINE_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_DEFINE"
 JBR_SHADER_HANDLE_USE_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_USE"
 JBR_SHADER_HANDLE_EVICT_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_EVICT"
+JBR_SHADER_HANDLE_CACHE_HIT_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_CACHE_HIT"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
 SKIKO_COMMAND_CACHES_CLEARED_MARKER="SKIKO_JBR_INTEROP_COMMAND_CACHES_CLEARED"
 SKIKO_TINY_FULL_SCENE_MARKER="SKIKO_JBR_INTEROP_TINY_FULL_SCENE_INJECTED"
@@ -380,9 +384,11 @@ Environment:
   EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES In strict command mode, require at least this many JBR-side effect handle define markers. Default: 0.
   EXPECT_MIN_JBR_EFFECT_HANDLE_USES In strict command mode, require at least this many JBR-side effect handle use markers. Default: 0.
   EXPECT_MIN_JBR_EFFECT_HANDLE_EVICTS In strict command mode, require at least this many JBR-side effect handle evict markers. Default: 0.
+  EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS In strict command mode, require at least this many JBR-side effect handle cache-hit markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES In strict command mode, require at least this many JBR-side shader handle define markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_USES In strict command mode, require at least this many JBR-side shader handle use markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS In strict command mode, require at least this many JBR-side shader handle evict markers. Default: 0.
+  EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS In strict command mode, require at least this many JBR-side shader handle cache-hit markers. Default: 0.
   EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side effect handle define markers. Default: disabled.
   EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side shader handle define markers. Default: disabled.
   EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE When EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed, require a matching stage=<value> marker. Default: disabled.
@@ -1120,9 +1126,11 @@ write_machine_summary() {
     echo "jbr_effect_handle_define_frames=$(grep -c "${JBR_EFFECT_HANDLE_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_effect_handle_use_frames=$(grep -c "${JBR_EFFECT_HANDLE_USE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_effect_handle_evict_frames=$(grep -c "${JBR_EFFECT_HANDLE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "jbr_effect_handle_cache_hit_frames=$(grep -c "${JBR_EFFECT_HANDLE_CACHE_HIT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_shader_handle_define_frames=$(grep -c "${JBR_SHADER_HANDLE_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_shader_handle_use_frames=$(grep -c "${JBR_SHADER_HANDLE_USE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_shader_handle_evict_frames=$(grep -c "${JBR_SHADER_HANDLE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "jbr_shader_handle_cache_hit_frames=$(grep -c "${JBR_SHADER_HANDLE_CACHE_HIT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_command_cache_clear_markers=$(grep -c "${SKIKO_COMMAND_CACHES_CLEARED_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_tiny_full_scene_injections=$(grep -c "${SKIKO_TINY_FULL_SCENE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
@@ -1199,16 +1207,20 @@ write_report() {
   local jbr_effect_handle_define_summary
   local jbr_effect_handle_use_summary
   local jbr_effect_handle_evict_summary
+  local jbr_effect_handle_cache_hit_summary
   local jbr_shader_handle_define_summary
   local jbr_shader_handle_use_summary
   local jbr_shader_handle_evict_summary
+  local jbr_shader_handle_cache_hit_summary
   local skiko_command_cache_clear_summary
   jbr_effect_handle_define_summary="$(frame_marker_summary "${JBR_EFFECT_HANDLE_DEFINE_MARKER}" "${new_full_log}")"
   jbr_effect_handle_use_summary="$(frame_marker_summary "${JBR_EFFECT_HANDLE_USE_MARKER}" "${new_full_log}")"
   jbr_effect_handle_evict_summary="$(frame_marker_summary "${JBR_EFFECT_HANDLE_EVICT_MARKER}" "${new_full_log}")"
+  jbr_effect_handle_cache_hit_summary="$(frame_marker_summary "${JBR_EFFECT_HANDLE_CACHE_HIT_MARKER}" "${new_full_log}")"
   jbr_shader_handle_define_summary="$(frame_marker_summary "${JBR_SHADER_HANDLE_DEFINE_MARKER}" "${new_full_log}")"
   jbr_shader_handle_use_summary="$(frame_marker_summary "${JBR_SHADER_HANDLE_USE_MARKER}" "${new_full_log}")"
   jbr_shader_handle_evict_summary="$(frame_marker_summary "${JBR_SHADER_HANDLE_EVICT_MARKER}" "${new_full_log}")"
+  jbr_shader_handle_cache_hit_summary="$(frame_marker_summary "${JBR_SHADER_HANDLE_CACHE_HIT_MARKER}" "${new_full_log}")"
   skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}")"
   skiko_command_cache_clear_summary="$(frame_marker_summary "${SKIKO_COMMAND_CACHES_CLEARED_MARKER}" "${new_full_log}")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
@@ -1366,9 +1378,11 @@ write_report() {
     echo "- JBR effect handle defines: ${jbr_effect_handle_define_summary}"
     echo "- JBR effect handle uses: ${jbr_effect_handle_use_summary}"
     echo "- JBR effect handle evicts: ${jbr_effect_handle_evict_summary}"
+    echo "- JBR effect handle cache hits: ${jbr_effect_handle_cache_hit_summary}"
     echo "- JBR shader handle defines: ${jbr_shader_handle_define_summary}"
     echo "- JBR shader handle uses: ${jbr_shader_handle_use_summary}"
     echo "- JBR shader handle evicts: ${jbr_shader_handle_evict_summary}"
+    echo "- JBR shader handle cache hits: ${jbr_shader_handle_cache_hit_summary}"
     echo
     echo "## Surface Identity Markers"
     echo
@@ -1616,6 +1630,12 @@ validate_report() {
         [[ "${jbr_effect_handle_evicts}" -ge "${EXPECT_MIN_JBR_EFFECT_HANDLE_EVICTS}" ]] ||
           failures+=("JBR effect handle evict markers ${jbr_effect_handle_evicts} below expected ${EXPECT_MIN_JBR_EFFECT_HANDLE_EVICTS}")
       fi
+      if [[ "${EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS}" -gt 0 ]]; then
+        local jbr_effect_handle_cache_hits
+        jbr_effect_handle_cache_hits="$(grep -c "${JBR_EFFECT_HANDLE_CACHE_HIT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${jbr_effect_handle_cache_hits}" -ge "${EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS}" ]] ||
+          failures+=("JBR effect handle cache-hit markers ${jbr_effect_handle_cache_hits} below expected ${EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS}")
+      fi
       if [[ "${EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES}" -gt 0 ]]; then
         local jbr_shader_handle_defines
         jbr_shader_handle_defines="$(grep -c "${JBR_SHADER_HANDLE_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
@@ -1633,6 +1653,12 @@ validate_report() {
         jbr_shader_handle_evicts="$(grep -c "${JBR_SHADER_HANDLE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${jbr_shader_handle_evicts}" -ge "${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS}" ]] ||
           failures+=("JBR shader handle evict markers ${jbr_shader_handle_evicts} below expected ${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS}")
+      fi
+      if [[ "${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS}" -gt 0 ]]; then
+        local jbr_shader_handle_cache_hits
+        jbr_shader_handle_cache_hits="$(grep -c "${JBR_SHADER_HANDLE_CACHE_HIT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${jbr_shader_handle_cache_hits}" -ge "${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS}" ]] ||
+          failures+=("JBR shader handle cache-hit markers ${jbr_shader_handle_cache_hits} below expected ${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS}")
       fi
       if [[ "${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES}" -ge 0 ]]; then
         local jbr_effect_handle_defines
