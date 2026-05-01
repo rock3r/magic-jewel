@@ -941,6 +941,20 @@ private fun MagicJewelApp() {
                                 pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 9f), 4f)
                             },
                         )
+                        val dashedPath = Path().apply {
+                            moveTo(size.width - 414f, 300f)
+                            cubicTo(size.width - 364f, 260f, size.width - 318f, 346f, size.width - 262f, 306f)
+                            lineTo(size.width - 236f, 348f)
+                        }
+                        canvas.drawPath(
+                            path = dashedPath,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFFFFF)
+                                style = PaintingStyle.Stroke
+                                strokeWidth = 5f
+                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 7f), 3f)
+                            },
+                        )
                     }
                 }
                 if (composeBlendModeEnabled) {

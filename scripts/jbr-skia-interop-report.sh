@@ -424,7 +424,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_LIGHTING_FILTER Enables a lighting descriptor command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_DESCRIPTOR_EVICTION Draws enough unique effect/shader descriptors to force LRU handle eviction. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE Enables the descriptor-handle color-filter replay variant. Default: false.
-  MAGIC_JEWEL_COMPOSE_PATH_EFFECT Enables dashed line/rectangle/rounded-rectangle path-effect command replay probes. Default: false.
+  MAGIC_JEWEL_COMPOSE_PATH_EFFECT Enables dashed line/rectangle/rounded-rectangle/arbitrary-path path-effect command replay probes. Default: false.
   MAGIC_JEWEL_COMPOSE_BLEND_MODE Enables Plus/Multiply/Screen/Overlay/Darken/Lighten/Difference/Exclusion/ColorDodge/ColorBurn/Hardlight/Softlight/Hue/Saturation/Color/Luminosity blend-mode command replay probes. Default: false.
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER Enables a graphics-layer command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP Adds a rectangular clip to the graphics-layer command replay probe. Default: false.
