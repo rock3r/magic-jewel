@@ -595,6 +595,21 @@ expected_image_fallback_passes() {
   grep -q "^jbr_picture_frames=1$" "${dir}/summary.properties"
 }
 
+expected_nested_fallback_reason_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_NESTED_UNSUPPORTED commands=42 unsupported=1 sweepGradientStops=1"
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=1 graphicsLayer=1"
+    echo "SKIKO_JBR_INTEROP_PICTURE_FRAME bytes=4096 rendered=true"
+    echo "JBR_SKIA_INTEROP_PICTURE_FRAME bytes=4096 rendered=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=sweepGradientStops
+  grep -q "sweepGradientStops:1" "${dir}/summary.properties"
+  grep -q "graphicsLayer:1" "${dir}/summary.properties"
+}
+
 expected_fallback_requires_reason() {
   local dir
   dir="$(make_report_dir)"
@@ -788,6 +803,7 @@ strict_command_fails_without_popup_window_screenshot
 strict_command_requires_menu_marker_and_min_frames
 strict_command_fails_without_menu_marker
 expected_image_fallback_passes
+expected_nested_fallback_reason_passes
 expected_fallback_requires_reason
 command_stream_invalid_fallback_passes
 runtime_effect_compile_failure_fallback_passes

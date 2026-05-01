@@ -220,7 +220,7 @@ for y in 0..<height {
             }
         }
         if inRect(x: x, y: y, left: probeRightRect.left, top: probeRightRect.top, right: probeRightRect.right, bottom: probeRightRect.bottom) {
-            if r > 90 && b > 140 && g < 120 {
+            if r > 90 && b > 140 && g < 190 && b > g {
                 probeRightPurple += 1
             }
             if r > 200 && g > 110 && g < 190 && b < 120 {
@@ -406,8 +406,11 @@ if graphicsLayerClipProbe || graphicsLayerRoundClipProbe || graphicsLayerPathCli
     probeChecks.append(("probeRightCyan", probeRightCyan, 1000))
     probeChecks.append(("probeRightPurple", probeRightPurple, 1000))
 }
-if graphicsLayerColorFilterProbe || graphicsLayerColorMatrixFilterProbe {
+if graphicsLayerColorFilterProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 1000))
+}
+if graphicsLayerColorMatrixFilterProbe {
+    probeChecks.append(("probeRightPurple", probeRightPurple, 1000))
 }
 if drawPathProbe {
     probeChecks.append(("probeRightOrange", probeRightOrange, 2000))

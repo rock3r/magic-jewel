@@ -291,6 +291,7 @@ JBR_IMAGE_CACHE_EVICT_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_EVICT"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
 SKIKO_TINY_FULL_SCENE_MARKER="SKIKO_JBR_INTEROP_TINY_FULL_SCENE_INJECTED"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
+CMP_COMMAND_RECORDER_NESTED_MARKER="CMP_JBR_COMMAND_RECORDER_NESTED_UNSUPPORTED"
 CMP_COMMAND_FRAME_KIND_MARKER="CMP_JBR_COMMAND_FRAME_KIND"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
 MIXED_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_MIXED_SCREENSHOT_COUNTS"
@@ -916,8 +917,8 @@ max_command_recorder_field() {
 
 command_recorder_reasons() {
   local log="$1"
-  awk -v marker="${CMP_COMMAND_RECORDER_MARKER}" '
-    index($0, marker) {
+  awk -v marker="${CMP_COMMAND_RECORDER_MARKER}" -v nested_marker="${CMP_COMMAND_RECORDER_NESTED_MARKER}" '
+    index($0, marker) || index($0, nested_marker) {
       for (i = 1; i <= NF; i++) {
         split($i, value, "=")
         if (value[2] ~ /^[0-9]+$/ &&
@@ -1429,7 +1430,7 @@ validate_report() {
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during expected fallback: ${jbr_command_frames}")
         [[ "${skiko_picture_frames}" -gt 0 ]] || failures+=("no Skiko picture frames during expected fallback")
         [[ "${jbr_picture_frames}" -gt 0 ]] || failures+=("no JBR picture frames during expected fallback")
-        if ! grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*.*${EXPECT_COMMAND_FALLBACK_REASON}=" "${new_log}" 2>/dev/null; then
+        if ! grep -Eq "(${CMP_COMMAND_RECORDER_MARKER}|${CMP_COMMAND_RECORDER_NESTED_MARKER}).*unsupported=[1-9][0-9]*.*${EXPECT_COMMAND_FALLBACK_REASON}=" "${new_log}" 2>/dev/null; then
           failures+=("CMP recorder did not report ${EXPECT_COMMAND_FALLBACK_REASON} as an unsupported command operation")
         fi
       fi
@@ -1443,7 +1444,7 @@ validate_report() {
       [[ "${command_frame_delta}" -le 1 ]] || failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames}")
       [[ "${skiko_picture_frames}" -eq 0 ]] || failures+=("unexpected Skiko picture frames in strict command mode: ${skiko_picture_frames}")
       [[ "${jbr_picture_frames}" -eq 0 ]] || failures+=("unexpected JBR picture frames in strict command mode: ${jbr_picture_frames}")
-      if grep -Eq "${CMP_COMMAND_RECORDER_MARKER}.*unsupported=[1-9][0-9]*" "${new_log}" 2>/dev/null; then
+      if grep -Eq "(${CMP_COMMAND_RECORDER_MARKER}|${CMP_COMMAND_RECORDER_NESTED_MARKER}).*unsupported=[1-9][0-9]*" "${new_log}" 2>/dev/null; then
         failures+=("CMP recorder reported unsupported command operations")
       fi
       if [[ "${EXPECT_MIN_TEXT_COMMANDS}" -gt 0 ]]; then
