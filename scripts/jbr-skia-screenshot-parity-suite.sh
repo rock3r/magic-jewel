@@ -9,7 +9,7 @@ DURATION_SECONDS="${DURATION_SECONDS:-6}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 PARITY_SCRIPT="${PARITY_SCRIPT:-${SCRIPT_DIR}/jbr-skia-screenshot-parity.sh}"
-CASES="${CASES:-parity-rich parity-geometry-clean parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-graphics-layer-effects}"
+CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-graphics-layer-effects}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -66,6 +66,15 @@ run_named_case() {
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.11 \
         MAX_SWING_ISLAND_BAD_PIXEL_RATIO=0.08 \
         EXPECT_MIN_IMAGE_REFS=0
+      ;;
+    parity-native-text)
+      run_case "$1" \
+        JBR_SKIA_NATIVE_TEXT=true \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=true \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=true \
+        EXPECT_MIN_IMAGE_REFS=0 \
+        EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS=4 \
+        MAX_BAD_PIXEL_RATIO=0.05
       ;;
     parity-runtime-effect-pure-color)
       run_case "$1" \
