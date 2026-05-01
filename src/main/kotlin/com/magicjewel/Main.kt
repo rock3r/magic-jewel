@@ -113,6 +113,7 @@ private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
+private const val ComposeImageShaderColorFilterProperty = "magic.jewel.compose.imageShaderColorFilter"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
 private const val ComposeCompositeShaderColorFilterProperty = "magic.jewel.compose.compositeShaderColorFilter"
 private const val ComposeRuntimeEffectShaderProperty = "magic.jewel.compose.runtimeEffectShader"
@@ -332,6 +333,9 @@ private fun MagicJewelApp() {
     val composeImageShaderEnabled = remember {
         System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
     }
+    val composeImageShaderColorFilterEnabled = remember {
+        System.getProperty(ComposeImageShaderColorFilterProperty, "false").toBoolean()
+    }
     val composeCompositeShaderEnabled = remember {
         System.getProperty(ComposeCompositeShaderProperty, "false").toBoolean()
     }
@@ -518,10 +522,16 @@ private fun MagicJewelApp() {
     val imageProbe = remember(
         composeImageEnabled,
         composeImageShaderEnabled,
+        composeImageShaderColorFilterEnabled,
         composeImageFilterEnabled,
         composeImageColorMatrixFilterEnabled,
     ) {
-        if (composeImageEnabled || composeImageShaderEnabled || composeImageFilterEnabled || composeImageColorMatrixFilterEnabled) {
+        if (composeImageEnabled ||
+            composeImageShaderEnabled ||
+            composeImageShaderColorFilterEnabled ||
+            composeImageFilterEnabled ||
+            composeImageColorMatrixFilterEnabled
+        ) {
             createImageProbe()
         } else {
             null
@@ -639,6 +649,25 @@ private fun MagicJewelApp() {
                             size = Size(140f, 116f),
                             alpha = 0.92f,
                         )
+                    }
+                }
+                if (composeImageShaderColorFilterEnabled) {
+                    imageProbe?.let {
+                        val topLeft = Offset(size.width - 596f, size.height - 224f)
+                        drawIntoCanvas { canvas ->
+                            canvas.drawRect(
+                                left = topLeft.x,
+                                top = topLeft.y,
+                                right = topLeft.x + 140f,
+                                bottom = topLeft.y + 116f,
+                                paint = Paint().apply {
+                                    shader = ImageShader(it, TileMode.Repeated, TileMode.Mirror)
+                                    colorFilter = ColorFilter.tint(Color(0xFFFFD166), BlendMode.SrcIn)
+                                    alpha = 0.92f
+                                },
+                            )
+                        }
+                        drawRect(color = Color.White, topLeft = topLeft, size = Size(140f, 116f), style = Stroke(width = 3f))
                     }
                 }
                 if (composeCompositeShaderEnabled) {
