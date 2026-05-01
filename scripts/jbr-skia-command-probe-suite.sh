@@ -156,7 +156,8 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER=true \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed
+        EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed \
+        EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE=missing-child
       ;;
     commands-image-filter)
       run_case "$1" \

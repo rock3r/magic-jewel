@@ -38,6 +38,7 @@ EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES:-0}
 EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS="${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS:-0}"
 EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES="${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES:--1}"
 EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES:--1}"
+EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE="${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE:-}"
 EXPECT_MIN_POPUP_FRAMES="${EXPECT_MIN_POPUP_FRAMES:-0}"
 EXPECT_MIN_APP_NEW_FRAMES="${EXPECT_MIN_APP_NEW_FRAMES:-0}"
 EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS="${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS:-0}"
@@ -366,6 +367,7 @@ Environment:
   EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS In strict command mode, require at least this many JBR-side shader handle evict markers. Default: 0.
   EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side effect handle define markers. Default: disabled.
   EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side shader handle define markers. Default: disabled.
+  EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE When EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed, require a matching stage=<value> marker. Default: disabled.
   EXPECT_MIN_POPUP_FRAMES In strict command mode, require at least this many Swing popup paint markers. Default: 0.
   EXPECT_MIN_APP_NEW_FRAMES In strict command mode, require at least this many Magic Jewel Compose frame markers in the new renderer. Default: 0.
   EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS In strict command mode, require at least this many test-only tiny full-scene injections. Default: 0.
@@ -1471,6 +1473,10 @@ validate_report() {
         [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during RuntimeEffect build fallback: ${jbr_command_frames}")
         if ! grep -q "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null; then
           failures+=("missing RuntimeEffect build-failure marker")
+        fi
+        if [[ -n "${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE}" ]] &&
+            ! grep -Eq "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}.*stage=${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE}" "${OUT_DIR}/new.log" 2>/dev/null; then
+          failures+=("missing RuntimeEffect build-failure stage marker: ${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE}")
         fi
         if ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
           failures+=("missing rendered=false command frame for RuntimeEffect build fallback")

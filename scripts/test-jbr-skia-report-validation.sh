@@ -792,7 +792,7 @@ runtime_effect_compile_failure_fallback_passes() {
   {
     echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
     echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=false"
-    echo "JBR_SKIA_INTEROP_RUNTIME_EFFECT_COMPILE_FAILED hash=0x0123456789abcdef skslLength=42 uniforms=1 children=0 errorLength=17"
+    echo "JBR_SKIA_INTEROP_RUNTIME_EFFECT_COMPILE_FAILED hash=0x0123456789abcdef skslLength=42 uniforms=1 children=0 errorLength=17 errorHash=0xfedcba9876543210"
   } > "${dir}/new.log"
 
   run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-compile-failed
@@ -806,10 +806,10 @@ runtime_effect_build_failure_fallback_passes() {
   {
     echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
     echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=false"
-    echo "JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FAILED hash=0x0123456789abcdef skslLength=42 uniforms=1 children=1 namedUniforms=1 namedChildren=1"
+    echo "JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FAILED hash=0x0123456789abcdef stage=missing-child nameHash=0xfedcba9876543210 skslLength=42 uniforms=1 children=1 namedUniforms=1 namedChildren=1"
   } > "${dir}/new.log"
 
-  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE=missing-child
   grep -q "^jbr_runtime_effect_build_failures=1$" "${dir}/summary.properties"
 }
 

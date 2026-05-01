@@ -158,9 +158,9 @@ Set `EXPECT_MIN_APP_NEW_FRAMES=5` on a normal command-mode report to fail if the
 Each report directory includes `report.md` for humans and `summary.properties` for automation. The properties file uses stable `key=value` entries such as `validation_status`, `fallback_new_count`, `host_cpu_count`, `host_load_1m`, `old_avg_cpu`, `new_avg_cpu`, `cmp_unsupported_reasons`, `cmp_frame_kind_full_scene`, `cmp_frame_kind_interop_only`, `skiko_command_frames`, `jbr_command_frames`, `jbr_command_fps`, `jbr_runtime_effect_compile_failures`, `jbr_runtime_effect_build_failures`, `jbr_effect_handle_define_frames`, `jbr_shader_handle_define_frames`, `app_new_fps`, `skiko_surface_change_markers`, `skiko_tiny_full_scene_injections`, `screenshot_parity_avgDelta`, `screenshot_parity_region_composeCanvas_badPixelRatio`, and scalar screenshot counters like `screenshot_paragraphCentered` or `screenshot_probeRightDark`.
 
 RuntimeEffect compile failures are reported with stable single-line markers:
-`JBR_SKIA_INTEROP_RUNTIME_EFFECT_COMPILE_FAILED hash=0x... skslLength=... uniforms=... children=... errorLength=...`.
+`JBR_SKIA_INTEROP_RUNTIME_EFFECT_COMPILE_FAILED hash=0x... skslLength=... uniforms=... children=... errorLength=... errorHash=0x...`.
 RuntimeEffect builder failures are reported with stable single-line markers:
-`JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FAILED hash=0x... skslLength=... uniforms=... children=... namedUniforms=... namedChildren=...`.
+`JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FAILED hash=0x... stage=missing-child|uniform-set|make-shader [nameHash=0x...] skslLength=... uniforms=... children=... namedUniforms=... namedChildren=...`.
 The RuntimeEffect command suite can run the combined probe (`commands-runtime-effect-shader`) or narrower conformance probes: `commands-runtime-effect-pure-color`, `commands-runtime-effect-uniform-only`, `commands-runtime-effect-child-only`, and `commands-runtime-effect-build-fallback`.
 
 The descriptor lifecycle probe (`commands-descriptor-eviction`) enables `MAGIC_JEWEL_COMPOSE_DESCRIPTOR_EVICTION=true` and `MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE=true`, then draws enough unique effect and composite-shader descriptors to exceed CMP's 1,024-entry handle caches. It asserts both define and evict markers in the full JBR log.
