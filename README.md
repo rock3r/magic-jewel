@@ -18,6 +18,14 @@ JBR Skia interop path, using the same patched module/native-library flags as the
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/run-jbr-skia.sh
 ```
 
+Refresh local patched JBR artifacts:
+
+```bash
+./scripts/rebuild-jbr-skia-local-artifacts.sh
+```
+
+The helper rebuilds the public JBR API shim, compiles the patched `java.desktop` classes into `/tmp/jbr-skia-run/desktop`, removes the temporary `com.jetbrains.exported` compile stub from that patch output, and links `/tmp/jbr-skia-native/libjbrskiainterop.dylib` against the local Skia archive from the Skiko worktree. Override `JBR_ROOT`, `JBR_API_ROOT`, `SKIKO_ROOT`, `SKIA_ROOT`, `DESKTOP_PATCH_DIR`, `JBR_API_SHIM`, or `NATIVE_LIB` if your worktrees or artifact paths move.
+
 By default Magic Jewel compiles against and the interop run prepends patched CMP jars from `/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core`. Override that with `LOCAL_CMP_OUT=/path/to/out/compose-multiplatform-core` or `-PlocalCmpOut=/path/to/out/compose-multiplatform-core` if the worktree moves. Keeping those jars on both classpaths is intentional: command probes that exercise new Compose APIs must not compile against published Compose jars and run against the patched local ABI.
 Set `JBR_SKIA_RENDER_MODE=commands` to exercise the lower-level command-list probe instead of the default Skia picture replay path.
 Command mode currently supports Magic Jewel text through a temporary text-as-inline-ARGB bridge by default: CMP rasterizes Skia Paragraph output into the existing image command so the sample stays on JBR command replay while preserving the resolved Jewel font, size, and alignment. This is useful for mixed-content validation, but it is not the final JBR-owned font/typeface solution. Set `JBR_SKIA_NATIVE_TEXT=true` to probe the ABI 43 native text commands, which now carry font-family metadata and are covered by the native-text report row below; the default remains text-as-image until broader typography parity is proven.
