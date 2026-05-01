@@ -137,6 +137,7 @@ private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.c
 private const val ComposeGraphicsLayerRenderEffectProperty = "magic.jewel.compose.graphicsLayerRenderEffect"
 private const val ComposeGraphicsLayerOffsetEffectProperty = "magic.jewel.compose.graphicsLayerOffsetEffect"
 private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel.compose.graphicsLayerChainedRenderEffect"
+private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.graphicsLayerShadow"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -397,6 +398,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerChainedRenderEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerChainedRenderEffectProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerShadowEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerShadowProperty, "false").toBoolean()
     }
     val swingIslandEnabled = remember {
         System.getProperty(SwingIslandProperty, "true").toBoolean()
@@ -1721,6 +1725,11 @@ private fun MagicJewelApp() {
                             rotationZ = -4f
                             if (composeGraphicsLayerBlendModeEnabled) {
                                 blendMode = BlendMode.Plus
+                            }
+                            if (composeGraphicsLayerShadowEnabled) {
+                                shadowElevation = 18f
+                                spotShadowColor = Color(0xFF111827)
+                                ambientShadowColor = Color(0xFF111827)
                             }
                             if (composeGraphicsLayerColorFilterEnabled) {
                                 colorFilter = ColorFilter.tint(Color(0xFF22D3EE))

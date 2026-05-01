@@ -121,7 +121,7 @@ summary_includes_screenshot_counts() {
     echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
   } > "${dir}/new.log"
   {
-    echo "JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=10 topText=20 topTextBox=1,2,3,4 paragraphCentered=30 probeRightDark=40"
+    echo "JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=10 topText=20 topTextBox=1,2,3,4 paragraphCentered=30 probeRightDark=40 probeRightShadow=50"
   } > "${dir}/new-screenshot-assertion.log"
 
   run_validate_only "${dir}"
@@ -130,6 +130,7 @@ summary_includes_screenshot_counts() {
   grep -q "^screenshot_topText=20$" "${dir}/summary.properties"
   grep -q "^screenshot_paragraphCentered=30$" "${dir}/summary.properties"
   grep -q "^screenshot_probeRightDark=40$" "${dir}/summary.properties"
+  grep -q "^screenshot_probeRightShadow=50$" "${dir}/summary.properties"
   if grep -q "^screenshot_topTextBox=" "${dir}/summary.properties"; then
     echo "Expected screenshot bbox fields to stay out of scalar summary properties" >&2
     return 1

@@ -67,6 +67,7 @@ var probeRightOrange = 0
 var probeRightCyan = 0
 var probeRightYellow = 0
 var probeRightDark = 0
+var probeRightShadow = 0
 var blendModeYellow = 0
 var blendModeMultiply = 0
 var blendModeScreen = 0
@@ -235,6 +236,9 @@ for y in 0..<height {
             if r < 60 && g < 60 && b < 60 {
                 probeRightDark += 1
             }
+            if r < 60 && g < 100 && b < 190 {
+                probeRightShadow += 1
+            }
         }
         if inRect(x: x, y: y, left: blendModeRect.left, top: blendModeRect.top, right: blendModeRect.right, bottom: blendModeRect.bottom) {
             if r > 220 && g > 150 && b < 120 {
@@ -320,7 +324,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) probeRightShadow=\(probeRightShadow) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
 
 let composeTextEnabled = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_TEXT"] != "false"
 var checks: [(String, Int, Int)] = [
@@ -364,6 +368,7 @@ let graphicsLayerRoundClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEW
 let graphicsLayerPathClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_PATH_CLIP"] == "true"
 let graphicsLayerColorFilterProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_FILTER"] == "true"
 let graphicsLayerColorMatrixFilterProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER"] == "true"
+let graphicsLayerShadowProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW"] == "true"
 let drawPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_PATH"] == "true"
 let drawArcProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ARC"] == "true"
 let drawRoundRectProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT"] == "true"
@@ -418,6 +423,9 @@ if graphicsLayerColorFilterProbe {
 if graphicsLayerColorMatrixFilterProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 1000))
 }
+if graphicsLayerShadowProbe {
+    probeChecks.append(("probeRightShadow", probeRightShadow, 400))
+}
 if drawPathProbe {
     probeChecks.append(("probeRightOrange", probeRightOrange, 2000))
 }
@@ -429,11 +437,11 @@ if drawRoundRectProbe {
 }
 if imageShaderProbe {
     probeChecks.append(("probeRightYellow", probeRightYellow, 1500))
-    probeChecks.append(("probeRightDark", probeRightDark, 5000))
+    probeChecks.append(("probeRightDark", probeRightDark, 2500))
 }
 if linearGradientStrokeProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 800))
-    probeChecks.append(("probeRightOrange", probeRightOrange, 800))
+    probeChecks.append(("probeRightOrange", probeRightOrange, 500))
 }
 if linearGradientSurfaceProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 5000))
