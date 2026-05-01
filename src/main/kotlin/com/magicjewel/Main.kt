@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.LinearGradientShader
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
@@ -143,6 +144,7 @@ private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.g
 private const val ComposeGraphicsLayerOffscreenProperty = "magic.jewel.compose.graphicsLayerOffscreen"
 private const val ComposeGraphicsLayerModulateAlphaProperty = "magic.jewel.compose.graphicsLayerModulateAlpha"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
+private const val ComposeConcatTransformProperty = "magic.jewel.compose.concatTransform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
@@ -420,6 +422,9 @@ private fun MagicJewelApp() {
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
+    }
+    val composeConcatTransformEnabled = remember {
+        System.getProperty(ComposeConcatTransformProperty, "false").toBoolean()
     }
     val composeSaveLayerEnabled = remember {
         System.getProperty(ComposeSaveLayerProperty, "false").toBoolean()
@@ -1351,6 +1356,28 @@ private fun MagicJewelApp() {
                             topLeft = Offset(112f, size.height - 128f),
                             size = Size(96f, 54f),
                         )
+                    }
+                }
+                if (composeConcatTransformEnabled) {
+                    drawIntoCanvas { canvas ->
+                        val matrix = Matrix().apply {
+                            values[Matrix.ScaleX] = 1f
+                            values[Matrix.SkewX] = 0.22f
+                            values[Matrix.TranslateX] = size.width - 238f
+                            values[Matrix.SkewY] = 0.04f
+                            values[Matrix.ScaleY] = 1f
+                            values[Matrix.TranslateY] = size.height - 172f
+                        }
+                        canvas.save()
+                        canvas.concat(matrix)
+                        canvas.drawRect(
+                            left = 0f,
+                            top = 0f,
+                            right = 104f,
+                            bottom = 46f,
+                            paint = Paint().apply { color = Color(0xFF22D3EE) },
+                        )
+                        canvas.restore()
                     }
                 }
                 if (composeSaveLayerEnabled) {
