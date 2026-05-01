@@ -164,6 +164,35 @@ strict_command_requires_min_surface_changes() {
   run_validate_only "${dir}" EXPECT_MIN_SURFACE_CHANGES=1
 }
 
+strict_command_requires_min_command_cache_clears() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "SKIKO_JBR_INTEROP_COMMAND_CACHES_CLEARED reason=surfaceChanged"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_COMMAND_CACHE_CLEARS=1
+  grep -q "^skiko_command_cache_clear_markers=1$" "${dir}/summary.properties"
+}
+
+strict_command_fails_without_min_command_cache_clears() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MIN_COMMAND_CACHE_CLEARS=1 2>/dev/null; then
+    echo "Expected strict command validation to fail without command-cache clear markers" >&2
+    return 1
+  fi
+}
+
 strict_command_requires_surface_change_shape() {
   local dir
   dir="$(make_report_dir)"
@@ -892,6 +921,8 @@ strict_command_fails_without_tiny_full_scene_injection_marker
 summary_includes_screenshot_counts
 surface_change_summary_is_machine_readable
 strict_command_requires_min_surface_changes
+strict_command_requires_min_command_cache_clears
+strict_command_fails_without_min_command_cache_clears
 strict_command_requires_surface_change_shape
 strict_command_fails_without_expected_surface_change_shape
 strict_command_fails_without_min_surface_changes

@@ -41,6 +41,7 @@ EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES:--1
 EXPECT_MIN_POPUP_FRAMES="${EXPECT_MIN_POPUP_FRAMES:-0}"
 EXPECT_MIN_APP_NEW_FRAMES="${EXPECT_MIN_APP_NEW_FRAMES:-0}"
 EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS="${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS:-0}"
+EXPECT_MIN_COMMAND_CACHE_CLEARS="${EXPECT_MIN_COMMAND_CACHE_CLEARS:-0}"
 EXPECT_MAX_IMAGE_DEFINES="${EXPECT_MAX_IMAGE_DEFINES:--1}"
 EXPECT_MAX_IMAGE_CACHE_CLEARS="${EXPECT_MAX_IMAGE_CACHE_CLEARS:--1}"
 EXPECT_MIN_SURFACE_CHANGES="${EXPECT_MIN_SURFACE_CHANGES:-0}"
@@ -305,6 +306,7 @@ JBR_EFFECT_HANDLE_EVICT_MARKER="JBR_SKIA_INTEROP_EFFECT_HANDLE_EVICT"
 JBR_SHADER_HANDLE_DEFINE_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_DEFINE"
 JBR_SHADER_HANDLE_EVICT_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_EVICT"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
+SKIKO_COMMAND_CACHES_CLEARED_MARKER="SKIKO_JBR_INTEROP_COMMAND_CACHES_CLEARED"
 SKIKO_TINY_FULL_SCENE_MARKER="SKIKO_JBR_INTEROP_TINY_FULL_SCENE_INJECTED"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 CMP_COMMAND_RECORDER_NESTED_MARKER="CMP_JBR_COMMAND_RECORDER_NESTED_UNSUPPORTED"
@@ -367,6 +369,7 @@ Environment:
   EXPECT_MIN_POPUP_FRAMES In strict command mode, require at least this many Swing popup paint markers. Default: 0.
   EXPECT_MIN_APP_NEW_FRAMES In strict command mode, require at least this many Magic Jewel Compose frame markers in the new renderer. Default: 0.
   EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS In strict command mode, require at least this many test-only tiny full-scene injections. Default: 0.
+  EXPECT_MIN_COMMAND_CACHE_CLEARS In strict command mode, require at least this many Skiko command-cache clear markers after surface/context changes. Default: 0.
   EXPECT_MAX_IMAGE_DEFINES In strict command mode, require CMP recorder max imageDefines at or below this value. Default: disabled.
   EXPECT_MAX_IMAGE_CACHE_CLEARS In strict command mode, require CMP recorder max imageCacheClears at or below this value. Default: disabled.
   EXPECT_MIN_SURFACE_CHANGES In strict command mode, require at least this many Skiko surface-change markers. Default: 0.
@@ -1096,6 +1099,7 @@ write_machine_summary() {
     echo "jbr_shader_handle_define_frames=$(grep -c "${JBR_SHADER_HANDLE_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_shader_handle_evict_frames=$(grep -c "${JBR_SHADER_HANDLE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "skiko_command_cache_clear_markers=$(grep -c "${SKIKO_COMMAND_CACHES_CLEARED_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_tiny_full_scene_injections=$(grep -c "${SKIKO_TINY_FULL_SCENE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_context_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_same_context_surface_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=false.*surfaceChanged=true" "${new_full_log}" 2>/dev/null || true)"
@@ -1171,11 +1175,13 @@ write_report() {
   local jbr_effect_handle_evict_summary
   local jbr_shader_handle_define_summary
   local jbr_shader_handle_evict_summary
+  local skiko_command_cache_clear_summary
   jbr_effect_handle_define_summary="$(frame_marker_summary "${JBR_EFFECT_HANDLE_DEFINE_MARKER}" "${new_full_log}")"
   jbr_effect_handle_evict_summary="$(frame_marker_summary "${JBR_EFFECT_HANDLE_EVICT_MARKER}" "${new_full_log}")"
   jbr_shader_handle_define_summary="$(frame_marker_summary "${JBR_SHADER_HANDLE_DEFINE_MARKER}" "${new_full_log}")"
   jbr_shader_handle_evict_summary="$(frame_marker_summary "${JBR_SHADER_HANDLE_EVICT_MARKER}" "${new_full_log}")"
   skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}")"
+  skiko_command_cache_clear_summary="$(frame_marker_summary "${SKIKO_COMMAND_CACHES_CLEARED_MARKER}" "${new_full_log}")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
   popup_screenshot_counts="$(grep -E "${POPUP_WINDOW_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-popup-window-screenshot-assertion.log" 2>/dev/null || true)"
@@ -1333,6 +1339,7 @@ write_report() {
     echo "## Surface Identity Markers"
     echo
     echo "- Skiko surface changes: ${skiko_surface_change_summary}"
+    echo "- Skiko command cache clears: ${skiko_command_cache_clear_summary}"
     echo
     echo "## Async Profiler"
     echo
@@ -1619,6 +1626,12 @@ validate_report() {
         surface_changes="$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${surface_changes}" -ge "${EXPECT_MIN_SURFACE_CHANGES}" ]] ||
           failures+=("Skiko surface-change markers ${surface_changes} below expected ${EXPECT_MIN_SURFACE_CHANGES}")
+      fi
+      if [[ "${EXPECT_MIN_COMMAND_CACHE_CLEARS}" -gt 0 ]]; then
+        local command_cache_clears
+        command_cache_clears="$(grep -c "${SKIKO_COMMAND_CACHES_CLEARED_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${command_cache_clears}" -ge "${EXPECT_MIN_COMMAND_CACHE_CLEARS}" ]] ||
+          failures+=("Skiko command-cache clear markers ${command_cache_clears} below expected ${EXPECT_MIN_COMMAND_CACHE_CLEARS}")
       fi
       if [[ -n "${EXPECT_SURFACE_CONTEXT_CHANGED}" ]]; then
         if ! grep -Eq "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=${EXPECT_SURFACE_CONTEXT_CHANGED}" "${new_full_log}" 2>/dev/null; then
