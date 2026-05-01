@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.RuntimeEffectChild
+import androidx.compose.ui.graphics.RuntimeEffectColorFilter
 import androidx.compose.ui.graphics.RuntimeEffectShader
 import androidx.compose.ui.graphics.RuntimeEffectUniform
 import androidx.compose.ui.graphics.ShaderBrush
@@ -113,6 +114,7 @@ private const val ComposeRuntimeEffectPureColorProperty = "magic.jewel.compose.r
 private const val ComposeRuntimeEffectUniformOnlyProperty = "magic.jewel.compose.runtimeEffectUniformOnly"
 private const val ComposeRuntimeEffectChildOnlyProperty = "magic.jewel.compose.runtimeEffectChildOnly"
 private const val ComposeRuntimeEffectBadChildProperty = "magic.jewel.compose.runtimeEffectBadChild"
+private const val ComposeRuntimeEffectColorFilterProperty = "magic.jewel.compose.runtimeEffectColorFilter"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
@@ -331,6 +333,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectBadChildEnabled = remember {
         System.getProperty(ComposeRuntimeEffectBadChildProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectColorFilterEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectColorFilterProperty, "false").toBoolean()
     }
     val composeImageFilterEnabled = remember {
         System.getProperty(ComposeImageFilterProperty, "false").toBoolean()
@@ -752,6 +757,29 @@ private fun MagicJewelApp() {
                             paint = Paint().apply {
                                 color = Color(0xFFE879F9)
                                 colorFilter = ColorFilter.tint(Color(0xFF22D3EE))
+                            },
+                        )
+                    }
+                }
+                if (composeRuntimeEffectColorFilterEnabled) {
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 244f,
+                            top = 34f,
+                            right = size.width - 132f,
+                            bottom = 112f,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFD166)
+                                colorFilter = RuntimeEffectColorFilter(
+                                    sksl = """
+                                        uniform float phase;
+                                        half4 main(half4 inColor) {
+                                            return half4(inColor.r, inColor.g * phase, 1.0 - inColor.b * 0.35, inColor.a);
+                                        }
+                                    """.trimIndent(),
+                                    uniforms = floatArrayOf(phase),
+                                    uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
+                                )
                             },
                         )
                     }
