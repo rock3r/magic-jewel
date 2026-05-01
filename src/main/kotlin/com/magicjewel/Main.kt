@@ -116,6 +116,7 @@ private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
 private const val ComposeRuntimeEffectShaderProperty = "magic.jewel.compose.runtimeEffectShader"
 private const val ComposeRuntimeEffectShaderColorFilterProperty = "magic.jewel.compose.runtimeEffectShaderColorFilter"
+private const val ComposeLinearGradientShaderColorFilterProperty = "magic.jewel.compose.linearGradientShaderColorFilter"
 private const val ComposeRuntimeEffectPureColorProperty = "magic.jewel.compose.runtimeEffectPureColor"
 private const val ComposeRuntimeEffectUniformOnlyProperty = "magic.jewel.compose.runtimeEffectUniformOnly"
 private const val ComposeRuntimeEffectChildOnlyProperty = "magic.jewel.compose.runtimeEffectChildOnly"
@@ -338,6 +339,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectShaderColorFilterEnabled = remember {
         System.getProperty(ComposeRuntimeEffectShaderColorFilterProperty, "false").toBoolean()
+    }
+    val composeLinearGradientShaderColorFilterEnabled = remember {
+        System.getProperty(ComposeLinearGradientShaderColorFilterProperty, "false").toBoolean()
     }
     val composeRuntimeEffectPureColorEnabled = remember {
         System.getProperty(ComposeRuntimeEffectPureColorProperty, "false").toBoolean()
@@ -749,6 +753,29 @@ private fun MagicJewelApp() {
                             paint = Paint().apply {
                                 this.shader = shader
                                 colorFilter = ColorFilter.tint(Color(0xFFFFD166), BlendMode.SrcIn)
+                            },
+                        )
+                    }
+                    drawRect(color = Color.White, topLeft = topLeft, size = Size(152f, 112f), style = Stroke(width = 3f))
+                }
+                if (composeLinearGradientShaderColorFilterEnabled) {
+                    val topLeft = Offset(size.width - 376f, size.height - 488f)
+                    val shader = LinearGradientShader(
+                        from = topLeft,
+                        to = topLeft + Offset(152f, 112f),
+                        colors = listOf(Color(0xFF22D3EE), Color(0xFFFDE047), Color(0xFFEC4899)),
+                        colorStops = listOf(0f, 0.52f, 1f),
+                        tileMode = TileMode.Clamp,
+                    )
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 152f,
+                            bottom = topLeft.y + 112f,
+                            paint = Paint().apply {
+                                this.shader = shader
+                                colorFilter = ColorFilter.tint(Color(0xFF22D3EE), BlendMode.SrcIn)
                             },
                         )
                     }
