@@ -11,8 +11,14 @@ MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO="${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO:-0.04
 MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO="${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO:-0.08}"
 MAX_SWING_ISLAND_BAD_PIXEL_RATIO="${MAX_SWING_ISLAND_BAD_PIXEL_RATIO:-0.03}"
 MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO="${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO:-0.05}"
+MAX_COMPOSE_BACKDROP_LEFT_BAD_PIXEL_RATIO="${MAX_COMPOSE_BACKDROP_LEFT_BAD_PIXEL_RATIO:--1}"
+MAX_COMPOSE_CENTER_ANIMATION_BAD_PIXEL_RATIO="${MAX_COMPOSE_CENTER_ANIMATION_BAD_PIXEL_RATIO:--1}"
+MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO="${MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO:--1}"
+MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO="${MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO:--1}"
+MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO="${MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO:--1}"
+MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO="${MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO:--1}"
 
-/usr/bin/swift - "${OLD_IMAGE}" "${NEW_IMAGE}" "${MAX_AVG_DELTA}" "${MAX_BAD_PIXEL_RATIO}" "${BAD_PIXEL_THRESHOLD}" "${DIFF_IMAGE}" "${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO}" "${MAX_SWING_ISLAND_BAD_PIXEL_RATIO}" "${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO}" <<'SWIFT'
+/usr/bin/swift - "${OLD_IMAGE}" "${NEW_IMAGE}" "${MAX_AVG_DELTA}" "${MAX_BAD_PIXEL_RATIO}" "${BAD_PIXEL_THRESHOLD}" "${DIFF_IMAGE}" "${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO}" "${MAX_SWING_ISLAND_BAD_PIXEL_RATIO}" "${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BACKDROP_LEFT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CENTER_ANIMATION_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO}" <<'SWIFT'
 import CoreGraphics
 import Foundation
 import ImageIO
@@ -23,12 +29,26 @@ let maxAverageDelta = Double(CommandLine.arguments[3]) ?? 8.0
 let maxBadPixelRatio = Double(CommandLine.arguments[4]) ?? 0.04
 let badPixelThreshold = Int(CommandLine.arguments[5]) ?? 32
 let diffPath = CommandLine.arguments.count > 6 ? CommandLine.arguments[6] : ""
-let regionBadPixelRatioLimits = [
+var regionBadPixelRatioLimits = [
     "headerControls": Double(CommandLine.arguments[7]) ?? 0.04,
     "composeCanvas": Double(CommandLine.arguments[8]) ?? 0.08,
     "swingIsland": Double(CommandLine.arguments[9]) ?? 0.03,
     "rightProbeStrip": Double(CommandLine.arguments[10]) ?? 0.05,
 ]
+for (argumentIndex, regionName) in [
+    (11, "composeBackdropLeft"),
+    (12, "composeCenterAnimation"),
+    (13, "composeBottomLabels"),
+    (14, "composePurpleRect"),
+    (15, "composeTopProgress"),
+    (16, "composeBottomSwatches"),
+] {
+    if CommandLine.arguments.count > argumentIndex,
+       let limit = Double(CommandLine.arguments[argumentIndex]),
+       limit >= 0.0 {
+        regionBadPixelRatioLimits[regionName] = limit
+    }
+}
 
 struct Region {
     let name: String
@@ -179,6 +199,9 @@ do {
         clampRegion(name: "composeBackdropLeft", x: 0.08, y: 0.24, width: 0.32, height: 0.26, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeCenterAnimation", x: 0.42, y: 0.43, width: 0.20, height: 0.28, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeBottomLabels", x: 0.08, y: 0.72, width: 0.40, height: 0.18, imageWidth: compareWidth, imageHeight: compareHeight),
+        clampRegion(name: "composePurpleRect", x: 0.09, y: 0.27, width: 0.11, height: 0.08, imageWidth: compareWidth, imageHeight: compareHeight),
+        clampRegion(name: "composeTopProgress", x: 0.16, y: 0.23, width: 0.22, height: 0.02, imageWidth: compareWidth, imageHeight: compareHeight),
+        clampRegion(name: "composeBottomSwatches", x: 0.07, y: 0.91, width: 0.56, height: 0.035, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "swingIsland", x: 0.62, y: 0.24, width: 0.33, height: 0.21, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "rightProbeStrip", x: 0.70, y: 0.22, width: 0.26, height: 0.68, imageWidth: compareWidth, imageHeight: compareHeight),
     ]

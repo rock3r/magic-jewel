@@ -13,7 +13,7 @@ CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-runt
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
-printf "case\tstatus\tavg_delta\tbad_pixel_ratio\tcompose_bad_pixel_ratio\treport\tdiff\n" > "${SUITE_TSV}"
+printf "case\tstatus\tavg_delta\tbad_pixel_ratio\tcompose_bad_pixel_ratio\tcompose_purple_rect_bad_pixel_ratio\tcompose_top_progress_bad_pixel_ratio\tcompose_bottom_swatches_bad_pixel_ratio\treport\tdiff\n" > "${SUITE_TSV}"
 
 summary_value() {
   local file="$1"
@@ -41,14 +41,21 @@ run_case() {
   local avg_delta
   local bad_pixel_ratio
   local compose_bad_pixel_ratio
+  local compose_purple_rect_bad_pixel_ratio
+  local compose_top_progress_bad_pixel_ratio
+  local compose_bottom_swatches_bad_pixel_ratio
   avg_delta="$(summary_value "${summary}" screenshot_parity_avgDelta)"
   bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_badPixelRatio)"
   compose_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeCanvas_badPixelRatio)"
+  compose_purple_rect_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composePurpleRect_badPixelRatio)"
+  compose_top_progress_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeTopProgress_badPixelRatio)"
+  compose_bottom_swatches_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeBottomSwatches_badPixelRatio)"
 
-  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
     "${name}" "${status}" "${avg_delta}" "${bad_pixel_ratio}" "${compose_bad_pixel_ratio}" \
+    "${compose_purple_rect_bad_pixel_ratio}" "${compose_top_progress_bad_pixel_ratio}" "${compose_bottom_swatches_bad_pixel_ratio}" \
     "${out_dir}/report/report.md" "${out_dir}/report/parity-diff.png" >> "${SUITE_TSV}"
-  echo "status=${status} avg_delta=${avg_delta} bad_pixel_ratio=${bad_pixel_ratio} compose_bad_pixel_ratio=${compose_bad_pixel_ratio} report=${out_dir}/report/report.md"
+  echo "status=${status} avg_delta=${avg_delta} bad_pixel_ratio=${bad_pixel_ratio} compose_bad_pixel_ratio=${compose_bad_pixel_ratio} compose_bottom_swatches_bad_pixel_ratio=${compose_bottom_swatches_bad_pixel_ratio} report=${out_dir}/report/report.md"
 }
 
 run_named_case() {
@@ -65,6 +72,9 @@ run_named_case() {
         MAX_BAD_PIXEL_RATIO=0.07 \
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.11 \
         MAX_SWING_ISLAND_BAD_PIXEL_RATIO=0.08 \
+        MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO=0.09 \
+        MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO=0.11 \
+        MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO=0.005 \
         EXPECT_MIN_IMAGE_REFS=0
       ;;
     parity-native-text)
