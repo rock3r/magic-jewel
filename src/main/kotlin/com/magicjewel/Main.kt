@@ -109,6 +109,9 @@ private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
 private const val ComposeRuntimeEffectShaderProperty = "magic.jewel.compose.runtimeEffectShader"
+private const val ComposeRuntimeEffectPureColorProperty = "magic.jewel.compose.runtimeEffectPureColor"
+private const val ComposeRuntimeEffectUniformOnlyProperty = "magic.jewel.compose.runtimeEffectUniformOnly"
+private const val ComposeRuntimeEffectChildOnlyProperty = "magic.jewel.compose.runtimeEffectChildOnly"
 private const val ComposeRuntimeEffectBadChildProperty = "magic.jewel.compose.runtimeEffectBadChild"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
@@ -308,6 +311,15 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectShaderEnabled = remember {
         System.getProperty(ComposeRuntimeEffectShaderProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectPureColorEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectPureColorProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectUniformOnlyEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectUniformOnlyProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectChildOnlyEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectChildOnlyProperty, "false").toBoolean()
     }
     val composeRuntimeEffectBadChildEnabled = remember {
         System.getProperty(ComposeRuntimeEffectBadChildProperty, "false").toBoolean()
@@ -591,6 +603,69 @@ private fun MagicJewelApp() {
                         size = Size(152f, 112f),
                         style = Stroke(width = 3f),
                     )
+                }
+                if (composeRuntimeEffectPureColorEnabled) {
+                    val topLeft = Offset(size.width - 740f, size.height - 360f)
+                    val shader = RuntimeEffectShader(
+                        sksl = """
+                            half4 main(float2 p) {
+                                float stripe = step(0.5, fract((p.x + p.y) * 0.025));
+                                return half4(mix(half3(0.10, 0.65, 0.95), half3(0.95, 0.20, 0.55), stripe), 1.0);
+                            }
+                        """.trimIndent(),
+                    )
+                    drawRect(
+                        brush = ShaderBrush(shader),
+                        topLeft = topLeft,
+                        size = Size(152f, 112f),
+                    )
+                    drawRect(color = Color.White, topLeft = topLeft, size = Size(152f, 112f), style = Stroke(width = 3f))
+                }
+                if (composeRuntimeEffectUniformOnlyEnabled) {
+                    val topLeft = Offset(size.width - 740f, size.height - 232f)
+                    val shader = RuntimeEffectShader(
+                        sksl = """
+                            uniform float phase;
+                            half4 main(float2 p) {
+                                float wave = 0.5 + 0.5 * sin(p.x * 0.08 + phase * 6.28318);
+                                return half4(wave, 0.28, 1.0 - wave, 1.0);
+                            }
+                        """.trimIndent(),
+                        uniforms = floatArrayOf(phase),
+                        uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
+                    )
+                    drawRect(
+                        brush = ShaderBrush(shader),
+                        topLeft = topLeft,
+                        size = Size(152f, 112f),
+                    )
+                    drawRect(color = Color.White, topLeft = topLeft, size = Size(152f, 112f), style = Stroke(width = 3f))
+                }
+                if (composeRuntimeEffectChildOnlyEnabled) {
+                    val topLeft = Offset(size.width - 372f, size.height - 232f)
+                    val child = RadialGradientShader(
+                        center = topLeft + Offset(82f, 54f),
+                        radius = 92f,
+                        colors = listOf(Color(0xFFFFF7AD), Color(0xFF38BDF8), Color(0xFF312E81)),
+                        colorStops = listOf(0f, 0.52f, 1f),
+                        tileMode = TileMode.Clamp,
+                    )
+                    val shader = RuntimeEffectShader(
+                        sksl = """
+                            uniform shader content;
+                            half4 main(float2 p) {
+                                half4 base = content.eval(p);
+                                return half4(base.bgr, 1.0);
+                            }
+                        """.trimIndent(),
+                        namedChildren = listOf(RuntimeEffectChild("content", child)),
+                    )
+                    drawRect(
+                        brush = ShaderBrush(shader),
+                        topLeft = topLeft,
+                        size = Size(152f, 112f),
+                    )
+                    drawRect(color = Color.White, topLeft = topLeft, size = Size(152f, 112f), style = Stroke(width = 3f))
                 }
                 if (composeRuntimeEffectShaderEnabled) {
                     val topLeft = Offset(size.width - 556f, size.height - 360f)

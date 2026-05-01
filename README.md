@@ -129,6 +129,7 @@ RuntimeEffect compile failures are reported with stable single-line markers:
 `JBR_SKIA_INTEROP_RUNTIME_EFFECT_COMPILE_FAILED hash=0x... skslLength=... uniforms=... children=... errorLength=...`.
 RuntimeEffect builder failures are reported with stable single-line markers:
 `JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FAILED hash=0x... skslLength=... uniforms=... children=... namedUniforms=... namedChildren=...`.
+The RuntimeEffect command suite can run the combined probe (`commands-runtime-effect-shader`) or narrower conformance probes: `commands-runtime-effect-pure-color`, `commands-runtime-effect-uniform-only`, `commands-runtime-effect-child-only`, and `commands-runtime-effect-build-fallback`.
 
 Surface identity changes are reported with `SKIKO_JBR_INTEROP_SURFACE_CHANGED oldContextId=... newContextId=... contextChanged=... surfaceChanged=... oldSurfaceId=... newSurfaceId=... oldMetalTexture=... newMetalTexture=...`. A non-zero `skiko_surface_change_markers` count means Skiko observed a different JBR destination surface during the run and discarded cached state tied to the previous surface. `contextChanged=false surfaceChanged=true` means a same-context surface replacement, such as resize.
 
