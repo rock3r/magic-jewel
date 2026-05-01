@@ -114,6 +114,7 @@ private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
+private const val ComposeCompositeShaderColorFilterProperty = "magic.jewel.compose.compositeShaderColorFilter"
 private const val ComposeRuntimeEffectShaderProperty = "magic.jewel.compose.runtimeEffectShader"
 private const val ComposeRuntimeEffectShaderColorFilterProperty = "magic.jewel.compose.runtimeEffectShaderColorFilter"
 private const val ComposeLinearGradientShaderColorFilterProperty = "magic.jewel.compose.linearGradientShaderColorFilter"
@@ -333,6 +334,9 @@ private fun MagicJewelApp() {
     }
     val composeCompositeShaderEnabled = remember {
         System.getProperty(ComposeCompositeShaderProperty, "false").toBoolean()
+    }
+    val composeCompositeShaderColorFilterEnabled = remember {
+        System.getProperty(ComposeCompositeShaderColorFilterProperty, "false").toBoolean()
     }
     val composeRuntimeEffectShaderEnabled = remember {
         System.getProperty(ComposeRuntimeEffectShaderProperty, "false").toBoolean()
@@ -667,6 +671,39 @@ private fun MagicJewelApp() {
                         size = Size(152f, 112f),
                         style = Stroke(width = 3f),
                     )
+                }
+                if (composeCompositeShaderColorFilterEnabled) {
+                    val topLeft = Offset(size.width - 736f, size.height - 488f)
+                    val shader = CompositeShader(
+                        dst = LinearGradientShader(
+                            from = topLeft,
+                            to = topLeft + Offset(152f, 112f),
+                            colors = listOf(Color(0xFF06B6D4), Color(0xFFFDE047), Color(0xFFEF4444)),
+                            colorStops = listOf(0f, 0.46f, 1f),
+                            tileMode = TileMode.Clamp,
+                        ),
+                        src = RadialGradientShader(
+                            center = topLeft + Offset(112f, 38f),
+                            radius = 92f,
+                            colors = listOf(Color(0xFFFFFFFF), Color(0xAA8B5CF6), Color(0x00000000)),
+                            colorStops = listOf(0f, 0.54f, 1f),
+                            tileMode = TileMode.Clamp,
+                        ),
+                        blendMode = BlendMode.SrcOver,
+                    )
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 152f,
+                            bottom = topLeft.y + 112f,
+                            paint = Paint().apply {
+                                this.shader = shader
+                                colorFilter = ColorFilter.tint(Color(0xFFFDE047), BlendMode.SrcIn)
+                            },
+                        )
+                    }
+                    drawRect(color = Color.White, topLeft = topLeft, size = Size(152f, 112f), style = Stroke(width = 3f))
                 }
                 if (composeRuntimeEffectPureColorEnabled) {
                     val topLeft = Offset(size.width - 740f, size.height - 360f)
