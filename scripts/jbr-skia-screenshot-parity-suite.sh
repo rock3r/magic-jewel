@@ -9,7 +9,7 @@ DURATION_SECONDS="${DURATION_SECONDS:-6}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 PARITY_SCRIPT="${PARITY_SCRIPT:-${SCRIPT_DIR}/jbr-skia-screenshot-parity.sh}"
-CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera}"
+CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -159,6 +159,80 @@ run_named_case() {
         MAX_BAD_PIXEL_RATIO=0.09 \
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.12 \
         MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.09
+      ;;
+    parity-graphics-layer-render-effect-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_PATH=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ARC=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RENDER_EFFECT=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLEND_MODE=true \
+        MAX_BAD_PIXEL_RATIO=0.09 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.12 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.16
+      ;;
+    parity-graphics-layer-render-effect-color-matrix-filter)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_PATH=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ARC=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RENDER_EFFECT=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER=true \
+        MAX_BAD_PIXEL_RATIO=0.09 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.12 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.16
+      ;;
+    parity-graphics-layer-render-effect-blend-color-filter)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_PATH=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ARC=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RENDER_EFFECT=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLEND_MODE=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_FILTER=true \
+        MAX_BAD_PIXEL_RATIO=0.09 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.12 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.16
+      ;;
+    parity-graphics-layer-render-effect-blend-color-matrix-filter)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_PATH=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ARC=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RENDER_EFFECT=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLEND_MODE=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER=true \
+        MAX_BAD_PIXEL_RATIO=0.09 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.12 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.16
       ;;
     parity-graphics-layer-shadow)
       run_case "$1" \
