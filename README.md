@@ -161,7 +161,7 @@ RuntimeEffect compile failures are reported with stable single-line markers:
 `JBR_SKIA_INTEROP_RUNTIME_EFFECT_COMPILE_FAILED hash=0x... skslLength=... uniforms=... children=... errorLength=... errorHash=0x...`.
 RuntimeEffect builder failures are reported with stable single-line markers:
 `JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FAILED hash=0x... stage=missing-child|uniform-set|make-shader [nameHash=0x...] skslLength=... uniforms=... children=... namedUniforms=... namedChildren=...`.
-The RuntimeEffect command suite can run the combined shader probe (`commands-runtime-effect-shader`) or narrower conformance probes: `commands-runtime-effect-pure-color`, `commands-runtime-effect-uniform-only`, `commands-runtime-effect-child-only`, `commands-runtime-effect-color-filter`, and `commands-runtime-effect-build-fallback`.
+The RuntimeEffect command suite can run the combined shader probe (`commands-runtime-effect-shader`) or narrower conformance probes: `commands-runtime-effect-pure-color`, `commands-runtime-effect-uniform-only`, `commands-runtime-effect-child-only`, `commands-runtime-effect-color-filter`, `commands-runtime-effect-color-filter-child`, and `commands-runtime-effect-build-fallback`.
 
 The descriptor lifecycle probe (`commands-descriptor-eviction`) enables `MAGIC_JEWEL_COMPOSE_DESCRIPTOR_EVICTION=true` and `MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE=true`, then draws enough unique effect and composite-shader descriptors to exceed CMP's 1,024-entry handle caches. It asserts both define and evict markers in the full JBR log.
 

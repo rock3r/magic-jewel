@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.RuntimeEffectChild
 import androidx.compose.ui.graphics.RuntimeEffectColorFilter
+import androidx.compose.ui.graphics.RuntimeEffectColorFilterChild
 import androidx.compose.ui.graphics.RuntimeEffectShader
 import androidx.compose.ui.graphics.RuntimeEffectUniform
 import androidx.compose.ui.graphics.ShaderBrush
@@ -115,6 +116,7 @@ private const val ComposeRuntimeEffectUniformOnlyProperty = "magic.jewel.compose
 private const val ComposeRuntimeEffectChildOnlyProperty = "magic.jewel.compose.runtimeEffectChildOnly"
 private const val ComposeRuntimeEffectBadChildProperty = "magic.jewel.compose.runtimeEffectBadChild"
 private const val ComposeRuntimeEffectColorFilterProperty = "magic.jewel.compose.runtimeEffectColorFilter"
+private const val ComposeRuntimeEffectColorFilterChildProperty = "magic.jewel.compose.runtimeEffectColorFilterChild"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
@@ -336,6 +338,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectColorFilterEnabled = remember {
         System.getProperty(ComposeRuntimeEffectColorFilterProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectColorFilterChildEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectColorFilterChildProperty, "false").toBoolean()
     }
     val composeImageFilterEnabled = remember {
         System.getProperty(ComposeImageFilterProperty, "false").toBoolean()
@@ -779,6 +784,37 @@ private fun MagicJewelApp() {
                                     """.trimIndent(),
                                     uniforms = floatArrayOf(phase),
                                     uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
+                                )
+                            },
+                        )
+                    }
+                }
+                if (composeRuntimeEffectColorFilterChildEnabled) {
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 124f,
+                            top = 34f,
+                            right = size.width - 24f,
+                            bottom = 112f,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFD166)
+                                colorFilter = RuntimeEffectColorFilter(
+                                    sksl = """
+                                        uniform colorFilter content;
+                                        uniform float phase;
+                                        half4 main(half4 inColor) {
+                                            half4 base = content.eval(inColor);
+                                            return half4(base.r, base.g * phase, base.b, base.a);
+                                        }
+                                    """.trimIndent(),
+                                    uniforms = floatArrayOf(phase),
+                                    uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
+                                    namedChildren = listOf(
+                                        RuntimeEffectColorFilterChild(
+                                            "content",
+                                            ColorFilter.tint(Color(0xFFEF476F), BlendMode.SrcIn),
+                                        )
+                                    ),
                                 )
                             },
                         )
