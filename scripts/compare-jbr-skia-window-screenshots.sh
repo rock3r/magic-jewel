@@ -7,8 +7,12 @@ DIFF_IMAGE="${3:-${DIFF_IMAGE:-}}"
 MAX_AVG_DELTA="${MAX_AVG_DELTA:-8.0}"
 MAX_BAD_PIXEL_RATIO="${MAX_BAD_PIXEL_RATIO:-0.04}"
 BAD_PIXEL_THRESHOLD="${BAD_PIXEL_THRESHOLD:-32}"
+MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO="${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO:-0.04}"
+MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO="${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO:-0.08}"
+MAX_SWING_ISLAND_BAD_PIXEL_RATIO="${MAX_SWING_ISLAND_BAD_PIXEL_RATIO:-0.03}"
+MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO="${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO:-0.05}"
 
-/usr/bin/swift - "${OLD_IMAGE}" "${NEW_IMAGE}" "${MAX_AVG_DELTA}" "${MAX_BAD_PIXEL_RATIO}" "${BAD_PIXEL_THRESHOLD}" "${DIFF_IMAGE}" <<'SWIFT'
+/usr/bin/swift - "${OLD_IMAGE}" "${NEW_IMAGE}" "${MAX_AVG_DELTA}" "${MAX_BAD_PIXEL_RATIO}" "${BAD_PIXEL_THRESHOLD}" "${DIFF_IMAGE}" "${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO}" "${MAX_SWING_ISLAND_BAD_PIXEL_RATIO}" "${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO}" <<'SWIFT'
 import CoreGraphics
 import Foundation
 import ImageIO
@@ -19,6 +23,12 @@ let maxAverageDelta = Double(CommandLine.arguments[3]) ?? 8.0
 let maxBadPixelRatio = Double(CommandLine.arguments[4]) ?? 0.04
 let badPixelThreshold = Int(CommandLine.arguments[5]) ?? 32
 let diffPath = CommandLine.arguments.count > 6 ? CommandLine.arguments[6] : ""
+let regionBadPixelRatioLimits = [
+    "headerControls": Double(CommandLine.arguments[7]) ?? 0.04,
+    "composeCanvas": Double(CommandLine.arguments[8]) ?? 0.08,
+    "swingIsland": Double(CommandLine.arguments[9]) ?? 0.03,
+    "rightProbeStrip": Double(CommandLine.arguments[10]) ?? 0.05,
+]
 
 struct Region {
     let name: String
@@ -176,6 +186,10 @@ do {
     for region in regions {
         let regionMetrics = metrics(old: old, new: new, region: region, badPixelThreshold: badPixelThreshold)
         print("JBR_SKIA_SCREENSHOT_PARITY_REGION name=\(region.name) x=\(region.x) y=\(region.y) width=\(region.width) height=\(region.height) avgDelta=\(String(format: "%.3f", regionMetrics.averageDelta)) maxDelta=\(regionMetrics.maxDelta) badPixels=\(regionMetrics.badPixels) badPixelRatio=\(String(format: "%.5f", regionMetrics.badPixelRatio))")
+        if let maxBadPixelRatio = regionBadPixelRatioLimits[region.name], regionMetrics.badPixelRatio > maxBadPixelRatio {
+            fputs("Screenshot parity region \(region.name) exceeded bad-pixel threshold: \(regionMetrics.badPixelRatio) > \(maxBadPixelRatio)\n", stderr)
+            exit(1)
+        }
     }
 
     if fullMetrics.averageDelta > maxAverageDelta || fullMetrics.badPixelRatio > maxBadPixelRatio {
