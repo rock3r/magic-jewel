@@ -59,6 +59,7 @@ import androidx.compose.ui.graphics.RuntimeEffectColorFilterChild
 import androidx.compose.ui.graphics.RuntimeEffectShader
 import androidx.compose.ui.graphics.RuntimeEffectUniform
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.StampedPathEffectStyle
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -969,6 +970,30 @@ private fun MagicJewelApp() {
                                 style = PaintingStyle.Stroke
                                 strokeWidth = 6f
                                 pathEffect = PathEffect.cornerPathEffect(18f)
+                            },
+                        )
+                        val stampedShape = Path().apply {
+                            moveTo(0f, -5f)
+                            lineTo(5f, 5f)
+                            lineTo(-5f, 5f)
+                            close()
+                        }
+                        val stampedPath = Path().apply {
+                            moveTo(size.width - 188f, 390f)
+                            cubicTo(size.width - 152f, 352f, size.width - 102f, 430f, size.width - 68f, 388f)
+                        }
+                        canvas.drawPath(
+                            path = stampedPath,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFFFFF)
+                                style = PaintingStyle.Stroke
+                                strokeWidth = 2f
+                                pathEffect = PathEffect.stampedPathEffect(
+                                    shape = stampedShape,
+                                    advance = 18f,
+                                    phase = 0f,
+                                    style = StampedPathEffectStyle.Rotate,
+                                )
                             },
                         )
                     }
