@@ -996,6 +996,27 @@ private fun MagicJewelApp() {
                                 )
                             },
                         )
+                        val chainedPath = Path().apply {
+                            moveTo(size.width - 188f, 456f)
+                            lineTo(size.width - 70f, 456f)
+                        }
+                        canvas.drawPath(
+                            path = chainedPath,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFD54A)
+                                style = PaintingStyle.Stroke
+                                strokeWidth = 6f
+                                pathEffect = PathEffect.chainPathEffect(
+                                    outer = PathEffect.cornerPathEffect(10f),
+                                    inner = PathEffect.stampedPathEffect(
+                                        shape = stampedShape,
+                                        advance = 22f,
+                                        phase = 2f,
+                                        style = StampedPathEffectStyle.Rotate,
+                                    ),
+                                )
+                            },
+                        )
                     }
                 }
                 if (composeBlendModeEnabled) {
