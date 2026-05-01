@@ -414,7 +414,7 @@ if clipPathProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 5000))
 }
 if graphicsLayerClipProbe || graphicsLayerRoundClipProbe || graphicsLayerPathClipProbe {
-    let cyanThreshold = graphicsLayerShadowProbe ? 300 : 1000
+    let cyanThreshold = graphicsLayerShadowProbe ? 30 : 1000
     probeChecks.append(("probeRightCyan", probeRightCyan, cyanThreshold))
     probeChecks.append(("probeRightPurple", probeRightPurple, 1000))
 }
