@@ -17,6 +17,7 @@ OLD_JBR_API_SHIM="${OLD_JBR_API_SHIM:-}"
 OLD_JBR_SKIA_LIB="${OLD_JBR_SKIA_LIB:-}"
 OLD_SKIKO_VERSION="${OLD_SKIKO_VERSION:-}"
 OLD_CMP_OUT="${OLD_CMP_OUT:-}"
+OLD_ARTIFACT_BUNDLE="${OLD_ARTIFACT_BUNDLE:-}"
 OLD_JBR_EXPECTED_REASON="${OLD_JBR_EXPECTED_REASON:-native-abi-mismatch}"
 OLD_API_EXPECTED_REASON="${OLD_API_EXPECTED_REASON:-public-api-missing}"
 OLD_SKIKO_EXPECTED_REASON="${OLD_SKIKO_EXPECTED_REASON:-native-abi-mismatch}"
@@ -45,6 +46,7 @@ Current artifact variables:
   CURRENT_CMP_OUT         Default: /Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core
 
 Optional old artifact variables:
+  OLD_ARTIFACT_BUNDLE    Bundle created by package-jbr-skia-artifact-bundle.sh.
   OLD_DESKTOP_PATCH       Old java.desktop patch directory.
   OLD_JBR_API_SHIM        Old public JBR API shim jar.
   OLD_JBR_SKIA_LIB        Old/native-incompatible JBR Skia dylib.
@@ -116,6 +118,33 @@ summary_value() {
   grep -E "^${key}=" "${file}" | head -n 1 | cut -d= -f2-
 }
 
+load_old_artifact_bundle() {
+  local bundle="$1"
+  local manifest="${bundle}/manifest.properties"
+  require_file "old artifact bundle manifest" "${manifest}"
+
+  local key value
+  while IFS='=' read -r key value; do
+    case "${key}" in
+      desktop_patch)
+        OLD_DESKTOP_PATCH="${OLD_DESKTOP_PATCH:-${value}}"
+        ;;
+      jbr_api_shim)
+        OLD_JBR_API_SHIM="${OLD_JBR_API_SHIM:-${value}}"
+        ;;
+      jbr_skia_lib)
+        OLD_JBR_SKIA_LIB="${OLD_JBR_SKIA_LIB:-${value}}"
+        ;;
+      skiko_version)
+        OLD_SKIKO_VERSION="${OLD_SKIKO_VERSION:-${value}}"
+        ;;
+      cmp_out)
+        OLD_CMP_OUT="${OLD_CMP_OUT:-${value}}"
+        ;;
+    esac
+  done <"${manifest}"
+}
+
 run_case() {
   local name="$1"
   local desktop_patch="$2"
@@ -179,6 +208,10 @@ require_dir "current desktop patch" "${CURRENT_DESKTOP_PATCH}"
 require_file "current JBR API shim" "${CURRENT_JBR_API_SHIM}"
 require_file "current JBR Skia dylib" "${CURRENT_JBR_SKIA_LIB}"
 require_dir "current CMP output" "${CURRENT_CMP_OUT}"
+
+if [[ -n "${OLD_ARTIFACT_BUNDLE}" ]]; then
+  load_old_artifact_bundle "${OLD_ARTIFACT_BUNDLE}"
+fi
 
 run_case \
   current-all \

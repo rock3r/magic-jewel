@@ -97,7 +97,19 @@ Launch-level artifact matrix smoke:
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-artifact-matrix.sh
 ```
 
-The artifact matrix uses named local artifact roots instead of test-only mismatch properties. The required `current-all` row validates the current JBR desktop patch, public API shim, native dylib, Skiko version, and CMP output root together; `missing-public-api` validates one real missing-artifact fallback. Optional rows run only when `OLD_JBR_API_SHIM`, `OLD_JBR_SKIA_LIB`, `OLD_DESKTOP_PATCH`, `OLD_SKIKO_VERSION`, or `OLD_CMP_OUT` are provided. Set `REQUIRE_OLD_ARTIFACT_ROWS=true` in CI when those old bundles are expected; the matrix then fails if any optional row is skipped. Results are written to `matrix.tsv` with stable columns for row status, expected fallback, actual fallback count, JBR command frames, and report path.
+The artifact matrix uses named local artifact roots instead of test-only mismatch properties. The required `current-all` row validates the current JBR desktop patch, public API shim, native dylib, Skiko version, and CMP output root together; `missing-public-api` validates one real missing-artifact fallback. Optional rows run only when `OLD_JBR_API_SHIM`, `OLD_JBR_SKIA_LIB`, `OLD_DESKTOP_PATCH`, `OLD_SKIKO_VERSION`, or `OLD_CMP_OUT` are provided, or when `OLD_ARTIFACT_BUNDLE` points at a bundle manifest created by:
+
+```bash
+./scripts/package-jbr-skia-artifact-bundle.sh
+```
+
+The bundle helper captures the current patched `java.desktop` output, public API shim, native bridge dylib, Skiko version, and CMP output pointer into `out/jbr-skia-artifact-bundles/<timestamp>/manifest.properties`. It also writes `use-as-old.env`, which can be sourced or inspected to replay that bundle later:
+
+```bash
+OLD_ARTIFACT_BUNDLE=/path/to/bundle SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-artifact-matrix.sh
+```
+
+Set `REQUIRE_OLD_ARTIFACT_ROWS=true` in CI when old bundles are expected; the matrix then fails if any optional row is skipped. When a bundle captures the same artifacts as the current run, override the optional expected reasons to `none` for a self-check. Results are written to `matrix.tsv` with stable columns for row status, expected fallback, actual fallback count, JBR command frames, and report path.
 
 Command rendering probe suite:
 
