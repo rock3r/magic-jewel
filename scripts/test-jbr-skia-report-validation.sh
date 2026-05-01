@@ -612,6 +612,36 @@ strict_command_requires_min_jbr_shader_handle_cache_hits() {
   grep -q "^jbr_shader_handle_cache_hit_frames=1$" "${dir}/summary.properties"
 }
 
+strict_command_requires_min_jbr_shadow_commands() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_TIMING totalNanos=100 drawNanos=80 flushNanos=10 paragraphCommands=0 paragraphNanos=0 shadowCommands=1"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_JBR_SHADOW_COMMANDS=1
+  grep -q "^jbr_shadow_commands_max=1$" "${dir}/summary.properties"
+}
+
+strict_command_fails_without_min_jbr_shadow_commands() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_TIMING totalNanos=100 drawNanos=80 flushNanos=10 paragraphCommands=0 paragraphNanos=0 shadowCommands=0"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MIN_JBR_SHADOW_COMMANDS=1 2>/dev/null; then
+    echo "Expected strict command validation to fail without enough JBR shadow commands" >&2
+    return 1
+  fi
+}
+
 strict_command_requires_max_jbr_effect_handle_defines() {
   local dir
   dir="$(make_report_dir)"
@@ -1039,6 +1069,8 @@ strict_command_requires_min_jbr_shader_handle_defines
 strict_command_requires_min_jbr_shader_handle_uses
 strict_command_requires_min_jbr_shader_handle_evicts
 strict_command_requires_min_jbr_shader_handle_cache_hits
+strict_command_requires_min_jbr_shadow_commands
+strict_command_fails_without_min_jbr_shadow_commands
 strict_command_requires_max_jbr_effect_handle_defines
 strict_command_fails_above_max_jbr_effect_handle_defines
 strict_command_requires_max_jbr_shader_handle_defines

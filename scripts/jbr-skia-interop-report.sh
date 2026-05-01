@@ -40,6 +40,7 @@ EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES:-0}
 EXPECT_MIN_JBR_SHADER_HANDLE_USES="${EXPECT_MIN_JBR_SHADER_HANDLE_USES:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS="${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS="${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS:-0}"
+EXPECT_MIN_JBR_SHADOW_COMMANDS="${EXPECT_MIN_JBR_SHADOW_COMMANDS:-0}"
 EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES="${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES:--1}"
 EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES:--1}"
 EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE="${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE:-}"
@@ -427,6 +428,7 @@ Environment:
   EXPECT_MIN_JBR_SHADER_HANDLE_USES In strict command mode, require at least this many JBR-side shader handle use markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS In strict command mode, require at least this many JBR-side shader handle evict markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS In strict command mode, require at least this many JBR-side shader handle cache-hit markers. Default: 0.
+  EXPECT_MIN_JBR_SHADOW_COMMANDS In strict command mode, require at least this many JBR direct-shadow commands in one timing frame. Default: 0.
   EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side effect handle define markers. Default: disabled.
   EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side shader handle define markers. Default: disabled.
   EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE When EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed, require a matching stage=<value> marker. Default: disabled.
@@ -981,22 +983,40 @@ jbr_command_timing_summary() {
         } else if (value[1] == "paragraphNanos") {
           paragraph += value[2]
           if (value[2] > maxParagraph) maxParagraph = value[2]
+        } else if (value[1] == "shadowCommands") {
+          shadowCommands += value[2]
+          if (value[2] > maxShadowCommands) maxShadowCommands = value[2]
         }
       }
     }
     END {
       if (frames == 0) {
-        printf "frames=0 avg_total_ms=0 max_total_ms=0 avg_draw_ms=0 max_draw_ms=0 avg_flush_ms=0 max_flush_ms=0 avg_paragraph_ms=0 max_paragraph_ms=0 avg_paragraph_commands=0 max_paragraph_commands=0"
+        printf "frames=0 avg_total_ms=0 max_total_ms=0 avg_draw_ms=0 max_draw_ms=0 avg_flush_ms=0 max_flush_ms=0 avg_paragraph_ms=0 max_paragraph_ms=0 avg_paragraph_commands=0 max_paragraph_commands=0 avg_shadow_commands=0 max_shadow_commands=0"
         exit
       }
-      printf "frames=%d avg_total_ms=%.3f max_total_ms=%.3f avg_draw_ms=%.3f max_draw_ms=%.3f avg_flush_ms=%.3f max_flush_ms=%.3f avg_paragraph_ms=%.3f max_paragraph_ms=%.3f avg_paragraph_commands=%.1f max_paragraph_commands=%.0f",
+      printf "frames=%d avg_total_ms=%.3f max_total_ms=%.3f avg_draw_ms=%.3f max_draw_ms=%.3f avg_flush_ms=%.3f max_flush_ms=%.3f avg_paragraph_ms=%.3f max_paragraph_ms=%.3f avg_paragraph_commands=%.1f max_paragraph_commands=%.0f avg_shadow_commands=%.1f max_shadow_commands=%.0f",
         frames,
         total / frames / 1000000.0, maxTotal / 1000000.0,
         draw / frames / 1000000.0, maxDraw / 1000000.0,
         flush / frames / 1000000.0, maxFlush / 1000000.0,
         paragraph / frames / 1000000.0, maxParagraph / 1000000.0,
-        paragraphCommands / frames, maxParagraphCommands
+        paragraphCommands / frames, maxParagraphCommands,
+        shadowCommands / frames, maxShadowCommands
     }
+  ' "${log}"
+}
+
+max_jbr_command_timing_field() {
+  local log="$1"
+  local field="$2"
+  awk -v marker="${JBR_COMMAND_TIMING_MARKER}" -v field="${field}" '
+    index($0, marker) {
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] == field && value[2] > maxValue) maxValue = value[2]
+      }
+    }
+    END { print maxValue + 0 }
   ' "${log}"
 }
 
@@ -1167,6 +1187,7 @@ write_machine_summary() {
     echo "skiko_command_fps=$(frame_marker_fps "${SKIKO_COMMAND_MARKER}" "${new_log}")"
     echo "jbr_command_fps=$(frame_marker_fps "${JBR_COMMAND_MARKER}" "${new_log}")"
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_shadow_commands_max=$(max_jbr_command_timing_field "${new_log}" "shadowCommands")"
     echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_scoped_image_cache_clear_frames=$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
     echo "jbr_image_cache_evict_frames=$(grep -c "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}" 2>/dev/null || true)"
@@ -1374,6 +1395,7 @@ write_report() {
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}"
+    echo "- EXPECT_MIN_JBR_SHADOW_COMMANDS: ${EXPECT_MIN_JBR_SHADOW_COMMANDS}"
     echo "- EXPECT_MIN_POPUP_FRAMES: ${EXPECT_MIN_POPUP_FRAMES}"
     echo "- EXPECT_MIN_APP_NEW_FRAMES: ${EXPECT_MIN_APP_NEW_FRAMES}"
     echo "- EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS: ${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS}"
@@ -1678,6 +1700,14 @@ validate_report() {
         [[ "${jbr_image_cache_evicts}" -ge "${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}" ]] ||
           failures+=("JBR image cache evict markers ${jbr_image_cache_evicts} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}")
       fi
+
+      if [[ "${EXPECT_MIN_JBR_SHADOW_COMMANDS}" -gt 0 ]]; then
+        local max_shadow_commands
+        max_shadow_commands="$(max_jbr_command_timing_field "${new_log}" "shadowCommands")"
+        [[ "${max_shadow_commands%.*}" -ge "${EXPECT_MIN_JBR_SHADOW_COMMANDS}" ]] ||
+          failures+=("JBR shadow commands ${max_shadow_commands} below expected ${EXPECT_MIN_JBR_SHADOW_COMMANDS}")
+      fi
+
       if [[ "${EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES}" -gt 0 ]]; then
         local jbr_effect_handle_defines
         jbr_effect_handle_defines="$(grep -c "${JBR_EFFECT_HANDLE_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
@@ -1790,8 +1820,15 @@ validate_report() {
         fi
       fi
     fi
-    if [[ "${EXPECT_COMMAND_FALLBACK:-false}" != "true" ||
-        ! "${EXPECT_COMMAND_FALLBACK_REASON:-}" =~ ^(abi-mismatch|command-cache-clear-unavailable|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing|runtime-effect-compile-failed|runtime-effect-build-failed)$ ]]; then
+    local screenshot_status_required="true"
+    if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
+      case "${EXPECT_COMMAND_FALLBACK_REASON:-}" in
+        abi-mismatch|command-cache-clear-unavailable|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing|runtime-effect-compile-failed|runtime-effect-build-failed)
+          screenshot_status_required="false"
+          ;;
+      esac
+    fi
+    if [[ "${screenshot_status_required}" == "true" ]]; then
       [[ "${screenshot_status}" == "passed" ]] || failures+=("screenshot assertion did not pass")
     fi
   fi
