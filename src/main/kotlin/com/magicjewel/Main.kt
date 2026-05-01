@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.CompositeShader
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.graphics.ImageBitmap
@@ -138,6 +139,8 @@ private const val ComposeGraphicsLayerRenderEffectProperty = "magic.jewel.compos
 private const val ComposeGraphicsLayerOffsetEffectProperty = "magic.jewel.compose.graphicsLayerOffsetEffect"
 private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel.compose.graphicsLayerChainedRenderEffect"
 private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.graphicsLayerShadow"
+private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.graphicsLayerRotationX"
+private const val ComposeGraphicsLayerOffscreenProperty = "magic.jewel.compose.graphicsLayerOffscreen"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
@@ -401,6 +404,12 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerShadowEnabled = remember {
         System.getProperty(ComposeGraphicsLayerShadowProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerRotationXEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerRotationXProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerOffscreenEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerOffscreenProperty, "false").toBoolean()
     }
     val swingIslandEnabled = remember {
         System.getProperty(SwingIslandProperty, "true").toBoolean()
@@ -1730,6 +1739,12 @@ private fun MagicJewelApp() {
                                 shadowElevation = 18f
                                 spotShadowColor = Color(0xFF111827)
                                 ambientShadowColor = Color(0xFF111827)
+                            }
+                            if (composeGraphicsLayerRotationXEnabled) {
+                                rotationX = 28f
+                            }
+                            if (composeGraphicsLayerOffscreenEnabled) {
+                                compositingStrategy = CompositingStrategy.Offscreen
                             }
                             if (composeGraphicsLayerColorFilterEnabled) {
                                 colorFilter = ColorFilter.tint(Color(0xFF22D3EE))
