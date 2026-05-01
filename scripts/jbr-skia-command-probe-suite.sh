@@ -126,23 +126,28 @@ run_named_case() {
       ;;
     commands-composite-shader)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER=true
+        MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER=true \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1
       ;;
     commands-runtime-effect-shader)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER=true
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER=true \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1
       ;;
     commands-runtime-effect-pure-color)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_PURE_COLOR=true
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_PURE_COLOR=true \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1
       ;;
     commands-runtime-effect-uniform-only)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_UNIFORM_ONLY=true
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_UNIFORM_ONLY=true \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1
       ;;
     commands-runtime-effect-child-only)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_CHILD_ONLY=true
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_CHILD_ONLY=true \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1
       ;;
     commands-runtime-effect-build-fallback)
       run_case "$1" \
@@ -158,7 +163,8 @@ run_named_case() {
     commands-image-color-matrix-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER=true \
-        EXPECT_MIN_IMAGE_REFS=1
+        EXPECT_MIN_IMAGE_REFS=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1
       ;;
     commands-gradient-stroke)
       run_case "$1" \
@@ -171,15 +177,18 @@ run_named_case() {
     commands-color-filter-handle)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_COLOR_FILTER=true \
-        MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE=true
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1
       ;;
     commands-color-matrix-filter)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_COLOR_MATRIX_FILTER=true
+        MAGIC_JEWEL_COMPOSE_COLOR_MATRIX_FILTER=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1
       ;;
     commands-lighting-filter)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_LIGHTING_FILTER=true
+        MAGIC_JEWEL_COMPOSE_LIGHTING_FILTER=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1
       ;;
     commands-path-effect-fallback)
       run_case "$1" \
