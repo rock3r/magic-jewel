@@ -133,7 +133,7 @@ Named old/new screenshot parity suite:
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-screenshot-parity-suite.sh
 ```
 
-The parity suite runs deterministic old/new window captures for the rich baseline scene plus focused native-text, RuntimeEffect, and graphics-layer effect scenes. RuntimeEffect coverage includes pure-color, uniform-only, child-only, combined child+uniform, and RuntimeEffect color-filter rows. Use `CASES="parity-rich parity-runtime-effect-pure-color"` to run a subset. It writes `suite.tsv` with one row per case, including whole-window and Compose-canvas bad-pixel ratios plus the report and diff image paths.
+The parity suite runs deterministic old/new window captures for the rich baseline scene plus focused native-text, RuntimeEffect, and graphics-layer effect scenes. RuntimeEffect coverage includes pure-color, uniform-only, child-only, combined child+uniform, RuntimeEffect color-filter, and RuntimeEffect child color-filter rows. Use `CASES="parity-rich parity-runtime-effect-pure-color"` to run a subset. It writes `suite.tsv` with one row per case, including whole-window and Compose-canvas bad-pixel ratios plus the report and diff image paths.
 
 `parity-geometry-clean` disables Compose text and the embedded Swing island with `MAGIC_JEWEL_COMPOSE_TEXT=false` and `MAGIC_JEWEL_SWING_ISLAND=false`. It is useful as a text/Swing-free geometry baseline while the stricter region masks are still being tuned.
 `parity-native-text` enables `JBR_SKIA_NATIVE_TEXT=true`, requires paragraph text commands, disables the image-ref expectation, and uses a text-aware whole-window threshold because native text is expected to differ slightly from the default text-as-image fidelity path.
