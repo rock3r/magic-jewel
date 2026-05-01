@@ -9,7 +9,7 @@ DURATION_SECONDS="${DURATION_SECONDS:-6}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 PARITY_SCRIPT="${PARITY_SCRIPT:-${SCRIPT_DIR}/jbr-skia-screenshot-parity.sh}"
-CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-path-effect parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera}"
+CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-path-effect parity-image-filter parity-image-color-matrix-filter parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -121,6 +121,19 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
         MAX_BAD_PIXEL_RATIO=0.07 \
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10
+      ;;
+    parity-image-filter)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=true \
+        EXPECT_MIN_IMAGE_REFS=1 \
+        MAX_BAD_PIXEL_RATIO=0.06
+      ;;
+    parity-image-color-matrix-filter)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER=true \
+        EXPECT_MIN_IMAGE_REFS=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        MAX_BAD_PIXEL_RATIO=0.06
       ;;
     parity-image-shader-color-filter)
       run_case "$1" \

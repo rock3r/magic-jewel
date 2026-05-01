@@ -238,7 +238,8 @@ run_named_case() {
       ;;
     commands-image-filter)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=true
+        MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=true \
+        EXPECT_MIN_IMAGE_REFS=1
       ;;
     commands-image-color-matrix-filter)
       run_case "$1" \
