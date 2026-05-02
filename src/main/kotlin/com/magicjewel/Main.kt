@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.PaintingStyle
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.RadialGradientShader
 import androidx.compose.ui.graphics.RuntimeEffectChild
 import androidx.compose.ui.graphics.RuntimeEffectColorFilter
@@ -159,6 +160,7 @@ private const val ComposeClipPathProperty = "magic.jewel.compose.clipPath"
 private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
 private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
+private const val ComposePointLinesProperty = "magic.jewel.compose.pointLines"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
 private const val ComposeLinearGradientStrokeProperty = "magic.jewel.compose.linearGradientStroke"
 private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
@@ -473,6 +475,9 @@ private fun MagicJewelApp() {
     }
     val composeDrawRoundRectEnabled = remember {
         System.getProperty(ComposeDrawRoundRectProperty, "false").toBoolean()
+    }
+    val composePointLinesEnabled = remember {
+        System.getProperty(ComposePointLinesProperty, "false").toBoolean()
     }
     val composeLinearGradientEnabled = remember {
         System.getProperty(ComposeLinearGradientProperty, "false").toBoolean()
@@ -1623,6 +1628,40 @@ private fun MagicJewelApp() {
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(18f, 10f),
                         style = Stroke(width = 3f),
                     )
+                }
+                if (composePointLinesEnabled) {
+                    val topLeft = Offset(size.width - 540f, size.height - 112f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawPoints(
+                            pointMode = PointMode.Lines,
+                            points = listOf(
+                                topLeft,
+                                topLeft + Offset(48f, -30f),
+                                topLeft + Offset(64f, 0f),
+                                topLeft + Offset(118f, -42f),
+                                topLeft + Offset(134f, 0f),
+                                topLeft + Offset(188f, -28f),
+                            ),
+                            paint = Paint().apply {
+                                color = Color(0xFFFFD166)
+                                strokeWidth = 8f
+                            },
+                        )
+                        canvas.drawPoints(
+                            pointMode = PointMode.Polygon,
+                            points = listOf(
+                                topLeft + Offset(0f, 26f),
+                                topLeft + Offset(44f, 48f),
+                                topLeft + Offset(90f, 28f),
+                                topLeft + Offset(138f, 52f),
+                                topLeft + Offset(188f, 30f),
+                            ),
+                            paint = Paint().apply {
+                                color = Color.White
+                                strokeWidth = 5f
+                            },
+                        )
+                    }
                 }
                 if (composeLinearGradientEnabled) {
                     drawRect(
