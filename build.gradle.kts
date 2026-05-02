@@ -13,9 +13,15 @@ kotlin {
 }
 
 val localSkikoVersion = providers.environmentVariable("SKIKO_VERSION")
+val generatedLocalCmpOut = layout.projectDirectory.dir("../cmp/out/compose-multiplatform-core").asFile
+val defaultLocalCmpOut = if (generatedLocalCmpOut.isDirectory) {
+    generatedLocalCmpOut.absolutePath
+} else {
+    layout.projectDirectory.dir("../cmp").asFile.absolutePath
+}
 val localCmpOut = providers.gradleProperty("localCmpOut")
     .orElse(providers.environmentVariable("LOCAL_CMP_OUT"))
-    .orElse("/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core")
+    .orElse(defaultLocalCmpOut)
 val jbrSkiaJvmArgs = providers.gradleProperty("jbrSkiaInteropJvmArgs")
 val jbrSkiaRenderMode = providers.gradleProperty("jbrSkiaRenderMode")
     .orElse(providers.environmentVariable("JBR_SKIA_RENDER_MODE"))
@@ -172,6 +178,9 @@ val composeDrawRoundRectEnabled = providers.gradleProperty("magicJewelComposeDra
     .orElse("false")
 val composePointLinesEnabled = providers.gradleProperty("magicJewelComposePointLines")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_POINT_LINES"))
+    .orElse("false")
+val composePointDotsEnabled = providers.gradleProperty("magicJewelComposePointDots")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_POINT_DOTS"))
     .orElse("false")
 val composeLinearGradientEnabled = providers.gradleProperty("magicJewelComposeLinearGradient")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT"))
@@ -336,6 +345,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.drawArc", composeDrawArcEnabled.get())
     systemProperty("magic.jewel.compose.drawRoundRect", composeDrawRoundRectEnabled.get())
     systemProperty("magic.jewel.compose.pointLines", composePointLinesEnabled.get())
+    systemProperty("magic.jewel.compose.pointDots", composePointDotsEnabled.get())
     systemProperty("magic.jewel.compose.linearGradient", composeLinearGradientEnabled.get())
     systemProperty("magic.jewel.compose.linearGradientStroke", composeLinearGradientStrokeEnabled.get())
     systemProperty("magic.jewel.compose.linearGradientRoundRect", composeLinearGradientRoundRectEnabled.get())

@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-JBR_ROOT="${JBR_ROOT:-/Users/rock3r/src/jbr-skia-compose-poc}"
-JBR_API_ROOT="${JBR_API_ROOT:-/Users/rock3r/src/jbr-api-skia-poc}"
-SKIKO_ROOT="${SKIKO_ROOT:-/Users/rock3r/src/skiko-jbr-skia-poc/skiko}"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+WORKSPACE_ROOT="$(cd -- "${SCRIPT_DIR}/../.." >/dev/null && pwd)"
+
+JBR_ROOT="${JBR_ROOT:-${WORKSPACE_ROOT}/jbr}"
+JBR_API_ROOT="${JBR_API_ROOT:-${WORKSPACE_ROOT}/jbr-api}"
+SKIKO_ROOT="${SKIKO_ROOT:-${WORKSPACE_ROOT}/skiko}"
 SKIA_REVISION="${SKIA_REVISION:-m147-64a2414108}"
-SKIA_ROOT="${SKIA_ROOT:-${SKIKO_ROOT}/dependencies/skia/${SKIA_REVISION}/Skia-${SKIA_REVISION}-macos-Release-arm64}"
+DEFAULT_SKIA_ROOT="${SKIKO_ROOT}/dependencies/skia/${SKIA_REVISION}/Skia-${SKIA_REVISION}-macos-Release-arm64"
+if [[ ! -d "${DEFAULT_SKIA_ROOT}" && -d "${SKIKO_ROOT}/skiko/dependencies/skia/${SKIA_REVISION}/Skia-${SKIA_REVISION}-macos-Release-arm64" ]]; then
+  DEFAULT_SKIA_ROOT="${SKIKO_ROOT}/skiko/dependencies/skia/${SKIA_REVISION}/Skia-${SKIA_REVISION}-macos-Release-arm64"
+fi
+SKIA_ROOT="${SKIA_ROOT:-${DEFAULT_SKIA_ROOT}}"
 SKIA_OUT="${SKIA_OUT:-${SKIA_ROOT}/out/Release-macos-arm64}"
 
 OUT_ROOT="${OUT_ROOT:-/tmp/jbr-skia-run}"

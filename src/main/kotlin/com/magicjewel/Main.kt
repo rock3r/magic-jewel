@@ -63,6 +63,7 @@ import androidx.compose.ui.graphics.RuntimeEffectShader
 import androidx.compose.ui.graphics.RuntimeEffectUniform
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.StampedPathEffectStyle
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -161,6 +162,7 @@ private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
 private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
 private const val ComposePointLinesProperty = "magic.jewel.compose.pointLines"
+private const val ComposePointDotsProperty = "magic.jewel.compose.pointDots"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
 private const val ComposeLinearGradientStrokeProperty = "magic.jewel.compose.linearGradientStroke"
 private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
@@ -478,6 +480,9 @@ private fun MagicJewelApp() {
     }
     val composePointLinesEnabled = remember {
         System.getProperty(ComposePointLinesProperty, "false").toBoolean()
+    }
+    val composePointDotsEnabled = remember {
+        System.getProperty(ComposePointDotsProperty, "false").toBoolean()
     }
     val composeLinearGradientEnabled = remember {
         System.getProperty(ComposeLinearGradientProperty, "false").toBoolean()
@@ -1659,6 +1664,27 @@ private fun MagicJewelApp() {
                             paint = Paint().apply {
                                 color = Color.White
                                 strokeWidth = 5f
+                            },
+                        )
+                    }
+                }
+                if (composePointDotsEnabled) {
+                    val topLeft = Offset(size.width - 300f, size.height - 112f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawPoints(
+                            pointMode = PointMode.Points,
+                            points = listOf(
+                                topLeft,
+                                topLeft + Offset(24f, -18f),
+                                topLeft + Offset(48f, 0f),
+                                topLeft + Offset(72f, -28f),
+                                topLeft + Offset(96f, -4f),
+                                topLeft + Offset(120f, -22f),
+                            ),
+                            paint = Paint().apply {
+                                color = Color(0xFFFB7185)
+                                strokeWidth = 14f
+                                strokeCap = StrokeCap.Round
                             },
                         )
                     }
