@@ -9,7 +9,7 @@ DURATION_SECONDS="${DURATION_SECONDS:-6}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 PARITY_SCRIPT="${PARITY_SCRIPT:-${SCRIPT_DIR}/jbr-skia-screenshot-parity.sh}"
-CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-point-dots parity-path-effect parity-image-filter parity-image-color-matrix-filter parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera}"
+CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-point-dots parity-path-effect parity-image-filter parity-image-color-matrix-filter parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -492,6 +492,26 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROTATION_X=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROTATION_Y=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_NEAR_CAMERA=true \
+        MAX_BAD_PIXEL_RATIO=0.10 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.13 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.10
+      ;;
+    parity-graphics-layer-offcenter-pivot)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_PATH=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ARC=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROTATION_X=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROTATION_Y=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_NEAR_CAMERA=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_OFFCENTER_PIVOT=true \
         MAX_BAD_PIXEL_RATIO=0.10 \
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.13 \
         MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.10

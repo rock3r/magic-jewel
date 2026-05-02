@@ -65,6 +65,7 @@ import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.StampedPathEffectStyle
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -149,6 +150,7 @@ private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.grap
 private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.graphicsLayerRotationX"
 private const val ComposeGraphicsLayerRotationYProperty = "magic.jewel.compose.graphicsLayerRotationY"
 private const val ComposeGraphicsLayerNearCameraProperty = "magic.jewel.compose.graphicsLayerNearCamera"
+private const val ComposeGraphicsLayerOffCenterPivotProperty = "magic.jewel.compose.graphicsLayerOffCenterPivot"
 private const val ComposeGraphicsLayerOffscreenProperty = "magic.jewel.compose.graphicsLayerOffscreen"
 private const val ComposeGraphicsLayerModulateAlphaProperty = "magic.jewel.compose.graphicsLayerModulateAlpha"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
@@ -438,6 +440,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerNearCameraEnabled = remember {
         System.getProperty(ComposeGraphicsLayerNearCameraProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerOffCenterPivotEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerOffCenterPivotProperty, "false").toBoolean()
     }
     val composeGraphicsLayerOffscreenEnabled = remember {
         System.getProperty(ComposeGraphicsLayerOffscreenProperty, "false").toBoolean()
@@ -1976,6 +1981,9 @@ private fun MagicJewelApp() {
                             }
                             if (composeGraphicsLayerNearCameraEnabled) {
                                 cameraDistance = 180f
+                            }
+                            if (composeGraphicsLayerOffCenterPivotEnabled) {
+                                transformOrigin = TransformOrigin(0.18f, 0.82f)
                             }
                             if (composeGraphicsLayerOffscreenEnabled) {
                                 compositingStrategy = CompositingStrategy.Offscreen
