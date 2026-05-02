@@ -118,6 +118,11 @@ OLD_ARTIFACT_BUNDLE=/path/to/bundle SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-s
 
 Set `REQUIRE_OLD_ARTIFACT_ROWS=true` in CI when old bundles are expected; the matrix then fails if any optional row is skipped. When a bundle captures the same artifacts as the current run, override the optional expected reasons to `none` for a self-check. Results are written to `matrix.tsv` with stable columns for row status, expected fallback, actual fallback count, JBR command frames, and report path.
 
+For a real incompatible old-Skiko row, publish the old Skiko checkout under a separate Maven version such as
+`0.0.0-abi99-SNAPSHOT` and pass it with `OLD_SKIKO_VERSION`; do not overwrite the current `0.0.0-SNAPSHOT` artifact.
+The full required matrix can then combine old JBR API/native/desktop paths, `OLD_SKIKO_VERSION`, and `OLD_CMP_OUT` with
+the expected fallback reasons set per row.
+
 Command rendering probe suite:
 
 ```bash
