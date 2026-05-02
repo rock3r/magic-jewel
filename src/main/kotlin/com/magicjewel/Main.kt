@@ -66,6 +66,7 @@ import androidx.compose.ui.graphics.StampedPathEffectStyle
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -73,6 +74,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -116,6 +118,7 @@ private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
+private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShader"
 private const val ComposeImageShaderColorFilterProperty = "magic.jewel.compose.imageShaderColorFilter"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
 private const val ComposeCompositeShaderColorFilterProperty = "magic.jewel.compose.compositeShaderColorFilter"
@@ -338,6 +341,9 @@ private fun MagicJewelApp() {
     }
     val composeImageShaderEnabled = remember {
         System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
+    }
+    val composeOpaqueShaderEnabled = remember {
+        System.getProperty(ComposeOpaqueShaderProperty, "false").toBoolean()
     }
     val composeImageShaderColorFilterEnabled = remember {
         System.getProperty(ComposeImageShaderColorFilterProperty, "false").toBoolean()
@@ -663,6 +669,20 @@ private fun MagicJewelApp() {
                             topLeft = Offset(size.width - 224f, size.height - 224f),
                             size = Size(140f, 116f),
                             alpha = 0.92f,
+                        )
+                    }
+                }
+                if (composeOpaqueShaderEnabled) {
+                    val topLeft = Offset(size.width - 224f, size.height - 360f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 140f,
+                            bottom = topLeft.y + 116f,
+                            paint = Paint().apply {
+                                shader = org.jetbrains.skia.Shader.makeColor(Color(0xFFEF4444).toArgb()).asComposeShader()
+                            },
                         )
                     }
                 }
