@@ -129,6 +129,7 @@ run_named_case() {
         JBR_SKIA_NATIVE_TEXT=true \
         MAGIC_JEWEL_UNSUPPORTED_TEXT=true \
         MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=true \
+        EXPECT_MIN_TEXT_COMMANDS=8 \
         EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS=4
       ;;
     commands-image-shader)
