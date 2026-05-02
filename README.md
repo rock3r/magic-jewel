@@ -18,6 +18,12 @@ JBR Skia interop path, using the same patched module/native-library flags as the
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/run-jbr-skia.sh
 ```
 
+By default `run-jbr-skia.sh` passes `-Dsun.java2d.skia.interop.library=/tmp/jbr-skia-native/libjbrskiainterop.dylib`
+so the patched-module local harness can load the out-of-build native bridge. Set `JBR_SKIA_LIB=` to omit that property
+and exercise JBR's bundled `System.loadLibrary("jbrskiainterop")` path instead; that mode requires a real JBR image
+where the bridge is on the runtime library path, so the current patched-class harness is expected to produce no JBR
+native command frames when the library has not been bundled.
+
 Refresh local patched JBR artifacts:
 
 ```bash

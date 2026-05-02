@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DESKTOP_PATCH=${DESKTOP_PATCH:-/tmp/jbr-skia-run/desktop}
 JBR_API_SHIM=${JBR_API_SHIM:-/tmp/jbr-api-shim.jar}
-JBR_SKIA_LIB=${JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}
+JBR_SKIA_LIB=${JBR_SKIA_LIB-/tmp/jbr-skia-native/libjbrskiainterop.dylib}
 SKIKO_VERSION=${SKIKO_VERSION:-0.0.0-SNAPSHOT}
 LOCAL_CMP_OUT=${LOCAL_CMP_OUT:-}
 JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
@@ -28,8 +28,10 @@ JBR_ARGS=(
   "-Xbootclasspath/a:${JBR_API_SHIM}"
   "--add-exports=java.desktop/com.jetbrains.desktop=ALL-UNNAMED"
   "-Dsun.java2d.skia.interop=true"
-  "-Dsun.java2d.skia.interop.library=${JBR_SKIA_LIB}"
 )
+if [[ -n "${JBR_SKIA_LIB}" ]]; then
+  JBR_ARGS+=("-Dsun.java2d.skia.interop.library=${JBR_SKIA_LIB}")
+fi
 
 case "${JBR_SKIA_RENDER_MODE}" in
   commands)
