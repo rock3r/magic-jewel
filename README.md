@@ -95,7 +95,7 @@ Launch-level compatibility matrix smoke:
 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-compatibility-matrix.sh
 ```
 
-The matrix runs the command-mode happy path plus forced `abi-mismatch`, `native-abi-mismatch`, high-word `command-capability-mismatch`, exact shader/color-filter capability removal, and `public-api-missing` fallbacks. The low 64-bit capability word is already saturated in this PoC, so the high-word rows are the useful forward-compatibility guards for new descriptor capabilities. It validates that happy path gets JBR command frames, while each forced mismatch emits one structured fallback marker and produces no JBR command frames.
+The matrix runs the command-mode happy path plus forced `abi-mismatch`, `native-abi-mismatch`, high-word `command-capability-mismatch`, exact shader/color-filter capability removal, and `public-api-missing` fallbacks. The low 64-bit capability word is already saturated in this PoC, so the high-word rows are the useful forward-compatibility guards for new descriptor capabilities. It validates that happy path gets JBR command frames, while each forced mismatch emits one structured fallback marker and produces no JBR command frames. Results are written to `matrix.tsv` with stable case, status, fallback, command-frame, and report columns.
 
 Launch-level artifact matrix smoke:
 

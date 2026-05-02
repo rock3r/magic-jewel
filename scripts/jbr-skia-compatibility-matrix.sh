@@ -10,6 +10,8 @@ WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 
 mkdir -p "${OUT_ROOT}"
+MATRIX_TSV="${OUT_ROOT}/matrix.tsv"
+printf "case\tstatus\tfallbacks\tcommand_frames\treport\n" > "${MATRIX_TSV}"
 
 run_case() {
   local name="$1"
@@ -33,6 +35,7 @@ run_case() {
   fallback="$(grep -E '^fallback_new_count=' "${out_dir}/summary.properties" | cut -d= -f2-)"
   local command_frames
   command_frames="$(grep -E '^jbr_command_frames=' "${out_dir}/summary.properties" | cut -d= -f2-)"
+  printf "%s\t%s\t%s\t%s\t%s\n" "${name}" "${status}" "${fallback}" "${command_frames}" "${report}" >> "${MATRIX_TSV}"
   echo "status=${status} fallback_new_count=${fallback} jbr_command_frames=${command_frames} report=${report}"
   [[ "${status}" == "passed" ]]
 }
@@ -45,3 +48,4 @@ run_case shader-color-filter-capability-missing EXPECT_COMMAND_FALLBACK=true EXP
 run_case public-api-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=public-api-missing JBR_API_SHIM=/tmp/missing-jbr-api-shim.jar
 
 echo "JBR_SKIA_COMPATIBILITY_MATRIX passed out_root=${OUT_ROOT}"
+echo "matrix=${MATRIX_TSV}"
