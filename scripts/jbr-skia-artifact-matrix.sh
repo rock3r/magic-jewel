@@ -11,7 +11,7 @@ CURRENT_DESKTOP_PATCH="${CURRENT_DESKTOP_PATCH:-/tmp/jbr-skia-run/desktop}"
 CURRENT_JBR_API_SHIM="${CURRENT_JBR_API_SHIM:-/tmp/jbr-api-shim.jar}"
 CURRENT_JBR_SKIA_LIB="${CURRENT_JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}"
 CURRENT_SKIKO_VERSION="${CURRENT_SKIKO_VERSION:-${SKIKO_VERSION:-0.0.0-SNAPSHOT}}"
-CURRENT_CMP_OUT="${CURRENT_CMP_OUT:-/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core}"
+CURRENT_CMP_OUT="${CURRENT_CMP_OUT:-${ROOT_DIR}/../cmp/out/compose-multiplatform-core}"
 OLD_DESKTOP_PATCH="${OLD_DESKTOP_PATCH:-}"
 OLD_JBR_API_SHIM="${OLD_JBR_API_SHIM:-}"
 OLD_JBR_SKIA_LIB="${OLD_JBR_SKIA_LIB:-}"
@@ -43,7 +43,7 @@ Current artifact variables:
   CURRENT_JBR_API_SHIM    Default: /tmp/jbr-api-shim.jar
   CURRENT_JBR_SKIA_LIB    Default: /tmp/jbr-skia-native/libjbrskiainterop.dylib
   CURRENT_SKIKO_VERSION   Default: SKIKO_VERSION or 0.0.0-SNAPSHOT
-  CURRENT_CMP_OUT         Default: /Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core
+  CURRENT_CMP_OUT         Default: sibling ../cmp/out/compose-multiplatform-core
 
 Optional old artifact variables:
   OLD_ARTIFACT_BUNDLE    Bundle created by package-jbr-skia-artifact-bundle.sh.

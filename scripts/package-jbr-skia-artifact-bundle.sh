@@ -9,7 +9,7 @@ DESKTOP_PATCH="${DESKTOP_PATCH:-/tmp/jbr-skia-run/desktop}"
 JBR_API_SHIM="${JBR_API_SHIM:-/tmp/jbr-api-shim.jar}"
 JBR_SKIA_LIB="${JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}"
 SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
-CMP_OUT="${CMP_OUT:-/Users/rock3r/src/cmp-jbr-skia-poc/out/compose-multiplatform-core}"
+CMP_OUT="${CMP_OUT:-${ROOT_DIR}/../cmp/out/compose-multiplatform-core}"
 COPY_CMP_OUT="${COPY_CMP_OUT:-false}"
 
 require_file() {
