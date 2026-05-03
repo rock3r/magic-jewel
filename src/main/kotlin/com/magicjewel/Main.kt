@@ -133,6 +133,8 @@ private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.co
 private const val ComposeNoiseShaderProperty = "magic.jewel.compose.noiseShader"
 private const val ComposeTurbulenceShaderProperty = "magic.jewel.compose.turbulenceShader"
 private const val ComposeRawLinearGradientShaderProperty = "magic.jewel.compose.rawLinearGradientShader"
+private const val ComposeRawRadialGradientShaderProperty = "magic.jewel.compose.rawRadialGradientShader"
+private const val ComposeRawSweepGradientShaderProperty = "magic.jewel.compose.rawSweepGradientShader"
 private const val ComposeRawNoiseShaderProperty = "magic.jewel.compose.rawNoiseShader"
 private const val ComposeRawTurbulenceShaderProperty = "magic.jewel.compose.rawTurbulenceShader"
 private const val ComposePictureShaderProperty = "magic.jewel.compose.pictureShader"
@@ -397,6 +399,12 @@ private fun MagicJewelApp() {
     }
     val composeRawLinearGradientShaderEnabled = remember {
         System.getProperty(ComposeRawLinearGradientShaderProperty, "false").toBoolean()
+    }
+    val composeRawRadialGradientShaderEnabled = remember {
+        System.getProperty(ComposeRawRadialGradientShaderProperty, "false").toBoolean()
+    }
+    val composeRawSweepGradientShaderEnabled = remember {
+        System.getProperty(ComposeRawSweepGradientShaderProperty, "false").toBoolean()
     }
     val composeRawNoiseShaderEnabled = remember {
         System.getProperty(ComposeRawNoiseShaderProperty, "false").toBoolean()
@@ -876,12 +884,47 @@ private fun MagicJewelApp() {
                                     topLeft.y,
                                     topLeft.x + 140f,
                                     topLeft.y + 116f,
-                                    intArrayOf(
-                                        Color(0xFF06B6D4).toArgb(),
-                                        Color(0xFFFDBA2D).toArgb(),
-                                        Color(0xFFEF1C24).toArgb(),
-                                    ),
-                                    floatArrayOf(0f, 0.5f, 1f),
+                                    RawGradientColors,
+                                    RawGradientStops,
+                                ).asComposeShader()
+                            },
+                        )
+                    }
+                }
+                if (composeRawRadialGradientShaderEnabled) {
+                    val topLeft = Offset(size.width - 300f, size.height - 232f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 140f,
+                            bottom = topLeft.y + 116f,
+                            paint = Paint().apply {
+                                shader = makeRawSkiaRadialGradientShader(
+                                    topLeft.x + 70f,
+                                    topLeft.y + 58f,
+                                    76f,
+                                    RawGradientColors,
+                                    RawGradientStops,
+                                ).asComposeShader()
+                            },
+                        )
+                    }
+                }
+                if (composeRawSweepGradientShaderEnabled) {
+                    val topLeft = Offset(size.width - 596f, size.height - 232f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 140f,
+                            bottom = topLeft.y + 116f,
+                            paint = Paint().apply {
+                                shader = makeRawSkiaSweepGradientShader(
+                                    topLeft.x + 70f,
+                                    topLeft.y + 58f,
+                                    RawGradientColors,
+                                    RawGradientStops,
                                 ).asComposeShader()
                             },
                         )
@@ -2630,6 +2673,13 @@ private fun MagicJewelApp() {
     }
 }
 
+private val RawGradientColors = intArrayOf(
+    Color(0xFF06B6D4).toArgb(),
+    Color(0xFFFDBA2D).toArgb(),
+    Color(0xFFEF1C24).toArgb(),
+)
+private val RawGradientStops = floatArrayOf(0f, 0.5f, 1f)
+
 private fun makeRawSkiaLinearGradientShader(
     x0: Float,
     y0: Float,
@@ -2651,13 +2701,89 @@ private fun makeRawSkiaLinearGradientShader(
         return oldStyleMethod.invoke(companion, x0, y0, x1, y1, colors, positions, defaultStyle) as org.jetbrains.skia.Shader
     }
 
+    val gradient = makeRawSkiaGradient(colors, positions)
+    val newStyleMethod = companion.javaClass.methods.first { method ->
+        method.name == "makeLinearGradient" &&
+            method.parameterTypes.size == 6 &&
+            method.parameterTypes[4].name == "org.jetbrains.skia.Gradient"
+    }
+    return newStyleMethod.invoke(companion, x0, y0, x1, y1, gradient, null) as org.jetbrains.skia.Shader
+}
+
+private fun makeRawSkiaRadialGradientShader(
+    centerX: Float,
+    centerY: Float,
+    radius: Float,
+    colors: IntArray,
+    positions: FloatArray,
+): org.jetbrains.skia.Shader {
+    val companion = org.jetbrains.skia.Shader.Companion
+    val oldStyleMethod = companion.javaClass.methods.firstOrNull { method ->
+        method.name == "makeRadialGradient" &&
+            method.parameterTypes.size == 6 &&
+            method.parameterTypes[3] == IntArray::class.java &&
+            method.parameterTypes[4] == FloatArray::class.java
+    }
+    if (oldStyleMethod != null) {
+        return oldStyleMethod.invoke(
+            companion,
+            centerX,
+            centerY,
+            radius,
+            colors,
+            positions,
+            defaultSkiaGradientStyle(),
+        ) as org.jetbrains.skia.Shader
+    }
+
+    val gradient = makeRawSkiaGradient(colors, positions)
+    val newStyleMethod = companion.javaClass.methods.first { method ->
+        method.name == "makeRadialGradient" &&
+            method.parameterTypes.size == 5 &&
+            method.parameterTypes[3].name == "org.jetbrains.skia.Gradient"
+    }
+    return newStyleMethod.invoke(companion, centerX, centerY, radius, gradient, null) as org.jetbrains.skia.Shader
+}
+
+private fun makeRawSkiaSweepGradientShader(
+    centerX: Float,
+    centerY: Float,
+    colors: IntArray,
+    positions: FloatArray,
+): org.jetbrains.skia.Shader {
+    val companion = org.jetbrains.skia.Shader.Companion
+    val oldStyleMethod = companion.javaClass.methods.firstOrNull { method ->
+        method.name == "makeSweepGradient" &&
+            method.parameterTypes.size == 5 &&
+            method.parameterTypes[2] == IntArray::class.java &&
+            method.parameterTypes[3] == FloatArray::class.java
+    }
+    if (oldStyleMethod != null) {
+        return oldStyleMethod.invoke(companion, centerX, centerY, colors, positions, defaultSkiaGradientStyle())
+            as org.jetbrains.skia.Shader
+    }
+
+    val gradient = makeRawSkiaGradient(colors, positions)
+    val newStyleMethod = companion.javaClass.methods.first { method ->
+        method.name == "makeSweepGradient" &&
+            method.parameterTypes.size == 4 &&
+            method.parameterTypes[2].name == "org.jetbrains.skia.Gradient"
+    }
+    return newStyleMethod.invoke(companion, centerX, centerY, gradient, null) as org.jetbrains.skia.Shader
+}
+
+private fun defaultSkiaGradientStyle(): Any {
+    val styleCompanion = Class.forName("org.jetbrains.skia.GradientStyle").getField("Companion").get(null)
+    return styleCompanion.javaClass.getMethod("getDEFAULT").invoke(styleCompanion)
+}
+
+private fun makeRawSkiaGradient(colors: IntArray, positions: FloatArray): Any {
     val tileModeClass = Class.forName("org.jetbrains.skia.FilterTileMode")
     val clampTileMode = tileModeClass.enumConstants.first { (it as Enum<*>).name == "CLAMP" }
-    val color4fs = arrayOf(
-        org.jetbrains.skia.Color4f(0.02f, 0.72f, 0.86f),
-        org.jetbrains.skia.Color4f(0.99f, 0.72f, 0.18f),
-        org.jetbrains.skia.Color4f(0.93f, 0.11f, 0.14f),
-    )
+    val color4fs = colors.map { argb ->
+        val color = Color(argb)
+        org.jetbrains.skia.Color4f(color.red, color.green, color.blue, color.alpha)
+    }.toTypedArray()
     val colorsClass = Class.forName("org.jetbrains.skia.Gradient\$Colors")
     val gradientColors = colorsClass.constructors.first { constructor ->
         constructor.parameterTypes.size == 4
@@ -2666,12 +2792,7 @@ private fun makeRawSkiaLinearGradientShader(
     val gradient = gradientClass.constructors.first { constructor ->
         constructor.parameterTypes.size == 4
     }.newInstance(gradientColors, null, 2, null)
-    val newStyleMethod = companion.javaClass.methods.first { method ->
-        method.name == "makeLinearGradient" &&
-            method.parameterTypes.size == 6 &&
-            method.parameterTypes[4].name == "org.jetbrains.skia.Gradient"
-    }
-    return newStyleMethod.invoke(companion, x0, y0, x1, y1, gradient, null) as org.jetbrains.skia.Shader
+    return gradient
 }
 
 private fun createImageProbe(): ImageBitmap {
