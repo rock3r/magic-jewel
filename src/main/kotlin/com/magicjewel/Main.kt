@@ -127,6 +127,7 @@ private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
+private const val ComposeRawImageShaderProperty = "magic.jewel.compose.rawImageShader"
 private const val ComposeColorShaderProperty = "magic.jewel.compose.colorShader"
 private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShader"
 private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.compositeOpaqueShader"
@@ -381,6 +382,9 @@ private fun MagicJewelApp() {
     }
     val composeImageShaderEnabled = remember {
         System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
+    }
+    val composeRawImageShaderEnabled = remember {
+        System.getProperty(ComposeRawImageShaderProperty, "false").toBoolean()
     }
     val composeColorShaderEnabled = remember {
         System.getProperty(ComposeColorShaderProperty, "false").toBoolean()
@@ -665,6 +669,13 @@ private fun MagicJewelApp() {
             null
         }
     }
+    val rawImageShader = remember(composeRawImageShaderEnabled) {
+        if (composeRawImageShaderEnabled) {
+            createRawSkiaImageShader().asComposeShader()
+        } else {
+            null
+        }
+    }
     val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
     val animatedPhase by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -789,6 +800,22 @@ private fun MagicJewelApp() {
                             size = Size(140f, 116f),
                             alpha = 0.92f,
                         )
+                    }
+                }
+                if (composeRawImageShaderEnabled) {
+                    rawImageShader?.let { shader ->
+                        val topLeft = Offset(size.width - 300f, size.height - 488f)
+                        drawIntoCanvas { canvas ->
+                            canvas.drawRect(
+                                left = topLeft.x,
+                                top = topLeft.y,
+                                right = topLeft.x + 140f,
+                                bottom = topLeft.y + 116f,
+                                paint = Paint().apply {
+                                    this.shader = shader
+                                },
+                            )
+                        }
                     }
                 }
                 if (composeColorShaderEnabled) {
@@ -2793,6 +2820,28 @@ private fun makeRawSkiaGradient(colors: IntArray, positions: FloatArray): Any {
         constructor.parameterTypes.size == 4
     }.newInstance(gradientColors, null, 2, null)
     return gradient
+}
+
+private fun createRawSkiaImageShader(): org.jetbrains.skia.Shader {
+    val surface = org.jetbrains.skia.Surface.makeRasterN32Premul(32, 32)
+    val canvas = surface.canvas
+    canvas.clear(Color(0xFF0F172A).toArgb())
+    canvas.drawRect(
+        org.jetbrains.skia.Rect(0f, 0f, 18f, 32f),
+        org.jetbrains.skia.Paint().apply { color = Color(0xFF22D3EE).toArgb() },
+    )
+    canvas.drawCircle(
+        22f,
+        16f,
+        9f,
+        org.jetbrains.skia.Paint().apply { color = Color(0xFFFFD166).toArgb() },
+    )
+    return surface.makeImageSnapshot().makeShader(
+        org.jetbrains.skia.FilterTileMode.REPEAT,
+        org.jetbrains.skia.FilterTileMode.MIRROR,
+        org.jetbrains.skia.SamplingMode.DEFAULT,
+        null,
+    )
 }
 
 private fun createImageProbe(): ImageBitmap {

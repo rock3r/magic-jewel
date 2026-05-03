@@ -74,6 +74,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_RAW_IMAGE_SHADER+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_RAW_IMAGE_SHADER=false
+fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_COLOR_SHADER+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_COLOR_SHADER=false
 fi
@@ -356,6 +359,7 @@ fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
+export MAGIC_JEWEL_COMPOSE_RAW_IMAGE_SHADER
 export MAGIC_JEWEL_COMPOSE_COLOR_SHADER
 export MAGIC_JEWEL_COMPOSE_OPAQUE_SHADER
 export MAGIC_JEWEL_COMPOSE_COMPOSITE_OPAQUE_SHADER
@@ -570,6 +574,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader rendering probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_RAW_IMAGE_SHADER Enables an unsupported raw Skia image-shader fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_SHADER Enables a JBR-owned solid color shader descriptor probe. Default: false.
   MAGIC_JEWEL_COMPOSE_OPAQUE_SHADER Enables an unsupported opaque Skia shader fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COMPOSITE_OPAQUE_SHADER Enables a composite shader with an unsupported raw-Skia child fallback probe. Default: false.
@@ -1466,6 +1471,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_TEXT: ${MAGIC_JEWEL_COMPOSE_TEXT}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE: ${MAGIC_JEWEL_COMPOSE_IMAGE}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE_SHADER: ${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER}"
+    echo "- MAGIC_JEWEL_COMPOSE_RAW_IMAGE_SHADER: ${MAGIC_JEWEL_COMPOSE_RAW_IMAGE_SHADER}"
     echo "- MAGIC_JEWEL_COMPOSE_OPAQUE_SHADER: ${MAGIC_JEWEL_COMPOSE_OPAQUE_SHADER}"
     echo "- MAGIC_JEWEL_COMPOSE_COMPOSITE_OPAQUE_SHADER: ${MAGIC_JEWEL_COMPOSE_COMPOSITE_OPAQUE_SHADER}"
     echo "- MAGIC_JEWEL_COMPOSE_NOISE_SHADER: ${MAGIC_JEWEL_COMPOSE_NOISE_SHADER}"
