@@ -13,7 +13,7 @@ CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-forc
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
-printf "case\tstatus\tavg_delta\tbad_pixel_ratio\tcompose_bad_pixel_ratio\tcompose_bottom_labels_bad_pixel_ratio\tcompose_purple_rect_bad_pixel_ratio\tcompose_top_progress_bad_pixel_ratio\tcompose_bottom_swatches_bad_pixel_ratio\tcompose_shader_image_bad_pixel_ratio\tcompose_shader_composite_bad_pixel_ratio\tcompose_shader_linear_bad_pixel_ratio\treport\tdiff\n" > "${SUITE_TSV}"
+printf "case\tstatus\tfallbacks\tjbr_picture_frames\tjbr_command_frames\tavg_delta\tbad_pixel_ratio\tcompose_bad_pixel_ratio\tcompose_bottom_labels_bad_pixel_ratio\tcompose_purple_rect_bad_pixel_ratio\tcompose_top_progress_bad_pixel_ratio\tcompose_bottom_swatches_bad_pixel_ratio\tcompose_shader_image_bad_pixel_ratio\tcompose_shader_composite_bad_pixel_ratio\tcompose_shader_linear_bad_pixel_ratio\treport\tdiff\n" > "${SUITE_TSV}"
 
 summary_value() {
   local file="$1"
@@ -49,6 +49,9 @@ run_case() {
 
   local summary="${out_dir}/report/summary.properties"
   local avg_delta
+  local fallback_count
+  local jbr_picture_frames
+  local jbr_command_frames
   local bad_pixel_ratio
   local compose_bad_pixel_ratio
   local compose_bottom_labels_bad_pixel_ratio
@@ -68,14 +71,18 @@ run_case() {
   compose_shader_image_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeShaderImage_badPixelRatio)"
   compose_shader_composite_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeShaderComposite_badPixelRatio)"
   compose_shader_linear_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeShaderLinear_badPixelRatio)"
+  fallback_count="$(summary_value "${summary}" fallback_new_count)"
+  jbr_picture_frames="$(summary_value "${summary}" jbr_picture_frames)"
+  jbr_command_frames="$(summary_value "${summary}" jbr_command_frames)"
 
-  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
-    "${name}" "${status}" "${avg_delta}" "${bad_pixel_ratio}" "${compose_bad_pixel_ratio}" \
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+    "${name}" "${status}" "${fallback_count}" "${jbr_picture_frames}" "${jbr_command_frames}" \
+    "${avg_delta}" "${bad_pixel_ratio}" "${compose_bad_pixel_ratio}" \
     "${compose_bottom_labels_bad_pixel_ratio}" \
     "${compose_purple_rect_bad_pixel_ratio}" "${compose_top_progress_bad_pixel_ratio}" "${compose_bottom_swatches_bad_pixel_ratio}" \
     "${compose_shader_image_bad_pixel_ratio}" "${compose_shader_composite_bad_pixel_ratio}" "${compose_shader_linear_bad_pixel_ratio}" \
     "${out_dir}/report/report.md" "${out_dir}/report/parity-diff.png" >> "${SUITE_TSV}"
-  echo "status=${status} avg_delta=${avg_delta} bad_pixel_ratio=${bad_pixel_ratio} compose_bad_pixel_ratio=${compose_bad_pixel_ratio} compose_bottom_labels_bad_pixel_ratio=${compose_bottom_labels_bad_pixel_ratio} compose_bottom_swatches_bad_pixel_ratio=${compose_bottom_swatches_bad_pixel_ratio} compose_shader_image_bad_pixel_ratio=${compose_shader_image_bad_pixel_ratio} compose_shader_composite_bad_pixel_ratio=${compose_shader_composite_bad_pixel_ratio} compose_shader_linear_bad_pixel_ratio=${compose_shader_linear_bad_pixel_ratio} report=${out_dir}/report/report.md"
+  echo "status=${status} fallback_new_count=${fallback_count} jbr_picture_frames=${jbr_picture_frames} jbr_command_frames=${jbr_command_frames} avg_delta=${avg_delta} bad_pixel_ratio=${bad_pixel_ratio} compose_bad_pixel_ratio=${compose_bad_pixel_ratio} compose_bottom_labels_bad_pixel_ratio=${compose_bottom_labels_bad_pixel_ratio} compose_bottom_swatches_bad_pixel_ratio=${compose_bottom_swatches_bad_pixel_ratio} compose_shader_image_bad_pixel_ratio=${compose_shader_image_bad_pixel_ratio} compose_shader_composite_bad_pixel_ratio=${compose_shader_composite_bad_pixel_ratio} compose_shader_linear_bad_pixel_ratio=${compose_shader_linear_bad_pixel_ratio} report=${out_dir}/report/report.md"
   if [ "${status}" != "passed" ]; then
     return 1
   fi
