@@ -85,7 +85,7 @@ run_case() {
   jbr_picture_frames="$(summary_value "${summary}" jbr_picture_frames)"
   jbr_command_frames="$(summary_value "${summary}" jbr_command_frames)"
 
-  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
     "${name}" "${status}" "${fallback_count}" "${jbr_picture_frames}" "${jbr_command_frames}" \
     "${avg_delta}" "${bad_pixel_ratio}" "${header_buttons_bad_pixel_ratio}" "${compose_bad_pixel_ratio}" \
     "${compose_bottom_labels_bad_pixel_ratio}" "${compose_paragraph_probes_bad_pixel_ratio}" \
