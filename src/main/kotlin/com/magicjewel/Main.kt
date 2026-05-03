@@ -120,6 +120,7 @@ private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShader"
 private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.compositeOpaqueShader"
+private const val ComposeNoiseShaderProperty = "magic.jewel.compose.noiseShader"
 private const val ComposeTransformedShaderProperty = "magic.jewel.compose.transformedShader"
 private const val ComposeImageShaderColorFilterProperty = "magic.jewel.compose.imageShaderColorFilter"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
@@ -349,6 +350,9 @@ private fun MagicJewelApp() {
     }
     val composeCompositeOpaqueShaderEnabled = remember {
         System.getProperty(ComposeCompositeOpaqueShaderProperty, "false").toBoolean()
+    }
+    val composeNoiseShaderEnabled = remember {
+        System.getProperty(ComposeNoiseShaderProperty, "false").toBoolean()
     }
     val composeTransformedShaderEnabled = remember {
         System.getProperty(ComposeTransformedShaderProperty, "false").toBoolean()
@@ -712,6 +716,25 @@ private fun MagicJewelApp() {
                         topLeft = topLeft,
                         size = Size(140f, 116f),
                     )
+                }
+                if (composeNoiseShaderEnabled) {
+                    val topLeft = Offset(size.width - 596f, size.height - 616f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 140f,
+                            bottom = topLeft.y + 116f,
+                            paint = Paint().apply {
+                                shader = org.jetbrains.skia.Shader.makeFractalNoise(
+                                    baseFrequencyX = 0.04f,
+                                    baseFrequencyY = 0.06f,
+                                    numOctaves = 4,
+                                    seed = 3.5f,
+                                ).asComposeShader()
+                            },
+                        )
+                    }
                 }
                 if (composeTransformedShaderEnabled) {
                     val topLeft = Offset(size.width - 224f, size.height - 488f)
