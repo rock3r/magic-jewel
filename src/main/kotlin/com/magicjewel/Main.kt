@@ -640,8 +640,20 @@ private fun MagicJewelApp() {
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            DefaultButton(onClick = { ticks++ }) { MagicLabel("Pulse", composeTextEnabled, width = 48.dp) }
-            OutlinedButton(onClick = { ticks = 0 }) { MagicLabel("Reset", composeTextEnabled, width = 48.dp) }
+            DefaultButton(onClick = { ticks++ }) {
+                Text(
+                    text = "Pulse",
+                    modifier = Modifier.width(48.dp),
+                    textAlign = TextAlign.Center,
+                )
+            }
+            OutlinedButton(onClick = { ticks = 0 }) {
+                Text(
+                    text = "Reset",
+                    modifier = Modifier.width(48.dp),
+                    textAlign = TextAlign.Center,
+                )
+            }
             MagicLabel("frames=$ticks", composeTextEnabled, modifier = Modifier.align(Alignment.CenterVertically), width = 92.dp)
         }
 

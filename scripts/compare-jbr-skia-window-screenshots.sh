@@ -8,6 +8,7 @@ MAX_AVG_DELTA="${MAX_AVG_DELTA:-8.0}"
 MAX_BAD_PIXEL_RATIO="${MAX_BAD_PIXEL_RATIO:-0.06}"
 BAD_PIXEL_THRESHOLD="${BAD_PIXEL_THRESHOLD:-32}"
 MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO="${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO:-0.04}"
+MAX_HEADER_BUTTONS_BAD_PIXEL_RATIO="${MAX_HEADER_BUTTONS_BAD_PIXEL_RATIO:-0.02}"
 MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO="${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO:-0.08}"
 MAX_SWING_ISLAND_BAD_PIXEL_RATIO="${MAX_SWING_ISLAND_BAD_PIXEL_RATIO:-0.03}"
 MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO="${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO:-0.05}"
@@ -22,7 +23,7 @@ MAX_COMPOSE_SHADER_IMAGE_BAD_PIXEL_RATIO="${MAX_COMPOSE_SHADER_IMAGE_BAD_PIXEL_R
 MAX_COMPOSE_SHADER_COMPOSITE_BAD_PIXEL_RATIO="${MAX_COMPOSE_SHADER_COMPOSITE_BAD_PIXEL_RATIO:--1}"
 MAX_COMPOSE_SHADER_LINEAR_BAD_PIXEL_RATIO="${MAX_COMPOSE_SHADER_LINEAR_BAD_PIXEL_RATIO:--1}"
 
-/usr/bin/swift - "${OLD_IMAGE}" "${NEW_IMAGE}" "${MAX_AVG_DELTA}" "${MAX_BAD_PIXEL_RATIO}" "${BAD_PIXEL_THRESHOLD}" "${DIFF_IMAGE}" "${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO}" "${MAX_SWING_ISLAND_BAD_PIXEL_RATIO}" "${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BACKDROP_LEFT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CENTER_ANIMATION_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_PARAGRAPH_PROBES_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_IMAGE_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_COMPOSITE_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_LINEAR_BAD_PIXEL_RATIO}" <<'SWIFT'
+/usr/bin/swift - "${OLD_IMAGE}" "${NEW_IMAGE}" "${MAX_AVG_DELTA}" "${MAX_BAD_PIXEL_RATIO}" "${BAD_PIXEL_THRESHOLD}" "${DIFF_IMAGE}" "${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO}" "${MAX_HEADER_BUTTONS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO}" "${MAX_SWING_ISLAND_BAD_PIXEL_RATIO}" "${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BACKDROP_LEFT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CENTER_ANIMATION_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_PARAGRAPH_PROBES_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_IMAGE_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_COMPOSITE_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_LINEAR_BAD_PIXEL_RATIO}" <<'SWIFT'
 import CoreGraphics
 import Foundation
 import ImageIO
@@ -35,21 +36,22 @@ let badPixelThreshold = Int(CommandLine.arguments[5]) ?? 32
 let diffPath = CommandLine.arguments.count > 6 ? CommandLine.arguments[6] : ""
 var regionBadPixelRatioLimits = [
     "headerControls": Double(CommandLine.arguments[7]) ?? 0.04,
-    "composeCanvas": Double(CommandLine.arguments[8]) ?? 0.08,
-    "swingIsland": Double(CommandLine.arguments[9]) ?? 0.03,
-    "rightProbeStrip": Double(CommandLine.arguments[10]) ?? 0.05,
+    "headerButtons": Double(CommandLine.arguments[8]) ?? 0.02,
+    "composeCanvas": Double(CommandLine.arguments[9]) ?? 0.08,
+    "swingIsland": Double(CommandLine.arguments[10]) ?? 0.03,
+    "rightProbeStrip": Double(CommandLine.arguments[11]) ?? 0.05,
 ]
 for (argumentIndex, regionName) in [
-    (11, "composeBackdropLeft"),
-    (12, "composeCenterAnimation"),
-    (13, "composeBottomLabels"),
-    (14, "composeParagraphProbes"),
-    (15, "composePurpleRect"),
-    (16, "composeTopProgress"),
-    (17, "composeBottomSwatches"),
-    (18, "composeShaderImage"),
-    (19, "composeShaderComposite"),
-    (20, "composeShaderLinear"),
+    (12, "composeBackdropLeft"),
+    (13, "composeCenterAnimation"),
+    (14, "composeBottomLabels"),
+    (15, "composeParagraphProbes"),
+    (16, "composePurpleRect"),
+    (17, "composeTopProgress"),
+    (18, "composeBottomSwatches"),
+    (19, "composeShaderImage"),
+    (20, "composeShaderComposite"),
+    (21, "composeShaderLinear"),
 ] {
     if CommandLine.arguments.count > argumentIndex,
        let limit = Double(CommandLine.arguments[argumentIndex]),
@@ -203,6 +205,7 @@ do {
     let regions = [
         Region(name: "full", x: 0, y: 0, width: compareWidth, height: compareHeight),
         clampRegion(name: "headerControls", x: 0.05, y: 0.08, width: 0.55, height: 0.15, imageWidth: compareWidth, imageHeight: compareHeight),
+        clampRegion(name: "headerButtons", x: 0.065, y: 0.145, width: 0.17, height: 0.07, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeCanvas", x: 0.07, y: 0.21, width: 0.86, height: 0.69, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeBackdropLeft", x: 0.08, y: 0.24, width: 0.32, height: 0.26, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeCenterAnimation", x: 0.42, y: 0.43, width: 0.20, height: 0.28, imageWidth: compareWidth, imageHeight: compareHeight),

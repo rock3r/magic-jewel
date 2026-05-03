@@ -9,11 +9,11 @@ DURATION_SECONDS="${DURATION_SECONDS:-6}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 PARITY_SCRIPT="${PARITY_SCRIPT:-${SCRIPT_DIR}/jbr-skia-screenshot-parity.sh}"
-CASES="${CASES:-parity-rich parity-geometry-clean parity-native-custom-font-text-image parity-native-generic-font-text parity-resize-native-generic-font-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-image-refs parity-point-dots parity-path-effect parity-image-filter parity-image-color-matrix-filter parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
+CASES="${CASES:-parity-rich parity-button-chrome parity-geometry-clean parity-native-custom-font-text-image parity-native-generic-font-text parity-resize-native-generic-font-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-image-refs parity-point-dots parity-path-effect parity-image-filter parity-image-color-matrix-filter parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
-printf "case\tstatus\tfallbacks\tjbr_picture_frames\tjbr_command_frames\tavg_delta\tbad_pixel_ratio\tcompose_bad_pixel_ratio\tcompose_bottom_labels_bad_pixel_ratio\tcompose_paragraph_probes_bad_pixel_ratio\tcompose_purple_rect_bad_pixel_ratio\tcompose_top_progress_bad_pixel_ratio\tcompose_bottom_swatches_bad_pixel_ratio\tcompose_shader_image_bad_pixel_ratio\tcompose_shader_composite_bad_pixel_ratio\tcompose_shader_linear_bad_pixel_ratio\treport\tdiff\n" > "${SUITE_TSV}"
+printf "case\tstatus\tfallbacks\tjbr_picture_frames\tjbr_command_frames\tavg_delta\tbad_pixel_ratio\theader_buttons_bad_pixel_ratio\tcompose_bad_pixel_ratio\tcompose_bottom_labels_bad_pixel_ratio\tcompose_paragraph_probes_bad_pixel_ratio\tcompose_purple_rect_bad_pixel_ratio\tcompose_top_progress_bad_pixel_ratio\tcompose_bottom_swatches_bad_pixel_ratio\tcompose_shader_image_bad_pixel_ratio\tcompose_shader_composite_bad_pixel_ratio\tcompose_shader_linear_bad_pixel_ratio\treport\tdiff\n" > "${SUITE_TSV}"
 
 summary_value() {
   local file="$1"
@@ -53,6 +53,7 @@ run_case() {
   local jbr_picture_frames
   local jbr_command_frames
   local bad_pixel_ratio
+  local header_buttons_bad_pixel_ratio
   local compose_bad_pixel_ratio
   local compose_bottom_labels_bad_pixel_ratio
   local compose_paragraph_probes_bad_pixel_ratio
@@ -64,6 +65,7 @@ run_case() {
   local compose_shader_linear_bad_pixel_ratio
   avg_delta="$(summary_value "${summary}" screenshot_parity_avgDelta)"
   bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_badPixelRatio)"
+  header_buttons_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_headerButtons_badPixelRatio)"
   compose_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeCanvas_badPixelRatio)"
   compose_bottom_labels_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeBottomLabels_badPixelRatio)"
   compose_paragraph_probes_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeParagraphProbes_badPixelRatio)"
@@ -77,14 +79,14 @@ run_case() {
   jbr_picture_frames="$(summary_value "${summary}" jbr_picture_frames)"
   jbr_command_frames="$(summary_value "${summary}" jbr_command_frames)"
 
-  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
     "${name}" "${status}" "${fallback_count}" "${jbr_picture_frames}" "${jbr_command_frames}" \
-    "${avg_delta}" "${bad_pixel_ratio}" "${compose_bad_pixel_ratio}" \
+    "${avg_delta}" "${bad_pixel_ratio}" "${header_buttons_bad_pixel_ratio}" "${compose_bad_pixel_ratio}" \
     "${compose_bottom_labels_bad_pixel_ratio}" "${compose_paragraph_probes_bad_pixel_ratio}" \
     "${compose_purple_rect_bad_pixel_ratio}" "${compose_top_progress_bad_pixel_ratio}" "${compose_bottom_swatches_bad_pixel_ratio}" \
     "${compose_shader_image_bad_pixel_ratio}" "${compose_shader_composite_bad_pixel_ratio}" "${compose_shader_linear_bad_pixel_ratio}" \
     "${out_dir}/report/report.md" "${out_dir}/report/parity-diff.png" >> "${SUITE_TSV}"
-  echo "status=${status} fallback_new_count=${fallback_count} jbr_picture_frames=${jbr_picture_frames} jbr_command_frames=${jbr_command_frames} avg_delta=${avg_delta} bad_pixel_ratio=${bad_pixel_ratio} compose_bad_pixel_ratio=${compose_bad_pixel_ratio} compose_bottom_labels_bad_pixel_ratio=${compose_bottom_labels_bad_pixel_ratio} compose_paragraph_probes_bad_pixel_ratio=${compose_paragraph_probes_bad_pixel_ratio} compose_bottom_swatches_bad_pixel_ratio=${compose_bottom_swatches_bad_pixel_ratio} compose_shader_image_bad_pixel_ratio=${compose_shader_image_bad_pixel_ratio} compose_shader_composite_bad_pixel_ratio=${compose_shader_composite_bad_pixel_ratio} compose_shader_linear_bad_pixel_ratio=${compose_shader_linear_bad_pixel_ratio} report=${out_dir}/report/report.md"
+  echo "status=${status} fallback_new_count=${fallback_count} jbr_picture_frames=${jbr_picture_frames} jbr_command_frames=${jbr_command_frames} avg_delta=${avg_delta} bad_pixel_ratio=${bad_pixel_ratio} header_buttons_bad_pixel_ratio=${header_buttons_bad_pixel_ratio} compose_bad_pixel_ratio=${compose_bad_pixel_ratio} compose_bottom_labels_bad_pixel_ratio=${compose_bottom_labels_bad_pixel_ratio} compose_paragraph_probes_bad_pixel_ratio=${compose_paragraph_probes_bad_pixel_ratio} compose_bottom_swatches_bad_pixel_ratio=${compose_bottom_swatches_bad_pixel_ratio} compose_shader_image_bad_pixel_ratio=${compose_shader_image_bad_pixel_ratio} compose_shader_composite_bad_pixel_ratio=${compose_shader_composite_bad_pixel_ratio} compose_shader_linear_bad_pixel_ratio=${compose_shader_linear_bad_pixel_ratio} report=${out_dir}/report/report.md"
   if [ "${status}" != "passed" ]; then
     return 1
   fi
@@ -94,6 +96,35 @@ run_named_case() {
   case "$1" in
     parity-rich)
       run_case "$1"
+      ;;
+    parity-button-chrome)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_IMAGE=false \
+        MAGIC_JEWEL_COMPOSE_IMAGE_SHADER=false \
+        MAGIC_JEWEL_COMPOSE_IMAGE_SHADER_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER=false \
+        MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER=false \
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_SHADER_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_IMAGE_COLOR_MATRIX_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_PATH=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ARC=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
+        MAGIC_JEWEL_SWING_ISLAND=false \
+        EXPECT_MIN_IMAGE_REFS=0 \
+        MAX_HEADER_BUTTONS_BAD_PIXEL_RATIO=0.02 \
+        MAX_SWING_ISLAND_BAD_PIXEL_RATIO=0.06 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.07
       ;;
     parity-geometry-clean)
       run_case "$1" \
