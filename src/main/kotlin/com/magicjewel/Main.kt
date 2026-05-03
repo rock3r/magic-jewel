@@ -66,6 +66,7 @@ import androidx.compose.ui.graphics.StampedPathEffectStyle
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -151,6 +152,8 @@ private const val ComposeGraphicsLayerBlendModeProperty = "magic.jewel.compose.g
 private const val ComposeGraphicsLayerColorFilterProperty = "magic.jewel.compose.graphicsLayerColorFilter"
 private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.compose.graphicsLayerColorMatrixFilter"
 private const val ComposeGraphicsLayerRenderEffectProperty = "magic.jewel.compose.graphicsLayerRenderEffect"
+private const val ComposeGraphicsLayerRawImageFilterEffectProperty =
+    "magic.jewel.compose.graphicsLayerRawImageFilterEffect"
 private const val ComposeGraphicsLayerOffsetEffectProperty = "magic.jewel.compose.graphicsLayerOffsetEffect"
 private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel.compose.graphicsLayerChainedRenderEffect"
 private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.graphicsLayerShadow"
@@ -444,6 +447,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerRenderEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRenderEffectProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerRawImageFilterEffectEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerRawImageFilterEffectProperty, "false").toBoolean()
     }
     val composeGraphicsLayerOffsetEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerOffsetEffectProperty, "false").toBoolean()
@@ -2128,6 +2134,16 @@ private fun MagicJewelApp() {
                                 )
                             }
                             when {
+                                composeGraphicsLayerRawImageFilterEffectEnabled -> {
+                                    renderEffect = org.jetbrains.skia.ImageFilter.makeDropShadow(
+                                        dx = 10f,
+                                        dy = 8f,
+                                        sigmaX = 3f,
+                                        sigmaY = 3f,
+                                        color = Color(0xAA0F172A).toArgb(),
+                                        crop = null,
+                                    ).asComposeRenderEffect()
+                                }
                                 composeGraphicsLayerChainedRenderEffectEnabled -> {
                                     renderEffect = OffsetEffect(
                                         renderEffect = BlurEffect(radiusX = 7f, radiusY = 5f),
