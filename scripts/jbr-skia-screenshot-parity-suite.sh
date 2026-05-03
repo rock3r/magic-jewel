@@ -13,7 +13,7 @@ CASES="${CASES:-parity-rich parity-geometry-clean parity-native-text parity-forc
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
-printf "case\tstatus\tfallbacks\tjbr_picture_frames\tjbr_command_frames\tavg_delta\tbad_pixel_ratio\tcompose_bad_pixel_ratio\tcompose_bottom_labels_bad_pixel_ratio\tcompose_purple_rect_bad_pixel_ratio\tcompose_top_progress_bad_pixel_ratio\tcompose_bottom_swatches_bad_pixel_ratio\tcompose_shader_image_bad_pixel_ratio\tcompose_shader_composite_bad_pixel_ratio\tcompose_shader_linear_bad_pixel_ratio\treport\tdiff\n" > "${SUITE_TSV}"
+printf "case\tstatus\tfallbacks\tjbr_picture_frames\tjbr_command_frames\tavg_delta\tbad_pixel_ratio\tcompose_bad_pixel_ratio\tcompose_bottom_labels_bad_pixel_ratio\tcompose_paragraph_probes_bad_pixel_ratio\tcompose_purple_rect_bad_pixel_ratio\tcompose_top_progress_bad_pixel_ratio\tcompose_bottom_swatches_bad_pixel_ratio\tcompose_shader_image_bad_pixel_ratio\tcompose_shader_composite_bad_pixel_ratio\tcompose_shader_linear_bad_pixel_ratio\treport\tdiff\n" > "${SUITE_TSV}"
 
 summary_value() {
   local file="$1"
@@ -55,6 +55,7 @@ run_case() {
   local bad_pixel_ratio
   local compose_bad_pixel_ratio
   local compose_bottom_labels_bad_pixel_ratio
+  local compose_paragraph_probes_bad_pixel_ratio
   local compose_purple_rect_bad_pixel_ratio
   local compose_top_progress_bad_pixel_ratio
   local compose_bottom_swatches_bad_pixel_ratio
@@ -65,6 +66,7 @@ run_case() {
   bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_badPixelRatio)"
   compose_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeCanvas_badPixelRatio)"
   compose_bottom_labels_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeBottomLabels_badPixelRatio)"
+  compose_paragraph_probes_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeParagraphProbes_badPixelRatio)"
   compose_purple_rect_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composePurpleRect_badPixelRatio)"
   compose_top_progress_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeTopProgress_badPixelRatio)"
   compose_bottom_swatches_bad_pixel_ratio="$(summary_value "${summary}" screenshot_parity_region_composeBottomSwatches_badPixelRatio)"
@@ -75,14 +77,14 @@ run_case() {
   jbr_picture_frames="$(summary_value "${summary}" jbr_picture_frames)"
   jbr_command_frames="$(summary_value "${summary}" jbr_command_frames)"
 
-  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
     "${name}" "${status}" "${fallback_count}" "${jbr_picture_frames}" "${jbr_command_frames}" \
     "${avg_delta}" "${bad_pixel_ratio}" "${compose_bad_pixel_ratio}" \
-    "${compose_bottom_labels_bad_pixel_ratio}" \
+    "${compose_bottom_labels_bad_pixel_ratio}" "${compose_paragraph_probes_bad_pixel_ratio}" \
     "${compose_purple_rect_bad_pixel_ratio}" "${compose_top_progress_bad_pixel_ratio}" "${compose_bottom_swatches_bad_pixel_ratio}" \
     "${compose_shader_image_bad_pixel_ratio}" "${compose_shader_composite_bad_pixel_ratio}" "${compose_shader_linear_bad_pixel_ratio}" \
     "${out_dir}/report/report.md" "${out_dir}/report/parity-diff.png" >> "${SUITE_TSV}"
-  echo "status=${status} fallback_new_count=${fallback_count} jbr_picture_frames=${jbr_picture_frames} jbr_command_frames=${jbr_command_frames} avg_delta=${avg_delta} bad_pixel_ratio=${bad_pixel_ratio} compose_bad_pixel_ratio=${compose_bad_pixel_ratio} compose_bottom_labels_bad_pixel_ratio=${compose_bottom_labels_bad_pixel_ratio} compose_bottom_swatches_bad_pixel_ratio=${compose_bottom_swatches_bad_pixel_ratio} compose_shader_image_bad_pixel_ratio=${compose_shader_image_bad_pixel_ratio} compose_shader_composite_bad_pixel_ratio=${compose_shader_composite_bad_pixel_ratio} compose_shader_linear_bad_pixel_ratio=${compose_shader_linear_bad_pixel_ratio} report=${out_dir}/report/report.md"
+  echo "status=${status} fallback_new_count=${fallback_count} jbr_picture_frames=${jbr_picture_frames} jbr_command_frames=${jbr_command_frames} avg_delta=${avg_delta} bad_pixel_ratio=${bad_pixel_ratio} compose_bad_pixel_ratio=${compose_bad_pixel_ratio} compose_bottom_labels_bad_pixel_ratio=${compose_bottom_labels_bad_pixel_ratio} compose_paragraph_probes_bad_pixel_ratio=${compose_paragraph_probes_bad_pixel_ratio} compose_bottom_swatches_bad_pixel_ratio=${compose_bottom_swatches_bad_pixel_ratio} compose_shader_image_bad_pixel_ratio=${compose_shader_image_bad_pixel_ratio} compose_shader_composite_bad_pixel_ratio=${compose_shader_composite_bad_pixel_ratio} compose_shader_linear_bad_pixel_ratio=${compose_shader_linear_bad_pixel_ratio} report=${out_dir}/report/report.md"
   if [ "${status}" != "passed" ]; then
     return 1
   fi
@@ -118,7 +120,8 @@ run_named_case() {
         EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS=4 \
         MAX_BAD_PIXEL_RATIO=0.07 \
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10 \
-        MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO=0.17
+        MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO=0.17 \
+        MAX_COMPOSE_PARAGRAPH_PROBES_BAD_PIXEL_RATIO=0.19
       ;;
     parity-forced-context-native-text)
       run_case "$1" \
@@ -134,7 +137,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         MAX_BAD_PIXEL_RATIO=0.07 \
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10 \
-        MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO=0.17
+        MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO=0.17 \
+        MAX_COMPOSE_PARAGRAPH_PROBES_BAD_PIXEL_RATIO=0.19
       ;;
     parity-forced-context-image-refs)
       run_case "$1" \

@@ -14,6 +14,7 @@ MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO="${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO:-
 MAX_COMPOSE_BACKDROP_LEFT_BAD_PIXEL_RATIO="${MAX_COMPOSE_BACKDROP_LEFT_BAD_PIXEL_RATIO:--1}"
 MAX_COMPOSE_CENTER_ANIMATION_BAD_PIXEL_RATIO="${MAX_COMPOSE_CENTER_ANIMATION_BAD_PIXEL_RATIO:--1}"
 MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO="${MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO:--1}"
+MAX_COMPOSE_PARAGRAPH_PROBES_BAD_PIXEL_RATIO="${MAX_COMPOSE_PARAGRAPH_PROBES_BAD_PIXEL_RATIO:--1}"
 MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO="${MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO:--1}"
 MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO="${MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO:--1}"
 MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO="${MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO:--1}"
@@ -21,7 +22,7 @@ MAX_COMPOSE_SHADER_IMAGE_BAD_PIXEL_RATIO="${MAX_COMPOSE_SHADER_IMAGE_BAD_PIXEL_R
 MAX_COMPOSE_SHADER_COMPOSITE_BAD_PIXEL_RATIO="${MAX_COMPOSE_SHADER_COMPOSITE_BAD_PIXEL_RATIO:--1}"
 MAX_COMPOSE_SHADER_LINEAR_BAD_PIXEL_RATIO="${MAX_COMPOSE_SHADER_LINEAR_BAD_PIXEL_RATIO:--1}"
 
-/usr/bin/swift - "${OLD_IMAGE}" "${NEW_IMAGE}" "${MAX_AVG_DELTA}" "${MAX_BAD_PIXEL_RATIO}" "${BAD_PIXEL_THRESHOLD}" "${DIFF_IMAGE}" "${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO}" "${MAX_SWING_ISLAND_BAD_PIXEL_RATIO}" "${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BACKDROP_LEFT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CENTER_ANIMATION_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_IMAGE_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_COMPOSITE_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_LINEAR_BAD_PIXEL_RATIO}" <<'SWIFT'
+/usr/bin/swift - "${OLD_IMAGE}" "${NEW_IMAGE}" "${MAX_AVG_DELTA}" "${MAX_BAD_PIXEL_RATIO}" "${BAD_PIXEL_THRESHOLD}" "${DIFF_IMAGE}" "${MAX_HEADER_CONTROLS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO}" "${MAX_SWING_ISLAND_BAD_PIXEL_RATIO}" "${MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BACKDROP_LEFT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_CENTER_ANIMATION_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_PARAGRAPH_PROBES_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_PURPLE_RECT_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_TOP_PROGRESS_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_BOTTOM_SWATCHES_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_IMAGE_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_COMPOSITE_BAD_PIXEL_RATIO}" "${MAX_COMPOSE_SHADER_LINEAR_BAD_PIXEL_RATIO}" <<'SWIFT'
 import CoreGraphics
 import Foundation
 import ImageIO
@@ -42,12 +43,13 @@ for (argumentIndex, regionName) in [
     (11, "composeBackdropLeft"),
     (12, "composeCenterAnimation"),
     (13, "composeBottomLabels"),
-    (14, "composePurpleRect"),
-    (15, "composeTopProgress"),
-    (16, "composeBottomSwatches"),
-    (17, "composeShaderImage"),
-    (18, "composeShaderComposite"),
-    (19, "composeShaderLinear"),
+    (14, "composeParagraphProbes"),
+    (15, "composePurpleRect"),
+    (16, "composeTopProgress"),
+    (17, "composeBottomSwatches"),
+    (18, "composeShaderImage"),
+    (19, "composeShaderComposite"),
+    (20, "composeShaderLinear"),
 ] {
     if CommandLine.arguments.count > argumentIndex,
        let limit = Double(CommandLine.arguments[argumentIndex]),
@@ -205,6 +207,7 @@ do {
         clampRegion(name: "composeBackdropLeft", x: 0.08, y: 0.24, width: 0.32, height: 0.26, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeCenterAnimation", x: 0.42, y: 0.43, width: 0.20, height: 0.28, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeBottomLabels", x: 0.08, y: 0.72, width: 0.40, height: 0.18, imageWidth: compareWidth, imageHeight: compareHeight),
+        clampRegion(name: "composeParagraphProbes", x: 0.08, y: 0.52, width: 0.34, height: 0.22, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composePurpleRect", x: 0.09, y: 0.27, width: 0.11, height: 0.08, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeTopProgress", x: 0.16, y: 0.23, width: 0.22, height: 0.02, imageWidth: compareWidth, imageHeight: compareHeight),
         clampRegion(name: "composeBottomSwatches", x: 0.07, y: 0.91, width: 0.56, height: 0.035, imageWidth: compareWidth, imageHeight: compareHeight),
