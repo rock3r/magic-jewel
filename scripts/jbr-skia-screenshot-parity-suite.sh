@@ -9,7 +9,7 @@ DURATION_SECONDS="${DURATION_SECONDS:-6}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 PARITY_SCRIPT="${PARITY_SCRIPT:-${SCRIPT_DIR}/jbr-skia-screenshot-parity.sh}"
-CASES="${CASES:-parity-rich parity-button-chrome parity-geometry-clean parity-native-custom-font-text-image parity-native-generic-font-text parity-resize-native-generic-font-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-image-refs parity-point-dots parity-path-effect parity-image-filter parity-image-color-matrix-filter parity-color-shader parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
+CASES="${CASES:-parity-rich parity-button-chrome parity-geometry-clean parity-native-custom-font-text-image parity-native-generic-font-text parity-native-resource-font-text parity-native-system-font-text parity-resize-native-generic-font-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-image-refs parity-point-dots parity-path-effect parity-image-filter parity-image-color-matrix-filter parity-color-shader parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -167,6 +167,29 @@ run_named_case() {
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10 \
         MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO=0.18 \
         MAX_COMPOSE_PARAGRAPH_PROBES_BAD_PIXEL_RATIO=0.20
+      ;;
+    parity-native-resource-font-text)
+      run_case "$1" \
+        JBR_SKIA_NATIVE_TEXT=true \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
+        MAGIC_JEWEL_RESOURCE_FONT_TEXT=true \
+        EXPECT_MIN_IMAGE_REFS=1 \
+        MAX_BAD_PIXEL_RATIO=0.07 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10 \
+        MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO=0.18
+      ;;
+    parity-native-system-font-text)
+      run_case "$1" \
+        JBR_SKIA_NATIVE_TEXT=true \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
+        MAGIC_JEWEL_SYSTEM_FONT_TEXT=true \
+        EXPECT_MIN_IMAGE_REFS=1 \
+        EXPECT_MIN_TEXT_COMMANDS=1 \
+        MAX_BAD_PIXEL_RATIO=0.07 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10 \
+        MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO=0.18
       ;;
     parity-resize-native-generic-font-text)
       run_case "$1" \

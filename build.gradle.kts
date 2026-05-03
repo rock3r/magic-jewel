@@ -258,6 +258,15 @@ val paragraphLayoutTextEnabled = providers.gradleProperty("magicJewelParagraphLa
 val genericFontTextEnabled = providers.gradleProperty("magicJewelGenericFontText")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_GENERIC_FONT_TEXT"))
     .orElse("false")
+val resourceFontTextEnabled = providers.gradleProperty("magicJewelResourceFontText")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_RESOURCE_FONT_TEXT"))
+    .orElse("false")
+val systemFontTextEnabled = providers.gradleProperty("magicJewelSystemFontText")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_SYSTEM_FONT_TEXT"))
+    .orElse("false")
+val resourceFontFile = providers.gradleProperty("magicJewelResourceFontFile")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_RESOURCE_FONT_FILE"))
+    .orElse("/System/Library/Fonts/Monaco.ttf")
 val imageCacheChurnEnabled = providers.gradleProperty("magicJewelImageCacheChurn")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_IMAGE_CACHE_CHURN"))
     .orElse("false")
@@ -319,6 +328,13 @@ dependencies {
 
 application {
     mainClass.set("com.magicjewel.MainKt")
+}
+
+tasks.named<ProcessResources>("processResources") {
+    from(resourceFontFile) {
+        into("magicjewel-fonts")
+        rename { "MagicJewelResourceFont.ttf" }
+    }
 }
 
 fun Project.patchedComposeRuntimeJars(): FileCollection {
@@ -416,6 +432,8 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.unsupportedText", unsupportedTextEnabled.get())
     systemProperty("magic.jewel.paragraphLayoutText", paragraphLayoutTextEnabled.get())
     systemProperty("magic.jewel.genericFontText", genericFontTextEnabled.get())
+    systemProperty("magic.jewel.resourceFontText", resourceFontTextEnabled.get())
+    systemProperty("magic.jewel.systemFontText", systemFontTextEnabled.get())
     systemProperty("magic.jewel.imageCacheChurn", imageCacheChurnEnabled.get())
     systemProperty("magic.jewel.stableImageCacheChurn", stableImageCacheChurnEnabled.get())
     systemProperty("magic.jewel.invalidSweepGradient", invalidSweepGradientEnabled.get())

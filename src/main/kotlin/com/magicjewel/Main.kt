@@ -79,6 +79,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -90,6 +91,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.compose.ui.text.platform.Font as ComposeFont
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Font
@@ -197,6 +199,8 @@ private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepG
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val GenericFontTextProperty = "magic.jewel.genericFontText"
+private const val ResourceFontTextProperty = "magic.jewel.resourceFontText"
+private const val SystemFontTextProperty = "magic.jewel.systemFontText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
 private const val StableImageCacheChurnProperty = "magic.jewel.stableImageCacheChurn"
 private const val InvalidSweepGradientProperty = "magic.jewel.invalidSweepGradient"
@@ -343,7 +347,7 @@ private fun JFrame.scheduleAutoResizeIfNeeded() {
 }
 
 @Composable
-@OptIn(ExperimentalGraphicsApi::class)
+@OptIn(ExperimentalGraphicsApi::class, ExperimentalTextApi::class)
 private fun MagicJewelApp() {
     val fixedFrameTicks = remember {
         System.getProperty(FixedFrameTicksProperty)?.toIntOrNull()
@@ -580,6 +584,12 @@ private fun MagicJewelApp() {
     }
     val genericFontTextEnabled = remember {
         System.getProperty(GenericFontTextProperty, "false").toBoolean()
+    }
+    val resourceFontTextEnabled = remember {
+        System.getProperty(ResourceFontTextProperty, "false").toBoolean()
+    }
+    val systemFontTextEnabled = remember {
+        System.getProperty(SystemFontTextProperty, "false").toBoolean()
     }
     val imageCacheChurnEnabled = remember {
         System.getProperty(ImageCacheChurnProperty, "false").toBoolean()
@@ -2435,6 +2445,32 @@ private fun MagicJewelApp() {
                             color = Color.Black,
                             fontSize = 17.sp,
                             fontFamily = FontFamily.Cursive,
+                        ),
+                    )
+                }
+                if (resourceFontTextEnabled) {
+                    MagicLabel(
+                        "Classpath resource font label",
+                        composeTextEnabled,
+                        width = 320.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            fontFamily = FontFamily(
+                                ComposeFont("magicjewel-fonts/MagicJewelResourceFont.ttf"),
+                            ),
+                        ),
+                    )
+                }
+                if (systemFontTextEnabled) {
+                    MagicLabel(
+                        "Named system font Menlo 012345",
+                        composeTextEnabled,
+                        width = 320.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            fontFamily = androidx.compose.ui.text.font.FontFamily("Menlo"),
                         ),
                     )
                 }
