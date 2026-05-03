@@ -205,6 +205,7 @@ The RuntimeEffect command suite can run the combined shader probe (`commands-run
 `commands-composite-opaque-shader-fallback` enables `MAGIC_JEWEL_COMPOSE_COMPOSITE_OPAQUE_SHADER=true` and asserts a composite shader tree with one opaque raw-Skia child stays on structured `shader` fallback instead of serializing only the known child.
 `commands-noise-shader` enables `MAGIC_JEWEL_COMPOSE_NOISE_SHADER=true` and asserts the JBR-owned fractal-noise shader descriptor define/use/cache-hit path.
 `commands-turbulence-shader` enables `MAGIC_JEWEL_COMPOSE_TURBULENCE_SHADER=true` and asserts the JBR-owned turbulence shader descriptor define/use/cache-hit path.
+`commands-raw-noise-shader-fallback` and `commands-raw-turbulence-shader-fallback` keep raw Skia Perlin/noise shader objects on structured `shader` fallback, proving the descriptor path does not reopen the raw pointer boundary.
 `commands-picture-shader-fallback` enables `MAGIC_JEWEL_COMPOSE_PICTURE_SHADER=true` and asserts Skia picture shaders stay on structured `shader` fallback until JBR owns an explicit descriptor for recorded-picture shader content.
 `commands-transformed-shader` enables `MAGIC_JEWEL_COMPOSE_TRANSFORMED_SHADER=true` and asserts transform-aware shader descriptor replay through JBR-owned child shader handles and local matrices.
 

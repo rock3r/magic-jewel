@@ -132,6 +132,8 @@ private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShade
 private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.compositeOpaqueShader"
 private const val ComposeNoiseShaderProperty = "magic.jewel.compose.noiseShader"
 private const val ComposeTurbulenceShaderProperty = "magic.jewel.compose.turbulenceShader"
+private const val ComposeRawNoiseShaderProperty = "magic.jewel.compose.rawNoiseShader"
+private const val ComposeRawTurbulenceShaderProperty = "magic.jewel.compose.rawTurbulenceShader"
 private const val ComposePictureShaderProperty = "magic.jewel.compose.pictureShader"
 private const val ComposeTransformedShaderProperty = "magic.jewel.compose.transformedShader"
 private const val ComposeImageShaderColorFilterProperty = "magic.jewel.compose.imageShaderColorFilter"
@@ -391,6 +393,12 @@ private fun MagicJewelApp() {
     }
     val composeTurbulenceShaderEnabled = remember {
         System.getProperty(ComposeTurbulenceShaderProperty, "false").toBoolean()
+    }
+    val composeRawNoiseShaderEnabled = remember {
+        System.getProperty(ComposeRawNoiseShaderProperty, "false").toBoolean()
+    }
+    val composeRawTurbulenceShaderEnabled = remember {
+        System.getProperty(ComposeRawTurbulenceShaderProperty, "false").toBoolean()
     }
     val composePictureShaderEnabled = remember {
         System.getProperty(ComposePictureShaderProperty, "false").toBoolean()
@@ -846,6 +854,46 @@ private fun MagicJewelApp() {
                                     numOctaves = 3,
                                     seed = 7.25f,
                                 )
+                            },
+                        )
+                    }
+                }
+                if (composeRawNoiseShaderEnabled) {
+                    val topLeft = Offset(size.width - 448f, size.height - 488f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 140f,
+                            bottom = topLeft.y + 116f,
+                            paint = Paint().apply {
+                                shader = org.jetbrains.skia.Shader.makeFractalNoise(
+                                    0.04f,
+                                    0.06f,
+                                    4,
+                                    3.5f,
+                                    org.jetbrains.skia.ISize.make(0, 0),
+                                ).asComposeShader()
+                            },
+                        )
+                    }
+                }
+                if (composeRawTurbulenceShaderEnabled) {
+                    val topLeft = Offset(size.width - 448f, size.height - 360f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 140f,
+                            bottom = topLeft.y + 116f,
+                            paint = Paint().apply {
+                                shader = org.jetbrains.skia.Shader.makeTurbulence(
+                                    0.035f,
+                                    0.055f,
+                                    3,
+                                    7.25f,
+                                    org.jetbrains.skia.ISize.make(0, 0),
+                                ).asComposeShader()
                             },
                         )
                     }
