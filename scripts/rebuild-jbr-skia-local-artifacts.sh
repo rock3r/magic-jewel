@@ -23,6 +23,7 @@ NATIVE_OUT_DIR="${NATIVE_OUT_DIR:-/tmp/jbr-skia-native}"
 NATIVE_GENERATED_DIR="${NATIVE_GENERATED_DIR:-${NATIVE_OUT_DIR}/generated}"
 NATIVE_LIB="${NATIVE_LIB:-${NATIVE_OUT_DIR}/libjbrskiainterop.dylib}"
 JAVA_HOME="${JAVA_HOME:-$(/usr/libexec/java_home -v 21)}"
+EXTRA_NATIVE_INCLUDE_DIR="${EXTRA_NATIVE_INCLUDE_DIR:-${NATIVE_OUT_DIR}/abi99/generated}"
 
 require_file() {
   local path="$1"
@@ -110,10 +111,15 @@ echo "== Build native JBR Skia bridge =="
 require_dir "${SKIA_ROOT}"
 require_dir "${SKIA_OUT}"
 mkdir -p "${NATIVE_OUT_DIR}" "${NATIVE_GENERATED_DIR}"
+EXTRA_NATIVE_INCLUDE_ARGS=()
+if [[ -d "${EXTRA_NATIVE_INCLUDE_DIR}" ]]; then
+  EXTRA_NATIVE_INCLUDE_ARGS+=("-I${EXTRA_NATIVE_INCLUDE_DIR}")
+fi
 
 clang++ -std=c++17 -dynamiclib -arch arm64 -mmacosx-version-min=12.0 -fobjc-arc -fvisibility=hidden \
   -I"${JAVA_HOME}/include" -I"${JAVA_HOME}/include/darwin" \
   -I"${NATIVE_GENERATED_DIR}" \
+  "${EXTRA_NATIVE_INCLUDE_ARGS[@]}" \
   -I"${JBR_ROOT}/src/java.desktop/macosx/native/libawt_lwawt/java2d/metal" \
   -I"${JBR_ROOT}/src/java.desktop/share/native/libawt/java2d" \
   -I"${JBR_ROOT}/src/java.desktop/share/native/common/awt/debug" \
