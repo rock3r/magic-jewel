@@ -129,6 +129,7 @@ private const val ComposeColorShaderProperty = "magic.jewel.compose.colorShader"
 private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShader"
 private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.compositeOpaqueShader"
 private const val ComposeNoiseShaderProperty = "magic.jewel.compose.noiseShader"
+private const val ComposeTurbulenceShaderProperty = "magic.jewel.compose.turbulenceShader"
 private const val ComposePictureShaderProperty = "magic.jewel.compose.pictureShader"
 private const val ComposeTransformedShaderProperty = "magic.jewel.compose.transformedShader"
 private const val ComposeImageShaderColorFilterProperty = "magic.jewel.compose.imageShaderColorFilter"
@@ -385,6 +386,9 @@ private fun MagicJewelApp() {
     }
     val composeNoiseShaderEnabled = remember {
         System.getProperty(ComposeNoiseShaderProperty, "false").toBoolean()
+    }
+    val composeTurbulenceShaderEnabled = remember {
+        System.getProperty(ComposeTurbulenceShaderProperty, "false").toBoolean()
     }
     val composePictureShaderEnabled = remember {
         System.getProperty(ComposePictureShaderProperty, "false").toBoolean()
@@ -820,6 +824,25 @@ private fun MagicJewelApp() {
                                     baseFrequencyY = 0.06f,
                                     numOctaves = 4,
                                     seed = 3.5f,
+                                ).asComposeShader()
+                            },
+                        )
+                    }
+                }
+                if (composeTurbulenceShaderEnabled) {
+                    val topLeft = Offset(size.width - 596f, size.height - 488f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 140f,
+                            bottom = topLeft.y + 116f,
+                            paint = Paint().apply {
+                                shader = org.jetbrains.skia.Shader.makeTurbulence(
+                                    baseFrequencyX = 0.035f,
+                                    baseFrequencyY = 0.055f,
+                                    numOctaves = 3,
+                                    seed = 7.25f,
                                 ).asComposeShader()
                             },
                         )
