@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.ColorShader
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.CompositeShader
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
+import androidx.compose.ui.graphics.FractalNoiseShader
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.LinearGradientShader
@@ -67,6 +68,7 @@ import androidx.compose.ui.graphics.StampedPathEffectStyle
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.TurbulenceShader
 import androidx.compose.ui.graphics.asComposeColorFilter
 import androidx.compose.ui.graphics.asComposePathEffect
 import androidx.compose.ui.graphics.asComposeRenderEffect
@@ -819,12 +821,12 @@ private fun MagicJewelApp() {
                             right = topLeft.x + 140f,
                             bottom = topLeft.y + 116f,
                             paint = Paint().apply {
-                                shader = org.jetbrains.skia.Shader.makeFractalNoise(
+                                shader = FractalNoiseShader(
                                     baseFrequencyX = 0.04f,
                                     baseFrequencyY = 0.06f,
                                     numOctaves = 4,
                                     seed = 3.5f,
-                                ).asComposeShader()
+                                )
                             },
                         )
                     }
@@ -838,12 +840,12 @@ private fun MagicJewelApp() {
                             right = topLeft.x + 140f,
                             bottom = topLeft.y + 116f,
                             paint = Paint().apply {
-                                shader = org.jetbrains.skia.Shader.makeTurbulence(
+                                shader = TurbulenceShader(
                                     baseFrequencyX = 0.035f,
                                     baseFrequencyY = 0.055f,
                                     numOctaves = 3,
                                     seed = 7.25f,
-                                ).asComposeShader()
+                                )
                             },
                         )
                     }

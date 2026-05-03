@@ -553,8 +553,8 @@ Environment:
   MAGIC_JEWEL_COMPOSE_COLOR_SHADER Enables a JBR-owned solid color shader descriptor probe. Default: false.
   MAGIC_JEWEL_COMPOSE_OPAQUE_SHADER Enables an unsupported opaque Skia shader fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_COMPOSITE_OPAQUE_SHADER Enables a composite shader with an unsupported raw-Skia child fallback probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_NOISE_SHADER Enables an unsupported Skia noise shader fallback probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_TURBULENCE_SHADER Enables an unsupported Skia turbulence shader fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_NOISE_SHADER Enables a JBR-owned fractal-noise shader descriptor probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_TURBULENCE_SHADER Enables a JBR-owned turbulence shader descriptor probe. Default: false.
   MAGIC_JEWEL_COMPOSE_PICTURE_SHADER Enables an unsupported Skia picture shader fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_TRANSFORMED_SHADER Enables a transformed shader descriptor probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER_COLOR_FILTER Enables an image shader with a color-filter descriptor probe. Default: false.
