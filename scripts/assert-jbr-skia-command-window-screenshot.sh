@@ -89,9 +89,19 @@ var paragraphItalicRight = 0
 var paragraphRtl = 0
 var paragraphOverflow = 0
 var paragraphDecorated = 0
+var primaryButtonWhiteText = 0
+var primaryButtonDarkText = 0
+var primaryButtonTextMinX = width
+var primaryButtonTextMinY = height
+var primaryButtonTextMaxX = 0
+var primaryButtonTextMaxY = 0
 
 func isDarkText(r: Int, g: Int, b: Int) -> Bool {
     return r < 55 && g < 55 && b < 55
+}
+
+func isWhiteText(r: Int, g: Int, b: Int) -> Bool {
+    return r > 215 && g > 215 && b > 215
 }
 
 func inRect(x: Int, y: Int, left: Int, top: Int, right: Int, bottom: Int) -> Bool {
@@ -169,6 +179,12 @@ let paragraphDecoratedRect = (
     top: height * 78 / 100,
     right: width * 7 / 20,
     bottom: height * 82 / 100
+)
+let primaryButtonTextRect = (
+    left: width * 7 / 200,
+    top: height * 123 / 1000,
+    right: width * 17 / 200,
+    bottom: height * 157 / 1000
 )
 
 for y in 0..<height {
@@ -290,6 +306,18 @@ for y in 0..<height {
                 blendModeLuminosity += 1
             }
         }
+        if inRect(x: x, y: y, left: primaryButtonTextRect.left, top: primaryButtonTextRect.top, right: primaryButtonTextRect.right, bottom: primaryButtonTextRect.bottom) {
+            if isWhiteText(r: r, g: g, b: b) {
+                primaryButtonWhiteText += 1
+                primaryButtonTextMinX = min(primaryButtonTextMinX, x)
+                primaryButtonTextMinY = min(primaryButtonTextMinY, y)
+                primaryButtonTextMaxX = max(primaryButtonTextMaxX, x)
+                primaryButtonTextMaxY = max(primaryButtonTextMaxY, y)
+            }
+            if isDarkText(r: r, g: g, b: b) {
+                primaryButtonDarkText += 1
+            }
+        }
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: paragraphCenteredRect.left, top: paragraphCenteredRect.top, right: paragraphCenteredRect.right, bottom: paragraphCenteredRect.bottom) {
                 paragraphCentered += 1
@@ -324,7 +352,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) probeRightShadow=\(probeRightShadow) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) primaryButtonWhiteText=\(primaryButtonWhiteText) primaryButtonDarkText=\(primaryButtonDarkText) primaryButtonTextBox=\(primaryButtonTextMinX),\(primaryButtonTextMinY),\(primaryButtonTextMaxX),\(primaryButtonTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) probeRightShadow=\(probeRightShadow) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
 
 let composeTextEnabled = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_TEXT"] != "false"
 var checks: [(String, Int, Int)] = [
@@ -338,6 +366,7 @@ var checks: [(String, Int, Int)] = [
 if composeTextEnabled {
     checks.append(("topText", topText, 900))
     checks.append(("bottomText", bottomText, 1200))
+    checks.append(("primaryButtonWhiteText", primaryButtonWhiteText, 180))
 }
 
 let nativeTextProbe = ProcessInfo.processInfo.environment["JBR_SKIA_NATIVE_TEXT"] == "true"
@@ -346,6 +375,10 @@ let minimumTextWidth = min(width / 5, 360)
 
 var textBoxChecks: [(String, Bool)] = []
 if composeTextEnabled {
+    let primaryButtonTextCenterX = (primaryButtonTextMinX + primaryButtonTextMaxX) / 2
+    let primaryButtonTextCenterY = (primaryButtonTextMinY + primaryButtonTextMaxY) / 2
+    let expectedPrimaryButtonTextCenterX = (primaryButtonTextRect.left + primaryButtonTextRect.right) / 2
+    let expectedPrimaryButtonTextCenterY = (primaryButtonTextRect.top + primaryButtonTextRect.bottom) / 2
     textBoxChecks.append(contentsOf: [
         ("topTextWidth", topTextMaxX - topTextMinX >= minimumTextWidth),
         ("topTextHeight", topTextMaxY - topTextMinY >= 30),
@@ -355,6 +388,10 @@ if composeTextEnabled {
         ("bottomTextVerticalAnchor", nativeTextProbe && paragraphLayoutProbe
             ? bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.top + height / 20
             : bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.bottom - height / 15),
+        ("primaryButtonTextColor", primaryButtonDarkText <= 20),
+        ("primaryButtonTextWidth", primaryButtonTextMaxX - primaryButtonTextMinX >= width / 45),
+        ("primaryButtonTextHorizontalCenter", abs(primaryButtonTextCenterX - expectedPrimaryButtonTextCenterX) <= width / 80),
+        ("primaryButtonTextVerticalCenter", abs(primaryButtonTextCenterY - expectedPrimaryButtonTextCenterY) <= height / 70),
     ])
 }
 
@@ -502,7 +539,7 @@ for (name, count, minimum) in checks where count < minimum {
     exit(1)
 }
 for (name, passed) in textBoxChecks where !passed {
-    fputs("Text placement check failed: \(name) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY)\n", stderr)
+    fputs("Text placement check failed: \(name) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) primaryButtonTextBox=\(primaryButtonTextMinX),\(primaryButtonTextMinY),\(primaryButtonTextMaxX),\(primaryButtonTextMaxY) primaryButtonWhiteText=\(primaryButtonWhiteText) primaryButtonDarkText=\(primaryButtonDarkText)\n", stderr)
     exit(1)
 }
 for (name, count, minimum) in popupChecks where count < minimum {
