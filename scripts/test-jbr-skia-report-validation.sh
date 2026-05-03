@@ -641,6 +641,36 @@ strict_command_fails_without_min_jbr_font_data_defines() {
   fi
 }
 
+strict_command_requires_max_jbr_font_data_defines() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_FONT_DATA_DEFINE backend=java2d contextId=0x1234 handle=0x4567 bytes=321"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MAX_JBR_FONT_DATA_DEFINES=1
+}
+
+strict_command_fails_above_max_jbr_font_data_defines() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_FONT_DATA_DEFINE backend=java2d contextId=0x1234 handle=0x4567 bytes=321"
+    echo "JBR_SKIA_INTEROP_FONT_DATA_DEFINE backend=java2d contextId=0x1234 handle=0x4567 bytes=321"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MAX_JBR_FONT_DATA_DEFINES=1 2>/dev/null; then
+    echo "Expected strict command validation to fail above max JBR font-data define markers" >&2
+    return 1
+  fi
+}
+
 strict_command_requires_min_jbr_shadow_commands() {
   local dir
   dir="$(make_report_dir)"
@@ -1100,6 +1130,8 @@ strict_command_requires_min_jbr_shader_handle_evicts
 strict_command_requires_min_jbr_shader_handle_cache_hits
 strict_command_requires_min_jbr_font_data_defines
 strict_command_fails_without_min_jbr_font_data_defines
+strict_command_requires_max_jbr_font_data_defines
+strict_command_fails_above_max_jbr_font_data_defines
 strict_command_requires_min_jbr_shadow_commands
 strict_command_fails_without_min_jbr_shadow_commands
 strict_command_requires_max_jbr_effect_handle_defines

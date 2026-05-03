@@ -42,6 +42,7 @@ EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS="${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS="${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS:-0}"
 EXPECT_MIN_JBR_FONT_DATA_DEFINES="${EXPECT_MIN_JBR_FONT_DATA_DEFINES:-0}"
 EXPECT_MIN_JBR_SHADOW_COMMANDS="${EXPECT_MIN_JBR_SHADOW_COMMANDS:-0}"
+EXPECT_MAX_JBR_FONT_DATA_DEFINES="${EXPECT_MAX_JBR_FONT_DATA_DEFINES:--1}"
 EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES="${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES:--1}"
 EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES:--1}"
 EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE="${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE:-}"
@@ -528,6 +529,7 @@ Environment:
   EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS In strict command mode, require at least this many JBR-side shader handle cache-hit markers. Default: 0.
   EXPECT_MIN_JBR_FONT_DATA_DEFINES In strict command mode, require at least this many JBR-side font-data define markers. Default: 0.
   EXPECT_MIN_JBR_SHADOW_COMMANDS In strict command mode, require at least this many JBR direct-shadow commands in one timing frame. Default: 0.
+  EXPECT_MAX_JBR_FONT_DATA_DEFINES In strict command mode, require no more than this many JBR-side font-data define markers. Default: disabled.
   EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side effect handle define markers. Default: disabled.
   EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side shader handle define markers. Default: disabled.
   EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE When EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed, require a matching stage=<value> marker. Default: disabled.
@@ -1543,6 +1545,7 @@ write_report() {
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}"
     echo "- EXPECT_MIN_JBR_FONT_DATA_DEFINES: ${EXPECT_MIN_JBR_FONT_DATA_DEFINES}"
     echo "- EXPECT_MIN_JBR_SHADOW_COMMANDS: ${EXPECT_MIN_JBR_SHADOW_COMMANDS}"
+    echo "- EXPECT_MAX_JBR_FONT_DATA_DEFINES: ${EXPECT_MAX_JBR_FONT_DATA_DEFINES}"
     echo "- EXPECT_MIN_POPUP_FRAMES: ${EXPECT_MIN_POPUP_FRAMES}"
     echo "- EXPECT_MIN_APP_NEW_FRAMES: ${EXPECT_MIN_APP_NEW_FRAMES}"
     echo "- EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS: ${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS}"
@@ -1908,6 +1911,12 @@ validate_report() {
         jbr_font_data_defines="$(grep -c "${JBR_FONT_DATA_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${jbr_font_data_defines}" -ge "${EXPECT_MIN_JBR_FONT_DATA_DEFINES}" ]] ||
           failures+=("JBR font-data define markers ${jbr_font_data_defines} below expected ${EXPECT_MIN_JBR_FONT_DATA_DEFINES}")
+      fi
+      if [[ "${EXPECT_MAX_JBR_FONT_DATA_DEFINES}" -ge 0 ]]; then
+        local jbr_font_data_defines
+        jbr_font_data_defines="$(grep -c "${JBR_FONT_DATA_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${jbr_font_data_defines}" -le "${EXPECT_MAX_JBR_FONT_DATA_DEFINES}" ]] ||
+          failures+=("JBR font-data define markers ${jbr_font_data_defines} above expected ${EXPECT_MAX_JBR_FONT_DATA_DEFINES}")
       fi
       if [[ "${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES}" -ge 0 ]]; then
         local jbr_effect_handle_defines
