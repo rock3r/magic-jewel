@@ -67,6 +67,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asComposeColorFilter
+import androidx.compose.ui.graphics.asComposePathEffect
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -147,6 +148,7 @@ private const val ComposeColorMatrixFilterProperty = "magic.jewel.compose.colorM
 private const val ComposeLightingFilterProperty = "magic.jewel.compose.lightingFilter"
 private const val ComposeDescriptorEvictionProperty = "magic.jewel.compose.descriptorEviction"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
+private const val ComposeRawDiscretePathEffectProperty = "magic.jewel.compose.rawDiscretePathEffect"
 private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
 private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLayer"
 private const val ComposeGraphicsLayerClipProperty = "magic.jewel.compose.graphicsLayerClip"
@@ -433,6 +435,9 @@ private fun MagicJewelApp() {
     }
     val composePathEffectEnabled = remember {
         System.getProperty(ComposePathEffectProperty, "false").toBoolean()
+    }
+    val composeRawDiscretePathEffectEnabled = remember {
+        System.getProperty(ComposeRawDiscretePathEffectProperty, "false").toBoolean()
     }
     val composeBlendModeEnabled = remember {
         System.getProperty(ComposeBlendModeProperty, "false").toBoolean()
@@ -1390,6 +1395,28 @@ private fun MagicJewelApp() {
                                         style = StampedPathEffectStyle.Rotate,
                                     ),
                                 )
+                            },
+                        )
+                    }
+                }
+                if (composeRawDiscretePathEffectEnabled) {
+                    val pathEffect = org.jetbrains.skia.PathEffect.makeDiscrete(
+                        segLength = 10f,
+                        dev = 4f,
+                        seed = 7,
+                    ).asComposePathEffect()
+                    val rawEffectPath = Path().apply {
+                        moveTo(size.width - 738f, 326f)
+                        cubicTo(size.width - 694f, 284f, size.width - 640f, 366f, size.width - 588f, 324f)
+                    }
+                    drawIntoCanvas { canvas ->
+                        canvas.drawPath(
+                            path = rawEffectPath,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFD54A)
+                                style = PaintingStyle.Stroke
+                                strokeWidth = 6f
+                                this.pathEffect = pathEffect
                             },
                         )
                     }
