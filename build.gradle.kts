@@ -267,6 +267,8 @@ val invalidSweepGradientEnabled = providers.gradleProperty("magicJewelInvalidSwe
 val autoResizeEnabled = providers.gradleProperty("magicJewelAutoResize")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_AUTO_RESIZE"))
     .orElse("false")
+val autoResizeDelayMillis = providers.gradleProperty("magicJewelAutoResizeDelayMillis")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS"))
 val popupStressEnabled = providers.gradleProperty("magicJewelPopupStress")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_POPUP_STRESS"))
     .orElse("false")
@@ -414,6 +416,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.stableImageCacheChurn", stableImageCacheChurnEnabled.get())
     systemProperty("magic.jewel.invalidSweepGradient", invalidSweepGradientEnabled.get())
     systemProperty("magic.jewel.autoResize", autoResizeEnabled.get())
+    autoResizeDelayMillis.orNull?.let { systemProperty("magic.jewel.autoResizeDelayMillis", it) }
     systemProperty("magic.jewel.popupStress", popupStressEnabled.get())
     systemProperty("magic.jewel.popupWindowStress", popupWindowStressEnabled.get())
     systemProperty("magic.jewel.menuStress", menuStressEnabled.get())

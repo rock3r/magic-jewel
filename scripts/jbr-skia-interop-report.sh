@@ -306,6 +306,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_AUTO_RESIZE+x}" ]]; then
   MAGIC_JEWEL_AUTO_RESIZE=false
 fi
+if [[ -z "${MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS+x}" ]]; then
+  MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS=
+fi
 if [[ -z "${MAGIC_JEWEL_POPUP_STRESS+x}" ]]; then
   MAGIC_JEWEL_POPUP_STRESS=false
 fi
@@ -397,6 +400,7 @@ export MAGIC_JEWEL_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_INVALID_SWEEP_GRADIENT
 export MAGIC_JEWEL_AUTO_RESIZE
+export MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS
 export MAGIC_JEWEL_POPUP_STRESS
 export MAGIC_JEWEL_POPUP_WINDOW_STRESS
 export MAGIC_JEWEL_MENU_STRESS
@@ -589,6 +593,7 @@ Environment:
   MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN Makes image cache churn images independent of frame ticks. Default: false.
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT Enables an invalid sweep-gradient stop probe. Default: false.
   MAGIC_JEWEL_AUTO_RESIZE Resizes the JFrame once after startup to exercise surface invalidation. Default: false.
+  MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS Delay before the automatic resize. Default: app default.
   MAGIC_JEWEL_POPUP_STRESS Shows an animated Swing popup over the ComposePanel. Default: false.
   MAGIC_JEWEL_POPUP_WINDOW_STRESS Shows an animated undecorated Swing popup window over the ComposePanel. Default: false.
   MAGIC_JEWEL_MENU_STRESS Shows an animated Swing JPopupMenu over the ComposePanel. Default: false.
@@ -1477,6 +1482,7 @@ write_report() {
     echo "- MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN}"
     echo "- MAGIC_JEWEL_INVALID_SWEEP_GRADIENT: ${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT}"
     echo "- MAGIC_JEWEL_AUTO_RESIZE: ${MAGIC_JEWEL_AUTO_RESIZE}"
+    echo "- MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS: ${MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS:-<unset>}"
     echo "- MAGIC_JEWEL_POPUP_STRESS: ${MAGIC_JEWEL_POPUP_STRESS}"
     echo "- MAGIC_JEWEL_POPUP_WINDOW_STRESS: ${MAGIC_JEWEL_POPUP_WINDOW_STRESS}"
     echo "- MAGIC_JEWEL_MENU_STRESS: ${MAGIC_JEWEL_MENU_STRESS}"

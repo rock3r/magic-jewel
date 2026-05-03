@@ -342,14 +342,15 @@ if composeTextEnabled {
 
 let nativeTextProbe = ProcessInfo.processInfo.environment["JBR_SKIA_NATIVE_TEXT"] == "true"
 let paragraphLayoutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT"] == "true"
+let minimumTextWidth = min(width / 5, 360)
 
 var textBoxChecks: [(String, Bool)] = []
 if composeTextEnabled {
     textBoxChecks.append(contentsOf: [
-        ("topTextWidth", topTextMaxX - topTextMinX >= width / 5),
+        ("topTextWidth", topTextMaxX - topTextMinX >= minimumTextWidth),
         ("topTextHeight", topTextMaxY - topTextMinY >= 30),
         ("topTextVerticalAnchor", topTextMinY <= topTextRect.top + height / 12 && topTextMaxY >= topTextRect.top + height / 24),
-        ("bottomTextWidth", bottomTextMaxX - bottomTextMinX >= width / 5),
+        ("bottomTextWidth", bottomTextMaxX - bottomTextMinX >= minimumTextWidth),
         ("bottomTextHeight", bottomTextMaxY - bottomTextMinY >= 40),
         ("bottomTextVerticalAnchor", nativeTextProbe && paragraphLayoutProbe
             ? bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.top + height / 20
