@@ -107,7 +107,8 @@ run_named_case() {
         EXPECT_MIN_TEXT_COMMANDS=8 \
         EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS=4 \
         MAX_BAD_PIXEL_RATIO=0.07 \
-        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10 \
+        MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO=0.17
       ;;
     parity-forced-context-native-text)
       run_case "$1" \
@@ -122,7 +123,8 @@ run_named_case() {
         EXPECT_SURFACE_CONTEXT_CHANGED=true \
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         MAX_BAD_PIXEL_RATIO=0.07 \
-        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.10 \
+        MAX_COMPOSE_BOTTOM_LABELS_BAD_PIXEL_RATIO=0.17
       ;;
     parity-forced-context-image-refs)
       run_case "$1" \
