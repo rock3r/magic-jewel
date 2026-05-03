@@ -66,6 +66,7 @@ import androidx.compose.ui.graphics.StampedPathEffectStyle
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.asComposeColorFilter
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.asComposeShader
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -136,6 +137,7 @@ private const val ComposeRuntimeEffectUniformOnlyProperty = "magic.jewel.compose
 private const val ComposeRuntimeEffectChildOnlyProperty = "magic.jewel.compose.runtimeEffectChildOnly"
 private const val ComposeRuntimeEffectBadChildProperty = "magic.jewel.compose.runtimeEffectBadChild"
 private const val ComposeRuntimeEffectColorFilterProperty = "magic.jewel.compose.runtimeEffectColorFilter"
+private const val ComposeRawRuntimeEffectColorFilterProperty = "magic.jewel.compose.rawRuntimeEffectColorFilter"
 private const val ComposeRuntimeEffectColorFilterChildProperty = "magic.jewel.compose.runtimeEffectColorFilterChild"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
@@ -400,6 +402,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectColorFilterEnabled = remember {
         System.getProperty(ComposeRuntimeEffectColorFilterProperty, "false").toBoolean()
+    }
+    val composeRawRuntimeEffectColorFilterEnabled = remember {
+        System.getProperty(ComposeRawRuntimeEffectColorFilterProperty, "false").toBoolean()
     }
     val composeRuntimeEffectColorFilterChildEnabled = remember {
         System.getProperty(ComposeRuntimeEffectColorFilterChildProperty, "false").toBoolean()
@@ -1107,6 +1112,34 @@ private fun MagicJewelApp() {
                                     uniforms = floatArrayOf(phase),
                                     uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
                                 )
+                            },
+                        )
+                    }
+                }
+                if (composeRawRuntimeEffectColorFilterEnabled) {
+                    val colorFilter = org.jetbrains.skia.RuntimeEffect.makeForColorFilter(
+                        """
+                            half4 main(half4 color) {
+                                return half4(color.b, color.r * 0.72, color.g, color.a);
+                            }
+                        """.trimIndent(),
+                    ).let { effect ->
+                        val method = effect.javaClass.getMethod(
+                            "makeColorFilter",
+                            org.jetbrains.skia.Data::class.java,
+                            Array<org.jetbrains.skia.ColorFilter?>::class.java,
+                        )
+                        method.invoke(effect, null, null) as org.jetbrains.skia.ColorFilter
+                    }.asComposeColorFilter()
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 556f,
+                            top = 34f,
+                            right = size.width - 444f,
+                            bottom = 112f,
+                            paint = Paint().apply {
+                                color = Color(0xFF38BDF8)
+                                this.colorFilter = colorFilter
                             },
                         )
                     }
