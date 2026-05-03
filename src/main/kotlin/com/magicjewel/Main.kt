@@ -119,6 +119,7 @@ private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShader"
+private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.compositeOpaqueShader"
 private const val ComposeTransformedShaderProperty = "magic.jewel.compose.transformedShader"
 private const val ComposeImageShaderColorFilterProperty = "magic.jewel.compose.imageShaderColorFilter"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
@@ -345,6 +346,9 @@ private fun MagicJewelApp() {
     }
     val composeOpaqueShaderEnabled = remember {
         System.getProperty(ComposeOpaqueShaderProperty, "false").toBoolean()
+    }
+    val composeCompositeOpaqueShaderEnabled = remember {
+        System.getProperty(ComposeCompositeOpaqueShaderProperty, "false").toBoolean()
     }
     val composeTransformedShaderEnabled = remember {
         System.getProperty(ComposeTransformedShaderProperty, "false").toBoolean()
@@ -689,6 +693,25 @@ private fun MagicJewelApp() {
                             },
                         )
                     }
+                }
+                if (composeCompositeOpaqueShaderEnabled) {
+                    val topLeft = Offset(size.width - 224f, size.height - 616f)
+                    val shader = CompositeShader(
+                        dst = LinearGradientShader(
+                            from = topLeft,
+                            to = topLeft + Offset(140f, 116f),
+                            colors = listOf(Color(0xFF22D3EE), Color(0xFF312E81)),
+                            colorStops = listOf(0f, 1f),
+                            tileMode = TileMode.Clamp,
+                        ),
+                        src = org.jetbrains.skia.Shader.makeColor(Color(0xCCF97316).toArgb()).asComposeShader(),
+                        blendMode = BlendMode.SrcOver,
+                    )
+                    drawRect(
+                        brush = ShaderBrush(shader),
+                        topLeft = topLeft,
+                        size = Size(140f, 116f),
+                    )
                 }
                 if (composeTransformedShaderEnabled) {
                     val topLeft = Offset(size.width - 224f, size.height - 488f)
