@@ -55,6 +55,8 @@ EXPECT_SURFACE_CONTEXT_CHANGED="${EXPECT_SURFACE_CONTEXT_CHANGED:-}"
 EXPECT_SURFACE_CHANGED="${EXPECT_SURFACE_CHANGED:-}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 MAGIC_JEWEL_SWING_ISLAND="${MAGIC_JEWEL_SWING_ISLAND:-true}"
+JBR_SKIA_LIB="${JBR_SKIA_LIB-/tmp/jbr-skia-native/libjbrskiainterop.dylib}"
+JBR_SKIA_LIBRARY_PATH="${JBR_SKIA_LIBRARY_PATH:-}"
 JBR_SKIA_NATIVE_TEXT="${JBR_SKIA_NATIVE_TEXT:-false}"
 SKIKO_EXPECTED_ABI_ID_FOR_TEST="${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-}"
 SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST="${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-}"
@@ -405,6 +407,8 @@ export MAGIC_JEWEL_POPUP_STRESS
 export MAGIC_JEWEL_POPUP_WINDOW_STRESS
 export MAGIC_JEWEL_MENU_STRESS
 export MAGIC_JEWEL_SWING_ISLAND
+export JBR_SKIA_LIB
+export JBR_SKIA_LIBRARY_PATH
 export JBR_SKIA_NATIVE_TEXT
 export SKIKO_EXPECTED_ABI_ID_FOR_TEST
 export SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST
@@ -473,6 +477,8 @@ Environment:
   DESKTOP_PATCH            Patched java.desktop classes. Default: /tmp/jbr-skia-run/desktop.
   JBR_API_SHIM             Public JBR API shim jar. Default: /tmp/jbr-api-shim.jar.
   JBR_SKIA_LIB             Native JBR Skia interop dylib. Default: /tmp/jbr-skia-native/libjbrskiainterop.dylib.
+                           Set to an empty string to use System.loadLibrary("jbrskiainterop").
+  JBR_SKIA_LIBRARY_PATH    Optional java.library.path for the app JVM, useful with empty JBR_SKIA_LIB.
   CMP_SCRIPTS_DIR          CMP sample scripts directory containing the capture helper.
   ASSERT_SCRIPT            Picture/mixed-mode screenshot assertion helper.
   COMMAND_ASSERT_SCRIPT    Command-mode screenshot assertion helper.
@@ -1487,6 +1493,8 @@ write_report() {
     echo "- MAGIC_JEWEL_POPUP_WINDOW_STRESS: ${MAGIC_JEWEL_POPUP_WINDOW_STRESS}"
     echo "- MAGIC_JEWEL_MENU_STRESS: ${MAGIC_JEWEL_MENU_STRESS}"
     echo "- MAGIC_JEWEL_SWING_ISLAND: ${MAGIC_JEWEL_SWING_ISLAND}"
+    echo "- JBR_SKIA_LIB: ${JBR_SKIA_LIB:-<system-load-library>}"
+    echo "- JBR_SKIA_LIBRARY_PATH: ${JBR_SKIA_LIBRARY_PATH:-<unset>}"
     echo "- JBR_SKIA_NATIVE_TEXT: ${JBR_SKIA_NATIVE_TEXT}"
     echo "- SKIKO_EXPECTED_ABI_ID_FOR_TEST: ${SKIKO_EXPECTED_ABI_ID_FOR_TEST:-<unset>}"
     echo "- SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST: ${SKIKO_EXPECTED_NATIVE_ABI_VERSION_FOR_TEST:-<unset>}"

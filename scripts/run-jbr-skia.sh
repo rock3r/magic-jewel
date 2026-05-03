@@ -5,6 +5,8 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 DESKTOP_PATCH=${DESKTOP_PATCH:-/tmp/jbr-skia-run/desktop}
 JBR_API_SHIM=${JBR_API_SHIM:-/tmp/jbr-api-shim.jar}
 JBR_SKIA_LIB=${JBR_SKIA_LIB-/tmp/jbr-skia-native/libjbrskiainterop.dylib}
+JBR_SKIA_LIBRARY_PATH=${JBR_SKIA_LIBRARY_PATH:-}
+JAVA_HOME_FOR_BOOT_LIBRARY_PATH=${JAVA_HOME:-$(/usr/libexec/java_home -v 21)}
 SKIKO_VERSION=${SKIKO_VERSION:-0.0.0-SNAPSHOT}
 LOCAL_CMP_OUT=${LOCAL_CMP_OUT:-}
 JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
@@ -31,6 +33,10 @@ JBR_ARGS=(
 )
 if [[ -n "${JBR_SKIA_LIB}" ]]; then
   JBR_ARGS+=("-Dsun.java2d.skia.interop.library=${JBR_SKIA_LIB}")
+fi
+if [[ -n "${JBR_SKIA_LIBRARY_PATH}" ]]; then
+  JBR_ARGS+=("-Djava.library.path=${JBR_SKIA_LIBRARY_PATH}")
+  JBR_ARGS+=("-Dsun.boot.library.path=${JAVA_HOME_FOR_BOOT_LIBRARY_PATH}/lib:${JBR_SKIA_LIBRARY_PATH}")
 fi
 
 case "${JBR_SKIA_RENDER_MODE}" in
