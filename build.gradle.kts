@@ -303,6 +303,9 @@ val pauseSwingAnimation = providers.gradleProperty("magicJewelPauseSwingAnimatio
 val swingIslandEnabled = providers.gradleProperty("magicJewelSwingIsland")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_SWING_ISLAND"))
     .orElse("true")
+val backgroundWindowEnabled = providers.gradleProperty("magicJewelBackgroundWindow")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_BACKGROUND_WINDOW"))
+    .orElse("false")
 
 configurations.configureEach {
     resolutionStrategy.eachDependency {
@@ -450,6 +453,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     fixedFrameTicks.orNull?.let { systemProperty("magic.jewel.fixedFrameTicks", it) }
     systemProperty("magic.jewel.pauseSwingAnimation", pauseSwingAnimation.get())
     systemProperty("magic.jewel.swingIsland", swingIslandEnabled.get())
+    systemProperty("magic.jewel.backgroundWindow", backgroundWindowEnabled.get())
+    if (backgroundWindowEnabled.get().toBoolean()) {
+        systemProperty("apple.awt.UIElement", "true")
+    }
     if (interoperable) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")

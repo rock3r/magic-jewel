@@ -217,6 +217,7 @@ private const val FixedAnimationPhaseProperty = "magic.jewel.fixedAnimationPhase
 private const val FixedFrameTicksProperty = "magic.jewel.fixedFrameTicks"
 private const val PauseSwingAnimationProperty = "magic.jewel.pauseSwingAnimation"
 private const val SwingIslandProperty = "magic.jewel.swingIsland"
+private const val BackgroundWindowProperty = "magic.jewel.backgroundWindow"
 private const val ResizeMarker = "MAGIC_JEWEL_WINDOW_RESIZE"
 private const val PopupShownMarker = "MAGIC_JEWEL_POPUP_SHOWN"
 private const val PopupWindowTitle = "MagicJewelPopupWindow"
@@ -250,6 +251,7 @@ private fun showMagicJewel() {
 
     JFrame(WindowTitle).apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        applyAutomationWindowFocusPolicy()
         contentPane.add(panel)
         pack()
         setLocationRelativeTo(null)
@@ -316,6 +318,7 @@ private fun JFrame.schedulePopupWindowStressIfNeeded() {
     Timer(delayMillis) {
         val dialog = JDialog(this, PopupWindowTitle).apply {
             isUndecorated = true
+            applyAutomationWindowFocusPolicy()
             contentPane.add(PopupStressPanel())
             pack()
             val anchor = location
@@ -329,6 +332,13 @@ private fun JFrame.schedulePopupWindowStressIfNeeded() {
         isRepeats = false
         start()
     }
+}
+
+private fun java.awt.Window.applyAutomationWindowFocusPolicy() {
+    if (!System.getProperty(BackgroundWindowProperty, "false").toBoolean()) return
+
+    setFocusableWindowState(false)
+    setAutoRequestFocus(false)
 }
 
 private fun JFrame.scheduleAutoResizeIfNeeded() {

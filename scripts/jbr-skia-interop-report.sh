@@ -56,6 +56,7 @@ EXPECT_SURFACE_CONTEXT_CHANGED="${EXPECT_SURFACE_CONTEXT_CHANGED:-}"
 EXPECT_SURFACE_CHANGED="${EXPECT_SURFACE_CHANGED:-}"
 MAGIC_JEWEL_COMPOSE_TEXT="${MAGIC_JEWEL_COMPOSE_TEXT:-true}"
 MAGIC_JEWEL_SWING_ISLAND="${MAGIC_JEWEL_SWING_ISLAND:-true}"
+MAGIC_JEWEL_BACKGROUND_WINDOW="${MAGIC_JEWEL_BACKGROUND_WINDOW:-true}"
 JBR_SKIA_LIB="${JBR_SKIA_LIB-/tmp/jbr-skia-native/libjbrskiainterop.dylib}"
 JBR_SKIA_LIBRARY_PATH="${JBR_SKIA_LIBRARY_PATH:-}"
 JBR_SKIA_NATIVE_TEXT="${JBR_SKIA_NATIVE_TEXT:-false}"
@@ -424,6 +425,7 @@ export MAGIC_JEWEL_POPUP_STRESS
 export MAGIC_JEWEL_POPUP_WINDOW_STRESS
 export MAGIC_JEWEL_MENU_STRESS
 export MAGIC_JEWEL_SWING_ISLAND
+export MAGIC_JEWEL_BACKGROUND_WINDOW
 export JBR_SKIA_LIB
 export JBR_SKIA_LIBRARY_PATH
 export JBR_SKIA_NATIVE_TEXT
@@ -624,6 +626,7 @@ Environment:
   MAGIC_JEWEL_POPUP_WINDOW_STRESS Shows an animated undecorated Swing popup window over the ComposePanel. Default: false.
   MAGIC_JEWEL_MENU_STRESS Shows an animated Swing JPopupMenu over the ComposePanel. Default: false.
   MAGIC_JEWEL_SWING_ISLAND Shows the embedded SwingPanel island. Default: true.
+  MAGIC_JEWEL_BACKGROUND_WINDOW Shows harness windows without requesting focus. Default: true.
   MAGIC_JEWEL_FIXED_ANIMATION_PHASE Freezes Compose/Swing animation phase to [0,1] for screenshot parity.
   MAGIC_JEWEL_FIXED_FRAME_TICKS Freezes the Compose frame counter used by deterministic probes.
   MAGIC_JEWEL_PAUSE_SWING_ANIMATION Pauses Swing timer repaint animation for stable screenshot parity.
@@ -1517,6 +1520,7 @@ write_report() {
     echo "- MAGIC_JEWEL_POPUP_WINDOW_STRESS: ${MAGIC_JEWEL_POPUP_WINDOW_STRESS}"
     echo "- MAGIC_JEWEL_MENU_STRESS: ${MAGIC_JEWEL_MENU_STRESS}"
     echo "- MAGIC_JEWEL_SWING_ISLAND: ${MAGIC_JEWEL_SWING_ISLAND}"
+    echo "- MAGIC_JEWEL_BACKGROUND_WINDOW: ${MAGIC_JEWEL_BACKGROUND_WINDOW}"
     echo "- JBR_SKIA_LIB: ${JBR_SKIA_LIB:-<system-load-library>}"
     echo "- JBR_SKIA_LIBRARY_PATH: ${JBR_SKIA_LIBRARY_PATH:-<unset>}"
     echo "- JBR_SKIA_NATIVE_TEXT: ${JBR_SKIA_NATIVE_TEXT}"
