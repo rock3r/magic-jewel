@@ -121,6 +121,7 @@ private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShader"
 private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.compositeOpaqueShader"
 private const val ComposeNoiseShaderProperty = "magic.jewel.compose.noiseShader"
+private const val ComposePictureShaderProperty = "magic.jewel.compose.pictureShader"
 private const val ComposeTransformedShaderProperty = "magic.jewel.compose.transformedShader"
 private const val ComposeImageShaderColorFilterProperty = "magic.jewel.compose.imageShaderColorFilter"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
@@ -353,6 +354,9 @@ private fun MagicJewelApp() {
     }
     val composeNoiseShaderEnabled = remember {
         System.getProperty(ComposeNoiseShaderProperty, "false").toBoolean()
+    }
+    val composePictureShaderEnabled = remember {
+        System.getProperty(ComposePictureShaderProperty, "false").toBoolean()
     }
     val composeTransformedShaderEnabled = remember {
         System.getProperty(ComposeTransformedShaderProperty, "false").toBoolean()
@@ -731,6 +735,38 @@ private fun MagicJewelApp() {
                                     baseFrequencyY = 0.06f,
                                     numOctaves = 4,
                                     seed = 3.5f,
+                                ).asComposeShader()
+                            },
+                        )
+                    }
+                }
+                if (composePictureShaderEnabled) {
+                    val topLeft = Offset(size.width - 448f, size.height - 616f)
+                    val picture = org.jetbrains.skia.PictureRecorder().let { recorder ->
+                        val pictureCanvas = recorder.beginRecording(org.jetbrains.skia.Rect(0f, 0f, 48f, 48f))
+                        pictureCanvas.drawRect(
+                            org.jetbrains.skia.Rect(0f, 0f, 48f, 48f),
+                            org.jetbrains.skia.Paint().apply { color = Color(0xFF0F172A).toArgb() },
+                        )
+                        pictureCanvas.drawCircle(
+                            24f,
+                            24f,
+                            16f,
+                            org.jetbrains.skia.Paint().apply { color = Color(0xFF38BDF8).toArgb() },
+                        )
+                        recorder.finishRecordingAsPicture()
+                    }
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 140f,
+                            bottom = topLeft.y + 116f,
+                            paint = Paint().apply {
+                                shader = picture.makeShader(
+                                    org.jetbrains.skia.FilterTileMode.REPEAT,
+                                    org.jetbrains.skia.FilterTileMode.REPEAT,
+                                    org.jetbrains.skia.FilterMode.NEAREST,
                                 ).asComposeShader()
                             },
                         )
