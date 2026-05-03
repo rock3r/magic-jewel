@@ -79,6 +79,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -193,6 +194,7 @@ private const val ComposeSweepGradientRoundRectProperty = "magic.jewel.compose.s
 private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepGradientPath"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
+private const val GenericFontTextProperty = "magic.jewel.genericFontText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
 private const val StableImageCacheChurnProperty = "magic.jewel.stableImageCacheChurn"
 private const val InvalidSweepGradientProperty = "magic.jewel.invalidSweepGradient"
@@ -570,6 +572,9 @@ private fun MagicJewelApp() {
     }
     val paragraphLayoutTextEnabled = remember {
         System.getProperty(ParagraphLayoutTextProperty, "false").toBoolean()
+    }
+    val genericFontTextEnabled = remember {
+        System.getProperty(GenericFontTextProperty, "false").toBoolean()
     }
     val imageCacheChurnEnabled = remember {
         System.getProperty(ImageCacheChurnProperty, "false").toBoolean()
@@ -2361,6 +2366,30 @@ private fun MagicJewelApp() {
                             fontSize = 17.sp,
                             letterSpacing = 1.5.sp,
                             textDecoration = TextDecoration.Underline + TextDecoration.LineThrough,
+                        ),
+                    )
+                }
+                if (genericFontTextEnabled) {
+                    MagicLabel(
+                        "Monospace 0123456789",
+                        composeTextEnabled,
+                        width = 260.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Bold,
+                        ),
+                    )
+                    MagicLabel(
+                        "Serif \uD83D\uDE80 paragraph",
+                        composeTextEnabled,
+                        width = 260.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            fontFamily = FontFamily.Serif,
+                            fontStyle = FontStyle.Italic,
                         ),
                     )
                 }

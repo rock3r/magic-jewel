@@ -291,6 +291,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT+x}" ]]; then
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false
 fi
+if [[ -z "${MAGIC_JEWEL_GENERIC_FONT_TEXT+x}" ]]; then
+  MAGIC_JEWEL_GENERIC_FONT_TEXT=false
+fi
 if [[ -z "${MAGIC_JEWEL_IMAGE_CACHE_CHURN+x}" ]]; then
   MAGIC_JEWEL_IMAGE_CACHE_CHURN=false
 fi
@@ -389,6 +392,7 @@ export MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE
 export MAGIC_JEWEL_FORCE_CONTEXT_CHANGE
 export MAGIC_JEWEL_UNSUPPORTED_TEXT
 export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
+export MAGIC_JEWEL_GENERIC_FONT_TEXT
 export MAGIC_JEWEL_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_INVALID_SWEEP_GRADIENT
@@ -580,6 +584,7 @@ Environment:
   MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE Corrupts one RuntimeEffect shader descriptor after recording so JBR sees a child type mismatch. Default: false.
   MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use the paragraph text command. Default: false.
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
+  MAGIC_JEWEL_GENERIC_FONT_TEXT Enables generic-family native text probes. Default: false.
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
   MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN Makes image cache churn images independent of frame ticks. Default: false.
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT Enables an invalid sweep-gradient stop probe. Default: false.
@@ -1467,6 +1472,7 @@ write_report() {
     echo "- MAGIC_JEWEL_FORCE_CONTEXT_CHANGE: ${MAGIC_JEWEL_FORCE_CONTEXT_CHANGE}"
     echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
     echo "- MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT: ${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT}"
+    echo "- MAGIC_JEWEL_GENERIC_FONT_TEXT: ${MAGIC_JEWEL_GENERIC_FONT_TEXT}"
     echo "- MAGIC_JEWEL_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_IMAGE_CACHE_CHURN}"
     echo "- MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN}"
     echo "- MAGIC_JEWEL_INVALID_SWEEP_GRADIENT: ${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT}"
