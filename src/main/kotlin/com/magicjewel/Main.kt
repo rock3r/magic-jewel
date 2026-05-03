@@ -128,6 +128,7 @@ private const val ComposeImageShaderColorFilterProperty = "magic.jewel.compose.i
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
 private const val ComposeCompositeShaderColorFilterProperty = "magic.jewel.compose.compositeShaderColorFilter"
 private const val ComposeRuntimeEffectShaderProperty = "magic.jewel.compose.runtimeEffectShader"
+private const val ComposeRawRuntimeEffectShaderProperty = "magic.jewel.compose.rawRuntimeEffectShader"
 private const val ComposeRuntimeEffectShaderColorFilterProperty = "magic.jewel.compose.runtimeEffectShaderColorFilter"
 private const val ComposeLinearGradientShaderColorFilterProperty = "magic.jewel.compose.linearGradientShaderColorFilter"
 private const val ComposeRuntimeEffectPureColorProperty = "magic.jewel.compose.runtimeEffectPureColor"
@@ -375,6 +376,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectShaderEnabled = remember {
         System.getProperty(ComposeRuntimeEffectShaderProperty, "false").toBoolean()
+    }
+    val composeRawRuntimeEffectShaderEnabled = remember {
+        System.getProperty(ComposeRawRuntimeEffectShaderProperty, "false").toBoolean()
     }
     val composeRuntimeEffectShaderColorFilterEnabled = remember {
         System.getProperty(ComposeRuntimeEffectShaderColorFilterProperty, "false").toBoolean()
@@ -895,6 +899,23 @@ private fun MagicJewelApp() {
                         size = Size(152f, 112f),
                     )
                     drawRect(color = Color.White, topLeft = topLeft, size = Size(152f, 112f), style = Stroke(width = 3f))
+                }
+                if (composeRawRuntimeEffectShaderEnabled) {
+                    val topLeft = Offset(size.width - 740f, size.height - 104f)
+                    val shader = org.jetbrains.skia.RuntimeEffect.makeForShader(
+                        """
+                            half4 main(float2 p) {
+                                float stripe = step(0.5, fract((p.x * 0.06) + (p.y * 0.03)));
+                                return half4(mix(half3(0.94, 0.38, 0.18), half3(0.18, 0.82, 0.74), stripe), 1.0);
+                            }
+                        """.trimIndent(),
+                    ).makeShader(null, null, null).asComposeShader()
+                    drawRect(
+                        brush = ShaderBrush(shader),
+                        topLeft = topLeft,
+                        size = Size(152f, 72f),
+                    )
+                    drawRect(color = Color.White, topLeft = topLeft, size = Size(152f, 72f), style = Stroke(width = 3f))
                 }
                 if (composeRuntimeEffectUniformOnlyEnabled) {
                     val topLeft = Offset(size.width - 740f, size.height - 232f)
