@@ -136,7 +136,7 @@ run_named_case() {
       run_case "$1" \
         JBR_SKIA_NATIVE_TEXT=true \
         MAGIC_JEWEL_GENERIC_FONT_TEXT=true \
-        EXPECT_MIN_TEXT_COMMANDS=9 \
+        EXPECT_MIN_TEXT_COMMANDS=11 \
         EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS=1
       ;;
     commands-forced-context-native-text)

@@ -2371,6 +2371,16 @@ private fun MagicJewelApp() {
                 }
                 if (genericFontTextEnabled) {
                     MagicLabel(
+                        "Sans-serif generic label",
+                        composeTextEnabled,
+                        width = 260.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            fontFamily = FontFamily.SansSerif,
+                        ),
+                    )
+                    MagicLabel(
                         "Monospace 0123456789",
                         composeTextEnabled,
                         width = 260.dp,
@@ -2390,6 +2400,16 @@ private fun MagicJewelApp() {
                             fontSize = 17.sp,
                             fontFamily = FontFamily.Serif,
                             fontStyle = FontStyle.Italic,
+                        ),
+                    )
+                    MagicLabel(
+                        "Cursive generic label",
+                        composeTextEnabled,
+                        width = 260.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            fontFamily = FontFamily.Cursive,
                         ),
                     )
                 }
