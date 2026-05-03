@@ -251,7 +251,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_COLOR_SHADER=true \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=1
       ;;
     commands-image-shader-color-filter)
       run_case "$1" \
@@ -259,7 +260,8 @@ run_named_case() {
         EXPECT_MIN_IMAGE_REFS=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-composite-shader)
       run_case "$1" \
@@ -797,7 +799,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_TRANSFORMED_SHADER=true \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-invalid-gradient-fallback)
       run_case "$1" \
