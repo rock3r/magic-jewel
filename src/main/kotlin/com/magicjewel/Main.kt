@@ -199,6 +199,7 @@ private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepG
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val GenericFontTextProperty = "magic.jewel.genericFontText"
+private const val LoadedFontDataTextProperty = "magic.jewel.loadedFontDataText"
 private const val ResourceFontTextProperty = "magic.jewel.resourceFontText"
 private const val SystemFontTextProperty = "magic.jewel.systemFontText"
 private const val ImageCacheChurnProperty = "magic.jewel.imageCacheChurn"
@@ -584,6 +585,16 @@ private fun MagicJewelApp() {
     }
     val genericFontTextEnabled = remember {
         System.getProperty(GenericFontTextProperty, "false").toBoolean()
+    }
+    val loadedFontDataTextEnabled = remember {
+        System.getProperty(LoadedFontDataTextProperty, "false").toBoolean()
+    }
+    val loadedFontDataFamily = remember(loadedFontDataTextEnabled) {
+        if (loadedFontDataTextEnabled) {
+            FontFamily(ComposeFont("magic-jewel-loaded-font-data", loadMagicJewelFontResourceBytes()))
+        } else {
+            null
+        }
     }
     val resourceFontTextEnabled = remember {
         System.getProperty(ResourceFontTextProperty, "false").toBoolean()
@@ -2448,6 +2459,18 @@ private fun MagicJewelApp() {
                         ),
                     )
                 }
+                if (loadedFontDataTextEnabled) {
+                    MagicLabel(
+                        "Loaded font-data label",
+                        composeTextEnabled,
+                        width = 300.dp,
+                        style = TextStyle(
+                            color = Color.Black,
+                            fontSize = 17.sp,
+                            fontFamily = loadedFontDataFamily,
+                        ),
+                    )
+                }
                 if (resourceFontTextEnabled) {
                     MagicLabel(
                         "Classpath resource font label",
@@ -2552,6 +2575,14 @@ private fun MagicLabel(
                 .background(Color.White.copy(alpha = 0.72f))
         )
     }
+}
+
+private fun loadMagicJewelFontResourceBytes(): ByteArray {
+    val resource = "magicjewel-fonts/MagicJewelResourceFont.ttf"
+    val stream = Thread.currentThread().contextClassLoader?.getResourceAsStream(resource)
+        ?: ClassLoader.getSystemResourceAsStream(resource)
+        ?: error("Missing Magic Jewel font resource: $resource")
+    return stream.use { it.readBytes() }
 }
 
 private fun createSwingStatusPanel(): JPanel {

@@ -40,6 +40,7 @@ EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES:-0}
 EXPECT_MIN_JBR_SHADER_HANDLE_USES="${EXPECT_MIN_JBR_SHADER_HANDLE_USES:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS="${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS="${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS:-0}"
+EXPECT_MIN_JBR_FONT_DATA_DEFINES="${EXPECT_MIN_JBR_FONT_DATA_DEFINES:-0}"
 EXPECT_MIN_JBR_SHADOW_COMMANDS="${EXPECT_MIN_JBR_SHADOW_COMMANDS:-0}"
 EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES="${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES:--1}"
 EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES:--1}"
@@ -299,6 +300,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_GENERIC_FONT_TEXT+x}" ]]; then
   MAGIC_JEWEL_GENERIC_FONT_TEXT=false
 fi
+if [[ -z "${MAGIC_JEWEL_LOADED_FONT_DATA_TEXT+x}" ]]; then
+  MAGIC_JEWEL_LOADED_FONT_DATA_TEXT=false
+fi
 if [[ -z "${MAGIC_JEWEL_RESOURCE_FONT_TEXT+x}" ]]; then
   MAGIC_JEWEL_RESOURCE_FONT_TEXT=false
 fi
@@ -408,6 +412,7 @@ export MAGIC_JEWEL_FORCE_CONTEXT_CHANGE
 export MAGIC_JEWEL_UNSUPPORTED_TEXT
 export MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT
 export MAGIC_JEWEL_GENERIC_FONT_TEXT
+export MAGIC_JEWEL_LOADED_FONT_DATA_TEXT
 export MAGIC_JEWEL_RESOURCE_FONT_TEXT
 export MAGIC_JEWEL_SYSTEM_FONT_TEXT
 export MAGIC_JEWEL_IMAGE_CACHE_CHURN
@@ -453,6 +458,7 @@ JBR_SHADER_HANDLE_DEFINE_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_DEFINE"
 JBR_SHADER_HANDLE_USE_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_USE"
 JBR_SHADER_HANDLE_EVICT_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_EVICT"
 JBR_SHADER_HANDLE_CACHE_HIT_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_CACHE_HIT"
+JBR_FONT_DATA_DEFINE_MARKER="JBR_SKIA_INTEROP_FONT_DATA_DEFINE"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
 SKIKO_COMMAND_CACHES_CLEARED_MARKER="SKIKO_JBR_INTEROP_COMMAND_CACHES_CLEARED"
 SKIKO_TINY_FULL_SCENE_MARKER="SKIKO_JBR_INTEROP_TINY_FULL_SCENE_INJECTED"
@@ -518,6 +524,7 @@ Environment:
   EXPECT_MIN_JBR_SHADER_HANDLE_USES In strict command mode, require at least this many JBR-side shader handle use markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS In strict command mode, require at least this many JBR-side shader handle evict markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS In strict command mode, require at least this many JBR-side shader handle cache-hit markers. Default: 0.
+  EXPECT_MIN_JBR_FONT_DATA_DEFINES In strict command mode, require at least this many JBR-side font-data define markers. Default: 0.
   EXPECT_MIN_JBR_SHADOW_COMMANDS In strict command mode, require at least this many JBR direct-shadow commands in one timing frame. Default: 0.
   EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side effect handle define markers. Default: disabled.
   EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side shader handle define markers. Default: disabled.
@@ -1309,6 +1316,7 @@ write_machine_summary() {
     echo "jbr_shader_handle_use_frames=$(grep -c "${JBR_SHADER_HANDLE_USE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_shader_handle_evict_frames=$(grep -c "${JBR_SHADER_HANDLE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_shader_handle_cache_hit_frames=$(grep -c "${JBR_SHADER_HANDLE_CACHE_HIT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "jbr_font_data_define_frames=$(grep -c "${JBR_FONT_DATA_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_command_cache_clear_markers=$(grep -c "${SKIKO_COMMAND_CACHES_CLEARED_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_tiny_full_scene_injections=$(grep -c "${SKIKO_TINY_FULL_SCENE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
@@ -1497,6 +1505,7 @@ write_report() {
     echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
     echo "- MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT: ${MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT}"
     echo "- MAGIC_JEWEL_GENERIC_FONT_TEXT: ${MAGIC_JEWEL_GENERIC_FONT_TEXT}"
+    echo "- MAGIC_JEWEL_LOADED_FONT_DATA_TEXT: ${MAGIC_JEWEL_LOADED_FONT_DATA_TEXT}"
     echo "- MAGIC_JEWEL_RESOURCE_FONT_TEXT: ${MAGIC_JEWEL_RESOURCE_FONT_TEXT}"
     echo "- MAGIC_JEWEL_SYSTEM_FONT_TEXT: ${MAGIC_JEWEL_SYSTEM_FONT_TEXT}"
     echo "- MAGIC_JEWEL_IMAGE_CACHE_CHURN: ${MAGIC_JEWEL_IMAGE_CACHE_CHURN}"
@@ -1528,6 +1537,7 @@ write_report() {
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}"
+    echo "- EXPECT_MIN_JBR_FONT_DATA_DEFINES: ${EXPECT_MIN_JBR_FONT_DATA_DEFINES}"
     echo "- EXPECT_MIN_JBR_SHADOW_COMMANDS: ${EXPECT_MIN_JBR_SHADOW_COMMANDS}"
     echo "- EXPECT_MIN_POPUP_FRAMES: ${EXPECT_MIN_POPUP_FRAMES}"
     echo "- EXPECT_MIN_APP_NEW_FRAMES: ${EXPECT_MIN_APP_NEW_FRAMES}"
@@ -1888,6 +1898,12 @@ validate_report() {
         jbr_shader_handle_cache_hits="$(grep -c "${JBR_SHADER_HANDLE_CACHE_HIT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${jbr_shader_handle_cache_hits}" -ge "${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS}" ]] ||
           failures+=("JBR shader handle cache-hit markers ${jbr_shader_handle_cache_hits} below expected ${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS}")
+      fi
+      if [[ "${EXPECT_MIN_JBR_FONT_DATA_DEFINES}" -gt 0 ]]; then
+        local jbr_font_data_defines
+        jbr_font_data_defines="$(grep -c "${JBR_FONT_DATA_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${jbr_font_data_defines}" -ge "${EXPECT_MIN_JBR_FONT_DATA_DEFINES}" ]] ||
+          failures+=("JBR font-data define markers ${jbr_font_data_defines} below expected ${EXPECT_MIN_JBR_FONT_DATA_DEFINES}")
       fi
       if [[ "${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES}" -ge 0 ]]; then
         local jbr_effect_handle_defines
