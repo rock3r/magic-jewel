@@ -155,6 +155,7 @@ private const val ComposeRuntimeEffectUniformOnlyProperty = "magic.jewel.compose
 private const val ComposeRuntimeEffectChildOnlyProperty = "magic.jewel.compose.runtimeEffectChildOnly"
 private const val ComposeRuntimeEffectBadChildProperty = "magic.jewel.compose.runtimeEffectBadChild"
 private const val ComposeRuntimeEffectColorFilterProperty = "magic.jewel.compose.runtimeEffectColorFilter"
+private const val ComposeRuntimeEffectStableColorFilterProperty = "magic.jewel.compose.runtimeEffectStableColorFilter"
 private const val ComposeRawRuntimeEffectColorFilterProperty = "magic.jewel.compose.rawRuntimeEffectColorFilter"
 private const val ComposeRuntimeEffectColorFilterChildProperty = "magic.jewel.compose.runtimeEffectColorFilterChild"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
@@ -466,6 +467,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectColorFilterEnabled = remember {
         System.getProperty(ComposeRuntimeEffectColorFilterProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectStableColorFilterEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectStableColorFilterProperty, "false").toBoolean()
     }
     val composeRawRuntimeEffectColorFilterEnabled = remember {
         System.getProperty(ComposeRawRuntimeEffectColorFilterProperty, "false").toBoolean()
@@ -1437,6 +1441,26 @@ private fun MagicJewelApp() {
                                     """.trimIndent(),
                                     uniforms = floatArrayOf(phase),
                                     uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
+                                )
+                            },
+                        )
+                    }
+                }
+                if (composeRuntimeEffectStableColorFilterEnabled) {
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 372f,
+                            top = 34f,
+                            right = size.width - 260f,
+                            bottom = 112f,
+                            paint = Paint().apply {
+                                color = Color(0xFF38BDF8)
+                                colorFilter = RuntimeEffectColorFilter(
+                                    sksl = """
+                                        half4 main(half4 inColor) {
+                                            return half4(1.0 - inColor.r * 0.35, inColor.g * 0.75, 0.95, inColor.a);
+                                        }
+                                    """.trimIndent(),
                                 )
                             },
                         )
