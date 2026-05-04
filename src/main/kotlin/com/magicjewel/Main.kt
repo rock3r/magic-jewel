@@ -142,6 +142,7 @@ private const val ComposePictureShaderProperty = "magic.jewel.compose.pictureSha
 private const val ComposeTransformedShaderProperty = "magic.jewel.compose.transformedShader"
 private const val ComposeImageShaderColorFilterProperty = "magic.jewel.compose.imageShaderColorFilter"
 private const val ComposeCompositeShaderProperty = "magic.jewel.compose.compositeShader"
+private const val ComposeCompositeNoiseShaderProperty = "magic.jewel.compose.compositeNoiseShader"
 private const val ComposeCompositeShaderColorFilterProperty = "magic.jewel.compose.compositeShaderColorFilter"
 private const val ComposeRuntimeEffectShaderProperty = "magic.jewel.compose.runtimeEffectShader"
 private const val ComposeRawRuntimeEffectShaderProperty = "magic.jewel.compose.rawRuntimeEffectShader"
@@ -427,6 +428,9 @@ private fun MagicJewelApp() {
     }
     val composeCompositeShaderEnabled = remember {
         System.getProperty(ComposeCompositeShaderProperty, "false").toBoolean()
+    }
+    val composeCompositeNoiseShaderEnabled = remember {
+        System.getProperty(ComposeCompositeNoiseShaderProperty, "false").toBoolean()
     }
     val composeCompositeShaderColorFilterEnabled = remember {
         System.getProperty(ComposeCompositeShaderColorFilterProperty, "false").toBoolean()
@@ -1082,6 +1086,39 @@ private fun MagicJewelApp() {
                             colors = listOf(Color(0xFFFFFFFF), Color(0xAA8B5CF6), Color(0x00000000)),
                             colorStops = listOf(0f, 0.54f, 1f),
                             tileMode = TileMode.Clamp,
+                        ),
+                        blendMode = BlendMode.SrcOver,
+                    )
+                    drawRect(
+                        brush = ShaderBrush(shader),
+                        topLeft = topLeft,
+                        size = Size(152f, 112f),
+                    )
+                    drawRect(
+                        color = Color.White,
+                        topLeft = topLeft,
+                        size = Size(152f, 112f),
+                        style = Stroke(width = 3f),
+                    )
+                }
+                if (composeCompositeNoiseShaderEnabled) {
+                    val topLeft = Offset(size.width - 736f, size.height - 616f)
+                    val shader = CompositeShader(
+                        dst = FractalNoiseShader(
+                            baseFrequencyX = 0.035f,
+                            baseFrequencyY = 0.052f,
+                            numOctaves = 3,
+                            seed = 5.5f,
+                            tileWidth = 96,
+                            tileHeight = 80,
+                        ),
+                        src = TurbulenceShader(
+                            baseFrequencyX = 0.055f,
+                            baseFrequencyY = 0.032f,
+                            numOctaves = 2,
+                            seed = 12.75f,
+                            tileWidth = 80,
+                            tileHeight = 96,
                         ),
                         blendMode = BlendMode.SrcOver,
                     )
