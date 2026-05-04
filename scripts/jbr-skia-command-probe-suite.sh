@@ -318,7 +318,9 @@ run_named_case() {
     commands-composite-shader)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER=true \
-        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=3 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=3 \
         EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=3
       ;;
     commands-composite-noise-shader)
