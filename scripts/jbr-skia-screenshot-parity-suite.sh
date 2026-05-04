@@ -9,7 +9,7 @@ DURATION_SECONDS="${DURATION_SECONDS:-6}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 PARITY_SCRIPT="${PARITY_SCRIPT:-${SCRIPT_DIR}/jbr-skia-screenshot-parity.sh}"
-CASES="${CASES:-parity-rich parity-button-chrome parity-geometry-clean parity-native-custom-font-text-image parity-native-generic-font-text parity-native-loaded-font-data-text parity-native-resource-font-text parity-native-system-font-text parity-resize-native-generic-font-text parity-resize-native-loaded-font-data-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-native-loaded-font-data-text parity-forced-context-image-refs parity-point-dots parity-path-effect parity-image-filter parity-image-color-matrix-filter parity-color-shader parity-noise-shader parity-resize-noise-shader parity-forced-context-noise-shader parity-turbulence-shader parity-resize-turbulence-shader parity-forced-context-turbulence-shader parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
+CASES="${CASES:-parity-rich parity-button-chrome parity-geometry-clean parity-native-custom-font-text-image parity-native-generic-font-text parity-native-loaded-font-data-text parity-native-resource-font-text parity-native-system-font-text parity-resize-native-generic-font-text parity-resize-native-loaded-font-data-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-native-loaded-font-data-text parity-forced-context-image-refs parity-point-dots parity-path-effect parity-image-filter parity-image-color-matrix-filter parity-color-shader parity-resize-color-shader parity-forced-context-color-shader parity-noise-shader parity-resize-noise-shader parity-forced-context-noise-shader parity-turbulence-shader parity-resize-turbulence-shader parity-forced-context-turbulence-shader parity-image-shader-color-filter parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -350,6 +350,42 @@ run_named_case() {
         MAX_BAD_PIXEL_RATIO=0.06 \
         MAX_COMPOSE_SHADER_COLOR_BAD_PIXEL_RATIO=0.04
       ;;
+    parity-resize-color-shader)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_COLOR_SHADER=true \
+        MAGIC_JEWEL_AUTO_RESIZE=true \
+        MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS=500 \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
+        EXPECT_MIN_IMAGE_REFS=0 \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=false \
+        EXPECT_SURFACE_CHANGED=true \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        MAX_BAD_PIXEL_RATIO=0.06 \
+        MAX_HEADER_BUTTONS_BAD_PIXEL_RATIO=0.03 \
+        MAX_COMPOSE_SHADER_COLOR_BAD_PIXEL_RATIO=0.05
+      ;;
+    parity-forced-context-color-shader)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_COLOR_SHADER=true \
+        MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
+        EXPECT_MIN_IMAGE_REFS=0 \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=true \
+        EXPECT_SURFACE_CHANGED=false \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        MAX_BAD_PIXEL_RATIO=0.06 \
+        MAX_COMPOSE_SHADER_COLOR_BAD_PIXEL_RATIO=0.04
+      ;;
     parity-noise-shader)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_NOISE_SHADER=true \
@@ -363,6 +399,9 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_NOISE_SHADER=true \
         MAGIC_JEWEL_AUTO_RESIZE=true \
+        MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS=500 \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
         EXPECT_MIN_IMAGE_REFS=0 \
         EXPECT_MIN_SURFACE_CHANGES=1 \
         EXPECT_SURFACE_CONTEXT_CHANGED=false \
@@ -372,12 +411,15 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
         MAX_BAD_PIXEL_RATIO=0.06 \
+        MAX_HEADER_BUTTONS_BAD_PIXEL_RATIO=0.03 \
         MAX_COMPOSE_SHADER_NOISE_BAD_PIXEL_RATIO=0.08
       ;;
     parity-forced-context-noise-shader)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_NOISE_SHADER=true \
         MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
         EXPECT_MIN_IMAGE_REFS=0 \
         EXPECT_MIN_SURFACE_CHANGES=1 \
         EXPECT_SURFACE_CONTEXT_CHANGED=true \
@@ -402,6 +444,9 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_TURBULENCE_SHADER=true \
         MAGIC_JEWEL_AUTO_RESIZE=true \
+        MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS=500 \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
         EXPECT_MIN_IMAGE_REFS=0 \
         EXPECT_MIN_SURFACE_CHANGES=1 \
         EXPECT_SURFACE_CONTEXT_CHANGED=false \
@@ -411,12 +456,15 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
         MAX_BAD_PIXEL_RATIO=0.06 \
+        MAX_HEADER_BUTTONS_BAD_PIXEL_RATIO=0.03 \
         MAX_COMPOSE_SHADER_TURBULENCE_BAD_PIXEL_RATIO=0.08
       ;;
     parity-forced-context-turbulence-shader)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_TURBULENCE_SHADER=true \
         MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        MAGIC_JEWEL_UNSUPPORTED_TEXT=false \
+        MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT=false \
         EXPECT_MIN_IMAGE_REFS=0 \
         EXPECT_MIN_SURFACE_CHANGES=1 \
         EXPECT_SURFACE_CONTEXT_CHANGED=true \
