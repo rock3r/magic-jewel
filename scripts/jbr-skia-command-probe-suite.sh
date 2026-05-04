@@ -724,7 +724,11 @@ run_named_case() {
     commands-graphics-layer-color-matrix-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER=true
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=1
       ;;
     commands-graphics-layer-render-effect)
       run_case "$1" \
@@ -935,7 +939,11 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLEND_MODE=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER=true
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=1
       ;;
     commands-save-layer-filter)
       run_case "$1" \
