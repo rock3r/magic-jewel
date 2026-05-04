@@ -159,7 +159,10 @@ run_named_case() {
       run_case "$1" \
         JBR_SKIA_NATIVE_TEXT=true \
         MAGIC_JEWEL_RESOURCE_FONT_TEXT=true \
-        EXPECT_MIN_IMAGE_REFS=1
+        EXPECT_MIN_IMAGE_REFS=1 \
+        EXPECT_MIN_TEXT_COMMANDS=1 \
+        EXPECT_MIN_JBR_FONT_DATA_DEFINES=1 \
+        EXPECT_MAX_JBR_FONT_DATA_DEFINES=1
       ;;
     commands-native-system-font-text)
       run_case "$1" \
