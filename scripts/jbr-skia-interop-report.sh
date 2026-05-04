@@ -40,11 +40,13 @@ EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES:-0}
 EXPECT_MIN_JBR_SHADER_HANDLE_USES="${EXPECT_MIN_JBR_SHADER_HANDLE_USES:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS="${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS="${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS:-0}"
+EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS="${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS:-0}"
 EXPECT_MIN_JBR_FONT_DATA_DEFINES="${EXPECT_MIN_JBR_FONT_DATA_DEFINES:-0}"
 EXPECT_MIN_JBR_SHADOW_COMMANDS="${EXPECT_MIN_JBR_SHADOW_COMMANDS:-0}"
 EXPECT_MAX_JBR_FONT_DATA_DEFINES="${EXPECT_MAX_JBR_FONT_DATA_DEFINES:--1}"
 EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES="${EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES:--1}"
 EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES="${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES:--1}"
+EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES="${EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES:--1}"
 EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE="${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE:-}"
 EXPECT_MIN_POPUP_FRAMES="${EXPECT_MIN_POPUP_FRAMES:-0}"
 EXPECT_MIN_APP_NEW_FRAMES="${EXPECT_MIN_APP_NEW_FRAMES:-0}"
@@ -479,6 +481,8 @@ JBR_COMMAND_MARKER="JBR_SKIA_INTEROP_COMMAND_FRAME"
 JBR_COMMAND_TIMING_MARKER="JBR_SKIA_INTEROP_COMMAND_TIMING"
 JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER="JBR_SKIA_INTEROP_RUNTIME_EFFECT_COMPILE_FAILED"
 JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER="JBR_SKIA_INTEROP_RUNTIME_EFFECT_BUILD_FAILED"
+JBR_RUNTIME_EFFECT_CACHE_HIT_MARKER="JBR_SKIA_INTEROP_RUNTIME_EFFECT_CACHE_HIT"
+JBR_RUNTIME_EFFECT_CACHE_MISS_MARKER="JBR_SKIA_INTEROP_RUNTIME_EFFECT_CACHE_MISS"
 JBR_IMAGE_CACHE_CLEAR_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR"
 JBR_IMAGE_CACHE_EVICT_MARKER="JBR_SKIA_INTEROP_IMAGE_CACHE_EVICT"
 JBR_EFFECT_HANDLE_DEFINE_MARKER="JBR_SKIA_INTEROP_EFFECT_HANDLE_DEFINE"
@@ -555,11 +559,13 @@ Environment:
   EXPECT_MIN_JBR_SHADER_HANDLE_USES In strict command mode, require at least this many JBR-side shader handle use markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS In strict command mode, require at least this many JBR-side shader handle evict markers. Default: 0.
   EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS In strict command mode, require at least this many JBR-side shader handle cache-hit markers. Default: 0.
+  EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS In strict command mode, require at least this many JBR-side RuntimeEffect source-cache hit markers. Default: 0.
   EXPECT_MIN_JBR_FONT_DATA_DEFINES In strict command mode, require at least this many JBR-side font-data define markers. Default: 0.
   EXPECT_MIN_JBR_SHADOW_COMMANDS In strict command mode, require at least this many JBR direct-shadow commands in one timing frame. Default: 0.
   EXPECT_MAX_JBR_FONT_DATA_DEFINES In strict command mode, require no more than this many JBR-side font-data define markers. Default: disabled.
   EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side effect handle define markers. Default: disabled.
   EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES In strict command mode, require no more than this many JBR-side shader handle define markers. Default: disabled.
+  EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES In strict command mode, require no more than this many JBR-side RuntimeEffect source-cache miss markers. Default: disabled.
   EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE When EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed, require a matching stage=<value> marker. Default: disabled.
   EXPECT_MIN_POPUP_FRAMES In strict command mode, require at least this many Swing popup paint markers. Default: 0.
   EXPECT_MIN_APP_NEW_FRAMES In strict command mode, require at least this many Magic Jewel Compose frame markers in the new renderer. Default: 0.
@@ -1339,6 +1345,8 @@ write_machine_summary() {
     echo "jbr_command_frames=$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_runtime_effect_compile_failures=$(grep -c "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_runtime_effect_build_failures=$(grep -c "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_runtime_effect_cache_hit_frames=$(grep -c "${JBR_RUNTIME_EFFECT_CACHE_HIT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "jbr_runtime_effect_cache_miss_frames=$(grep -c "${JBR_RUNTIME_EFFECT_CACHE_MISS_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_picture_fps=$(frame_marker_fps "${SKIKO_PICTURE_MARKER}" "${new_log}")"
     echo "jbr_picture_fps=$(frame_marker_fps "${JBR_PICTURE_MARKER}" "${new_log}")"
     echo "skiko_command_fps=$(frame_marker_fps "${SKIKO_COMMAND_MARKER}" "${new_log}")"
@@ -1428,6 +1436,10 @@ write_report() {
   jbr_runtime_effect_compile_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_log}")"
   local jbr_runtime_effect_build_failure_summary
   jbr_runtime_effect_build_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${new_log}")"
+  local jbr_runtime_effect_cache_hit_summary
+  local jbr_runtime_effect_cache_miss_summary
+  jbr_runtime_effect_cache_hit_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_CACHE_HIT_MARKER}" "${new_full_log}")"
+  jbr_runtime_effect_cache_miss_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_CACHE_MISS_MARKER}" "${new_full_log}")"
   jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}")"
   jbr_image_cache_evict_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}")"
   local jbr_effect_handle_define_summary
@@ -1585,8 +1597,10 @@ write_report() {
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS: ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}"
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}"
+    echo "- EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS: ${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS}"
     echo "- EXPECT_MIN_JBR_FONT_DATA_DEFINES: ${EXPECT_MIN_JBR_FONT_DATA_DEFINES}"
     echo "- EXPECT_MIN_JBR_SHADOW_COMMANDS: ${EXPECT_MIN_JBR_SHADOW_COMMANDS}"
+    echo "- EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES: ${EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES}"
     echo "- EXPECT_MAX_JBR_FONT_DATA_DEFINES: ${EXPECT_MAX_JBR_FONT_DATA_DEFINES}"
     echo "- EXPECT_MIN_POPUP_FRAMES: ${EXPECT_MIN_POPUP_FRAMES}"
     echo "- EXPECT_MIN_APP_NEW_FRAMES: ${EXPECT_MIN_APP_NEW_FRAMES}"
@@ -1643,6 +1657,8 @@ write_report() {
     echo "- JBR command timing: ${jbr_command_timing_summary}"
     echo "- JBR RuntimeEffect compile failures: ${jbr_runtime_effect_compile_failure_summary}"
     echo "- JBR RuntimeEffect build failures: ${jbr_runtime_effect_build_failure_summary}"
+    echo "- JBR RuntimeEffect source-cache hits: ${jbr_runtime_effect_cache_hit_summary}"
+    echo "- JBR RuntimeEffect source-cache misses: ${jbr_runtime_effect_cache_miss_summary}"
     echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
     echo "- JBR scoped image cache clears: $(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
     echo "- JBR image cache evicts: ${jbr_image_cache_evict_summary}"
@@ -1948,6 +1964,12 @@ validate_report() {
         [[ "${jbr_shader_handle_cache_hits}" -ge "${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS}" ]] ||
           failures+=("JBR shader handle cache-hit markers ${jbr_shader_handle_cache_hits} below expected ${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS}")
       fi
+      if [[ "${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS}" -gt 0 ]]; then
+        local jbr_runtime_effect_cache_hits
+        jbr_runtime_effect_cache_hits="$(grep -c "${JBR_RUNTIME_EFFECT_CACHE_HIT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${jbr_runtime_effect_cache_hits}" -ge "${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS}" ]] ||
+          failures+=("JBR RuntimeEffect source-cache hit markers ${jbr_runtime_effect_cache_hits} below expected ${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS}")
+      fi
       if [[ "${EXPECT_MIN_JBR_FONT_DATA_DEFINES}" -gt 0 ]]; then
         local jbr_font_data_defines
         jbr_font_data_defines="$(grep -c "${JBR_FONT_DATA_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
@@ -1971,6 +1993,12 @@ validate_report() {
         jbr_shader_handle_defines="$(grep -c "${JBR_SHADER_HANDLE_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${jbr_shader_handle_defines}" -le "${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES}" ]] ||
           failures+=("JBR shader handle define markers ${jbr_shader_handle_defines} above expected ${EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES}")
+      fi
+      if [[ "${EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES}" -ge 0 ]]; then
+        local jbr_runtime_effect_cache_misses
+        jbr_runtime_effect_cache_misses="$(grep -c "${JBR_RUNTIME_EFFECT_CACHE_MISS_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        [[ "${jbr_runtime_effect_cache_misses}" -le "${EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES}" ]] ||
+          failures+=("JBR RuntimeEffect source-cache miss markers ${jbr_runtime_effect_cache_misses} above expected ${EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES}")
       fi
       if [[ "${EXPECT_MIN_POPUP_FRAMES}" -gt 0 ]]; then
         local popup_frames
