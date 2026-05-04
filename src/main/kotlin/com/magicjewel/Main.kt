@@ -1102,7 +1102,7 @@ private fun MagicJewelApp() {
                     )
                 }
                 if (composeCompositeNoiseShaderEnabled) {
-                    val topLeft = Offset(size.width - 736f, size.height - 616f)
+                    val topLeft = Offset(size.width - 372f, size.height - 360f)
                     val shader = CompositeShader(
                         dst = FractalNoiseShader(
                             baseFrequencyX = 0.035f,
