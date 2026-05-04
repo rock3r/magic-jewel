@@ -303,7 +303,10 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_SHADER_COLOR_FILTER=true \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=1
       ;;
     commands-runtime-effect-pure-color)
       run_case "$1" \
@@ -321,7 +324,10 @@ run_named_case() {
     commands-runtime-effect-child-only)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_CHILD_ONLY=true \
-        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-runtime-effect-color-filter)
       run_case "$1" \
