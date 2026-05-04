@@ -66,6 +66,7 @@ import androidx.compose.ui.graphics.RuntimeEffectUniform
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.StampedPathEffectStyle
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.SweepGradientShader
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.TurbulenceShader
@@ -133,6 +134,7 @@ private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShade
 private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.compositeOpaqueShader"
 private const val ComposeNoiseShaderProperty = "magic.jewel.compose.noiseShader"
 private const val ComposeTurbulenceShaderProperty = "magic.jewel.compose.turbulenceShader"
+private const val ComposeGradientShadersProperty = "magic.jewel.compose.gradientShaders"
 private const val ComposeRawLinearGradientShaderProperty = "magic.jewel.compose.rawLinearGradientShader"
 private const val ComposeRawRadialGradientShaderProperty = "magic.jewel.compose.rawRadialGradientShader"
 private const val ComposeRawSweepGradientShaderProperty = "magic.jewel.compose.rawSweepGradientShader"
@@ -401,6 +403,9 @@ private fun MagicJewelApp() {
     }
     val composeTurbulenceShaderEnabled = remember {
         System.getProperty(ComposeTurbulenceShaderProperty, "false").toBoolean()
+    }
+    val composeGradientShadersEnabled = remember {
+        System.getProperty(ComposeGradientShadersProperty, "false").toBoolean()
     }
     val composeRawLinearGradientShaderEnabled = remember {
         System.getProperty(ComposeRawLinearGradientShaderProperty, "false").toBoolean()
@@ -900,6 +905,48 @@ private fun MagicJewelApp() {
                             },
                         )
                     }
+                }
+                if (composeGradientShadersEnabled) {
+                    val linearTopLeft = Offset(size.width - 740f, size.height - 616f)
+                    drawRect(
+                        brush = ShaderBrush(
+                            LinearGradientShader(
+                                from = linearTopLeft,
+                                to = linearTopLeft + Offset(140f, 116f),
+                                colors = listOf(Color(0xFF06B6D4), Color(0xFFFDE047), Color(0xFFEF4444)),
+                                colorStops = listOf(0f, 0.46f, 1f),
+                                tileMode = TileMode.Clamp,
+                            )
+                        ),
+                        topLeft = linearTopLeft,
+                        size = Size(140f, 116f),
+                    )
+                    val radialTopLeft = Offset(size.width - 740f, size.height - 488f)
+                    drawRect(
+                        brush = ShaderBrush(
+                            RadialGradientShader(
+                                center = radialTopLeft + Offset(92f, 42f),
+                                radius = 88f,
+                                colors = listOf(Color(0xFFFFFFFF), Color(0xAA8B5CF6), Color(0x00000000)),
+                                colorStops = listOf(0f, 0.56f, 1f),
+                                tileMode = TileMode.Clamp,
+                            )
+                        ),
+                        topLeft = radialTopLeft,
+                        size = Size(140f, 116f),
+                    )
+                    val sweepTopLeft = Offset(size.width - 740f, size.height - 232f)
+                    drawRect(
+                        brush = ShaderBrush(
+                            SweepGradientShader(
+                                center = sweepTopLeft + Offset(70f, 58f),
+                                colors = listOf(Color(0xFF22D3EE), Color(0xFFFDE047), Color(0xFFEF4444), Color(0xFF22D3EE)),
+                                colorStops = listOf(0f, 0.34f, 0.72f, 1f),
+                            )
+                        ),
+                        topLeft = sweepTopLeft,
+                        size = Size(140f, 116f),
+                    )
                 }
                 if (composeRawLinearGradientShaderEnabled) {
                     val topLeft = Offset(size.width - 448f, size.height - 232f)
