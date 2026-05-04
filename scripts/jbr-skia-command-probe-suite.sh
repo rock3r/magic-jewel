@@ -303,6 +303,7 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_COLOR_SHADER=true \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
         EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=1
       ;;
     commands-image-shader-color-filter)
@@ -1024,6 +1025,7 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_TRANSFORMED_SHADER=true \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
         EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-invalid-gradient-fallback)
