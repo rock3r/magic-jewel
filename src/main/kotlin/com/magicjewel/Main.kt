@@ -93,6 +93,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -129,6 +131,7 @@ private const val FrameMarker = "MAGIC_JEWEL_COMPOSE_FRAME"
 private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
+private const val ComposeImagePathEffectProperty = "magic.jewel.compose.imagePathEffect"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeRawImageShaderProperty = "magic.jewel.compose.rawImageShader"
 private const val ComposeColorShaderProperty = "magic.jewel.compose.colorShader"
@@ -389,6 +392,9 @@ private fun MagicJewelApp() {
     }
     val composeImageEnabled = remember {
         System.getProperty(ComposeImageProperty, "false").toBoolean()
+    }
+    val composeImagePathEffectEnabled = remember {
+        System.getProperty(ComposeImagePathEffectProperty, "false").toBoolean()
     }
     val composeImageShaderEnabled = remember {
         System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
@@ -684,12 +690,14 @@ private fun MagicJewelApp() {
     }
     val imageProbe = remember(
         composeImageEnabled,
+        composeImagePathEffectEnabled,
         composeImageShaderEnabled,
         composeImageShaderColorFilterEnabled,
         composeImageFilterEnabled,
         composeImageColorMatrixFilterEnabled,
     ) {
         if (composeImageEnabled ||
+            composeImagePathEffectEnabled ||
             composeImageShaderEnabled ||
             composeDescriptorStrokeShaderEnabled ||
             composeImageShaderColorFilterEnabled ||
@@ -822,6 +830,22 @@ private fun MagicJewelApp() {
                 if (composeImageEnabled) {
                     imageProbe?.let {
                         drawImage(it, topLeft = Offset(size.width - 212f, size.height - 126f))
+                    }
+                }
+                if (composeImagePathEffectEnabled) {
+                    imageProbe?.let {
+                        drawIntoCanvas { canvas ->
+                            canvas.drawImageRect(
+                                image = it,
+                                srcOffset = IntOffset.Zero,
+                                srcSize = IntSize(it.width, it.height),
+                                dstOffset = IntOffset((size.width - 332f).toInt(), (size.height - 126f).toInt()),
+                                dstSize = IntSize(96, 96),
+                                paint = Paint().apply {
+                                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 4f), 0f)
+                                },
+                            )
+                        }
                     }
                 }
                 if (composeImageShaderEnabled) {
