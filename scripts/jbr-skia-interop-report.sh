@@ -193,6 +193,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_PATH_EFFECT+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_PATH_EFFECT_COLOR_FILTER+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_PATH_EFFECT_COLOR_FILTER=false
+fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_BLEND_MODE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_BLEND_MODE=false
 fi
@@ -418,6 +421,7 @@ export MAGIC_JEWEL_COMPOSE_LIGHTING_FILTER
 export MAGIC_JEWEL_COMPOSE_DESCRIPTOR_EVICTION
 export MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE
 export MAGIC_JEWEL_COMPOSE_PATH_EFFECT
+export MAGIC_JEWEL_COMPOSE_PATH_EFFECT_COLOR_FILTER
 export MAGIC_JEWEL_COMPOSE_BLEND_MODE
 export MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER
 export MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP
@@ -642,6 +646,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_DESCRIPTOR_EVICTION Draws enough unique effect/shader descriptors to force LRU handle eviction. Default: false.
   MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE Enables the descriptor-handle color-filter replay variant. Default: false.
   MAGIC_JEWEL_COMPOSE_PATH_EFFECT Enables dashed line/rectangle/rounded-rectangle/arbitrary-path plus corner/stamped/chained path-effect command replay probes. Default: false.
+  MAGIC_JEWEL_COMPOSE_PATH_EFFECT_COLOR_FILTER Enables a path-effect descriptor with an unsupported color-filter fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_BLEND_MODE Enables Plus/Multiply/Screen/Overlay/Darken/Lighten/Difference/Exclusion/ColorDodge/ColorBurn/Hardlight/Softlight/Hue/Saturation/Color/Luminosity blend-mode command replay probes. Default: false.
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER Enables a graphics-layer command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP Adds a rectangular clip to the graphics-layer command replay probe. Default: false.
@@ -1550,6 +1555,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_DESCRIPTOR_EVICTION: ${MAGIC_JEWEL_COMPOSE_DESCRIPTOR_EVICTION}"
     echo "- MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE: ${MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE}"
     echo "- MAGIC_JEWEL_COMPOSE_PATH_EFFECT: ${MAGIC_JEWEL_COMPOSE_PATH_EFFECT}"
+    echo "- MAGIC_JEWEL_COMPOSE_PATH_EFFECT_COLOR_FILTER: ${MAGIC_JEWEL_COMPOSE_PATH_EFFECT_COLOR_FILTER}"
     echo "- MAGIC_JEWEL_COMPOSE_BLEND_MODE: ${MAGIC_JEWEL_COMPOSE_BLEND_MODE}"
     echo "- MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER: ${MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER}"
     echo "- MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP: ${MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP}"

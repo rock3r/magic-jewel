@@ -169,6 +169,7 @@ private const val ComposeColorMatrixFilterProperty = "magic.jewel.compose.colorM
 private const val ComposeLightingFilterProperty = "magic.jewel.compose.lightingFilter"
 private const val ComposeDescriptorEvictionProperty = "magic.jewel.compose.descriptorEviction"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
+private const val ComposePathEffectColorFilterProperty = "magic.jewel.compose.pathEffectColorFilter"
 private const val ComposeRawDiscretePathEffectProperty = "magic.jewel.compose.rawDiscretePathEffect"
 private const val ComposeBlendModeProperty = "magic.jewel.compose.blendMode"
 private const val ComposeGraphicsLayerProperty = "magic.jewel.compose.graphicsLayer"
@@ -508,6 +509,9 @@ private fun MagicJewelApp() {
     }
     val composePathEffectEnabled = remember {
         System.getProperty(ComposePathEffectProperty, "false").toBoolean()
+    }
+    val composePathEffectColorFilterEnabled = remember {
+        System.getProperty(ComposePathEffectColorFilterProperty, "false").toBoolean()
     }
     val composeRawDiscretePathEffectEnabled = remember {
         System.getProperty(ComposeRawDiscretePathEffectProperty, "false").toBoolean()
@@ -1783,6 +1787,24 @@ private fun MagicJewelApp() {
                                         style = StampedPathEffectStyle.Rotate,
                                     ),
                                 )
+                            },
+                        )
+                    }
+                }
+                if (composePathEffectColorFilterEnabled) {
+                    val path = Path().apply {
+                        moveTo(size.width - 520f, 392f)
+                        cubicTo(size.width - 472f, 348f, size.width - 412f, 436f, size.width - 356f, 388f)
+                    }
+                    drawIntoCanvas { canvas ->
+                        canvas.drawPath(
+                            path = path,
+                            paint = Paint().apply {
+                                color = Color(0xFFFFD54A)
+                                style = PaintingStyle.Stroke
+                                strokeWidth = 8f
+                                colorFilter = ColorFilter.tint(Color(0xFF22D3EE), BlendMode.SrcIn)
+                                pathEffect = PathEffect.cornerPathEffect(14f)
                             },
                         )
                     }
