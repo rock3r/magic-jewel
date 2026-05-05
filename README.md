@@ -231,7 +231,7 @@ The RuntimeEffect command suite can run the combined shader probe (`commands-run
 `commands-transformed-shader` enables `MAGIC_JEWEL_COMPOSE_TRANSFORMED_SHADER=true` and asserts transform-aware shader descriptor replay through JBR-owned child shader handles and local matrices.
 
 `commands-color-shader` enables `MAGIC_JEWEL_COMPOSE_COLOR_SHADER=true` and asserts a JBR-owned solid color shader descriptor define/use path. The separate `commands-opaque-shader-fallback` row still uses raw `SkShader.makeColor(...).asComposeShader()` and must remain on structured picture fallback.
-`commands-descriptor-stroke-shader-fallback` enables `MAGIC_JEWEL_COMPOSE_DESCRIPTOR_STROKE_SHADER=true` and asserts descriptor shaders with unsupported stroked-rect paint fail structurally with `paintStyle` fallback rather than recording an incomplete command frame.
+`commands-descriptor-stroke-shader-fallback` enables `MAGIC_JEWEL_COMPOSE_DESCRIPTOR_STROKE_SHADER=true` and asserts descriptor and image shaders with unsupported stroked-rect paint fail structurally with `paintStyle` fallback rather than recording an incomplete command frame.
 `commands-path-effect` enables `MAGIC_JEWEL_COMPOSE_PATH_EFFECT=true` and asserts Compose-created dash/corner/stamped/chained path-effect descriptors stay on command replay; the old `commands-path-effect-fallback` case name remains accepted as a compatibility alias.
 `commands-raw-discrete-path-effect-fallback` enables `MAGIC_JEWEL_COMPOSE_RAW_DISCRETE_PATH_EFFECT=true` and asserts raw Skia discrete path effects stay on structured `pathEffect` fallback.
 `commands-vertices` enables `MAGIC_JEWEL_COMPOSE_VERTICES=true` and asserts `Canvas.drawVertices` triangle replay stays on the JBR-owned serialized vertices command.

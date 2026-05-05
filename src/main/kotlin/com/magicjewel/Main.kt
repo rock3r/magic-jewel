@@ -687,6 +687,7 @@ private fun MagicJewelApp() {
     ) {
         if (composeImageEnabled ||
             composeImageShaderEnabled ||
+            composeDescriptorStrokeShaderEnabled ||
             composeImageShaderColorFilterEnabled ||
             composeImageFilterEnabled ||
             composeImageColorMatrixFilterEnabled
@@ -867,6 +868,22 @@ private fun MagicJewelApp() {
                                 shader = ColorShader(Color(0xFF22C55E))
                             },
                         )
+                    }
+                    imageProbe?.let {
+                        val imageShaderTopLeft = topLeft + Offset(132f, 0f)
+                        drawIntoCanvas { canvas ->
+                            canvas.drawRect(
+                                left = imageShaderTopLeft.x,
+                                top = imageShaderTopLeft.y,
+                                right = imageShaderTopLeft.x + 112f,
+                                bottom = imageShaderTopLeft.y + 78f,
+                                paint = Paint().apply {
+                                    style = PaintingStyle.Stroke
+                                    strokeWidth = 12f
+                                    shader = ImageShader(it, TileMode.Repeated, TileMode.Mirror)
+                                },
+                            )
+                        }
                     }
                 }
                 if (composeOpaqueShaderEnabled) {
