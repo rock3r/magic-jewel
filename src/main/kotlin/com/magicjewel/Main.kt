@@ -70,6 +70,8 @@ import androidx.compose.ui.graphics.SweepGradientShader
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.TurbulenceShader
+import androidx.compose.ui.graphics.VertexMode
+import androidx.compose.ui.graphics.Vertices
 import androidx.compose.ui.graphics.asComposeColorFilter
 import androidx.compose.ui.graphics.asComposePathEffect
 import androidx.compose.ui.graphics.asComposeRenderEffect
@@ -190,6 +192,7 @@ private const val ComposeGraphicsLayerModulateAlphaProperty = "magic.jewel.compo
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeConcatTransformProperty = "magic.jewel.compose.concatTransform"
 private const val ComposeSkewTransformProperty = "magic.jewel.compose.skewTransform"
+private const val ComposeVerticesProperty = "magic.jewel.compose.vertices"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
@@ -573,6 +576,9 @@ private fun MagicJewelApp() {
     }
     val composeSkewTransformEnabled = remember {
         System.getProperty(ComposeSkewTransformProperty, "false").toBoolean()
+    }
+    val composeVerticesEnabled = remember {
+        System.getProperty(ComposeVerticesProperty, "false").toBoolean()
     }
     val composeSaveLayerEnabled = remember {
         System.getProperty(ComposeSaveLayerProperty, "false").toBoolean()
@@ -2118,6 +2124,26 @@ private fun MagicJewelApp() {
                             paint = Paint().apply { color = Color(0xFFFDE047) },
                         )
                         canvas.restore()
+                    }
+                }
+                if (composeVerticesEnabled) {
+                    drawIntoCanvas { canvas ->
+                        val topLeft = Offset(size.width - 216f, size.height - 154f)
+                        canvas.drawVertices(
+                            vertices = Vertices(
+                                vertexMode = VertexMode.Triangles,
+                                positions = listOf(
+                                    topLeft,
+                                    topLeft + Offset(112f, 12f),
+                                    topLeft + Offset(32f, 88f),
+                                ),
+                                textureCoordinates = listOf(Offset.Zero, Offset(1f, 0f), Offset(0f, 1f)),
+                                colors = listOf(Color(0xFFF97316), Color(0xFF22D3EE), Color(0xFFFDE047)),
+                                indices = listOf(0, 1, 2),
+                            ),
+                            blendMode = BlendMode.SrcOver,
+                            paint = Paint(),
+                        )
                     }
                 }
                 if (composeSaveLayerEnabled) {
