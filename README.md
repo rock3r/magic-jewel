@@ -231,7 +231,8 @@ The RuntimeEffect command suite can run the combined shader probe (`commands-run
 `commands-transformed-shader` enables `MAGIC_JEWEL_COMPOSE_TRANSFORMED_SHADER=true` and asserts transform-aware shader descriptor replay through JBR-owned child shader handles and local matrices.
 
 `commands-color-shader` enables `MAGIC_JEWEL_COMPOSE_COLOR_SHADER=true` and asserts a JBR-owned solid color shader descriptor define/use path. The separate `commands-opaque-shader-fallback` row still uses raw `SkShader.makeColor(...).asComposeShader()` and must remain on structured picture fallback.
-`commands-raw-discrete-path-effect-fallback` enables `MAGIC_JEWEL_COMPOSE_RAW_DISCRETE_PATH_EFFECT=true` and asserts raw Skia discrete path effects stay on structured `pathEffect` fallback, while Compose-created dash/corner/stamped/chained descriptors continue through command replay.
+`commands-path-effect` enables `MAGIC_JEWEL_COMPOSE_PATH_EFFECT=true` and asserts Compose-created dash/corner/stamped/chained path-effect descriptors stay on command replay; the old `commands-path-effect-fallback` case name remains accepted as a compatibility alias.
+`commands-raw-discrete-path-effect-fallback` enables `MAGIC_JEWEL_COMPOSE_RAW_DISCRETE_PATH_EFFECT=true` and asserts raw Skia discrete path effects stay on structured `pathEffect` fallback.
 `commands-vertices` enables `MAGIC_JEWEL_COMPOSE_VERTICES=true` and asserts `Canvas.drawVertices` triangle replay stays on the JBR-owned serialized vertices command.
 
 The descriptor lifecycle probe (`commands-descriptor-eviction`) enables `MAGIC_JEWEL_COMPOSE_DESCRIPTOR_EVICTION=true` and `MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE=true`, then draws enough unique effect and composite-shader descriptors to exceed CMP's 1,024-entry handle caches. It asserts both define and evict markers in the full JBR log.
