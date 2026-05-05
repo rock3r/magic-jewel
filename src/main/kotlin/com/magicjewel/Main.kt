@@ -189,6 +189,7 @@ private const val ComposeGraphicsLayerOffscreenProperty = "magic.jewel.compose.g
 private const val ComposeGraphicsLayerModulateAlphaProperty = "magic.jewel.compose.graphicsLayerModulateAlpha"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeConcatTransformProperty = "magic.jewel.compose.concatTransform"
+private const val ComposeSkewTransformProperty = "magic.jewel.compose.skewTransform"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
@@ -569,6 +570,9 @@ private fun MagicJewelApp() {
     }
     val composeConcatTransformEnabled = remember {
         System.getProperty(ComposeConcatTransformProperty, "false").toBoolean()
+    }
+    val composeSkewTransformEnabled = remember {
+        System.getProperty(ComposeSkewTransformProperty, "false").toBoolean()
     }
     val composeSaveLayerEnabled = remember {
         System.getProperty(ComposeSaveLayerProperty, "false").toBoolean()
@@ -2097,6 +2101,21 @@ private fun MagicJewelApp() {
                             right = 104f,
                             bottom = 46f,
                             paint = Paint().apply { color = Color(0xFF22D3EE) },
+                        )
+                        canvas.restore()
+                    }
+                }
+                if (composeSkewTransformEnabled) {
+                    drawIntoCanvas { canvas ->
+                        canvas.save()
+                        canvas.translate(size.width - 372f, size.height - 154f)
+                        canvas.skew(0.32f, -0.08f)
+                        canvas.drawRect(
+                            left = 0f,
+                            top = 0f,
+                            right = 104f,
+                            bottom = 46f,
+                            paint = Paint().apply { color = Color(0xFFFDE047) },
                         )
                         canvas.restore()
                     }
