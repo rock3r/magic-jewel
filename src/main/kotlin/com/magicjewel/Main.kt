@@ -132,6 +132,7 @@ private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeRawImageShaderProperty = "magic.jewel.compose.rawImageShader"
 private const val ComposeColorShaderProperty = "magic.jewel.compose.colorShader"
+private const val ComposeDescriptorStrokeShaderProperty = "magic.jewel.compose.descriptorStrokeShader"
 private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShader"
 private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.compositeOpaqueShader"
 private const val ComposeNoiseShaderProperty = "magic.jewel.compose.noiseShader"
@@ -396,6 +397,9 @@ private fun MagicJewelApp() {
     }
     val composeColorShaderEnabled = remember {
         System.getProperty(ComposeColorShaderProperty, "false").toBoolean()
+    }
+    val composeDescriptorStrokeShaderEnabled = remember {
+        System.getProperty(ComposeDescriptorStrokeShaderProperty, "false").toBoolean()
     }
     val composeOpaqueShaderEnabled = remember {
         System.getProperty(ComposeOpaqueShaderProperty, "false").toBoolean()
@@ -848,6 +852,22 @@ private fun MagicJewelApp() {
                         size = Size(112f, 78f),
                         alpha = 0.92f,
                     )
+                }
+                if (composeDescriptorStrokeShaderEnabled) {
+                    val topLeft = Offset(size.width - 356f, size.height - 228f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 112f,
+                            bottom = topLeft.y + 78f,
+                            paint = Paint().apply {
+                                style = PaintingStyle.Stroke
+                                strokeWidth = 12f
+                                shader = ColorShader(Color(0xFF22C55E))
+                            },
+                        )
+                    }
                 }
                 if (composeOpaqueShaderEnabled) {
                     val topLeft = Offset(size.width - 224f, size.height - 360f)
