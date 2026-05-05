@@ -660,7 +660,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_TRANSFORM Enables the Compose transform probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CONCAT_TRANSFORM Enables the Compose Canvas.concat matrix transform probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SKEW_TRANSFORM Enables the Compose Canvas.skew matrix transform probe. Default: false.
-  MAGIC_JEWEL_COMPOSE_VERTICES Enables the Compose Canvas.drawVertices fallback probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_VERTICES Enables the Compose Canvas.drawVertices probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER Enables the Compose saveLayer probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER Enables a saveLayer tint color-filter command probe. Default: false.
   MAGIC_JEWEL_COMPOSE_CLIP Enables the Compose clipRect probe. Default: false.
