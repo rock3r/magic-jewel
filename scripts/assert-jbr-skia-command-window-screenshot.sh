@@ -401,6 +401,8 @@ let transformProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_TR
 let clipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP"] == "true"
 let clipOutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP_OUT"] == "true"
 let clipPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP_PATH"] == "true"
+let minClipPathProbeRightCyan =
+    Int(ProcessInfo.processInfo.environment["MIN_CLIP_PATH_PROBE_RIGHT_CYAN"] ?? "") ?? 5000
 let graphicsLayerClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP"] == "true"
 let graphicsLayerRoundClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROUND_CLIP"] == "true"
 let graphicsLayerPathClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_PATH_CLIP"] == "true"
@@ -449,7 +451,7 @@ if clipProbe || clipOutProbe {
     probeChecks.append(("probeTopLeftCyan", probeTopLeftCyan, 2000))
 }
 if clipPathProbe {
-    probeChecks.append(("probeRightCyan", probeRightCyan, 5000))
+    probeChecks.append(("probeRightCyan", probeRightCyan, minClipPathProbeRightCyan))
 }
 if graphicsLayerClipProbe || graphicsLayerRoundClipProbe || graphicsLayerPathClipProbe {
     let cyanThreshold = graphicsLayerShadowProbe ? 30 : 1000
