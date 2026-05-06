@@ -758,18 +758,10 @@ private fun MagicJewelApp() {
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             DefaultButton(onClick = { ticks++ }) {
-                Text(
-                    text = "Pulse",
-                    modifier = Modifier.width(48.dp),
-                    textAlign = TextAlign.Center,
-                )
+                ButtonLabel("Pulse", color = Color.White)
             }
             OutlinedButton(onClick = { ticks = 0 }) {
-                Text(
-                    text = "Reset",
-                    modifier = Modifier.width(48.dp),
-                    textAlign = TextAlign.Center,
-                )
+                ButtonLabel("Reset")
             }
             MagicLabel("frames=$ticks", composeTextEnabled, modifier = Modifier.align(Alignment.CenterVertically), width = 92.dp)
         }
@@ -3147,6 +3139,21 @@ private fun createChurnImage(index: Int, ticks: Int): ImageBitmap {
     }
     canvas.drawRect(0f, 0f, 1f, 1f, paint)
     return bitmap
+}
+
+@Composable
+private fun ButtonLabel(text: String, color: Color = Color.Unspecified) {
+    Box(
+        modifier = Modifier.size(width = 48.dp, height = 22.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            color = color,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Composable
