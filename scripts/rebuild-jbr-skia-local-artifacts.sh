@@ -111,15 +111,36 @@ echo "== Build native JBR Skia bridge =="
 require_dir "${SKIA_ROOT}"
 require_dir "${SKIA_OUT}"
 mkdir -p "${NATIVE_OUT_DIR}" "${NATIVE_GENERATED_DIR}"
-EXTRA_NATIVE_INCLUDE_ARGS=()
+cat > "${NATIVE_GENERATED_DIR}/java_awt_image_AffineTransformOp.h" <<'EOF_AFFINE_HEADER'
+#ifndef JAVA_AWT_IMAGE_AFFINETRANSFORMOP_H
+#define JAVA_AWT_IMAGE_AFFINETRANSFORMOP_H
+
+#define java_awt_image_AffineTransformOp_TYPE_NEAREST_NEIGHBOR 1L
+#define java_awt_image_AffineTransformOp_TYPE_BILINEAR 2L
+
+#endif
+EOF_AFFINE_HEADER
+cat > "${NATIVE_GENERATED_DIR}/sun_java2d_pipe_hw_AccelSurface.h" <<'EOF_ACCEL_HEADER'
+#ifndef SUN_JAVA2D_PIPE_HW_ACCELSURFACE_H
+#define SUN_JAVA2D_PIPE_HW_ACCELSURFACE_H
+
+#define sun_java2d_pipe_hw_AccelSurface_UNDEFINED 0L
+#define sun_java2d_pipe_hw_AccelSurface_WINDOW 1L
+#define sun_java2d_pipe_hw_AccelSurface_TEXTURE 3L
+#define sun_java2d_pipe_hw_AccelSurface_FLIP_BACKBUFFER 4L
+#define sun_java2d_pipe_hw_AccelSurface_RT_TEXTURE 5L
+
+#endif
+EOF_ACCEL_HEADER
+EXTRA_NATIVE_INCLUDE_ARG=""
 if [[ -d "${EXTRA_NATIVE_INCLUDE_DIR}" ]]; then
-  EXTRA_NATIVE_INCLUDE_ARGS+=("-I${EXTRA_NATIVE_INCLUDE_DIR}")
+  EXTRA_NATIVE_INCLUDE_ARG="-I${EXTRA_NATIVE_INCLUDE_DIR}"
 fi
 
 clang++ -std=c++17 -dynamiclib -arch arm64 -mmacosx-version-min=12.0 -fobjc-arc -fvisibility=hidden \
   -I"${JAVA_HOME}/include" -I"${JAVA_HOME}/include/darwin" \
   -I"${NATIVE_GENERATED_DIR}" \
-  "${EXTRA_NATIVE_INCLUDE_ARGS[@]}" \
+  ${EXTRA_NATIVE_INCLUDE_ARG:+"${EXTRA_NATIVE_INCLUDE_ARG}"} \
   -I"${JBR_ROOT}/src/java.desktop/macosx/native/libawt_lwawt/java2d/metal" \
   -I"${JBR_ROOT}/src/java.desktop/share/native/libawt/java2d" \
   -I"${JBR_ROOT}/src/java.desktop/share/native/common/awt/debug" \
