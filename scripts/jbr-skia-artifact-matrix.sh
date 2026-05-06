@@ -24,11 +24,12 @@ OLD_SKIKO_EXPECTED_REASON="${OLD_SKIKO_EXPECTED_REASON:-native-abi-mismatch}"
 OLD_CMP_EXPECTED_REASON="${OLD_CMP_EXPECTED_REASON:-public-api-missing}"
 DRY_RUN="${DRY_RUN:-false}"
 REQUIRE_OLD_ARTIFACT_ROWS="${REQUIRE_OLD_ARTIFACT_ROWS:-false}"
+EXPECT_BACKGROUND_WINDOW="${EXPECT_BACKGROUND_WINDOW:-true}"
 SKIPPED_OPTIONAL_ROWS=0
 
 mkdir -p "${OUT_ROOT}"
 MATRIX_TSV="${OUT_ROOT}/matrix.tsv"
-printf "case\tstatus\texpected\tactual_fallbacks\tcommand_frames\treport\tnote\n" >"${MATRIX_TSV}"
+printf "case\tstatus\texpected\tactual_fallbacks\tcommand_frames\tbackground_window\treport\tnote\n" >"${MATRIX_TSV}"
 
 usage() {
   cat <<EOF_USAGE
@@ -61,6 +62,7 @@ Expected fallback variables for optional rows:
 
 Validation controls:
   REQUIRE_OLD_ARTIFACT_ROWS   When true, fail if any optional old-artifact row is skipped. Default: false
+  EXPECT_BACKGROUND_WINDOW    Expected magic_jewel_background_window summary value. Default: true
 EOF_USAGE
 }
 
@@ -106,10 +108,11 @@ append_row() {
   local expected="$3"
   local fallbacks="$4"
   local command_frames="$5"
-  local report="$6"
-  local note="$7"
-  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
-    "${name}" "${status}" "${expected}" "${fallbacks}" "${command_frames}" "${report}" "${note}" >>"${MATRIX_TSV}"
+  local background_window="$6"
+  local report="$7"
+  local note="$8"
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+    "${name}" "${status}" "${expected}" "${fallbacks}" "${command_frames}" "${background_window}" "${report}" "${note}" >>"${MATRIX_TSV}"
 }
 
 summary_value() {
@@ -157,7 +160,7 @@ run_case() {
 
   echo "== ${name} =="
   if [[ "${DRY_RUN}" == "true" ]]; then
-    append_row "${name}" "dry-run" "${expected_reason}" "-" "-" "${out_dir}/report.md" "not launched"
+    append_row "${name}" "dry-run" "${expected_reason}" "-" "-" "-" "${out_dir}/report.md" "not launched"
     return 0
   fi
 
@@ -189,10 +192,13 @@ run_case() {
   fallbacks="$(summary_value "${summary}" fallback_new_count)"
   local command_frames
   command_frames="$(summary_value "${summary}" jbr_command_frames)"
+  local background_window
+  background_window="$(summary_value "${summary}" magic_jewel_background_window)"
   local report
   report="$(cat /tmp/magic-jewel-${name}-artifact-matrix-report.txt)"
-  append_row "${name}" "${status}" "${expected_reason}" "${fallbacks}" "${command_frames}" "${report}" ""
-  echo "status=${status} expected=${expected_reason} fallback_new_count=${fallbacks} jbr_command_frames=${command_frames} report=${report}"
+  append_row "${name}" "${status}" "${expected_reason}" "${fallbacks}" "${command_frames}" "${background_window}" "${report}" ""
+  echo "status=${status} expected=${expected_reason} fallback_new_count=${fallbacks} jbr_command_frames=${command_frames} background_window=${background_window} report=${report}"
+  [[ "${background_window}" == "${EXPECT_BACKGROUND_WINDOW}" ]]
   [[ "${status}" == "passed" ]]
 }
 
@@ -201,7 +207,7 @@ skip_case() {
   local reason="$2"
   echo "== ${name} skipped: ${reason} =="
   SKIPPED_OPTIONAL_ROWS=$((SKIPPED_OPTIONAL_ROWS + 1))
-  append_row "${name}" "skipped" "-" "-" "-" "-" "${reason}"
+  append_row "${name}" "skipped" "-" "-" "-" "-" "-" "${reason}"
 }
 
 require_dir "current desktop patch" "${CURRENT_DESKTOP_PATCH}"

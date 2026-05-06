@@ -129,7 +129,7 @@ The bundle helper captures the current patched `java.desktop` output, public API
 OLD_ARTIFACT_BUNDLE=/path/to/bundle SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-artifact-matrix.sh
 ```
 
-Set `REQUIRE_OLD_ARTIFACT_ROWS=true` in CI when old bundles are expected; the matrix then fails if any optional row is skipped. When a bundle captures the same artifacts as the current run, override the optional expected reasons to `none` for a self-check. Results are written to `matrix.tsv` with stable columns for row status, expected fallback, actual fallback count, JBR command frames, and report path.
+Set `REQUIRE_OLD_ARTIFACT_ROWS=true` in CI when old bundles are expected; the matrix then fails if any optional row is skipped. When a bundle captures the same artifacts as the current run, override the optional expected reasons to `none` for a self-check. Results are written to `matrix.tsv` with stable columns for row status, expected fallback, actual fallback count, JBR command frames, background-window state, and report path. Artifact matrix rows assert `magic_jewel_background_window=true` by default; set `EXPECT_BACKGROUND_WINDOW=false MAGIC_JEWEL_BACKGROUND_WINDOW=false` only for interactive debugging.
 
 For a real incompatible old-Skiko row, publish the old Skiko checkout under a separate Maven version such as
 `0.0.0-abi99-SNAPSHOT` and pass it with `OLD_SKIKO_VERSION`; do not overwrite the current `0.0.0-SNAPSHOT` artifact.
