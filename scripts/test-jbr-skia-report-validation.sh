@@ -45,6 +45,19 @@ strict_command_passes() {
   grep -q "^host_load_15m=" "${dir}/summary.properties"
 }
 
+report_defaults_to_background_window() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}"
+  grep -q "^magic_jewel_background_window=true$" "${dir}/summary.properties"
+}
+
 strict_command_requires_min_app_new_frames() {
   local dir
   dir="$(make_report_dir)"
@@ -1149,6 +1162,7 @@ handshake_fallback_fails_with_command_frames() {
 }
 
 strict_command_passes
+report_defaults_to_background_window
 strict_command_requires_min_app_new_frames
 strict_command_fails_without_min_app_new_frames
 strict_command_requires_tiny_full_scene_injection_marker

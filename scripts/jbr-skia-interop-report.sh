@@ -1347,6 +1347,7 @@ write_machine_summary() {
     echo "host_load_1m=$(host_load_field 1)"
     echo "host_load_5m=$(host_load_field 2)"
     echo "host_load_15m=$(host_load_field 3)"
+    echo "magic_jewel_background_window=${MAGIC_JEWEL_BACKGROUND_WINDOW}"
     echo "expect_command_fallback=${EXPECT_COMMAND_FALLBACK}"
     echo "expect_command_fallback_reason=${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "fallback_old_count=$(grep -c "${FALLBACK_MARKER}" "${old_full_log}" 2>/dev/null || true)"
