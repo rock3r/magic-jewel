@@ -8,10 +8,11 @@ SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 DURATION_SECONDS="${DURATION_SECONDS:-5}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
+EXPECT_BACKGROUND_WINDOW="${EXPECT_BACKGROUND_WINDOW:-true}"
 
 mkdir -p "${OUT_ROOT}"
 MATRIX_TSV="${OUT_ROOT}/matrix.tsv"
-printf "case\tstatus\tfallbacks\tcommand_frames\treport\n" > "${MATRIX_TSV}"
+printf "case\tstatus\tfallbacks\tcommand_frames\tbackground_window\treport\n" > "${MATRIX_TSV}"
 
 run_case() {
   local name="$1"
@@ -35,8 +36,11 @@ run_case() {
   fallback="$(grep -E '^fallback_new_count=' "${out_dir}/summary.properties" | cut -d= -f2-)"
   local command_frames
   command_frames="$(grep -E '^jbr_command_frames=' "${out_dir}/summary.properties" | cut -d= -f2-)"
-  printf "%s\t%s\t%s\t%s\t%s\n" "${name}" "${status}" "${fallback}" "${command_frames}" "${report}" >> "${MATRIX_TSV}"
-  echo "status=${status} fallback_new_count=${fallback} jbr_command_frames=${command_frames} report=${report}"
+  local background_window
+  background_window="$(grep -E '^magic_jewel_background_window=' "${out_dir}/summary.properties" | cut -d= -f2-)"
+  printf "%s\t%s\t%s\t%s\t%s\t%s\n" "${name}" "${status}" "${fallback}" "${command_frames}" "${background_window}" "${report}" >> "${MATRIX_TSV}"
+  echo "status=${status} fallback_new_count=${fallback} jbr_command_frames=${command_frames} background_window=${background_window} report=${report}"
+  [[ "${background_window}" == "${EXPECT_BACKGROUND_WINDOW}" ]]
   [[ "${status}" == "passed" ]]
 }
 
