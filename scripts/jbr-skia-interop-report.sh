@@ -334,6 +334,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION=false
 fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SOURCE+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SOURCE=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE=false
 fi
@@ -471,6 +474,7 @@ export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 export MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE
 export MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT
 export MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION
+export MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SOURCE
 export MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE
 export MAGIC_JEWEL_FORCE_CONTEXT_CHANGE
 export MAGIC_JEWEL_UNSUPPORTED_TEXT
@@ -695,6 +699,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH Enables the Compose sweep-gradient path command replay probe. Default: false.
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT Evicts one shader descriptor handle immediately before using it. Default: false.
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION Corrupts one shader descriptor version after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SOURCE Corrupts one RuntimeEffect SKSL source after recording so JBR reports a compile failure. Default: false.
   MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE Corrupts one RuntimeEffect shader descriptor after recording so JBR sees a child type mismatch. Default: false.
   MAGIC_JEWEL_UNSUPPORTED_TEXT Enables a surrogate-pair text label that should use the paragraph text command. Default: false.
   MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT Enables centered/bold/italic/RTL paragraph layout text probes. Default: false.
@@ -1382,8 +1387,8 @@ write_machine_summary() {
     echo "jbr_picture_frames=$(grep -c "${JBR_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_command_frames=$(grep -c "${SKIKO_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_command_frames=$(grep -c "${JBR_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
-    echo "jbr_runtime_effect_compile_failures=$(grep -c "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_log}" 2>/dev/null || true)"
-    echo "jbr_runtime_effect_build_failures=$(grep -c "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_runtime_effect_compile_failures=$(grep -c "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "jbr_runtime_effect_build_failures=$(grep -c "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_runtime_effect_cache_hit_frames=$(grep -c "${JBR_RUNTIME_EFFECT_CACHE_HIT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_runtime_effect_cache_miss_frames=$(grep -c "${JBR_RUNTIME_EFFECT_CACHE_MISS_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_picture_fps=$(frame_marker_fps "${SKIKO_PICTURE_MARKER}" "${new_log}")"
@@ -1472,9 +1477,9 @@ write_report() {
   cmp_command_recorder_summary="$(command_recorder_summary "${new_log}")"
   cmp_command_frame_kind_summary="$(command_frame_kind_summary "${new_log}")"
   jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
-  jbr_runtime_effect_compile_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_log}")"
+  jbr_runtime_effect_compile_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_full_log}")"
   local jbr_runtime_effect_build_failure_summary
-  jbr_runtime_effect_build_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${new_log}")"
+  jbr_runtime_effect_build_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${new_full_log}")"
   local jbr_runtime_effect_cache_hit_summary
   local jbr_runtime_effect_cache_miss_summary
   jbr_runtime_effect_cache_hit_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_CACHE_HIT_MARKER}" "${new_full_log}")"
@@ -1607,6 +1612,7 @@ write_report() {
     echo "- MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE: ${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE}"
     echo "- MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT: ${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT}"
     echo "- MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION: ${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION}"
+    echo "- MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SOURCE: ${MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SOURCE}"
     echo "- MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE: ${MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE}"
     echo "- MAGIC_JEWEL_FORCE_CONTEXT_CHANGE: ${MAGIC_JEWEL_FORCE_CONTEXT_CHANGE}"
     echo "- MAGIC_JEWEL_UNSUPPORTED_TEXT: ${MAGIC_JEWEL_UNSUPPORTED_TEXT}"
