@@ -9,6 +9,7 @@ DURATION_SECONDS="${DURATION_SECONDS:-5}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 EXPECT_BACKGROUND_WINDOW="${EXPECT_BACKGROUND_WINDOW:-true}"
+CASES_FILTER="${CASES:-}"
 
 mkdir -p "${OUT_ROOT}"
 MATRIX_TSV="${OUT_ROOT}/matrix.tsv"
@@ -17,6 +18,19 @@ printf "case\tstatus\tfallbacks\tcommand_frames\tbackground_window\treport\n" > 
 run_case() {
   local name="$1"
   shift
+  if [[ -n "${CASES_FILTER}" ]]; then
+    local selected=false
+    local filter
+    for filter in ${CASES_FILTER}; do
+      if [[ "${filter}" == "${name}" ]]; then
+        selected=true
+        break
+      fi
+    done
+    if [[ "${selected}" != "true" ]]; then
+      return 0
+    fi
+  fi
   local out_dir="${OUT_ROOT}/${name}"
   echo "== ${name} =="
   env \
@@ -60,6 +74,9 @@ run_case offset-image-filter-capability-missing EXPECT_COMMAND_FALLBACK=true EXP
 run_case chained-image-filter-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=262139
 run_case shader-descriptor-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=262135
 run_case runtime-color-filter-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=262127
+run_case stroke-rect-dash-path-effect-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=262111
+run_case stroke-round-rect-dash-path-effect-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=262079
+run_case stroke-path-dash-path-effect-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=262015
 run_case path-effect-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=261887
 run_case concat-matrix-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=261631
 run_case direct-shadow-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=261119
