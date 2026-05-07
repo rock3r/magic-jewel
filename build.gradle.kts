@@ -188,6 +188,9 @@ val composeGraphicsLayerColorFilterEnabled = providers.gradleProperty("magicJewe
 val composeGraphicsLayerColorMatrixFilterEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerColorMatrixFilter")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER"))
     .orElse("false")
+val composeGraphicsLayerRawColorFilterEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerRawColorFilter")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_COLOR_FILTER"))
+    .orElse("false")
 val composeGraphicsLayerRenderEffectEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerRenderEffect")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RENDER_EFFECT"))
     .orElse("false")
@@ -460,6 +463,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.graphicsLayerBlendMode", composeGraphicsLayerBlendModeEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerColorFilter", composeGraphicsLayerColorFilterEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerColorMatrixFilter", composeGraphicsLayerColorMatrixFilterEnabled.get())
+    systemProperty("magic.jewel.compose.graphicsLayerRawColorFilter", composeGraphicsLayerRawColorFilterEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerRenderEffect", composeGraphicsLayerRenderEffectEnabled.get())
     systemProperty(
         "magic.jewel.compose.graphicsLayerRawImageFilterEffect",

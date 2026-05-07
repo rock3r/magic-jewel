@@ -182,6 +182,7 @@ private const val ComposeGraphicsLayerPathClipProperty = "magic.jewel.compose.gr
 private const val ComposeGraphicsLayerBlendModeProperty = "magic.jewel.compose.graphicsLayerBlendMode"
 private const val ComposeGraphicsLayerColorFilterProperty = "magic.jewel.compose.graphicsLayerColorFilter"
 private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.compose.graphicsLayerColorMatrixFilter"
+private const val ComposeGraphicsLayerRawColorFilterProperty = "magic.jewel.compose.graphicsLayerRawColorFilter"
 private const val ComposeGraphicsLayerRenderEffectProperty = "magic.jewel.compose.graphicsLayerRenderEffect"
 private const val ComposeGraphicsLayerRawImageFilterEffectProperty =
     "magic.jewel.compose.graphicsLayerRawImageFilterEffect"
@@ -546,6 +547,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerColorMatrixFilterEnabled = remember {
         System.getProperty(ComposeGraphicsLayerColorMatrixFilterProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerRawColorFilterEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerRawColorFilterProperty, "false").toBoolean()
     }
     val composeGraphicsLayerRenderEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRenderEffectProperty, "false").toBoolean()
@@ -2732,6 +2736,12 @@ private fun MagicJewelApp() {
                                         this[0, 4] = 24f
                                     }
                                 )
+                            }
+                            if (composeGraphicsLayerRawColorFilterEnabled) {
+                                colorFilter = org.jetbrains.skia.ColorFilter.makeBlend(
+                                    Color(0xFF22D3EE).toArgb(),
+                                    org.jetbrains.skia.BlendMode.SRC_IN,
+                                ).asComposeColorFilter()
                             }
                             when {
                                 composeGraphicsLayerRawImageFilterEffectEnabled -> {
