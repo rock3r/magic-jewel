@@ -85,6 +85,10 @@ public final class JBRApi {
         String value();
     }
 
+    public static <T> T internalService() {
+        return null;
+    }
+
     public static final class ServiceNotAvailableException extends RuntimeException {
         public ServiceNotAvailableException(String message) {
             super(message);
