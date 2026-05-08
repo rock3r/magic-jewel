@@ -172,6 +172,8 @@ private const val ComposeRuntimeEffectColorFilterInvalidUniformSchemaProperty =
     "magic.jewel.compose.runtimeEffectColorFilterInvalidUniformSchema"
 private const val ComposeRuntimeEffectColorFilterInvalidChildSchemaProperty =
     "magic.jewel.compose.runtimeEffectColorFilterInvalidChildSchema"
+private const val ComposeRuntimeEffectColorFilterInvalidNestedChildProperty =
+    "magic.jewel.compose.runtimeEffectColorFilterInvalidNestedChild"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
 private const val ComposeRawBlendColorFilterProperty = "magic.jewel.compose.rawBlendColorFilter"
@@ -514,6 +516,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectColorFilterInvalidChildSchemaEnabled = remember {
         System.getProperty(ComposeRuntimeEffectColorFilterInvalidChildSchemaProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectColorFilterInvalidNestedChildEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectColorFilterInvalidNestedChildProperty, "false").toBoolean()
     }
     val composeImageFilterEnabled = remember {
         System.getProperty(ComposeImageFilterProperty, "false").toBoolean()
@@ -1653,7 +1658,20 @@ private fun MagicJewelApp() {
                                         RuntimeEffectColorFilterChild(
                                             if (composeRuntimeEffectColorFilterInvalidChildSchemaEnabled) "1content"
                                             else "content",
-                                            ColorFilter.tint(Color(0xFFEF476F), BlendMode.SrcIn),
+                                            if (composeRuntimeEffectColorFilterInvalidNestedChildEnabled) {
+                                                RuntimeEffectColorFilter(
+                                                    sksl = """
+                                                        uniform float phase;
+                                                        half4 main(half4 inColor) {
+                                                            return half4(inColor.r * phase, inColor.g, inColor.b, inColor.a);
+                                                        }
+                                                    """.trimIndent(),
+                                                    uniforms = floatArrayOf(phase),
+                                                    uniformSchema = listOf(RuntimeEffectUniform("1phase", 0, 1)),
+                                                )
+                                            } else {
+                                                ColorFilter.tint(Color(0xFFEF476F), BlendMode.SrcIn)
+                                            },
                                         )
                                     ),
                                 )
