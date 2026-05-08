@@ -142,6 +142,20 @@ val composeRawRuntimeEffectColorFilterEnabled = providers.gradleProperty("magicJ
 val composeRuntimeEffectColorFilterChildEnabled = providers.gradleProperty("magicJewelComposeRuntimeEffectColorFilterChild")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_CHILD"))
     .orElse("false")
+val composeRuntimeEffectColorFilterInvalidUniformSchemaEnabled =
+    providers.gradleProperty("magicJewelComposeRuntimeEffectColorFilterInvalidUniformSchema")
+        .orElse(
+            providers.environmentVariable(
+                "MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_INVALID_UNIFORM_SCHEMA"
+            )
+        )
+        .orElse("false")
+val composeRuntimeEffectColorFilterInvalidChildSchemaEnabled =
+    providers.gradleProperty("magicJewelComposeRuntimeEffectColorFilterInvalidChildSchema")
+        .orElse(
+            providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_INVALID_CHILD_SCHEMA")
+        )
+        .orElse("false")
 val composeImageFilterEnabled = providers.gradleProperty("magicJewelComposeImageFilter")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_IMAGE_FILTER"))
     .orElse("false")
@@ -464,6 +478,14 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.runtimeEffectStableColorFilter", composeRuntimeEffectStableColorFilterEnabled.get())
     systemProperty("magic.jewel.compose.rawRuntimeEffectColorFilter", composeRawRuntimeEffectColorFilterEnabled.get())
     systemProperty("magic.jewel.compose.runtimeEffectColorFilterChild", composeRuntimeEffectColorFilterChildEnabled.get())
+    systemProperty(
+        "magic.jewel.compose.runtimeEffectColorFilterInvalidUniformSchema",
+        composeRuntimeEffectColorFilterInvalidUniformSchemaEnabled.get()
+    )
+    systemProperty(
+        "magic.jewel.compose.runtimeEffectColorFilterInvalidChildSchema",
+        composeRuntimeEffectColorFilterInvalidChildSchemaEnabled.get()
+    )
     systemProperty("magic.jewel.compose.imageFilter", composeImageFilterEnabled.get())
     systemProperty("magic.jewel.compose.imageColorMatrixFilter", composeImageColorMatrixFilterEnabled.get())
     systemProperty("magic.jewel.compose.rawBlendColorFilter", composeRawBlendColorFilterEnabled.get())

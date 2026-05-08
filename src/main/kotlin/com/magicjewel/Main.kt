@@ -168,6 +168,10 @@ private const val ComposeRuntimeEffectColorFilterProperty = "magic.jewel.compose
 private const val ComposeRuntimeEffectStableColorFilterProperty = "magic.jewel.compose.runtimeEffectStableColorFilter"
 private const val ComposeRawRuntimeEffectColorFilterProperty = "magic.jewel.compose.rawRuntimeEffectColorFilter"
 private const val ComposeRuntimeEffectColorFilterChildProperty = "magic.jewel.compose.runtimeEffectColorFilterChild"
+private const val ComposeRuntimeEffectColorFilterInvalidUniformSchemaProperty =
+    "magic.jewel.compose.runtimeEffectColorFilterInvalidUniformSchema"
+private const val ComposeRuntimeEffectColorFilterInvalidChildSchemaProperty =
+    "magic.jewel.compose.runtimeEffectColorFilterInvalidChildSchema"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
 private const val ComposeRawBlendColorFilterProperty = "magic.jewel.compose.rawBlendColorFilter"
@@ -504,6 +508,12 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectColorFilterChildEnabled = remember {
         System.getProperty(ComposeRuntimeEffectColorFilterChildProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectColorFilterInvalidUniformSchemaEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectColorFilterInvalidUniformSchemaProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectColorFilterInvalidChildSchemaEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectColorFilterInvalidChildSchemaProperty, "false").toBoolean()
     }
     val composeImageFilterEnabled = remember {
         System.getProperty(ComposeImageFilterProperty, "false").toBoolean()
@@ -1540,7 +1550,14 @@ private fun MagicJewelApp() {
                                         }
                                     """.trimIndent(),
                                     uniforms = floatArrayOf(phase),
-                                    uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
+                                    uniformSchema = listOf(
+                                        RuntimeEffectUniform(
+                                            if (composeRuntimeEffectColorFilterInvalidUniformSchemaEnabled) "1phase"
+                                            else "phase",
+                                            0,
+                                            1,
+                                        )
+                                    ),
                                 )
                             },
                         )
@@ -1634,7 +1651,8 @@ private fun MagicJewelApp() {
                                     uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
                                     namedChildren = listOf(
                                         RuntimeEffectColorFilterChild(
-                                            "content",
+                                            if (composeRuntimeEffectColorFilterInvalidChildSchemaEnabled) "1content"
+                                            else "content",
                                             ColorFilter.tint(Color(0xFFEF476F), BlendMode.SrcIn),
                                         )
                                     ),
