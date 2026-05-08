@@ -191,6 +191,7 @@ private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel
 private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.graphicsLayerShadow"
 private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.graphicsLayerRotationX"
 private const val ComposeGraphicsLayerRotationYProperty = "magic.jewel.compose.graphicsLayerRotationY"
+private const val ComposeGraphicsLayerScaleTranslateProperty = "magic.jewel.compose.graphicsLayerScaleTranslate"
 private const val ComposeGraphicsLayerNearCameraProperty = "magic.jewel.compose.graphicsLayerNearCamera"
 private const val ComposeGraphicsLayerOffCenterPivotProperty = "magic.jewel.compose.graphicsLayerOffCenterPivot"
 private const val ComposeGraphicsLayerOffscreenProperty = "magic.jewel.compose.graphicsLayerOffscreen"
@@ -571,6 +572,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerRotationYEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRotationYProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerScaleTranslateEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerScaleTranslateProperty, "false").toBoolean()
     }
     val composeGraphicsLayerNearCameraEnabled = remember {
         System.getProperty(ComposeGraphicsLayerNearCameraProperty, "false").toBoolean()
@@ -2712,6 +2716,12 @@ private fun MagicJewelApp() {
                             }
                             if (composeGraphicsLayerRotationYEnabled) {
                                 rotationY = -24f
+                            }
+                            if (composeGraphicsLayerScaleTranslateEnabled) {
+                                scaleX = 1.18f
+                                scaleY = 0.82f
+                                translationX = -18f
+                                translationY = 14f
                             }
                             if (composeGraphicsLayerNearCameraEnabled) {
                                 cameraDistance = 180f
