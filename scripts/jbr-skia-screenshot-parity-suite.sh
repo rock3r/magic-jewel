@@ -9,7 +9,7 @@ DURATION_SECONDS="${DURATION_SECONDS:-6}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 PARITY_SCRIPT="${PARITY_SCRIPT:-${SCRIPT_DIR}/jbr-skia-screenshot-parity.sh}"
-CASES="${CASES:-parity-rich parity-button-chrome parity-geometry-clean parity-skew-transform parity-vertices parity-save-layer-filter parity-native-custom-font-text-image parity-native-generic-font-text parity-native-loaded-font-data-text parity-native-resource-font-text parity-native-system-font-text parity-resize-native-generic-font-text parity-resize-native-loaded-font-data-text parity-resize-native-resource-font-text parity-resize-native-system-font-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-native-loaded-font-data-text parity-forced-context-native-resource-font-text parity-forced-context-native-system-font-text parity-forced-context-image-refs parity-point-dots parity-path-effect parity-draw-shapes parity-clip-rects parity-clip-path parity-blend-modes parity-gradient-surfaces parity-gradient-paths parity-gradient-shaders parity-gradient-stroke parity-image-filter parity-image-color-matrix-filter parity-color-shader parity-resize-color-shader parity-forced-context-color-shader parity-noise-shader parity-resize-noise-shader parity-forced-context-noise-shader parity-turbulence-shader parity-resize-turbulence-shader parity-forced-context-turbulence-shader parity-image-shader-color-filter parity-composite-noise-shader parity-resize-composite-noise-shader parity-forced-context-composite-noise-shader parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-stable-color-filter parity-resize-runtime-effect-stable-color-filter parity-forced-context-runtime-effect-stable-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer-effects parity-graphics-layer-blend-mode parity-graphics-layer-color-filter parity-graphics-layer-color-matrix-filter parity-resize-graphics-layer-color-matrix-filter parity-forced-context-graphics-layer-color-matrix-filter parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-clip parity-graphics-layer-round-clip parity-graphics-layer-path-clip parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-modulate-alpha parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-scale-translate parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
+CASES="${CASES:-parity-rich parity-button-chrome parity-geometry-clean parity-skew-transform parity-vertices parity-save-layer-filter parity-native-custom-font-text-image parity-native-generic-font-text parity-native-loaded-font-data-text parity-native-resource-font-text parity-native-system-font-text parity-resize-native-generic-font-text parity-resize-native-loaded-font-data-text parity-resize-native-resource-font-text parity-resize-native-system-font-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-native-loaded-font-data-text parity-forced-context-native-resource-font-text parity-forced-context-native-system-font-text parity-forced-context-image-refs parity-point-dots parity-path-effect parity-draw-shapes parity-clip-rects parity-clip-path parity-blend-modes parity-gradient-surfaces parity-gradient-paths parity-gradient-shaders parity-gradient-stroke parity-image-filter parity-image-color-matrix-filter parity-color-shader parity-resize-color-shader parity-forced-context-color-shader parity-noise-shader parity-resize-noise-shader parity-forced-context-noise-shader parity-turbulence-shader parity-resize-turbulence-shader parity-forced-context-turbulence-shader parity-image-shader-color-filter parity-composite-noise-shader parity-resize-composite-noise-shader parity-forced-context-composite-noise-shader parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader parity-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-stable-color-filter parity-resize-runtime-effect-stable-color-filter parity-forced-context-runtime-effect-stable-color-filter parity-runtime-effect-color-filter-child parity-graphics-layer parity-graphics-layer-effects parity-graphics-layer-blend-mode parity-graphics-layer-color-filter parity-graphics-layer-color-matrix-filter parity-graphics-layer-blend-color-filter parity-graphics-layer-blend-color-matrix-filter parity-resize-graphics-layer-color-matrix-filter parity-forced-context-graphics-layer-color-matrix-filter parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-clip parity-graphics-layer-round-clip parity-graphics-layer-path-clip parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-modulate-alpha parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-scale-translate parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -887,6 +887,22 @@ run_named_case() {
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
       ;;
+    parity-graphics-layer)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_PATH=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ARC=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAX_BAD_PIXEL_RATIO=0.09 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.12 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.09
+      ;;
     parity-graphics-layer-blend-mode)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
@@ -933,6 +949,42 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
         MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER=true \
+        MAX_BAD_PIXEL_RATIO=0.09 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.12 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.16
+      ;;
+    parity-graphics-layer-blend-color-filter)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_PATH=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ARC=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLEND_MODE=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_FILTER=true \
+        MAX_BAD_PIXEL_RATIO=0.09 \
+        MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.12 \
+        MAX_RIGHT_PROBE_STRIP_BAD_PIXEL_RATIO=0.16
+      ;;
+    parity-graphics-layer-blend-color-matrix-filter)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=false \
+        MAGIC_JEWEL_COMPOSE_COLOR_FILTER=false \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_PATH=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ARC=false \
+        MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT=false \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=false \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLEND_MODE=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_MATRIX_FILTER=true \
         MAX_BAD_PIXEL_RATIO=0.09 \
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.12 \
