@@ -159,6 +159,8 @@ private const val ComposeLinearGradientShaderColorFilterProperty = "magic.jewel.
 private const val ComposeRuntimeEffectPureColorProperty = "magic.jewel.compose.runtimeEffectPureColor"
 private const val ComposeRuntimeEffectUniformOnlyProperty = "magic.jewel.compose.runtimeEffectUniformOnly"
 private const val ComposeRuntimeEffectChildOnlyProperty = "magic.jewel.compose.runtimeEffectChildOnly"
+private const val ComposeRuntimeEffectInvalidUniformSchemaProperty =
+    "magic.jewel.compose.runtimeEffectInvalidUniformSchema"
 private const val ComposeRuntimeEffectBadChildProperty = "magic.jewel.compose.runtimeEffectBadChild"
 private const val ComposeRuntimeEffectColorFilterProperty = "magic.jewel.compose.runtimeEffectColorFilter"
 private const val ComposeRuntimeEffectStableColorFilterProperty = "magic.jewel.compose.runtimeEffectStableColorFilter"
@@ -479,6 +481,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectChildOnlyEnabled = remember {
         System.getProperty(ComposeRuntimeEffectChildOnlyProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectInvalidUniformSchemaEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectInvalidUniformSchemaProperty, "false").toBoolean()
     }
     val composeRuntimeEffectBadChildEnabled = remember {
         System.getProperty(ComposeRuntimeEffectBadChildProperty, "false").toBoolean()
@@ -1342,7 +1347,13 @@ private fun MagicJewelApp() {
                             }
                         """.trimIndent(),
                         uniforms = floatArrayOf(phase),
-                        uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
+                        uniformSchema = listOf(
+                            RuntimeEffectUniform(
+                                if (composeRuntimeEffectInvalidUniformSchemaEnabled) "1phase" else "phase",
+                                0,
+                                1,
+                            )
+                        ),
                     )
                     drawRect(
                         brush = ShaderBrush(shader),

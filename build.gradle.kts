@@ -119,6 +119,10 @@ val composeRuntimeEffectUniformOnlyEnabled = providers.gradleProperty("magicJewe
 val composeRuntimeEffectChildOnlyEnabled = providers.gradleProperty("magicJewelComposeRuntimeEffectChildOnly")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_CHILD_ONLY"))
     .orElse("false")
+val composeRuntimeEffectInvalidUniformSchemaEnabled =
+    providers.gradleProperty("magicJewelComposeRuntimeEffectInvalidUniformSchema")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_INVALID_UNIFORM_SCHEMA"))
+        .orElse("false")
 val composeRuntimeEffectBadChildEnabled = providers.gradleProperty("magicJewelComposeRuntimeEffectBadChild")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD"))
     .orElse("false")
@@ -443,6 +447,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.runtimeEffectPureColor", composeRuntimeEffectPureColorEnabled.get())
     systemProperty("magic.jewel.compose.runtimeEffectUniformOnly", composeRuntimeEffectUniformOnlyEnabled.get())
     systemProperty("magic.jewel.compose.runtimeEffectChildOnly", composeRuntimeEffectChildOnlyEnabled.get())
+    systemProperty(
+        "magic.jewel.compose.runtimeEffectInvalidUniformSchema",
+        composeRuntimeEffectInvalidUniformSchemaEnabled.get()
+    )
     systemProperty("magic.jewel.compose.runtimeEffectBadChild", composeRuntimeEffectBadChildEnabled.get())
     systemProperty("magic.jewel.compose.runtimeEffectColorFilter", composeRuntimeEffectColorFilterEnabled.get())
     systemProperty("magic.jewel.compose.runtimeEffectStableColorFilter", composeRuntimeEffectStableColorFilterEnabled.get())
