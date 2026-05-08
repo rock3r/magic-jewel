@@ -127,6 +127,10 @@ val composeRuntimeEffectInvalidChildSchemaEnabled =
     providers.gradleProperty("magicJewelComposeRuntimeEffectInvalidChildSchema")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_INVALID_CHILD_SCHEMA"))
         .orElse("false")
+val composeRuntimeEffectInvalidNestedChildEnabled =
+    providers.gradleProperty("magicJewelComposeRuntimeEffectInvalidNestedChild")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_INVALID_NESTED_CHILD"))
+        .orElse("false")
 val composeRuntimeEffectBadChildEnabled = providers.gradleProperty("magicJewelComposeRuntimeEffectBadChild")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD"))
     .orElse("false")
@@ -476,6 +480,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty(
         "magic.jewel.compose.runtimeEffectInvalidChildSchema",
         composeRuntimeEffectInvalidChildSchemaEnabled.get()
+    )
+    systemProperty(
+        "magic.jewel.compose.runtimeEffectInvalidNestedChild",
+        composeRuntimeEffectInvalidNestedChildEnabled.get()
     )
     systemProperty("magic.jewel.compose.runtimeEffectBadChild", composeRuntimeEffectBadChildEnabled.get())
     systemProperty("magic.jewel.compose.runtimeEffectColorFilter", composeRuntimeEffectColorFilterEnabled.get())

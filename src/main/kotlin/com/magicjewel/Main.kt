@@ -163,6 +163,8 @@ private const val ComposeRuntimeEffectInvalidUniformSchemaProperty =
     "magic.jewel.compose.runtimeEffectInvalidUniformSchema"
 private const val ComposeRuntimeEffectInvalidChildSchemaProperty =
     "magic.jewel.compose.runtimeEffectInvalidChildSchema"
+private const val ComposeRuntimeEffectInvalidNestedChildProperty =
+    "magic.jewel.compose.runtimeEffectInvalidNestedChild"
 private const val ComposeRuntimeEffectBadChildProperty = "magic.jewel.compose.runtimeEffectBadChild"
 private const val ComposeRuntimeEffectColorFilterProperty = "magic.jewel.compose.runtimeEffectColorFilter"
 private const val ComposeRuntimeEffectStableColorFilterProperty = "magic.jewel.compose.runtimeEffectStableColorFilter"
@@ -495,6 +497,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectInvalidChildSchemaEnabled = remember {
         System.getProperty(ComposeRuntimeEffectInvalidChildSchemaProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectInvalidNestedChildEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectInvalidNestedChildProperty, "false").toBoolean()
     }
     val composeRuntimeEffectBadChildEnabled = remember {
         System.getProperty(ComposeRuntimeEffectBadChildProperty, "false").toBoolean()
@@ -1402,7 +1407,20 @@ private fun MagicJewelApp() {
                         namedChildren = listOf(
                             RuntimeEffectChild(
                                 if (composeRuntimeEffectInvalidChildSchemaEnabled) "1content" else "content",
-                                child,
+                                if (composeRuntimeEffectInvalidNestedChildEnabled) {
+                                    RuntimeEffectShader(
+                                        sksl = """
+                                            uniform float phase;
+                                            half4 main(float2 p) {
+                                                return half4(phase, 0.25, 0.75, 1.0);
+                                            }
+                                        """.trimIndent(),
+                                        uniforms = floatArrayOf(phase),
+                                        uniformSchema = listOf(RuntimeEffectUniform("1phase", 0, 1)),
+                                    )
+                                } else {
+                                    child
+                                },
                             )
                         ),
                     )
