@@ -161,6 +161,8 @@ private const val ComposeRuntimeEffectUniformOnlyProperty = "magic.jewel.compose
 private const val ComposeRuntimeEffectChildOnlyProperty = "magic.jewel.compose.runtimeEffectChildOnly"
 private const val ComposeRuntimeEffectInvalidUniformSchemaProperty =
     "magic.jewel.compose.runtimeEffectInvalidUniformSchema"
+private const val ComposeRuntimeEffectInvalidChildSchemaProperty =
+    "magic.jewel.compose.runtimeEffectInvalidChildSchema"
 private const val ComposeRuntimeEffectBadChildProperty = "magic.jewel.compose.runtimeEffectBadChild"
 private const val ComposeRuntimeEffectColorFilterProperty = "magic.jewel.compose.runtimeEffectColorFilter"
 private const val ComposeRuntimeEffectStableColorFilterProperty = "magic.jewel.compose.runtimeEffectStableColorFilter"
@@ -484,6 +486,9 @@ private fun MagicJewelApp() {
     }
     val composeRuntimeEffectInvalidUniformSchemaEnabled = remember {
         System.getProperty(ComposeRuntimeEffectInvalidUniformSchemaProperty, "false").toBoolean()
+    }
+    val composeRuntimeEffectInvalidChildSchemaEnabled = remember {
+        System.getProperty(ComposeRuntimeEffectInvalidChildSchemaProperty, "false").toBoolean()
     }
     val composeRuntimeEffectBadChildEnabled = remember {
         System.getProperty(ComposeRuntimeEffectBadChildProperty, "false").toBoolean()
@@ -1379,7 +1384,12 @@ private fun MagicJewelApp() {
                                 return half4(base.bgr, 1.0);
                             }
                         """.trimIndent(),
-                        namedChildren = listOf(RuntimeEffectChild("content", child)),
+                        namedChildren = listOf(
+                            RuntimeEffectChild(
+                                if (composeRuntimeEffectInvalidChildSchemaEnabled) "1content" else "content",
+                                child,
+                            )
+                        ),
                     )
                     drawRect(
                         brush = ShaderBrush(shader),
