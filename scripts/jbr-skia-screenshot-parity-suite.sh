@@ -773,7 +773,8 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
-        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1
+        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
       ;;
     parity-runtime-effect-uniform-only)
       run_case "$1" \
@@ -782,6 +783,7 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
         EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1 \
         MAX_BAD_PIXEL_RATIO=0.06
       ;;
     parity-runtime-effect-child-only)
@@ -790,7 +792,8 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
-        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1
+        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
       ;;
     parity-runtime-effect-shader)
       run_case "$1" \
@@ -798,7 +801,8 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
-        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1
+        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
       ;;
     parity-runtime-effect-shader-color-filter)
       run_case "$1" \
@@ -809,6 +813,7 @@ run_named_case() {
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
         EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1 \
         MAX_BAD_PIXEL_RATIO=0.06
       ;;
     parity-runtime-effect-color-filter)
@@ -817,7 +822,8 @@ run_named_case() {
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
-        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1
+        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
       ;;
     parity-runtime-effect-stable-color-filter)
       run_case "$1" \
@@ -870,7 +876,8 @@ run_named_case() {
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
-        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1
+        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
       ;;
     parity-graphics-layer-effects)
       run_case "$1" \
