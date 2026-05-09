@@ -654,6 +654,35 @@ strict_command_fails_without_min_jbr_runtime_effect_cache_hits() {
   fi
 }
 
+strict_command_requires_min_jbr_runtime_effect_cache_evicts() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_RUNTIME_EFFECT_CACHE_EVICT type=colorFilter hash=0x5678 skslLength=48 limit=2"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS=1
+  grep -q "^jbr_runtime_effect_cache_evict_frames=1$" "${dir}/summary.properties"
+}
+
+strict_command_fails_without_min_jbr_runtime_effect_cache_evicts() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS=1 2>/dev/null; then
+    echo "Expected strict command validation to fail without JBR RuntimeEffect source-cache evict markers" >&2
+    return 1
+  fi
+}
+
 strict_command_requires_max_jbr_runtime_effect_cache_misses() {
   local dir
   dir="$(make_report_dir)"
@@ -1232,6 +1261,8 @@ strict_command_requires_min_jbr_shader_handle_evicts
 strict_command_requires_min_jbr_shader_handle_cache_hits
 strict_command_requires_min_jbr_runtime_effect_cache_hits
 strict_command_fails_without_min_jbr_runtime_effect_cache_hits
+strict_command_requires_min_jbr_runtime_effect_cache_evicts
+strict_command_fails_without_min_jbr_runtime_effect_cache_evicts
 strict_command_requires_max_jbr_runtime_effect_cache_misses
 strict_command_fails_above_max_jbr_runtime_effect_cache_misses
 strict_command_requires_min_jbr_font_data_defines
