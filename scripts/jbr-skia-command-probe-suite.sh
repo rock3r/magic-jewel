@@ -431,7 +431,8 @@ run_named_case() {
         JBR_SKIA_RUNTIME_EFFECT_CACHE_LIMIT_FOR_TEST=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=3 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS=1
+        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS=1 \
+        EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE=shader
       ;;
     commands-runtime-effect-invalid-uniform-schema-fallback)
       run_case "$1" \
@@ -522,7 +523,8 @@ run_named_case() {
         JBR_SKIA_RUNTIME_EFFECT_CACHE_LIMIT_FOR_TEST=2 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=3 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS=1
+        EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS=1 \
+        EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE=colorFilter
       ;;
     commands-runtime-effect-color-filter-invalid-uniform-schema-fallback)
       run_case "$1" \

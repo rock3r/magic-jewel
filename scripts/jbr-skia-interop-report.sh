@@ -42,6 +42,7 @@ EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS="${EXPECT_MIN_JBR_SHADER_HANDLE_EVICTS:-0}"
 EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS="${EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS:-0}"
 EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS="${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS:-0}"
 EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS="${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS:-0}"
+EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE="${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE:-}"
 EXPECT_MIN_JBR_FONT_DATA_DEFINES="${EXPECT_MIN_JBR_FONT_DATA_DEFINES:-0}"
 EXPECT_MIN_JBR_SHADOW_COMMANDS="${EXPECT_MIN_JBR_SHADOW_COMMANDS:-0}"
 EXPECT_MAX_JBR_FONT_DATA_DEFINES="${EXPECT_MAX_JBR_FONT_DATA_DEFINES:--1}"
@@ -633,6 +634,7 @@ Environment:
   EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS In strict command mode, require at least this many JBR-side shader handle cache-hit markers. Default: 0.
   EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS In strict command mode, require at least this many JBR-side RuntimeEffect source-cache hit markers. Default: 0.
   EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS In strict command mode, require at least this many JBR-side RuntimeEffect source-cache evict markers. Default: 0.
+  EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE When EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS is set, require matching evict markers to have this type value. Default: any.
   EXPECT_MIN_JBR_FONT_DATA_DEFINES In strict command mode, require at least this many JBR-side font-data define markers. Default: 0.
   EXPECT_MIN_JBR_SHADOW_COMMANDS In strict command mode, require at least this many JBR direct-shadow commands in one timing frame. Default: 0.
   EXPECT_MAX_JBR_FONT_DATA_DEFINES In strict command mode, require no more than this many JBR-side font-data define markers. Default: disabled.
@@ -1712,6 +1714,7 @@ write_report() {
     echo "- EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS: ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}"
     echo "- EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS: ${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS}"
     echo "- EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS: ${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS}"
+    echo "- EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE: ${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE:-<unset>}"
     echo "- EXPECT_MIN_JBR_FONT_DATA_DEFINES: ${EXPECT_MIN_JBR_FONT_DATA_DEFINES}"
     echo "- EXPECT_MIN_JBR_SHADOW_COMMANDS: ${EXPECT_MIN_JBR_SHADOW_COMMANDS}"
     echo "- EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES: ${EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES}"
@@ -2087,9 +2090,13 @@ validate_report() {
       fi
       if [[ "${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS}" -gt 0 ]]; then
         local jbr_runtime_effect_cache_evicts
-        jbr_runtime_effect_cache_evicts="$(grep -c "${JBR_RUNTIME_EFFECT_CACHE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        if [[ -n "${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE}" ]]; then
+          jbr_runtime_effect_cache_evicts="$(grep -Ec "${JBR_RUNTIME_EFFECT_CACHE_EVICT_MARKER}.*type=${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE}( |$)" "${new_full_log}" 2>/dev/null || true)"
+        else
+          jbr_runtime_effect_cache_evicts="$(grep -c "${JBR_RUNTIME_EFFECT_CACHE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+        fi
         [[ "${jbr_runtime_effect_cache_evicts}" -ge "${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS}" ]] ||
-          failures+=("JBR RuntimeEffect source-cache evict markers ${jbr_runtime_effect_cache_evicts} below expected ${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS}")
+          failures+=("JBR RuntimeEffect source-cache evict markers ${jbr_runtime_effect_cache_evicts} below expected ${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS} for type ${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE:-any}")
       fi
       if [[ "${EXPECT_MIN_JBR_FONT_DATA_DEFINES}" -gt 0 ]]; then
         local jbr_font_data_defines

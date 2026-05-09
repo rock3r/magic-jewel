@@ -231,6 +231,8 @@ Source-cache eviction is reported with:
 `JBR_SKIA_INTEROP_RUNTIME_EFFECT_CACHE_EVICT type=shader|colorFilter hash=0x... skslLength=... limit=...`.
 Use `EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS` and `EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES` to assert that animated
 uniform updates reuse the compiled JBR-owned `SkRuntimeEffect` instead of recompiling identical SKSL sources every frame.
+Use `EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE=shader|colorFilter` with
+`EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS` when an eviction probe must prove the exact native source-cache family.
 Use `JBR_SKIA_RUNTIME_EFFECT_CACHE_LIMIT_FOR_TEST` only in focused eviction probes to lower the native source-cache
 limit without changing production defaults.
 `MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION=true` asks Skiko to corrupt one shader descriptor version after recording; the `commands-invalid-descriptor-version-fallback` row asserts JBR rejects that stream with the structured `command-stream-invalid` fallback. `MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT=true` inserts a shader-handle eviction immediately before a matching use; the `commands-invalid-descriptor-use-after-evict-fallback` row guards stale/use-after-free handle rejection.
