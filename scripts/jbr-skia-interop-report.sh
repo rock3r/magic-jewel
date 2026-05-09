@@ -2091,6 +2091,10 @@ validate_report() {
       if [[ "${EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS}" -gt 0 ]]; then
         local jbr_runtime_effect_cache_evicts
         if [[ -n "${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE}" ]]; then
+          if [[ "${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE}" != "shader" &&
+                "${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE}" != "colorFilter" ]]; then
+            failures+=("Unsupported EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE ${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE}")
+          fi
           jbr_runtime_effect_cache_evicts="$(grep -Ec "${JBR_RUNTIME_EFFECT_CACHE_EVICT_MARKER}.*type=${EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE}( |$)" "${new_full_log}" 2>/dev/null || true)"
         else
           jbr_runtime_effect_cache_evicts="$(grep -c "${JBR_RUNTIME_EFFECT_CACHE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
