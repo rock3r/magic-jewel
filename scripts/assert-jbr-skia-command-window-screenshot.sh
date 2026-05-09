@@ -413,6 +413,8 @@ let drawPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRA
 let drawArcProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ARC"] == "true"
 let drawRoundRectProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT"] == "true"
 let imageShaderProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_IMAGE_SHADER"] == "true"
+let minImageShaderProbeRightDark =
+    Int(ProcessInfo.processInfo.environment["MIN_IMAGE_SHADER_PROBE_RIGHT_DARK"] ?? "") ?? 2500
 let linearGradientStrokeProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_STROKE"] == "true"
 let linearGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT"] == "true"
 let linearGradientRoundRectSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT"] == "true"
@@ -478,7 +480,7 @@ if drawRoundRectProbe {
 }
 if imageShaderProbe {
     probeChecks.append(("probeRightYellow", probeRightYellow, 1500))
-    probeChecks.append(("probeRightDark", probeRightDark, 2500))
+    probeChecks.append(("probeRightDark", probeRightDark, minImageShaderProbeRightDark))
 }
 if linearGradientStrokeProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 800))
