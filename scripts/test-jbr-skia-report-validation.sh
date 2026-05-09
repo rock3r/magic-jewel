@@ -1137,6 +1137,20 @@ runtime_color_filter_child_type_build_failure_fallback_passes() {
   grep -q "^jbr_runtime_effect_build_failures=1$" "${dir}/summary.properties"
 }
 
+runtime_color_filter_child_count_build_failure_fallback_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=false"
+    echo "JBR_SKIA_INTEROP_RUNTIME_COLOR_FILTER_BUILD_FAILED hash=0x0123456789abcdef stage=child-count skslLength=42 uniforms=1 children=0 namedUniforms=1 namedChildren=0 effectChildren=1"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE=child-count
+  grep -q "^jbr_runtime_effect_build_failures=1$" "${dir}/summary.properties"
+}
+
 runtime_effect_child_type_build_failure_fallback_passes() {
   local dir
   dir="$(make_report_dir)"
@@ -1339,6 +1353,7 @@ command_stream_invalid_fallback_passes
 runtime_effect_compile_failure_fallback_passes
 runtime_color_filter_compile_failure_fallback_passes
 runtime_effect_build_failure_fallback_passes
+runtime_color_filter_child_count_build_failure_fallback_passes
 runtime_color_filter_child_type_build_failure_fallback_passes
 runtime_effect_child_type_build_failure_fallback_passes
 abi_mismatch_fallback_passes
