@@ -24,6 +24,7 @@ CAPTURE_POPUP_WINDOW_QUERY="${CAPTURE_POPUP_WINDOW_QUERY:-MagicJewelPopupWindow}
 CAPTURE_OLD_SCREENSHOT="${CAPTURE_OLD_SCREENSHOT:-false}"
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
+EXPECT_COMMAND_FALLBACK_MARKER="${EXPECT_COMMAND_FALLBACK_MARKER:-}"
 EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
 EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS="${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS:-0}"
 EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
@@ -628,6 +629,7 @@ Environment:
   EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
   EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
+  EXPECT_COMMAND_FALLBACK_MARKER Optional fixed string that must appear in the new renderer log. Default: disabled.
   EXPECT_MIN_TEXT_COMMANDS In strict command mode, require at least this many simple text commands in one CMP recorder frame. Default: 0.
   EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS In strict command mode, require at least this many paragraph text commands in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_REFS In strict command mode, require at least this many image refs in one CMP recorder frame. Default: 0.
@@ -1413,6 +1415,7 @@ write_machine_summary() {
     echo "magic_jewel_background_window=${MAGIC_JEWEL_BACKGROUND_WINDOW}"
     echo "expect_command_fallback=${EXPECT_COMMAND_FALLBACK}"
     echo "expect_command_fallback_reason=${EXPECT_COMMAND_FALLBACK_REASON}"
+    echo "expect_command_fallback_marker=${EXPECT_COMMAND_FALLBACK_MARKER}"
     echo "fallback_old_count=$(grep -c "${FALLBACK_MARKER}" "${old_full_log}" 2>/dev/null || true)"
     echo "fallback_new_count=$(grep -c "${FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "old_samples=$(csv_summary_field "${OUT_DIR}/old-ps.csv" samples)"
@@ -1722,6 +1725,7 @@ write_report() {
     echo "- SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST: ${SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST}"
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
+    echo "- EXPECT_COMMAND_FALLBACK_MARKER: ${EXPECT_COMMAND_FALLBACK_MARKER:-<unset>}"
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
     echo "- EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS: ${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}"
     echo "- EXPECT_MIN_IMAGE_REFS: ${EXPECT_MIN_IMAGE_REFS}"
@@ -2201,6 +2205,10 @@ validate_report() {
           failures+=("missing Skiko surface-change marker with surfaceChanged=${EXPECT_SURFACE_CHANGED}")
         fi
       fi
+    fi
+    if [[ -n "${EXPECT_COMMAND_FALLBACK_MARKER}" ]] &&
+        ! grep -Fq -- "${EXPECT_COMMAND_FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null; then
+      failures+=("missing expected new-log marker: ${EXPECT_COMMAND_FALLBACK_MARKER}")
     fi
     local screenshot_status_required="true"
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then

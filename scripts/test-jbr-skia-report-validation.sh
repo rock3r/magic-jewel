@@ -1081,6 +1081,46 @@ command_stream_invalid_fallback_passes() {
   run_validate_only "${dir}" EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
 }
 
+expected_command_fallback_marker_passes() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COLOR_FILTER_HANDLE_TYPE_CORRUPTED target=shaderColorFilter"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=false"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=command-stream-invalid"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" \
+    EXPECT_COMMAND_FALLBACK=true \
+    EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+    EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_COLOR_FILTER_HANDLE_TYPE_CORRUPTED target=shaderColorFilter"
+  grep -q "^expect_command_fallback_marker=SKIKO_JBR_INTEROP_COLOR_FILTER_HANDLE_TYPE_CORRUPTED target=shaderColorFilter$" "${dir}/summary.properties"
+}
+
+expected_command_fallback_marker_fails_when_missing() {
+  local dir
+  dir="$(make_report_dir)"
+  rm -f "${dir}/new-screenshot-status.txt"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COLOR_FILTER_HANDLE_TYPE_CORRUPTED target=fillRectColorFilter"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=false"
+    echo "SKIKO_JBR_INTEROP_FALLBACK reason=command-stream-invalid"
+  } > "${dir}/new.log"
+
+  if run_validate_only "${dir}" \
+      EXPECT_COMMAND_FALLBACK=true \
+      EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+      EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_COLOR_FILTER_HANDLE_TYPE_CORRUPTED target=shaderColorFilter" 2>/dev/null; then
+    echo "Expected command fallback marker validation to fail without the requested target marker" >&2
+    return 1
+  fi
+  grep -q "^validation_status=failed$" "${dir}/summary.properties"
+  grep -q "validation_failures=.*missing expected new-log marker: SKIKO_JBR_INTEROP_COLOR_FILTER_HANDLE_TYPE_CORRUPTED target=shaderColorFilter" "${dir}/summary.properties"
+}
+
 runtime_effect_compile_failure_fallback_passes() {
   local dir
   dir="$(make_report_dir)"
@@ -1350,6 +1390,8 @@ expected_image_fallback_passes
 expected_nested_fallback_reason_passes
 expected_fallback_requires_reason
 command_stream_invalid_fallback_passes
+expected_command_fallback_marker_passes
+expected_command_fallback_marker_fails_when_missing
 runtime_effect_compile_failure_fallback_passes
 runtime_color_filter_compile_failure_fallback_passes
 runtime_effect_build_failure_fallback_passes

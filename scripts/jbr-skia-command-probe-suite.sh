@@ -621,7 +621,8 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE=true \
         MAGIC_JEWEL_CORRUPT_COLOR_FILTER_HANDLE_TYPE=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_COLOR_FILTER_HANDLE_TYPE_CORRUPTED target=fillRectColorFilter"
       ;;
     commands-shader-color-filter-wrong-effect-type-fallback)
       run_case "$1" \
@@ -630,7 +631,8 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_IMAGE_SHADER_COLOR_FILTER=true \
         MAGIC_JEWEL_CORRUPT_COLOR_FILTER_HANDLE_TYPE=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_COLOR_FILTER_HANDLE_TYPE_CORRUPTED target=shaderColorFilter"
       ;;
     commands-image-filter-wrong-effect-type-fallback)
       run_case "$1" \
@@ -640,7 +642,8 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_COLOR_FILTER_HANDLE=true \
         MAGIC_JEWEL_CORRUPT_IMAGE_FILTER_HANDLE_TYPE=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_FILTER_HANDLE_TYPE_CORRUPTED target=saveLayerImageFilter"
       ;;
     commands-image-filter)
       run_case "$1" \
