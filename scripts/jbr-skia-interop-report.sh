@@ -760,7 +760,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH Enables the Compose sweep-gradient path command replay probe. Default: false.
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT Evicts one shader descriptor handle immediately before using it. Default: false.
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION Corrupts one shader descriptor version after recording so JBR rejects the command stream. Default: false.
-  MAGIC_JEWEL_CORRUPT_COLOR_FILTER_HANDLE_TYPE Rewrites one color-filter handle use to reference an image-filter handle. Default: false.
+  MAGIC_JEWEL_CORRUPT_COLOR_FILTER_HANDLE_TYPE Rewrites one color-filter use or shader color-filter child to reference an image-filter handle. Default: false.
   MAGIC_JEWEL_CORRUPT_IMAGE_FILTER_HANDLE_TYPE Rewrites one image-filter handle use to reference a color-filter handle. Default: false.
   MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SOURCE Corrupts one RuntimeEffect SKSL source after recording so JBR reports a compile failure. Default: false.
   MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE Corrupts one RuntimeEffect shader descriptor after recording so JBR sees a child type mismatch. Default: false.
