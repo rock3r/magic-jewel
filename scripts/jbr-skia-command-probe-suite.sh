@@ -871,7 +871,9 @@ run_named_case() {
       ;;
     commands-path-effect|commands-path-effect-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=true
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=5 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=5
       ;;
     commands-path-effect-color-filter-fallback)
       run_case "$1" \
