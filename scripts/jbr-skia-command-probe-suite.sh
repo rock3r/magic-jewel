@@ -484,7 +484,8 @@ run_named_case() {
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
         EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
-        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=2
       ;;
     commands-forced-context-runtime-effect-stable-color-filter)
       run_case "$1" \
@@ -498,7 +499,8 @@ run_named_case() {
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
         EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
-        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=2
       ;;
     commands-raw-runtime-effect-color-filter-fallback)
       run_case "$1" \
@@ -730,7 +732,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=2
       ;;
     commands-forced-context-descriptor-redefine)
       run_case "$1" \
@@ -743,7 +746,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=2
       ;;
     commands-resize-shader-descriptor-redefine)
       run_case "$1" \
@@ -757,7 +761,8 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
         EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
-        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-forced-context-shader-descriptor-redefine)
       run_case "$1" \
@@ -771,7 +776,8 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
         EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
-        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-resize-color-shader-descriptor-redefine)
       run_case "$1" \
@@ -783,7 +789,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-forced-context-color-shader-descriptor-redefine)
       run_case "$1" \
@@ -795,7 +802,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-resize-noise-shader-descriptor-redefine)
       run_case "$1" \
@@ -807,7 +815,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-forced-context-noise-shader-descriptor-redefine)
       run_case "$1" \
@@ -819,7 +828,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-resize-turbulence-shader-descriptor-redefine)
       run_case "$1" \
@@ -831,7 +841,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-forced-context-turbulence-shader-descriptor-redefine)
       run_case "$1" \
@@ -843,7 +854,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=2
       ;;
     commands-resize-composite-noise-shader-descriptor-redefine)
       run_case "$1" \
@@ -855,7 +867,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=6 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=3
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=3 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=6
       ;;
     commands-forced-context-composite-noise-shader-descriptor-redefine)
       run_case "$1" \
@@ -867,7 +880,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=6 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=3
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=3 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=6
       ;;
     commands-path-effect|commands-path-effect-fallback)
       run_case "$1" \
@@ -954,7 +968,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=2
       ;;
     commands-forced-context-graphics-layer-color-matrix-filter)
       run_case "$1" \
@@ -967,7 +982,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=2
       ;;
     commands-graphics-layer-raw-color-filter-fallback)
       run_case "$1" \
@@ -996,7 +1012,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=2
       ;;
     commands-forced-context-graphics-layer-render-effect)
       run_case "$1" \
@@ -1009,7 +1026,8 @@ run_named_case() {
         EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=2 \
         EXPECT_MIN_JBR_EFFECT_HANDLE_USES=1 \
-        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1
+        EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=2
       ;;
     commands-graphics-layer-raw-image-filter-effect-fallback)
       run_case "$1" \
