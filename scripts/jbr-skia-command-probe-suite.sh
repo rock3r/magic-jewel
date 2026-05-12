@@ -599,7 +599,16 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_CHILD=true \
         MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_DESCRIPTOR_USE_CORRUPTED op=47"
+      ;;
+    commands-invalid-shader-descriptor-use-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_PURE_COLOR=true \
+        MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_DESCRIPTOR_USE_CORRUPTED op=58"
       ;;
     commands-invalid-descriptor-use-after-evict-fallback)
       run_case "$1" \

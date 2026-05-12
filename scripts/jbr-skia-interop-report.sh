@@ -784,6 +784,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT Enables the Compose sweep-gradient rect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT Enables the Compose sweep-gradient round-rect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH Enables the Compose sweep-gradient path command replay probe. Default: false.
+  MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE Rewrites one shader or color-filter descriptor use to an undefined handle. Default: false.
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT Evicts one shader descriptor handle immediately before using it. Default: false.
   MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_USE_AFTER_EVICT Evicts one effect descriptor child handle immediately before using it. Default: false.
   MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_MISSING Rewrites one effect descriptor child to an undefined effect handle. Default: false.
