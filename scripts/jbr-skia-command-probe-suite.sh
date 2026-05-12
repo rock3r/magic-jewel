@@ -608,6 +608,23 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
       ;;
+    commands-invalid-effect-child-use-after-evict-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHAINED_RENDER_EFFECT=true \
+        MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_USE_AFTER_EVICT=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_EFFECT_CHILD_USE_AFTER_EVICT_CORRUPTED target=offsetImageFilterChild"
+      ;;
+    commands-invalid-path-effect-child-use-after-evict-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=true \
+        MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_USE_AFTER_EVICT=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_EFFECT_CHILD_USE_AFTER_EVICT_CORRUPTED target=chainPathEffectChild"
+      ;;
     commands-invalid-descriptor-version-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_PURE_COLOR=true \
