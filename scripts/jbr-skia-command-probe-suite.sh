@@ -625,6 +625,39 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_EFFECT_CHILD_USE_AFTER_EVICT_CORRUPTED target=chainPathEffectChild"
       ;;
+    commands-runtime-effect-color-filter-child-missing-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_CHILD=true \
+        MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_MISSING=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_EFFECT_CHILD_MISSING_CORRUPTED target=runtimeEffectColorFilterChild"
+      ;;
+    commands-offset-image-filter-child-missing-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHAINED_RENDER_EFFECT=true \
+        MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_MISSING=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_EFFECT_CHILD_MISSING_CORRUPTED target=offsetImageFilterChild"
+      ;;
+    commands-chain-path-effect-child-missing-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=true \
+        MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_MISSING=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_EFFECT_CHILD_MISSING_CORRUPTED target=chainPathEffectChild"
+      ;;
+    commands-shader-color-filter-effect-child-missing-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_IMAGE_SHADER_COLOR_FILTER=true \
+        MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_MISSING=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_EFFECT_CHILD_MISSING_CORRUPTED target=shaderColorFilterEffectChild"
+      ;;
     commands-invalid-descriptor-version-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_PURE_COLOR=true \
