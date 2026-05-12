@@ -662,6 +662,14 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_SHADER_HANDLE_TYPE_CORRUPTED target=compositeShaderDstChild"
       ;;
+    commands-composite-shader-child-missing-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER=true \
+        MAGIC_JEWEL_CORRUPT_SHADER_CHILD_MISSING=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_SHADER_CHILD_MISSING_CORRUPTED target=compositeShaderDstChild"
+      ;;
     commands-runtime-effect-shader-child-wrong-effect-type-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_CHILD_ONLY=true \
@@ -671,6 +679,22 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_SHADER_HANDLE_TYPE_CORRUPTED target=runtimeEffectShaderChild"
+      ;;
+    commands-transformed-shader-child-missing-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_TRANSFORMED_SHADER=true \
+        MAGIC_JEWEL_CORRUPT_SHADER_CHILD_MISSING=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_SHADER_CHILD_MISSING_CORRUPTED target=transformedShaderChild"
+      ;;
+    commands-shader-color-filter-shader-child-missing-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_IMAGE_SHADER_COLOR_FILTER=true \
+        MAGIC_JEWEL_CORRUPT_SHADER_CHILD_MISSING=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_SHADER_CHILD_MISSING_CORRUPTED target=shaderColorFilterShaderChild"
       ;;
     commands-color-filter-wrong-effect-type-fallback)
       run_case "$1" \
