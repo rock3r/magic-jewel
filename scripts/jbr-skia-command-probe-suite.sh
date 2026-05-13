@@ -711,7 +711,8 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_PURE_COLOR=true \
         MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_DESCRIPTOR_VERSION_CORRUPTED"
       ;;
     commands-shader-wrong-effect-type-fallback)
       run_case "$1" \
