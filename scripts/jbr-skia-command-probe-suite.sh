@@ -13,6 +13,7 @@ CASES="${CASES:-commands-live-animation commands-native-bridge-load-library comm
 if [[ -z "${CASES_WAS_SET}" ]]; then
   CASES="${CASES/commands-shader-color-filter-effect-child-missing-fallback commands-invalid-shader-descriptor-type-fallback/commands-shader-color-filter-effect-child-missing-fallback commands-invalid-effect-descriptor-type-fallback commands-invalid-effect-descriptor-version-fallback commands-invalid-effect-descriptor-payload-count-fallback commands-invalid-effect-descriptor-record-length-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-shader-descriptor-type-fallback commands-invalid-descriptor-version-fallback/commands-invalid-shader-descriptor-type-fallback commands-invalid-shader-descriptor-payload-count-fallback commands-invalid-shader-descriptor-record-length-fallback commands-invalid-descriptor-version-fallback}"
+  CASES="${CASES/commands-invalid-shader-descriptor-record-length-fallback commands-invalid-descriptor-version-fallback/commands-invalid-shader-descriptor-record-length-fallback commands-invalid-transformed-shader-descriptor-payload-count-fallback commands-invalid-descriptor-version-fallback}"
 fi
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -742,6 +743,14 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_SHADER_DESCRIPTOR_RECORD_LENGTH_CORRUPTED"
+      ;;
+    commands-invalid-transformed-shader-descriptor-payload-count-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_TRANSFORMED_SHADER=true \
+        MAGIC_JEWEL_CORRUPT_TRANSFORMED_SHADER_DESCRIPTOR_PAYLOAD_COUNT=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_TRANSFORMED_SHADER_DESCRIPTOR_PAYLOAD_COUNT_CORRUPTED"
       ;;
     commands-invalid-descriptor-version-fallback)
       run_case "$1" \
