@@ -17,7 +17,7 @@ case_group_cases() {
       echo "commands-live-animation commands-core-primitives commands-color-shader commands-color-filter-handle commands-color-matrix-filter commands-graphics-layer"
       ;;
     effect-descriptor-invalid)
-      echo "commands-invalid-effect-descriptor-type-fallback commands-invalid-effect-descriptor-version-fallback commands-invalid-effect-descriptor-payload-count-fallback commands-invalid-effect-descriptor-record-length-fallback commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-corner-path-effect-descriptor-radius-fallback"
+      echo "commands-invalid-effect-descriptor-type-fallback commands-invalid-effect-descriptor-version-fallback commands-invalid-effect-descriptor-payload-count-fallback commands-invalid-effect-descriptor-record-length-fallback commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-corner-path-effect-descriptor-radius-fallback commands-invalid-stamped-path-effect-descriptor-advance-fallback"
       ;;
     shader-descriptor-invalid)
       echo "commands-invalid-shader-descriptor-type-fallback commands-invalid-shader-descriptor-payload-count-fallback commands-invalid-shader-descriptor-record-length-fallback commands-invalid-transformed-shader-descriptor-payload-count-fallback commands-invalid-perlin-noise-shader-kind-fallback commands-invalid-perlin-noise-shader-frequency-fallback commands-invalid-perlin-noise-shader-octaves-fallback commands-invalid-perlin-noise-shader-tile-size-fallback commands-invalid-descriptor-version-fallback"
@@ -57,6 +57,7 @@ if [[ -z "${CASES_WAS_SET}" ]]; then
   CASES="${CASES/commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-corner-path-effect-descriptor-radius-fallback commands-invalid-shader-descriptor-type-fallback}"
+  CASES="${CASES/commands-invalid-corner-path-effect-descriptor-radius-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-corner-path-effect-descriptor-radius-fallback commands-invalid-stamped-path-effect-descriptor-advance-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-shader-descriptor-type-fallback commands-invalid-descriptor-version-fallback/commands-invalid-shader-descriptor-type-fallback commands-invalid-shader-descriptor-payload-count-fallback commands-invalid-shader-descriptor-record-length-fallback commands-invalid-descriptor-version-fallback}"
   CASES="${CASES/commands-invalid-shader-descriptor-record-length-fallback commands-invalid-descriptor-version-fallback/commands-invalid-shader-descriptor-record-length-fallback commands-invalid-transformed-shader-descriptor-payload-count-fallback commands-invalid-descriptor-version-fallback}"
   CASES="${CASES/commands-runtime-effect-invalid-uniform-schema-fallback/commands-runtime-effect-shader-source-hash-fallback commands-runtime-effect-invalid-uniform-schema-fallback}"
@@ -817,6 +818,14 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_CORNER_PATH_EFFECT_DESCRIPTOR_RADIUS_CORRUPTED"
+      ;;
+    commands-invalid-stamped-path-effect-descriptor-advance-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_PATH_EFFECT=true \
+        MAGIC_JEWEL_CORRUPT_STAMPED_PATH_EFFECT_DESCRIPTOR_ADVANCE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STAMPED_PATH_EFFECT_DESCRIPTOR_ADVANCE_CORRUPTED"
       ;;
     commands-invalid-shader-descriptor-type-fallback)
       run_case "$1" \
