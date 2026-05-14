@@ -14,6 +14,7 @@ if [[ -z "${CASES_WAS_SET}" ]]; then
   CASES="${CASES/commands-shader-color-filter-effect-child-missing-fallback commands-invalid-shader-descriptor-type-fallback/commands-shader-color-filter-effect-child-missing-fallback commands-invalid-effect-descriptor-type-fallback commands-invalid-effect-descriptor-version-fallback commands-invalid-effect-descriptor-payload-count-fallback commands-invalid-effect-descriptor-record-length-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-shader-descriptor-type-fallback commands-invalid-descriptor-version-fallback/commands-invalid-shader-descriptor-type-fallback commands-invalid-shader-descriptor-payload-count-fallback commands-invalid-shader-descriptor-record-length-fallback commands-invalid-descriptor-version-fallback}"
   CASES="${CASES/commands-invalid-shader-descriptor-record-length-fallback commands-invalid-descriptor-version-fallback/commands-invalid-shader-descriptor-record-length-fallback commands-invalid-transformed-shader-descriptor-payload-count-fallback commands-invalid-descriptor-version-fallback}"
+  CASES="${CASES/commands-runtime-effect-invalid-uniform-schema-fallback/commands-runtime-effect-shader-source-hash-fallback commands-runtime-effect-invalid-uniform-schema-fallback}"
 fi
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -439,6 +440,14 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS=1 \
         EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE=shader
+      ;;
+    commands-runtime-effect-shader-source-hash-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_PURE_COLOR=true \
+        MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_SOURCE_HASH=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_SOURCE_HASH_CORRUPTED"
       ;;
     commands-runtime-effect-invalid-uniform-schema-fallback)
       run_case "$1" \
