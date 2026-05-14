@@ -15,6 +15,7 @@ if [[ -z "${CASES_WAS_SET}" ]]; then
   CASES="${CASES/commands-invalid-shader-descriptor-type-fallback commands-invalid-descriptor-version-fallback/commands-invalid-shader-descriptor-type-fallback commands-invalid-shader-descriptor-payload-count-fallback commands-invalid-shader-descriptor-record-length-fallback commands-invalid-descriptor-version-fallback}"
   CASES="${CASES/commands-invalid-shader-descriptor-record-length-fallback commands-invalid-descriptor-version-fallback/commands-invalid-shader-descriptor-record-length-fallback commands-invalid-transformed-shader-descriptor-payload-count-fallback commands-invalid-descriptor-version-fallback}"
   CASES="${CASES/commands-runtime-effect-invalid-uniform-schema-fallback/commands-runtime-effect-shader-source-hash-fallback commands-runtime-effect-invalid-uniform-schema-fallback}"
+  CASES="${CASES/commands-invalid-transformed-shader-descriptor-payload-count-fallback commands-invalid-descriptor-version-fallback/commands-invalid-transformed-shader-descriptor-payload-count-fallback commands-invalid-perlin-noise-shader-kind-fallback commands-invalid-perlin-noise-shader-frequency-fallback commands-invalid-perlin-noise-shader-octaves-fallback commands-invalid-perlin-noise-shader-tile-size-fallback commands-invalid-descriptor-version-fallback}"
 fi
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
@@ -760,6 +761,38 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_TRANSFORMED_SHADER_DESCRIPTOR_PAYLOAD_COUNT_CORRUPTED"
+      ;;
+    commands-invalid-perlin-noise-shader-kind-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_NOISE_SHADER=true \
+        MAGIC_JEWEL_CORRUPT_PERLIN_NOISE_SHADER_KIND=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_PERLIN_NOISE_SHADER_KIND_CORRUPTED"
+      ;;
+    commands-invalid-perlin-noise-shader-frequency-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_NOISE_SHADER=true \
+        MAGIC_JEWEL_CORRUPT_PERLIN_NOISE_SHADER_FREQUENCY=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_PERLIN_NOISE_SHADER_FREQUENCY_CORRUPTED"
+      ;;
+    commands-invalid-perlin-noise-shader-octaves-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_NOISE_SHADER=true \
+        MAGIC_JEWEL_CORRUPT_PERLIN_NOISE_SHADER_OCTAVES=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_PERLIN_NOISE_SHADER_OCTAVES_CORRUPTED"
+      ;;
+    commands-invalid-perlin-noise-shader-tile-size-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_NOISE_SHADER=true \
+        MAGIC_JEWEL_CORRUPT_PERLIN_NOISE_SHADER_TILE_SIZE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_PERLIN_NOISE_SHADER_TILE_SIZE_CORRUPTED"
       ;;
     commands-invalid-descriptor-version-fallback)
       run_case "$1" \
