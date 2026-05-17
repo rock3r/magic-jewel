@@ -13,6 +13,10 @@ JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
 JBR_SKIA_NATIVE_TEXT=${JBR_SKIA_NATIVE_TEXT:-false}
 MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM:-false}
 MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE=${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE:-false}
+MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT=${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT:-false}
+MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH=${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH:-false}
+MAGIC_JEWEL_CORRUPT_TEXT_FONT_SLANT=${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SLANT:-false}
+MAGIC_JEWEL_CORRUPT_TEXT_FONT_FAMILY_COUNT=${MAGIC_JEWEL_CORRUPT_TEXT_FONT_FAMILY_COUNT:-false}
 MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE=${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE:-false}
 MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT=${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT:-false}
 MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_USE_AFTER_EVICT=${MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_USE_AFTER_EVICT:-false}
@@ -130,6 +134,18 @@ case "${JBR_SKIA_RENDER_MODE}" in
     fi
     if [[ "${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE}" == "true" ]]; then
       JBR_ARGS+=("-Dskiko.jbr.interop.corruptTextFontSizeForTesting=true")
+    fi
+    if [[ "${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT}" == "true" ]]; then
+      JBR_ARGS+=("-Dskiko.jbr.interop.corruptTextFontWeightForTesting=true")
+    fi
+    if [[ "${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH}" == "true" ]]; then
+      JBR_ARGS+=("-Dskiko.jbr.interop.corruptTextFontWidthForTesting=true")
+    fi
+    if [[ "${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SLANT}" == "true" ]]; then
+      JBR_ARGS+=("-Dskiko.jbr.interop.corruptTextFontSlantForTesting=true")
+    fi
+    if [[ "${MAGIC_JEWEL_CORRUPT_TEXT_FONT_FAMILY_COUNT}" == "true" ]]; then
+      JBR_ARGS+=("-Dskiko.jbr.interop.corruptTextFontFamilyCountForTesting=true")
     fi
     if [[ "${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE}" == "true" ]]; then
       JBR_ARGS+=("-Dskiko.jbr.interop.corruptDescriptorUseForTesting=true")
