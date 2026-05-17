@@ -374,6 +374,21 @@ fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_TEXT_FONT_FAMILY_COUNT+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_FAMILY_COUNT=false
 fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SIZE+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SIZE=false
+fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WEIGHT+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WEIGHT=false
+fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WIDTH+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WIDTH=false
+fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SLANT+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SLANT=false
+fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_FAMILY_COUNT+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_FAMILY_COUNT=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE=false
 fi
@@ -766,6 +781,11 @@ export MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_SLANT
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_FAMILY_COUNT
+export MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SIZE
+export MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WEIGHT
+export MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WIDTH
+export MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SLANT
+export MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_FAMILY_COUNT
 export MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE
 export MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT
 export MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_USE_AFTER_EVICT
@@ -1090,6 +1110,11 @@ Environment:
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH Corrupts one native text command font width after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_SLANT Corrupts one native text command font slant after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_FAMILY_COUNT Corrupts one native text command font-family count after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SIZE Corrupts one native paragraph command font size after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WEIGHT Corrupts one native paragraph command font weight after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WIDTH Corrupts one native paragraph command font width after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SLANT Corrupts one native paragraph command font slant after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_FAMILY_COUNT Corrupts one native paragraph command font-family count after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE Rewrites one shader or color-filter descriptor use to an undefined handle. Default: false.
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT Evicts one shader descriptor handle immediately before using it. Default: false.
   MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_USE_AFTER_EVICT Evicts one effect descriptor child handle immediately before using it. Default: false.
@@ -2100,6 +2125,11 @@ write_report() {
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_SLANT: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SLANT}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_FAMILY_COUNT: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_FAMILY_COUNT}"
+    echo "- MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SIZE: ${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SIZE}"
+    echo "- MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WEIGHT: ${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WEIGHT}"
+    echo "- MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WIDTH: ${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_WIDTH}"
+    echo "- MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SLANT: ${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_SLANT}"
+    echo "- MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_FAMILY_COUNT: ${MAGIC_JEWEL_CORRUPT_PARAGRAPH_FONT_FAMILY_COUNT}"
     echo "- MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE: ${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE}"
     echo "- MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT: ${MAGIC_JEWEL_CORRUPT_DESCRIPTOR_USE_AFTER_EVICT}"
     echo "- MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_USE_AFTER_EVICT: ${MAGIC_JEWEL_CORRUPT_EFFECT_CHILD_USE_AFTER_EVICT}"
