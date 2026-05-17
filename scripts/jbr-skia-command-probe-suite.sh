@@ -34,6 +34,9 @@ case_group_cases() {
     native-text)
       echo "commands-native-custom-font-text-image commands-native-generic-font-text commands-native-loaded-font-data-text commands-native-resource-font-text commands-native-system-font-text commands-resize-native-generic-font-text commands-resize-native-loaded-font-data-text commands-resize-native-resource-font-text commands-resize-native-system-font-text commands-forced-context-native-custom-font-text-image commands-forced-context-native-generic-font-text commands-forced-context-native-loaded-font-data-text commands-forced-context-native-resource-font-text commands-forced-context-native-system-font-text"
       ;;
+    native-text-invalid)
+      echo "commands-invalid-text-font-size-fallback"
+      ;;
     graphics-layer)
       echo "commands-graphics-layer commands-graphics-layer-modulate-alpha commands-graphics-layer-offscreen commands-graphics-layer-clip commands-graphics-layer-round-clip commands-graphics-layer-path-clip commands-graphics-layer-blend-mode commands-graphics-layer-color-filter commands-graphics-layer-color-matrix-filter commands-graphics-layer-render-effect commands-graphics-layer-offset-effect commands-graphics-layer-chained-render-effect commands-graphics-layer-shadow commands-graphics-layer-round-shadow commands-graphics-layer-path-shadow commands-graphics-layer-rotationx commands-graphics-layer-rotationy commands-graphics-layer-rotationxy commands-graphics-layer-scale-translate commands-graphics-layer-near-camera commands-graphics-layer-offcenter-pivot"
       ;;
@@ -51,6 +54,7 @@ if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   CASES="${CASES# }"
 fi
 if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+  CASES="${CASES/commands-native-generic-font-text commands-native-loaded-font-data-text/commands-native-generic-font-text commands-invalid-text-font-size-fallback commands-native-loaded-font-data-text}"
   CASES="${CASES/commands-shader-color-filter-effect-child-missing-fallback commands-invalid-shader-descriptor-type-fallback/commands-shader-color-filter-effect-child-missing-fallback commands-invalid-effect-descriptor-type-fallback commands-invalid-effect-descriptor-version-fallback commands-invalid-effect-descriptor-payload-count-fallback commands-invalid-effect-descriptor-record-length-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-effect-descriptor-record-length-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-effect-descriptor-record-length-fallback commands-invalid-lighting-filter-descriptor-payload-count-fallback commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-shader-descriptor-type-fallback}"
@@ -203,6 +207,15 @@ run_named_case() {
         EXPECT_MIN_IMAGE_REFS=1 \
         EXPECT_MIN_TEXT_COMMANDS=3 \
         EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS=1
+      ;;
+    commands-invalid-text-font-size-fallback)
+      run_case "$1" \
+        JBR_SKIA_NATIVE_TEXT=true \
+        MAGIC_JEWEL_GENERIC_FONT_TEXT=true \
+        MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_TEXT_FONT_SIZE_CORRUPTED"
       ;;
     commands-native-loaded-font-data-text)
       run_case "$1" \
