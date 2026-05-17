@@ -23,7 +23,7 @@ case_group_cases() {
       echo "commands-invalid-shader-descriptor-type-fallback commands-invalid-shader-descriptor-payload-count-fallback commands-invalid-color-shader-descriptor-payload-count-fallback commands-invalid-shader-color-filter-descriptor-payload-count-fallback commands-invalid-shader-descriptor-record-length-fallback commands-invalid-transformed-shader-descriptor-payload-count-fallback commands-invalid-composite-shader-descriptor-blend-mode-fallback commands-invalid-linear-gradient-shader-descriptor-tile-mode-fallback commands-invalid-linear-gradient-shader-descriptor-stop-order-fallback commands-invalid-radial-gradient-shader-descriptor-radius-fallback commands-invalid-radial-gradient-shader-descriptor-tile-mode-fallback commands-invalid-radial-gradient-shader-descriptor-stop-order-fallback commands-invalid-sweep-gradient-shader-descriptor-color-count-fallback commands-invalid-sweep-gradient-shader-descriptor-stop-order-fallback commands-invalid-image-shader-descriptor-width-fallback commands-invalid-image-shader-descriptor-max-width-fallback commands-invalid-image-shader-descriptor-height-fallback commands-invalid-image-shader-descriptor-max-height-fallback commands-invalid-image-shader-descriptor-tile-mode-x-fallback commands-invalid-image-shader-descriptor-tile-mode-y-fallback commands-invalid-perlin-noise-shader-kind-fallback commands-invalid-perlin-noise-shader-frequency-fallback commands-invalid-perlin-noise-shader-octaves-fallback commands-invalid-perlin-noise-shader-zero-octaves-fallback commands-invalid-perlin-noise-shader-tile-size-fallback commands-invalid-perlin-noise-shader-tile-height-fallback commands-invalid-perlin-noise-shader-negative-tile-size-fallback commands-invalid-perlin-noise-shader-negative-tile-height-fallback commands-invalid-descriptor-version-fallback"
       ;;
     gradient-invalid)
-      echo "commands-invalid-linear-gradient-stroke-width-fallback commands-invalid-linear-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-stroke-width-fallback commands-invalid-radial-gradient-round-rect-stroke-width-fallback commands-invalid-sweep-gradient-stroke-width-fallback commands-invalid-sweep-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-radius-fallback commands-invalid-radial-gradient-round-rect-radius-fallback commands-invalid-radial-gradient-stroke-radius-fallback commands-invalid-radial-gradient-round-rect-stroke-radius-fallback"
+      echo "commands-invalid-linear-gradient-stroke-width-fallback commands-invalid-linear-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-stroke-width-fallback commands-invalid-radial-gradient-round-rect-stroke-width-fallback commands-invalid-sweep-gradient-stroke-width-fallback commands-invalid-sweep-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-radius-fallback commands-invalid-radial-gradient-round-rect-radius-fallback commands-invalid-radial-gradient-stroke-radius-fallback commands-invalid-radial-gradient-round-rect-stroke-radius-fallback commands-invalid-radial-gradient-tile-mode-fallback commands-invalid-radial-gradient-round-rect-tile-mode-fallback commands-invalid-radial-gradient-stroke-tile-mode-fallback commands-invalid-radial-gradient-round-rect-stroke-tile-mode-fallback"
       ;;
     runtime-effect-invalid)
       echo "commands-runtime-effect-shader-source-hash-fallback commands-runtime-effect-shader-sksl-length-fallback commands-runtime-effect-shader-uniform-float-count-fallback commands-runtime-effect-shader-negative-uniform-float-count-fallback commands-runtime-effect-shader-child-count-fallback commands-runtime-effect-shader-negative-child-count-fallback commands-runtime-effect-shader-named-uniform-count-fallback commands-runtime-effect-shader-negative-named-uniform-count-fallback commands-runtime-effect-shader-named-child-count-fallback commands-runtime-effect-shader-negative-named-child-count-fallback commands-runtime-effect-color-filter-sksl-length-fallback commands-runtime-effect-color-filter-uniform-float-count-fallback commands-runtime-effect-color-filter-negative-uniform-float-count-fallback commands-runtime-effect-color-filter-child-count-fallback commands-runtime-effect-color-filter-negative-child-count-fallback commands-runtime-effect-color-filter-named-uniform-count-fallback commands-runtime-effect-color-filter-negative-named-uniform-count-fallback commands-runtime-effect-color-filter-named-child-count-fallback commands-runtime-effect-color-filter-negative-named-child-count-fallback commands-runtime-effect-invalid-uniform-schema-fallback commands-runtime-effect-invalid-child-schema-fallback commands-runtime-effect-invalid-nested-child-fallback commands-runtime-effect-color-filter-invalid-uniform-schema-fallback commands-runtime-effect-color-filter-invalid-child-schema-fallback commands-runtime-effect-color-filter-invalid-nested-child-fallback commands-runtime-effect-color-filter-compile-fallback commands-runtime-effect-color-filter-build-fallback commands-runtime-effect-color-filter-child-type-fallback commands-runtime-effect-compile-fallback commands-runtime-effect-build-fallback commands-runtime-effect-child-type-fallback"
@@ -58,7 +58,7 @@ if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
 fi
 if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   CASES="${CASES/commands-native-generic-font-text commands-native-loaded-font-data-text/commands-native-generic-font-text commands-invalid-text-font-size-fallback commands-invalid-text-font-weight-fallback commands-invalid-text-font-width-fallback commands-invalid-text-font-slant-fallback commands-invalid-text-font-family-count-fallback commands-invalid-paragraph-font-size-fallback commands-invalid-paragraph-font-weight-fallback commands-invalid-paragraph-font-width-fallback commands-invalid-paragraph-font-slant-fallback commands-invalid-paragraph-font-family-count-fallback commands-native-loaded-font-data-text}"
-  CASES="${CASES/commands-gradient-stroke commands-image-filter/commands-gradient-stroke commands-invalid-linear-gradient-stroke-width-fallback commands-invalid-linear-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-stroke-width-fallback commands-invalid-radial-gradient-round-rect-stroke-width-fallback commands-invalid-sweep-gradient-stroke-width-fallback commands-invalid-sweep-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-radius-fallback commands-invalid-radial-gradient-round-rect-radius-fallback commands-invalid-radial-gradient-stroke-radius-fallback commands-invalid-radial-gradient-round-rect-stroke-radius-fallback commands-image-filter}"
+  CASES="${CASES/commands-gradient-stroke commands-image-filter/commands-gradient-stroke commands-invalid-linear-gradient-stroke-width-fallback commands-invalid-linear-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-stroke-width-fallback commands-invalid-radial-gradient-round-rect-stroke-width-fallback commands-invalid-sweep-gradient-stroke-width-fallback commands-invalid-sweep-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-radius-fallback commands-invalid-radial-gradient-round-rect-radius-fallback commands-invalid-radial-gradient-stroke-radius-fallback commands-invalid-radial-gradient-round-rect-stroke-radius-fallback commands-invalid-radial-gradient-tile-mode-fallback commands-invalid-radial-gradient-round-rect-tile-mode-fallback commands-invalid-radial-gradient-stroke-tile-mode-fallback commands-invalid-radial-gradient-round-rect-stroke-tile-mode-fallback commands-image-filter}"
   CASES="${CASES/commands-shader-color-filter-effect-child-missing-fallback commands-invalid-shader-descriptor-type-fallback/commands-shader-color-filter-effect-child-missing-fallback commands-invalid-effect-descriptor-type-fallback commands-invalid-effect-descriptor-version-fallback commands-invalid-effect-descriptor-payload-count-fallback commands-invalid-effect-descriptor-record-length-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-effect-descriptor-record-length-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-effect-descriptor-record-length-fallback commands-invalid-lighting-filter-descriptor-payload-count-fallback commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-shader-descriptor-type-fallback}"
@@ -1663,6 +1663,38 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RADIAL_GRADIENT_ROUND_RECT_STROKE_RADIUS_CORRUPTED"
+      ;;
+    commands-invalid-radial-gradient-tile-mode-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=true \
+        MAGIC_JEWEL_CORRUPT_RADIAL_GRADIENT_TILE_MODE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RADIAL_GRADIENT_TILE_MODE_CORRUPTED"
+      ;;
+    commands-invalid-radial-gradient-round-rect-tile-mode-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT=true \
+        MAGIC_JEWEL_CORRUPT_RADIAL_GRADIENT_ROUND_RECT_TILE_MODE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RADIAL_GRADIENT_ROUND_RECT_TILE_MODE_CORRUPTED"
+      ;;
+    commands-invalid-radial-gradient-stroke-tile-mode-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=true \
+        MAGIC_JEWEL_CORRUPT_RADIAL_GRADIENT_STROKE_TILE_MODE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RADIAL_GRADIENT_STROKE_TILE_MODE_CORRUPTED"
+      ;;
+    commands-invalid-radial-gradient-round-rect-stroke-tile-mode-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT=true \
+        MAGIC_JEWEL_CORRUPT_RADIAL_GRADIENT_ROUND_RECT_STROKE_TILE_MODE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RADIAL_GRADIENT_ROUND_RECT_STROKE_TILE_MODE_CORRUPTED"
       ;;
     commands-color-filter|commands-color-filter-fallback)
       run_case "$1" \
