@@ -20,7 +20,7 @@ case_group_cases() {
       echo "commands-invalid-clip-path-verb-fallback commands-invalid-draw-path-verb-fallback commands-invalid-draw-path-path-effect-verb-fallback commands-invalid-stroke-path-dash-path-effect-verb-fallback commands-invalid-draw-shadow-path-verb-fallback"
       ;;
     effect-descriptor-invalid)
-      echo "commands-invalid-effect-descriptor-type-fallback commands-invalid-effect-descriptor-version-fallback commands-invalid-effect-descriptor-payload-count-fallback commands-invalid-effect-descriptor-record-length-fallback commands-invalid-lighting-filter-descriptor-payload-count-fallback commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-blur-image-filter-descriptor-negative-sigma-fallback commands-invalid-blur-image-filter-descriptor-tile-mode-fallback commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-corner-path-effect-descriptor-radius-fallback commands-invalid-corner-path-effect-descriptor-negative-radius-fallback commands-invalid-stamped-path-effect-descriptor-advance-fallback commands-invalid-stamped-path-effect-descriptor-zero-advance-fallback commands-invalid-stamped-path-effect-descriptor-phase-fallback commands-invalid-stamped-path-effect-descriptor-negative-phase-fallback commands-invalid-stamped-path-effect-descriptor-style-fallback commands-invalid-stamped-path-effect-descriptor-fill-type-fallback commands-invalid-stamped-path-effect-descriptor-path-data-length-fallback commands-invalid-stamped-path-effect-descriptor-negative-path-data-length-fallback commands-invalid-stamped-path-effect-descriptor-path-verb-fallback commands-invalid-chain-path-effect-descriptor-payload-count-fallback"
+      echo "commands-invalid-effect-descriptor-type-fallback commands-invalid-effect-descriptor-version-fallback commands-invalid-effect-descriptor-payload-count-fallback commands-invalid-effect-descriptor-record-length-fallback commands-invalid-lighting-filter-descriptor-payload-count-fallback commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-blur-with-input-image-filter-descriptor-sigma-fallback commands-invalid-blur-image-filter-descriptor-negative-sigma-fallback commands-invalid-blur-with-input-image-filter-descriptor-negative-sigma-fallback commands-invalid-blur-image-filter-descriptor-tile-mode-fallback commands-invalid-blur-with-input-image-filter-descriptor-tile-mode-fallback commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-offset-with-input-image-filter-descriptor-delta-fallback commands-invalid-corner-path-effect-descriptor-radius-fallback commands-invalid-corner-path-effect-descriptor-negative-radius-fallback commands-invalid-stamped-path-effect-descriptor-advance-fallback commands-invalid-stamped-path-effect-descriptor-zero-advance-fallback commands-invalid-stamped-path-effect-descriptor-phase-fallback commands-invalid-stamped-path-effect-descriptor-negative-phase-fallback commands-invalid-stamped-path-effect-descriptor-style-fallback commands-invalid-stamped-path-effect-descriptor-fill-type-fallback commands-invalid-stamped-path-effect-descriptor-path-data-length-fallback commands-invalid-stamped-path-effect-descriptor-negative-path-data-length-fallback commands-invalid-stamped-path-effect-descriptor-path-verb-fallback commands-invalid-chain-path-effect-descriptor-payload-count-fallback"
       ;;
     shader-descriptor-invalid)
       echo "commands-invalid-shader-descriptor-type-fallback commands-invalid-shader-descriptor-payload-count-fallback commands-invalid-color-shader-descriptor-payload-count-fallback commands-invalid-shader-color-filter-descriptor-payload-count-fallback commands-invalid-shader-descriptor-record-length-fallback commands-invalid-transformed-shader-descriptor-payload-count-fallback commands-invalid-composite-shader-descriptor-blend-mode-fallback commands-invalid-linear-gradient-shader-descriptor-tile-mode-fallback commands-invalid-linear-gradient-shader-descriptor-stop-order-fallback commands-invalid-radial-gradient-shader-descriptor-radius-fallback commands-invalid-radial-gradient-shader-descriptor-tile-mode-fallback commands-invalid-radial-gradient-shader-descriptor-stop-order-fallback commands-invalid-sweep-gradient-shader-descriptor-color-count-fallback commands-invalid-sweep-gradient-shader-descriptor-stop-order-fallback commands-invalid-image-shader-descriptor-width-fallback commands-invalid-image-shader-descriptor-max-width-fallback commands-invalid-image-shader-descriptor-height-fallback commands-invalid-image-shader-descriptor-max-height-fallback commands-invalid-image-shader-descriptor-tile-mode-x-fallback commands-invalid-image-shader-descriptor-tile-mode-y-fallback commands-invalid-perlin-noise-shader-kind-fallback commands-invalid-perlin-noise-shader-frequency-fallback commands-invalid-perlin-noise-shader-octaves-fallback commands-invalid-perlin-noise-shader-zero-octaves-fallback commands-invalid-perlin-noise-shader-tile-size-fallback commands-invalid-perlin-noise-shader-tile-height-fallback commands-invalid-perlin-noise-shader-negative-tile-size-fallback commands-invalid-perlin-noise-shader-negative-tile-height-fallback commands-invalid-descriptor-version-fallback"
@@ -70,8 +70,8 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   CASES="${CASES/commands-invalid-effect-descriptor-record-length-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-effect-descriptor-record-length-fallback commands-invalid-lighting-filter-descriptor-payload-count-fallback commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-tint-color-filter-descriptor-blend-mode-fallback commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-color-matrix-filter-descriptor-payload-fallback commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-shader-descriptor-type-fallback}"
-  CASES="${CASES/commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-blur-image-filter-descriptor-negative-sigma-fallback commands-invalid-blur-image-filter-descriptor-tile-mode-fallback commands-invalid-shader-descriptor-type-fallback}"
-  CASES="${CASES/commands-invalid-blur-image-filter-descriptor-tile-mode-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-blur-image-filter-descriptor-tile-mode-fallback commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-shader-descriptor-type-fallback}"
+  CASES="${CASES/commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-blur-image-filter-descriptor-sigma-fallback commands-invalid-blur-with-input-image-filter-descriptor-sigma-fallback commands-invalid-blur-image-filter-descriptor-negative-sigma-fallback commands-invalid-blur-with-input-image-filter-descriptor-negative-sigma-fallback commands-invalid-blur-image-filter-descriptor-tile-mode-fallback commands-invalid-blur-with-input-image-filter-descriptor-tile-mode-fallback commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-offset-with-input-image-filter-descriptor-delta-fallback commands-invalid-shader-descriptor-type-fallback}"
+  CASES="${CASES/commands-invalid-blur-image-filter-descriptor-tile-mode-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-blur-image-filter-descriptor-tile-mode-fallback commands-invalid-blur-with-input-image-filter-descriptor-tile-mode-fallback commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-offset-with-input-image-filter-descriptor-delta-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-offset-image-filter-descriptor-delta-fallback commands-invalid-corner-path-effect-descriptor-radius-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-corner-path-effect-descriptor-radius-fallback commands-invalid-shader-descriptor-type-fallback/commands-invalid-corner-path-effect-descriptor-radius-fallback commands-invalid-corner-path-effect-descriptor-negative-radius-fallback commands-invalid-stamped-path-effect-descriptor-advance-fallback commands-invalid-stamped-path-effect-descriptor-zero-advance-fallback commands-invalid-stamped-path-effect-descriptor-phase-fallback commands-invalid-stamped-path-effect-descriptor-negative-phase-fallback commands-invalid-stamped-path-effect-descriptor-style-fallback commands-invalid-stamped-path-effect-descriptor-fill-type-fallback commands-invalid-stamped-path-effect-descriptor-path-data-length-fallback commands-invalid-stamped-path-effect-descriptor-negative-path-data-length-fallback commands-invalid-stamped-path-effect-descriptor-path-verb-fallback commands-invalid-chain-path-effect-descriptor-payload-count-fallback commands-invalid-shader-descriptor-type-fallback}"
   CASES="${CASES/commands-invalid-shader-descriptor-type-fallback commands-invalid-descriptor-version-fallback/commands-invalid-shader-descriptor-type-fallback commands-invalid-shader-descriptor-payload-count-fallback commands-invalid-color-shader-descriptor-payload-count-fallback commands-invalid-shader-color-filter-descriptor-payload-count-fallback commands-invalid-shader-descriptor-record-length-fallback commands-invalid-descriptor-version-fallback}"
@@ -1368,10 +1368,28 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_BLUR_IMAGE_FILTER_DESCRIPTOR_SIGMA_CORRUPTED"
       ;;
+    commands-invalid-blur-with-input-image-filter-descriptor-sigma-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLUR_CHAINED_RENDER_EFFECT=true \
+        MAGIC_JEWEL_CORRUPT_BLUR_IMAGE_FILTER_DESCRIPTOR_SIGMA=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_BLUR_IMAGE_FILTER_DESCRIPTOR_SIGMA_CORRUPTED"
+      ;;
     commands-invalid-blur-image-filter-descriptor-negative-sigma-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RENDER_EFFECT=true \
+        MAGIC_JEWEL_CORRUPT_BLUR_IMAGE_FILTER_DESCRIPTOR_NEGATIVE_SIGMA=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_BLUR_IMAGE_FILTER_DESCRIPTOR_NEGATIVE_SIGMA_CORRUPTED"
+      ;;
+    commands-invalid-blur-with-input-image-filter-descriptor-negative-sigma-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLUR_CHAINED_RENDER_EFFECT=true \
         MAGIC_JEWEL_CORRUPT_BLUR_IMAGE_FILTER_DESCRIPTOR_NEGATIVE_SIGMA=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
@@ -1386,10 +1404,28 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_BLUR_IMAGE_FILTER_DESCRIPTOR_TILE_MODE_CORRUPTED"
       ;;
+    commands-invalid-blur-with-input-image-filter-descriptor-tile-mode-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLUR_CHAINED_RENDER_EFFECT=true \
+        MAGIC_JEWEL_CORRUPT_BLUR_IMAGE_FILTER_DESCRIPTOR_TILE_MODE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_BLUR_IMAGE_FILTER_DESCRIPTOR_TILE_MODE_CORRUPTED"
+      ;;
     commands-invalid-offset-image-filter-descriptor-delta-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_OFFSET_EFFECT=true \
+        MAGIC_JEWEL_CORRUPT_OFFSET_IMAGE_FILTER_DESCRIPTOR_DELTA=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_OFFSET_IMAGE_FILTER_DESCRIPTOR_DELTA_CORRUPTED"
+      ;;
+    commands-invalid-offset-with-input-image-filter-descriptor-delta-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHAINED_RENDER_EFFECT=true \
         MAGIC_JEWEL_CORRUPT_OFFSET_IMAGE_FILTER_DESCRIPTOR_DELTA=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
