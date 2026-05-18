@@ -1405,12 +1405,21 @@ private fun MagicJewelApp() {
                         colorStops = listOf(0f, 0.52f, 1f),
                         tileMode = TileMode.Clamp,
                     )
+                    val accentChild = LinearGradientShader(
+                        from = topLeft,
+                        to = topLeft + Offset(152f, 112f),
+                        colors = listOf(Color(0xFF7C3AED), Color(0xFF14B8A6), Color(0xFFFFF7AD)),
+                        colorStops = listOf(0f, 0.46f, 1f),
+                        tileMode = TileMode.Clamp,
+                    )
                     val shader = RuntimeEffectShader(
                         sksl = """
                             uniform shader content;
+                            uniform shader accent;
                             half4 main(float2 p) {
                                 half4 base = content.eval(p);
-                                return half4(base.bgr, 1.0);
+                                half4 glow = accent.eval(p);
+                                return half4(mix(base.bgr, glow.rgb, 0.28), 1.0);
                             }
                         """.trimIndent(),
                         namedChildren = listOf(
@@ -1430,7 +1439,8 @@ private fun MagicJewelApp() {
                                 } else {
                                     child
                                 },
-                            )
+                            ),
+                            RuntimeEffectChild("accent", accentChild),
                         ),
                     )
                     drawRect(
@@ -1520,21 +1530,32 @@ private fun MagicJewelApp() {
                         colorStops = listOf(0f, 0.48f, 1f),
                         tileMode = TileMode.Clamp,
                     )
+                    val accentChild = RadialGradientShader(
+                        center = topLeft + Offset(74f, 50f),
+                        radius = 96f,
+                        colors = listOf(Color(0xFF0F172A), Color(0xFF38BDF8), Color(0xFFF8FAFC)),
+                        colorStops = listOf(0f, 0.58f, 1f),
+                        tileMode = TileMode.Clamp,
+                    )
                     val shader = RuntimeEffectShader(
                         sksl = """
                             uniform shader content;
+                            uniform shader accent;
                             uniform float phase;
                             half4 main(float2 p) {
                                 half4 base = content.eval(p);
+                                half4 glow = accent.eval(p);
                                 float wave = 0.5 + 0.5 * sin(p.x * 0.045 + phase * 6.28318);
                                 float band = smoothstep(0.15, 0.85, wave);
-                                return half4(mix(base.rgb, half3(band, 0.18 + p.y * 0.003, 1.0 - band), 0.55), 1.0);
+                                half3 tint = mix(half3(band, 0.18 + p.y * 0.003, 1.0 - band), glow.rgb, 0.25);
+                                return half4(mix(base.rgb, tint, 0.55), 1.0);
                             }
                         """.trimIndent(),
                         uniforms = floatArrayOf(phase),
                         uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
                         namedChildren = listOf(
-                            RuntimeEffectChild(if (composeRuntimeEffectBadChildEnabled) "missingContent" else "content", child)
+                            RuntimeEffectChild(if (composeRuntimeEffectBadChildEnabled) "missingContent" else "content", child),
+                            RuntimeEffectChild("accent", accentChild),
                         ),
                     )
                     drawRect(
@@ -1694,10 +1715,12 @@ private fun MagicJewelApp() {
                                 colorFilter = RuntimeEffectColorFilter(
                                     sksl = """
                                         uniform colorFilter content;
+                                        uniform colorFilter accent;
                                         uniform float phase;
                                         half4 main(half4 inColor) {
                                             half4 base = content.eval(inColor);
-                                            return half4(base.r, base.g * phase, base.b, base.a);
+                                            half4 glow = accent.eval(inColor);
+                                            return half4(base.r, base.g * phase, mix(base.b, glow.b, 0.35), base.a);
                                         }
                                     """.trimIndent(),
                                     uniforms = floatArrayOf(phase),
@@ -1732,7 +1755,11 @@ private fun MagicJewelApp() {
                                                     } else {
                                                         ColorFilter.tint(Color(0xFFEF476F), BlendMode.SrcIn)
                                                     },
-                                                )
+                                                ),
+                                                RuntimeEffectColorFilterChild(
+                                                    "accent",
+                                                    ColorFilter.tint(Color(0xFF118AB2), BlendMode.SrcIn),
+                                                ),
                                             )
                                         },
                                 )
