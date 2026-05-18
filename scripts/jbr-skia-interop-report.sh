@@ -25,6 +25,7 @@ CAPTURE_OLD_SCREENSHOT="${CAPTURE_OLD_SCREENSHOT:-false}"
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
 EXPECT_COMMAND_FALLBACK_MARKER="${EXPECT_COMMAND_FALLBACK_MARKER:-}"
+EXPECT_SCREENSHOT_ASSERTION="${EXPECT_SCREENSHOT_ASSERTION:-true}"
 EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
 EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS="${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS:-0}"
 EXPECT_MIN_IMAGE_REFS="${EXPECT_MIN_IMAGE_REFS:-0}"
@@ -1294,6 +1295,7 @@ Environment:
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
   EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
   EXPECT_COMMAND_FALLBACK_MARKER Optional fixed string that must appear in the new renderer log. Default: disabled.
+  EXPECT_SCREENSHOT_ASSERTION If false, strict validation skips the main-window screenshot assertion. Default: true.
   EXPECT_MIN_TEXT_COMMANDS In strict command mode, require at least this many simple text commands in one CMP recorder frame. Default: 0.
   EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS In strict command mode, require at least this many paragraph text commands in one CMP recorder frame. Default: 0.
   EXPECT_MIN_IMAGE_REFS In strict command mode, require at least this many image refs in one CMP recorder frame. Default: 0.
@@ -2247,6 +2249,7 @@ write_machine_summary() {
     echo "expect_command_fallback=${EXPECT_COMMAND_FALLBACK}"
     echo "expect_command_fallback_reason=${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "expect_command_fallback_marker=${EXPECT_COMMAND_FALLBACK_MARKER}"
+    echo "expect_screenshot_assertion=${EXPECT_SCREENSHOT_ASSERTION}"
     echo "fallback_old_count=$(grep -c "${FALLBACK_MARKER}" "${old_full_log}" 2>/dev/null || true)"
     echo "fallback_new_count=$(grep -c "${FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "old_samples=$(csv_summary_field "${OUT_DIR}/old-ps.csv" samples)"
@@ -2723,6 +2726,7 @@ write_report() {
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- EXPECT_COMMAND_FALLBACK_MARKER: ${EXPECT_COMMAND_FALLBACK_MARKER:-<unset>}"
+    echo "- EXPECT_SCREENSHOT_ASSERTION: ${EXPECT_SCREENSHOT_ASSERTION}"
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
     echo "- EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS: ${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}"
     echo "- EXPECT_MIN_IMAGE_REFS: ${EXPECT_MIN_IMAGE_REFS}"
@@ -3173,7 +3177,9 @@ validate_report() {
         if ! grep -q "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null; then
           failures+=("missing Swing popup window shown marker")
         fi
-        [[ "${popup_screenshot_status}" == "passed" ]] || failures+=("popup window screenshot assertion did not pass")
+        if [[ "${EXPECT_SCREENSHOT_ASSERTION}" == "true" ]]; then
+          [[ "${popup_screenshot_status}" == "passed" ]] || failures+=("popup window screenshot assertion did not pass")
+        fi
       fi
       if [[ "${MAGIC_JEWEL_MENU_STRESS}" == "true" ]]; then
         if ! grep -q "${MENU_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null; then
@@ -3207,7 +3213,7 @@ validate_report() {
         ! grep -Fq -- "${EXPECT_COMMAND_FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null; then
       failures+=("missing expected new-log marker: ${EXPECT_COMMAND_FALLBACK_MARKER}")
     fi
-    local screenshot_status_required="true"
+    local screenshot_status_required="${EXPECT_SCREENSHOT_ASSERTION}"
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
       case "${EXPECT_COMMAND_FALLBACK_REASON:-}" in
         abi-mismatch|command-cache-clear-unavailable|command-capability-mismatch|command-stream-invalid|native-abi-mismatch|public-api-missing|runtime-effect-compile-failed|runtime-effect-build-failed)
