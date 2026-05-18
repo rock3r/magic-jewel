@@ -241,6 +241,10 @@ val composeGraphicsLayerOffsetEffectEnabled = providers.gradleProperty("magicJew
 val composeGraphicsLayerChainedRenderEffectEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerChainedRenderEffect")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHAINED_RENDER_EFFECT"))
     .orElse("false")
+val composeGraphicsLayerBlurChainedRenderEffectEnabled =
+    providers.gradleProperty("magicJewelComposeGraphicsLayerBlurChainedRenderEffect")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLUR_CHAINED_RENDER_EFFECT"))
+        .orElse("false")
 val composeGraphicsLayerShadowEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerShadow")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW"))
     .orElse("false")
@@ -540,6 +544,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     )
     systemProperty("magic.jewel.compose.graphicsLayerOffsetEffect", composeGraphicsLayerOffsetEffectEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerChainedRenderEffect", composeGraphicsLayerChainedRenderEffectEnabled.get())
+    systemProperty(
+        "magic.jewel.compose.graphicsLayerBlurChainedRenderEffect",
+        composeGraphicsLayerBlurChainedRenderEffectEnabled.get()
+    )
     systemProperty("magic.jewel.compose.graphicsLayerShadow", composeGraphicsLayerShadowEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerRotationX", composeGraphicsLayerRotationXEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerRotationY", composeGraphicsLayerRotationYEnabled.get())

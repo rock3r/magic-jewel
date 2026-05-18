@@ -203,6 +203,8 @@ private const val ComposeGraphicsLayerRawImageFilterEffectProperty =
     "magic.jewel.compose.graphicsLayerRawImageFilterEffect"
 private const val ComposeGraphicsLayerOffsetEffectProperty = "magic.jewel.compose.graphicsLayerOffsetEffect"
 private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel.compose.graphicsLayerChainedRenderEffect"
+private const val ComposeGraphicsLayerBlurChainedRenderEffectProperty =
+    "magic.jewel.compose.graphicsLayerBlurChainedRenderEffect"
 private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.graphicsLayerShadow"
 private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.graphicsLayerRotationX"
 private const val ComposeGraphicsLayerRotationYProperty = "magic.jewel.compose.graphicsLayerRotationY"
@@ -602,6 +604,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerChainedRenderEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerChainedRenderEffectProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerBlurChainedRenderEffectEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerBlurChainedRenderEffectProperty, "false").toBoolean()
     }
     val composeGraphicsLayerShadowEnabled = remember {
         System.getProperty(ComposeGraphicsLayerShadowProperty, "false").toBoolean()
@@ -2913,6 +2918,13 @@ private fun MagicJewelApp() {
                                     renderEffect = OffsetEffect(
                                         renderEffect = BlurEffect(radiusX = 7f, radiusY = 5f),
                                         offset = Offset(13f, -9f),
+                                    )
+                                }
+                                composeGraphicsLayerBlurChainedRenderEffectEnabled -> {
+                                    renderEffect = BlurEffect(
+                                        renderEffect = OffsetEffect(offsetX = 13f, offsetY = -9f),
+                                        radiusX = 7f,
+                                        radiusY = 5f,
                                     )
                                 }
                                 composeGraphicsLayerOffsetEffectEnabled -> {
