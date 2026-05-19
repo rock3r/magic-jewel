@@ -219,6 +219,7 @@ private const val ComposeSkewTransformProperty = "magic.jewel.compose.skewTransf
 private const val ComposeVerticesProperty = "magic.jewel.compose.vertices"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
+private const val ComposeSaveLayerBlendModeProperty = "magic.jewel.compose.saveLayerBlendMode"
 private const val ComposeSaveLayerRawColorFilterProperty = "magic.jewel.compose.saveLayerRawColorFilter"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
 private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
@@ -652,6 +653,9 @@ private fun MagicJewelApp() {
     }
     val composeSaveLayerFilterEnabled = remember {
         System.getProperty(ComposeSaveLayerFilterProperty, "false").toBoolean()
+    }
+    val composeSaveLayerBlendModeEnabled = remember {
+        System.getProperty(ComposeSaveLayerBlendModeProperty, "false").toBoolean()
     }
     val composeSaveLayerRawColorFilterEnabled = remember {
         System.getProperty(ComposeSaveLayerRawColorFilterProperty, "false").toBoolean()
@@ -2411,6 +2415,29 @@ private fun MagicJewelApp() {
                             top = size.height - 258f,
                             right = size.width - 78f,
                             bottom = size.height - 190f,
+                            paint = contentPaint,
+                        )
+                        canvas.restore()
+                    }
+                }
+                if (composeSaveLayerBlendModeEnabled) {
+                    val layerPaint = Paint().apply {
+                        color = Color.White.copy(alpha = 0.7f)
+                        blendMode = BlendMode.Plus
+                    }
+                    val contentPaint = Paint().apply {
+                        color = Color(0xFF22D3EE)
+                    }
+                    drawIntoCanvas { canvas ->
+                        canvas.saveLayer(
+                            Rect(154f, size.height - 144f, 262f, size.height - 36f),
+                            layerPaint,
+                        )
+                        canvas.drawOval(
+                            left = 174f,
+                            top = size.height - 124f,
+                            right = 242f,
+                            bottom = size.height - 56f,
                             paint = contentPaint,
                         )
                         canvas.restore()
