@@ -372,6 +372,12 @@ fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS=false
 fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE=false
+fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_COMMAND_PAINT_FORMAT+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_COMMAND_PAINT_FORMAT=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE=false
 fi
@@ -1102,6 +1108,8 @@ export MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT
 export MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH
 export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 export MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS
+export MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE
+export MAGIC_JEWEL_CORRUPT_COMMAND_PAINT_FORMAT
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH
@@ -1539,6 +1547,8 @@ Environment:
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT Enables the Compose sweep-gradient round-rect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH Enables the Compose sweep-gradient path command replay probe. Default: false.
   MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS Corrupts the first command record flags word after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE Corrupts the command stream coordinate-space header word after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_COMMAND_PAINT_FORMAT Corrupts the command stream paint-format header word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE Corrupts one native text command font size after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT Corrupts one native text command font weight after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH Corrupts one native text command font width after recording so JBR rejects the command stream. Default: false.
@@ -2662,6 +2672,8 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH: ${MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_STREAM: ${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS}"
+    echo "- MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE: ${MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE}"
+    echo "- MAGIC_JEWEL_CORRUPT_COMMAND_PAINT_FORMAT: ${MAGIC_JEWEL_CORRUPT_COMMAND_PAINT_FORMAT}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH}"
