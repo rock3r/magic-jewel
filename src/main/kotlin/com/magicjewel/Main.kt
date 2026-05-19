@@ -219,6 +219,7 @@ private const val ComposeSkewTransformProperty = "magic.jewel.compose.skewTransf
 private const val ComposeVerticesProperty = "magic.jewel.compose.vertices"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
+private const val ComposeSaveLayerColorMatrixFilterProperty = "magic.jewel.compose.saveLayerColorMatrixFilter"
 private const val ComposeSaveLayerBlendModeProperty = "magic.jewel.compose.saveLayerBlendMode"
 private const val ComposeSaveLayerRawColorFilterProperty = "magic.jewel.compose.saveLayerRawColorFilter"
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
@@ -653,6 +654,9 @@ private fun MagicJewelApp() {
     }
     val composeSaveLayerFilterEnabled = remember {
         System.getProperty(ComposeSaveLayerFilterProperty, "false").toBoolean()
+    }
+    val composeSaveLayerColorMatrixFilterEnabled = remember {
+        System.getProperty(ComposeSaveLayerColorMatrixFilterProperty, "false").toBoolean()
     }
     val composeSaveLayerBlendModeEnabled = remember {
         System.getProperty(ComposeSaveLayerBlendModeProperty, "false").toBoolean()
@@ -2414,6 +2418,35 @@ private fun MagicJewelApp() {
                             left = size.width - 146f,
                             top = size.height - 258f,
                             right = size.width - 78f,
+                            bottom = size.height - 190f,
+                            paint = contentPaint,
+                        )
+                        canvas.restore()
+                    }
+                }
+                if (composeSaveLayerColorMatrixFilterEnabled) {
+                    val matrix = ColorMatrix().apply {
+                        this[0, 0] = 1.1f
+                        this[1, 1] = 0.82f
+                        this[2, 2] = 1.18f
+                        this[0, 4] = 18f
+                    }
+                    val layerPaint = Paint().apply {
+                        color = Color.White.copy(alpha = 0.72f)
+                        colorFilter = ColorFilter.colorMatrix(matrix)
+                    }
+                    val contentPaint = Paint().apply {
+                        color = Color(0xFFF97316)
+                    }
+                    drawIntoCanvas { canvas ->
+                        canvas.saveLayer(
+                            Rect(size.width - 424f, size.height - 278f, size.width - 316f, size.height - 170f),
+                            layerPaint,
+                        )
+                        canvas.drawOval(
+                            left = size.width - 404f,
+                            top = size.height - 258f,
+                            right = size.width - 336f,
                             bottom = size.height - 190f,
                             paint = contentPaint,
                         )
