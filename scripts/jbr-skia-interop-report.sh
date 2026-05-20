@@ -388,6 +388,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_CLIP_OPERATION+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_CLIP_OPERATION=false
 fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS=false
 fi
@@ -1150,6 +1153,7 @@ export MAGIC_JEWEL_CORRUPT_COMMAND_PAINT_FORMAT
 export MAGIC_JEWEL_CORRUPT_STROKE_CAP
 export MAGIC_JEWEL_CORRUPT_TRANSFORM_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_CLIP_OPERATION
+export MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT
 export MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS
@@ -1602,6 +1606,7 @@ Environment:
   MAGIC_JEWEL_CORRUPT_STROKE_CAP Corrupts one stroke-line cap after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TRANSFORM_RECORD_FLAGS Corrupts one transform command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_CLIP_OPERATION Corrupts one clip-rect operation after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT Corrupts one draw-points command point count after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS Corrupts one saveLayer command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS Corrupts one effect descriptor command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS Corrupts one shader descriptor command record flags word after recording so JBR rejects the command stream. Default: false.
@@ -2507,9 +2512,9 @@ write_machine_summary() {
     echo "jbr_command_fps=$(frame_marker_fps "${JBR_COMMAND_MARKER}" "${new_log}")"
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_shadow_commands_max=$(max_jbr_command_timing_field "${new_log}" "shadowCommands")"
-    echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
-    echo "jbr_scoped_image_cache_clear_frames=$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
-    echo "jbr_image_cache_evict_frames=$(grep -c "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "jbr_scoped_image_cache_clear_frames=$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_full_log}" 2>/dev/null || true)"
+    echo "jbr_image_cache_evict_frames=$(grep -c "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_effect_handle_define_frames=$(grep -c "${JBR_EFFECT_HANDLE_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_effect_handle_use_frames=$(grep -c "${JBR_EFFECT_HANDLE_USE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_effect_handle_evict_frames=$(grep -c "${JBR_EFFECT_HANDLE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
@@ -2596,8 +2601,8 @@ write_report() {
   jbr_runtime_effect_cache_hit_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_CACHE_HIT_MARKER}" "${new_full_log}")"
   jbr_runtime_effect_cache_miss_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_CACHE_MISS_MARKER}" "${new_full_log}")"
   jbr_runtime_effect_cache_evict_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_CACHE_EVICT_MARKER}" "${new_full_log}")"
-  jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}")"
-  jbr_image_cache_evict_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}")"
+  jbr_image_cache_clear_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_full_log}")"
+  jbr_image_cache_evict_summary="$(frame_marker_summary "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_full_log}")"
   local jbr_effect_handle_define_summary
   local jbr_effect_handle_use_summary
   local jbr_effect_handle_evict_summary
@@ -2740,6 +2745,7 @@ write_report() {
     echo "- MAGIC_JEWEL_CORRUPT_STROKE_CAP: ${MAGIC_JEWEL_CORRUPT_STROKE_CAP}"
     echo "- MAGIC_JEWEL_CORRUPT_TRANSFORM_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_TRANSFORM_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_CLIP_OPERATION: ${MAGIC_JEWEL_CORRUPT_CLIP_OPERATION}"
+    echo "- MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT: ${MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT}"
     echo "- MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS}"
@@ -3051,7 +3057,7 @@ write_report() {
     echo "- JBR RuntimeEffect source-cache misses: ${jbr_runtime_effect_cache_miss_summary}"
     echo "- JBR RuntimeEffect source-cache evicts: ${jbr_runtime_effect_cache_evict_summary}"
     echo "- JBR image cache clears: ${jbr_image_cache_clear_summary}"
-    echo "- JBR scoped image cache clears: $(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
+    echo "- JBR scoped image cache clears: $(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_full_log}" 2>/dev/null || true)"
     echo "- JBR image cache evicts: ${jbr_image_cache_evict_summary}"
     echo "- JBR effect handle defines: ${jbr_effect_handle_define_summary}"
     echo "- JBR effect handle uses: ${jbr_effect_handle_use_summary}"
@@ -3266,13 +3272,13 @@ validate_report() {
       fi
       if [[ "${EXPECT_MIN_IMAGE_CACHE_CLEARS}" -gt 0 ]]; then
         local max_image_cache_clears
-        max_image_cache_clears="$(max_command_recorder_field "${new_log}" "imageCacheClears")"
+        max_image_cache_clears="$(max_command_recorder_field "${new_full_log}" "imageCacheClears")"
         [[ "${max_image_cache_clears}" -ge "${EXPECT_MIN_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("CMP recorder max imageCacheClears ${max_image_cache_clears} below expected ${EXPECT_MIN_IMAGE_CACHE_CLEARS}")
       fi
       if [[ "${EXPECT_MIN_IMAGE_CACHE_EVICTS}" -gt 0 ]]; then
         local max_image_cache_evicts
-        max_image_cache_evicts="$(max_command_recorder_field "${new_log}" "imageCacheEvicts")"
+        max_image_cache_evicts="$(max_command_recorder_field "${new_full_log}" "imageCacheEvicts")"
         [[ "${max_image_cache_evicts}" -ge "${EXPECT_MIN_IMAGE_CACHE_EVICTS}" ]] ||
           failures+=("CMP recorder max imageCacheEvicts ${max_image_cache_evicts} below expected ${EXPECT_MIN_IMAGE_CACHE_EVICTS}")
       fi
@@ -3284,25 +3290,25 @@ validate_report() {
       fi
       if [[ "${EXPECT_MAX_IMAGE_CACHE_CLEARS}" -ge 0 ]]; then
         local max_image_cache_clears
-        max_image_cache_clears="$(max_command_recorder_field "${new_log}" "imageCacheClears")"
+        max_image_cache_clears="$(max_command_recorder_field "${new_full_log}" "imageCacheClears")"
         [[ "${max_image_cache_clears}" -le "${EXPECT_MAX_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("CMP recorder max imageCacheClears ${max_image_cache_clears} above expected ${EXPECT_MAX_IMAGE_CACHE_CLEARS}")
       fi
       if [[ "${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}" -gt 0 ]]; then
         local jbr_image_cache_clears
-        jbr_image_cache_clears="$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_log}" 2>/dev/null || true)"
+        jbr_image_cache_clears="$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${jbr_image_cache_clears}" -ge "${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("JBR image cache clear markers ${jbr_image_cache_clears} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS}")
       fi
       if [[ "${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}" -gt 0 ]]; then
         local jbr_scoped_image_cache_clears
-        jbr_scoped_image_cache_clears="$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_log}" 2>/dev/null || true)"
+        jbr_scoped_image_cache_clears="$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_full_log}" 2>/dev/null || true)"
         [[ "${jbr_scoped_image_cache_clears}" -ge "${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}" ]] ||
           failures+=("JBR scoped image cache clear markers ${jbr_scoped_image_cache_clears} below expected ${EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS}")
       fi
       if [[ "${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}" -gt 0 ]]; then
         local jbr_image_cache_evicts
-        jbr_image_cache_evicts="$(grep -c "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_log}" 2>/dev/null || true)"
+        jbr_image_cache_evicts="$(grep -c "${JBR_IMAGE_CACHE_EVICT_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${jbr_image_cache_evicts}" -ge "${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}" ]] ||
           failures+=("JBR image cache evict markers ${jbr_image_cache_evicts} below expected ${EXPECT_MIN_JBR_IMAGE_CACHE_EVICTS}")
       fi
