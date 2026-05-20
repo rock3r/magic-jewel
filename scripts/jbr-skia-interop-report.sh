@@ -403,6 +403,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS=false
 fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_IMAGE_CACHE_CLEAR_RECORD_FLAGS+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_IMAGE_CACHE_CLEAR_RECORD_FLAGS=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_IMAGE_EVICT_RECORD_FLAGS+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_IMAGE_EVICT_RECORD_FLAGS=false
 fi
@@ -1152,6 +1155,7 @@ export MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS
+export MAGIC_JEWEL_CORRUPT_IMAGE_CACHE_CLEAR_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_IMAGE_EVICT_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_COLOR_FILTER_EVICT_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_SHADER_EVICT_RECORD_FLAGS
@@ -1603,6 +1607,7 @@ Environment:
   MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS Corrupts one shader descriptor command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS Corrupts one image definition command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS Corrupts one font-data definition command record flags word after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_IMAGE_CACHE_CLEAR_RECORD_FLAGS Corrupts one image-cache clear command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_IMAGE_EVICT_RECORD_FLAGS Corrupts one image-cache eviction command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_COLOR_FILTER_EVICT_RECORD_FLAGS Corrupts one color-filter/effect-handle eviction command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_SHADER_EVICT_RECORD_FLAGS Corrupts one shader-handle eviction command record flags word after recording so JBR rejects the command stream. Default: false.
@@ -2740,6 +2745,7 @@ write_report() {
     echo "- MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS}"
+    echo "- MAGIC_JEWEL_CORRUPT_IMAGE_CACHE_CLEAR_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_IMAGE_CACHE_CLEAR_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_IMAGE_EVICT_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_IMAGE_EVICT_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_COLOR_FILTER_EVICT_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_COLOR_FILTER_EVICT_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_SHADER_EVICT_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_SHADER_EVICT_RECORD_FLAGS}"
