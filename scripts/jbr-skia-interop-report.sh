@@ -25,6 +25,7 @@ CAPTURE_OLD_SCREENSHOT="${CAPTURE_OLD_SCREENSHOT:-false}"
 EXPECT_COMMAND_FALLBACK="${EXPECT_COMMAND_FALLBACK:-false}"
 EXPECT_COMMAND_FALLBACK_REASON="${EXPECT_COMMAND_FALLBACK_REASON:-text}"
 EXPECT_COMMAND_FALLBACK_MARKER="${EXPECT_COMMAND_FALLBACK_MARKER:-}"
+EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY="${EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY:-false}"
 EXPECT_SCREENSHOT_ASSERTION="${EXPECT_SCREENSHOT_ASSERTION:-true}"
 EXPECT_MIN_TEXT_COMMANDS="${EXPECT_MIN_TEXT_COMMANDS:-0}"
 EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS="${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS:-0}"
@@ -398,6 +399,9 @@ if [[ -z "${MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS+x}" ]]; then
 fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS=false
+fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS=false
 fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE=false
@@ -1138,6 +1142,7 @@ export MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS
+export MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH
@@ -1439,6 +1444,7 @@ Environment:
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
   EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
   EXPECT_COMMAND_FALLBACK_MARKER Optional fixed string that must appear in the new renderer log. Default: disabled.
+  EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY Allows later command frames after a required one-shot fallback for cache-front-loaded records. Default: false.
   EXPECT_SCREENSHOT_ASSERTION If false, strict validation skips the main-window screenshot assertion. Default: true.
   EXPECT_MIN_TEXT_COMMANDS In strict command mode, require at least this many simple text commands in one CMP recorder frame. Default: 0.
   EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS In strict command mode, require at least this many paragraph text commands in one CMP recorder frame. Default: 0.
@@ -1584,6 +1590,7 @@ Environment:
   MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS Corrupts one effect descriptor command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS Corrupts one shader descriptor command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS Corrupts one image definition command record flags word after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS Corrupts one font-data definition command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE Corrupts one native text command font size after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT Corrupts one native text command font weight after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH Corrupts one native text command font width after recording so JBR rejects the command stream. Default: false.
@@ -2429,6 +2436,7 @@ write_machine_summary() {
     echo "expect_command_fallback=${EXPECT_COMMAND_FALLBACK}"
     echo "expect_command_fallback_reason=${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "expect_command_fallback_marker=${EXPECT_COMMAND_FALLBACK_MARKER}"
+    echo "expect_command_fallback_allow_recovery=${EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY}"
     echo "expect_screenshot_assertion=${EXPECT_SCREENSHOT_ASSERTION}"
     echo "fallback_old_count=$(grep -c "${FALLBACK_MARKER}" "${old_full_log}" 2>/dev/null || true)"
     echo "fallback_new_count=$(grep -c "${FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null || true)"
@@ -2716,6 +2724,7 @@ write_report() {
     echo "- MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS}"
+    echo "- MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_FONT_DATA_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH}"
@@ -2942,6 +2951,7 @@ write_report() {
     echo "- EXPECT_COMMAND_FALLBACK: ${EXPECT_COMMAND_FALLBACK}"
     echo "- EXPECT_COMMAND_FALLBACK_REASON: ${EXPECT_COMMAND_FALLBACK_REASON}"
     echo "- EXPECT_COMMAND_FALLBACK_MARKER: ${EXPECT_COMMAND_FALLBACK_MARKER:-<unset>}"
+    echo "- EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY: ${EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY}"
     echo "- EXPECT_SCREENSHOT_ASSERTION: ${EXPECT_SCREENSHOT_ASSERTION}"
     echo "- EXPECT_MIN_TEXT_COMMANDS: ${EXPECT_MIN_TEXT_COMMANDS}"
     echo "- EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS: ${EXPECT_MIN_PARAGRAPH_TEXT_COMMANDS}"
@@ -3119,9 +3129,16 @@ validate_report() {
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
       if [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-stream-invalid" ]]; then
         [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames before invalid-stream fallback")
-        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during invalid-stream fallback: ${jbr_command_frames}")
-        if ! grep -q "${FALLBACK_MARKER} reason=command-stream-invalid" "${new_log}" 2>/dev/null &&
-            ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
+        if [[ "${EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY}" != "true" ]]; then
+          [[ "${jbr_command_frames}" -eq 0 ]] ||
+            failures+=("unexpected JBR command frames during invalid-stream fallback: ${jbr_command_frames}")
+        fi
+        local command_fallback_log="${new_log}"
+        if [[ "${EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY}" == "true" ]]; then
+          command_fallback_log="${new_full_log}"
+        fi
+        if ! grep -q "${FALLBACK_MARKER} reason=command-stream-invalid" "${command_fallback_log}" 2>/dev/null &&
+            ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${command_fallback_log}" 2>/dev/null; then
           failures+=("missing command-stream-invalid fallback marker or rendered=false command frame")
         fi
       elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "abi-mismatch" ]]; then
