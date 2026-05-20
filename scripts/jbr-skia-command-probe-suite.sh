@@ -48,7 +48,7 @@ case_group_cases() {
       echo "commands-invalid-command-stream-flags-fallback commands-invalid-command-record-flags-fallback commands-invalid-command-coordinate-space-fallback commands-invalid-command-paint-format-fallback commands-invalid-command-payload-length-fallback commands-invalid-command-payload-truncated-fallback commands-invalid-command-payload-extra-fallback commands-invalid-command-record-length-fallback"
       ;;
     primitive-invalid)
-      echo "commands-invalid-stroke-cap-fallback commands-invalid-transform-record-flags-fallback commands-invalid-clip-operation-fallback commands-invalid-draw-points-point-count-fallback commands-invalid-draw-points-record-length-fallback commands-invalid-draw-vertices-vertex-count-fallback commands-invalid-draw-vertices-max-vertex-count-fallback commands-invalid-draw-vertices-record-length-fallback commands-invalid-draw-vertices-vertex-mode-fallback commands-invalid-draw-vertices-blend-mode-fallback commands-invalid-draw-vertices-index-count-fallback commands-invalid-draw-vertices-max-index-count-fallback"
+      echo "commands-invalid-stroke-cap-fallback commands-invalid-transform-record-flags-fallback commands-invalid-clip-operation-fallback commands-invalid-draw-points-point-count-fallback commands-invalid-draw-points-max-point-count-fallback commands-invalid-draw-points-record-length-fallback commands-invalid-draw-vertices-vertex-count-fallback commands-invalid-draw-vertices-max-vertex-count-fallback commands-invalid-draw-vertices-record-length-fallback commands-invalid-draw-vertices-vertex-mode-fallback commands-invalid-draw-vertices-blend-mode-fallback commands-invalid-draw-vertices-index-count-fallback commands-invalid-draw-vertices-max-index-count-fallback"
       ;;
     path-invalid)
       echo "commands-invalid-clip-path-verb-fallback commands-invalid-draw-path-verb-fallback commands-invalid-draw-path-path-effect-verb-fallback commands-invalid-stroke-path-dash-path-effect-verb-fallback commands-invalid-stroke-path-dash-path-effect-interval-count-fallback commands-invalid-stroke-path-dash-path-effect-interval-fallback commands-invalid-draw-shadow-path-verb-fallback"
@@ -131,7 +131,7 @@ if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
 fi
 if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-native-bridge-load-library commands-core-primitives" "commands-native-bridge-load-library commands-invalid-stroke-cap-fallback commands-invalid-transform-record-flags-fallback commands-invalid-clip-operation-fallback commands-core-primitives"
-  replace_default_case_segment "commands-point-lines commands-point-dots" "commands-point-lines commands-invalid-draw-points-point-count-fallback commands-invalid-draw-points-record-length-fallback commands-point-dots"
+  replace_default_case_segment "commands-point-lines commands-point-dots" "commands-point-lines commands-invalid-draw-points-point-count-fallback commands-invalid-draw-points-max-point-count-fallback commands-invalid-draw-points-record-length-fallback commands-point-dots"
   replace_default_case_segment "commands-vertices commands-blend-mode" "commands-vertices commands-invalid-draw-vertices-vertex-count-fallback commands-invalid-draw-vertices-max-vertex-count-fallback commands-invalid-draw-vertices-record-length-fallback commands-invalid-draw-vertices-vertex-mode-fallback commands-invalid-draw-vertices-blend-mode-fallback commands-invalid-draw-vertices-index-count-fallback commands-invalid-draw-vertices-max-index-count-fallback commands-blend-mode"
   replace_default_case_segment "commands-core-primitives commands-point-lines" "commands-core-primitives commands-invalid-image-define-record-flags-fallback commands-invalid-image-cache-clear-record-flags-fallback commands-invalid-image-evict-record-flags-fallback commands-invalid-image-define-pixel-count-fallback commands-invalid-image-use-fallback commands-invalid-image-use-after-evict-fallback commands-invalid-image-ref-width-fallback commands-invalid-image-ref-height-fallback commands-invalid-image-ref-alpha-fallback commands-invalid-image-ref-filter-quality-fallback commands-invalid-clip-path-verb-fallback commands-invalid-draw-path-verb-fallback commands-invalid-draw-path-path-effect-verb-fallback commands-invalid-stroke-path-dash-path-effect-verb-fallback commands-invalid-stroke-path-dash-path-effect-interval-count-fallback commands-invalid-stroke-path-dash-path-effect-interval-fallback commands-invalid-draw-shadow-path-verb-fallback commands-point-lines"
   replace_default_case_segment "commands-native-generic-font-text commands-native-loaded-font-data-text" "commands-native-generic-font-text commands-invalid-text-font-size-fallback commands-invalid-text-font-weight-fallback commands-invalid-text-font-width-fallback commands-invalid-text-font-slant-fallback commands-invalid-text-font-family-count-fallback commands-invalid-paragraph-font-size-fallback commands-invalid-paragraph-font-weight-fallback commands-invalid-paragraph-font-width-fallback commands-invalid-paragraph-font-slant-fallback commands-invalid-paragraph-font-family-count-fallback commands-invalid-font-data-record-flags-fallback commands-native-loaded-font-data-text"
@@ -339,6 +339,14 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_DRAW_POINTS_POINT_COUNT_CORRUPTED"
+      ;;
+    commands-invalid-draw-points-max-point-count-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_POINT_DOTS=true \
+        MAGIC_JEWEL_CORRUPT_DRAW_POINTS_MAX_POINT_COUNT=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_DRAW_POINTS_MAX_POINT_COUNT_CORRUPTED"
       ;;
     commands-invalid-draw-points-record-length-fallback)
       run_case "$1" \

@@ -391,6 +391,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT=false
 fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_DRAW_POINTS_MAX_POINT_COUNT+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_DRAW_POINTS_MAX_POINT_COUNT=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_DRAW_POINTS_RECORD_LENGTH+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_DRAW_POINTS_RECORD_LENGTH=false
 fi
@@ -1178,6 +1181,7 @@ export MAGIC_JEWEL_CORRUPT_STROKE_CAP
 export MAGIC_JEWEL_CORRUPT_TRANSFORM_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_CLIP_OPERATION
 export MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT
+export MAGIC_JEWEL_CORRUPT_DRAW_POINTS_MAX_POINT_COUNT
 export MAGIC_JEWEL_CORRUPT_DRAW_POINTS_RECORD_LENGTH
 export MAGIC_JEWEL_CORRUPT_DRAW_VERTICES_VERTEX_COUNT
 export MAGIC_JEWEL_CORRUPT_DRAW_VERTICES_MAX_VERTEX_COUNT
@@ -1639,6 +1643,7 @@ Environment:
   MAGIC_JEWEL_CORRUPT_TRANSFORM_RECORD_FLAGS Corrupts one transform command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_CLIP_OPERATION Corrupts one clip-rect operation after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT Corrupts one draw-points command point count after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_DRAW_POINTS_MAX_POINT_COUNT Corrupts one draw-points command point count above the supported maximum after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_DRAW_POINTS_RECORD_LENGTH Corrupts one draw-points command record length after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_DRAW_VERTICES_VERTEX_COUNT Corrupts one draw-vertices command vertex count after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_DRAW_VERTICES_MAX_VERTEX_COUNT Corrupts one draw-vertices command vertex count above the supported maximum after recording so JBR rejects the command stream. Default: false.
@@ -2786,6 +2791,7 @@ write_report() {
     echo "- MAGIC_JEWEL_CORRUPT_TRANSFORM_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_TRANSFORM_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_CLIP_OPERATION: ${MAGIC_JEWEL_CORRUPT_CLIP_OPERATION}"
     echo "- MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT: ${MAGIC_JEWEL_CORRUPT_DRAW_POINTS_POINT_COUNT}"
+    echo "- MAGIC_JEWEL_CORRUPT_DRAW_POINTS_MAX_POINT_COUNT: ${MAGIC_JEWEL_CORRUPT_DRAW_POINTS_MAX_POINT_COUNT}"
     echo "- MAGIC_JEWEL_CORRUPT_DRAW_POINTS_RECORD_LENGTH: ${MAGIC_JEWEL_CORRUPT_DRAW_POINTS_RECORD_LENGTH}"
     echo "- MAGIC_JEWEL_CORRUPT_DRAW_VERTICES_VERTEX_COUNT: ${MAGIC_JEWEL_CORRUPT_DRAW_VERTICES_VERTEX_COUNT}"
     echo "- MAGIC_JEWEL_CORRUPT_DRAW_VERTICES_MAX_VERTEX_COUNT: ${MAGIC_JEWEL_CORRUPT_DRAW_VERTICES_MAX_VERTEX_COUNT}"
