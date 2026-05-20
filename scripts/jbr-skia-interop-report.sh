@@ -396,6 +396,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS=false
 fi
+if [[ -z "${MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS+x}" ]]; then
+  MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE=false
 fi
@@ -1134,6 +1137,7 @@ export MAGIC_JEWEL_CORRUPT_CLIP_OPERATION
 export MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS
+export MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT
 export MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH
@@ -1579,6 +1583,7 @@ Environment:
   MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS Corrupts one saveLayer command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS Corrupts one effect descriptor command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS Corrupts one shader descriptor command record flags word after recording so JBR rejects the command stream. Default: false.
+  MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS Corrupts one image definition command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE Corrupts one native text command font size after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT Corrupts one native text command font weight after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH Corrupts one native text command font width after recording so JBR rejects the command stream. Default: false.
@@ -2710,6 +2715,7 @@ write_report() {
     echo "- MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_SAVE_LAYER_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_EFFECT_DESCRIPTOR_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_SHADER_DESCRIPTOR_RECORD_FLAGS}"
+    echo "- MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_SIZE}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WEIGHT}"
     echo "- MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH: ${MAGIC_JEWEL_CORRUPT_TEXT_FONT_WIDTH}"
