@@ -27,11 +27,14 @@ list_case_groups() {
     gradient-path-invalid \
     runtime-effect-invalid \
     descriptor-handles-invalid \
+    shader-ref-invalid \
     image-handles-invalid \
     save-layer-invalid \
     color-filters \
+    fill-rect-color-filter-invalid \
     native-text \
     native-text-invalid \
+    blend-mode-invalid \
     graphics-layer
 }
 
