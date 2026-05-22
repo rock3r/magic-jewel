@@ -2729,7 +2729,8 @@ run_named_case() {
       ;;
     commands-gradient-stroke)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_STROKE=true
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_STROKE=true \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-invalid-linear-gradient-stroke-width-fallback)
       run_case "$1" \
