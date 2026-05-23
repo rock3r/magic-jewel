@@ -32,6 +32,7 @@ list_case_groups() {
     image-handles-invalid \
     save-layer-invalid \
     color-filters \
+    descriptor-lifecycle \
     fill-rect-color-filter-invalid \
     native-text \
     native-text-invalid \
@@ -82,6 +83,9 @@ case_group_cases() {
       ;;
     color-filters)
       echo "commands-image-color-matrix-filter commands-raw-blend-color-filter-fallback commands-color-filter commands-color-filter-handle commands-color-matrix-filter commands-lighting-filter commands-graphics-layer-color-filter commands-graphics-layer-color-matrix-filter commands-graphics-layer-blend-color-filter commands-graphics-layer-blend-color-matrix-filter"
+      ;;
+    descriptor-lifecycle)
+      echo "commands-descriptor-eviction commands-resize-descriptor-redefine commands-forced-context-descriptor-redefine commands-resize-shader-descriptor-redefine commands-forced-context-shader-descriptor-redefine commands-resize-color-shader-descriptor-redefine commands-forced-context-color-shader-descriptor-redefine commands-resize-noise-shader-descriptor-redefine commands-forced-context-noise-shader-descriptor-redefine commands-resize-turbulence-shader-descriptor-redefine commands-forced-context-turbulence-shader-descriptor-redefine commands-resize-composite-noise-shader-descriptor-redefine commands-forced-context-composite-noise-shader-descriptor-redefine commands-runtime-effect-stable-color-filter commands-resize-runtime-effect-stable-color-filter commands-forced-context-runtime-effect-stable-color-filter commands-runtime-effect-shader-source-cache-eviction commands-runtime-effect-source-cache-eviction"
       ;;
     fill-rect-color-filter-invalid)
       echo "commands-invalid-fill-rect-color-filter-blend-mode-fallback commands-invalid-fill-rect-color-filter-width-fallback commands-invalid-fill-rect-color-filter-height-fallback commands-invalid-fill-rect-color-filter-ref-width-fallback commands-invalid-fill-rect-color-filter-ref-height-fallback"
