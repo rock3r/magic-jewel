@@ -2028,7 +2028,7 @@ Environment:
   MAGIC_JEWEL_CORRUPT_PERLIN_NOISE_SHADER_NEGATIVE_TILE_HEIGHT Corrupts one Perlin/noise shader descriptor tile height to -1 after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_DESCRIPTOR_VERSION Corrupts one shader descriptor version after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_COLOR_FILTER_HANDLE_TYPE Rewrites one color-filter use or shader color-filter child to reference an image-filter handle. Default: false.
-  MAGIC_JEWEL_CORRUPT_COLOR_FILTER_HANDLE_TO_PATH_EFFECT_TYPE Rewrites one color-filter use to reference a path-effect handle. Default: false.
+  MAGIC_JEWEL_CORRUPT_COLOR_FILTER_HANDLE_TO_PATH_EFFECT_TYPE Rewrites one color-filter use or RuntimeEffect color-filter child to reference a path-effect handle. Default: false.
   MAGIC_JEWEL_CORRUPT_IMAGE_FILTER_HANDLE_TYPE Rewrites one image-filter handle use to reference a color-filter handle. Default: false.
   MAGIC_JEWEL_CORRUPT_PATH_EFFECT_HANDLE_TYPE Rewrites one path-effect child handle to reference a color-filter handle. Default: false.
   MAGIC_JEWEL_CORRUPT_PATH_EFFECT_USE_HANDLE_TYPE Rewrites one top-level path-effect use to reference a color-filter handle. Default: false.
