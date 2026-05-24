@@ -2483,10 +2483,12 @@ command_recorder_summary() {
   local log="$1"
   awk -v marker="${CMP_COMMAND_RECORDER_MARKER}" -v duration="${DURATION_SECONDS}" '
     index($0, marker) {
+      line = substr($0, index($0, marker))
       frames++
       frameUnsupported = 0
-      for (i = 1; i <= NF; i++) {
-        split($i, value, "=")
+      fieldCount = split(line, fields, " ")
+      for (i = 1; i <= fieldCount; i++) {
+        split(fields[i], value, "=")
         if (value[1] == "commands") {
           commands += value[2]
           if (value[2] > maxCommands) maxCommands = value[2]
@@ -2619,8 +2621,15 @@ command_recorder_reasons() {
   local log="$1"
   awk -v marker="${CMP_COMMAND_RECORDER_MARKER}" -v nested_marker="${CMP_COMMAND_RECORDER_NESTED_MARKER}" '
     index($0, marker) || index($0, nested_marker) {
-      for (i = 1; i <= NF; i++) {
-        split($i, value, "=")
+      markerStart = index($0, marker)
+      nestedStart = index($0, nested_marker)
+      if (markerStart == 0 || (nestedStart > 0 && nestedStart < markerStart)) {
+        markerStart = nestedStart
+      }
+      line = substr($0, markerStart)
+      fieldCount = split(line, fields, " ")
+      for (i = 1; i <= fieldCount; i++) {
+        split(fields[i], value, "=")
         if (value[2] ~ /^[0-9]+$/ &&
             value[1] != "commands" &&
             value[1] != "unsupported" &&
