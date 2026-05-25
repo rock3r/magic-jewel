@@ -21,6 +21,7 @@ list_case_groups() {
   printf "%s\n" \
     smoke \
     surface-transform-ui \
+    shader-rendering \
     stream-invalid \
     primitive-invalid \
     path-invalid \
@@ -49,6 +50,9 @@ case_group_cases() {
       ;;
     surface-transform-ui)
       echo "commands-native-bridge-load-library commands-point-lines commands-point-dots commands-concat-transform commands-skew-transform commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image"
+      ;;
+    shader-rendering)
+      echo "commands-forced-context-dynamic-images commands-image-path-effect-fallback commands-image-shader commands-raw-image-shader-fallback commands-descriptor-stroke-shader-fallback commands-gradient-shaders commands-noise-shader commands-turbulence-shader commands-raw-linear-gradient-shader-fallback commands-raw-radial-gradient-shader-fallback commands-raw-sweep-gradient-shader-fallback commands-raw-noise-shader-fallback commands-raw-turbulence-shader-fallback"
       ;;
     stream-invalid)
       echo "commands-invalid-command-stream-flags-fallback commands-invalid-command-record-flags-fallback commands-invalid-command-coordinate-space-fallback commands-invalid-command-paint-format-fallback commands-invalid-command-payload-length-fallback commands-invalid-command-payload-truncated-fallback commands-invalid-command-payload-extra-fallback commands-invalid-command-record-length-fallback"
