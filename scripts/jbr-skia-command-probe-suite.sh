@@ -20,6 +20,7 @@ CASES="${CASES:-commands-live-animation commands-invalid-command-stream-flags-fa
 list_case_groups() {
   printf "%s\n" \
     smoke \
+    surface-transform-ui \
     stream-invalid \
     primitive-invalid \
     path-invalid \
@@ -45,6 +46,9 @@ case_group_cases() {
   case "$1" in
     smoke)
       echo "commands-live-animation commands-core-primitives commands-color-shader commands-color-filter-handle commands-color-matrix-filter commands-graphics-layer"
+      ;;
+    surface-transform-ui)
+      echo "commands-native-bridge-load-library commands-point-lines commands-point-dots commands-concat-transform commands-skew-transform commands-gradient-surfaces commands-gradient-paths commands-popup commands-popup-window commands-menu commands-text-image"
       ;;
     stream-invalid)
       echo "commands-invalid-command-stream-flags-fallback commands-invalid-command-record-flags-fallback commands-invalid-command-coordinate-space-fallback commands-invalid-command-paint-format-fallback commands-invalid-command-payload-length-fallback commands-invalid-command-payload-truncated-fallback commands-invalid-command-payload-extra-fallback commands-invalid-command-record-length-fallback"
