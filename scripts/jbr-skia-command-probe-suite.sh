@@ -23,6 +23,7 @@ list_case_groups() {
     surface-transform-ui \
     shader-rendering \
     shader-composition-runtime \
+    core-effects \
     stream-invalid \
     primitive-invalid \
     path-invalid \
@@ -57,6 +58,9 @@ case_group_cases() {
       ;;
     shader-composition-runtime)
       echo "commands-image-shader-color-filter commands-composite-shader commands-composite-noise-shader commands-composite-shader-color-filter commands-transformed-shader commands-runtime-effect-shader commands-raw-runtime-effect-shader-fallback commands-runtime-effect-shader-color-filter commands-linear-gradient-shader-color-filter commands-runtime-effect-pure-color commands-runtime-effect-uniform-only commands-runtime-effect-child-only commands-runtime-effect-color-filter commands-raw-runtime-effect-color-filter-fallback commands-runtime-effect-color-filter-child"
+      ;;
+    core-effects)
+      echo "commands-gradient-stroke commands-image-filter commands-path-effect commands-path-effect-color-filter-fallback commands-raw-discrete-path-effect-fallback commands-vertices commands-blend-mode"
       ;;
     stream-invalid)
       echo "commands-invalid-command-stream-flags-fallback commands-invalid-command-record-flags-fallback commands-invalid-command-coordinate-space-fallback commands-invalid-command-paint-format-fallback commands-invalid-command-payload-length-fallback commands-invalid-command-payload-truncated-fallback commands-invalid-command-payload-extra-fallback commands-invalid-command-record-length-fallback"
