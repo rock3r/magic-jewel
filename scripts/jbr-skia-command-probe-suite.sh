@@ -25,6 +25,7 @@ list_case_groups() {
     shader-composition-runtime \
     core-effects \
     graphics-layer-extras \
+    save-layer-shader-fallbacks \
     stream-invalid \
     primitive-invalid \
     path-invalid \
@@ -65,6 +66,9 @@ case_group_cases() {
       ;;
     graphics-layer-extras)
       echo "commands-resize-graphics-layer-color-matrix-filter commands-forced-context-graphics-layer-color-matrix-filter commands-graphics-layer-raw-color-filter-fallback commands-resize-graphics-layer-render-effect commands-forced-context-graphics-layer-render-effect commands-graphics-layer-raw-image-filter-effect-fallback commands-graphics-layer-render-effect-color-filter commands-graphics-layer-render-effect-blend-mode commands-graphics-layer-render-effect-color-matrix-filter commands-graphics-layer-render-effect-blend-color-filter commands-graphics-layer-render-effect-blend-color-matrix-filter commands-graphics-layer-offset-effect-blend-color-matrix-filter commands-graphics-layer-chained-render-effect-blend-color-matrix-filter commands-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter"
+      ;;
+    save-layer-shader-fallbacks)
+      echo "commands-save-layer-filter commands-save-layer-blend-mode commands-save-layer-raw-color-filter-fallback commands-opaque-shader-fallback commands-composite-opaque-shader-fallback commands-picture-shader-fallback commands-invalid-gradient-fallback"
       ;;
     stream-invalid)
       echo "commands-invalid-command-stream-flags-fallback commands-invalid-command-record-flags-fallback commands-invalid-command-coordinate-space-fallback commands-invalid-command-paint-format-fallback commands-invalid-command-payload-length-fallback commands-invalid-command-payload-truncated-fallback commands-invalid-command-payload-extra-fallback commands-invalid-command-record-length-fallback"
