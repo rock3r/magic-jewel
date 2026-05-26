@@ -9,23 +9,146 @@ DURATION_SECONDS="${DURATION_SECONDS:-6}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 PARITY_SCRIPT="${PARITY_SCRIPT:-${SCRIPT_DIR}/jbr-skia-screenshot-parity.sh}"
+CASE_GROUPS="${CASE_GROUPS:-}"
+CASES_WAS_SET="${CASES+x}"
+LIST_CASE_GROUPS="${LIST_CASE_GROUPS:-false}"
+LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
+LIST_UNGROUPED_CASES="${LIST_UNGROUPED_CASES:-false}"
 CASES="${CASES:-parity-rich parity-button-chrome parity-geometry-clean parity-skew-transform parity-vertices parity-save-layer-filter parity-native-custom-font-text-image parity-native-generic-font-text parity-native-loaded-font-data-text parity-native-resource-font-text parity-native-system-font-text parity-resize-native-generic-font-text parity-resize-native-loaded-font-data-text parity-resize-native-resource-font-text parity-resize-native-system-font-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-native-loaded-font-data-text parity-forced-context-native-resource-font-text parity-forced-context-native-system-font-text parity-forced-context-image-refs parity-point-dots parity-path-effect parity-draw-shapes parity-clip-rects parity-clip-path parity-blend-modes parity-gradient-surfaces parity-gradient-paths parity-gradient-shaders parity-gradient-stroke parity-image-filter parity-image-color-matrix-filter parity-color-filter-handle parity-resize-color-filter-handle parity-forced-context-color-filter-handle parity-color-matrix-filter parity-lighting-filter parity-descriptor-eviction parity-image-shader parity-color-shader parity-resize-color-shader parity-forced-context-color-shader parity-noise-shader parity-resize-noise-shader parity-forced-context-noise-shader parity-turbulence-shader parity-resize-turbulence-shader parity-forced-context-turbulence-shader parity-image-shader-color-filter parity-composite-shader parity-composite-noise-shader parity-resize-composite-noise-shader parity-forced-context-composite-noise-shader parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader parity-runtime-effect-pure-color parity-resize-runtime-effect-pure-color parity-forced-context-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader-source-cache-eviction parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-stable-color-filter parity-resize-runtime-effect-stable-color-filter parity-forced-context-runtime-effect-stable-color-filter parity-runtime-effect-color-filter-child parity-runtime-effect-source-cache-eviction parity-graphics-layer parity-graphics-layer-effects parity-graphics-layer-blend-mode parity-graphics-layer-color-filter parity-graphics-layer-color-matrix-filter parity-graphics-layer-blend-color-filter parity-graphics-layer-blend-color-matrix-filter parity-resize-graphics-layer-color-matrix-filter parity-forced-context-graphics-layer-color-matrix-filter parity-resize-graphics-layer-render-effect parity-forced-context-graphics-layer-render-effect parity-graphics-layer-offset-effect parity-graphics-layer-chained-render-effect parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-clip parity-graphics-layer-round-clip parity-graphics-layer-path-clip parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-modulate-alpha parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-scale-translate parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot}"
+
+list_case_groups() {
+  printf "%s\n" \
+    smoke \
+    core-drawing \
+    native-text \
+    descriptor-lifecycle \
+    shader-rendering \
+    runtime-effect \
+    graphics-layer-basic \
+    graphics-layer-effects \
+    graphics-layer-clip-shadow-transform
+}
+
+case_group_cases() {
+  case "$1" in
+    smoke)
+      echo "parity-rich parity-button-chrome parity-geometry-clean"
+      ;;
+    core-drawing)
+      echo "parity-skew-transform parity-vertices parity-save-layer-filter parity-forced-context-image-refs parity-point-dots parity-path-effect parity-draw-shapes parity-clip-rects parity-clip-path parity-blend-modes parity-gradient-surfaces parity-gradient-paths parity-gradient-shaders parity-gradient-stroke parity-image-filter parity-image-color-matrix-filter"
+      ;;
+    native-text)
+      echo "parity-native-custom-font-text-image parity-native-generic-font-text parity-native-loaded-font-data-text parity-native-resource-font-text parity-native-system-font-text parity-resize-native-generic-font-text parity-resize-native-loaded-font-data-text parity-resize-native-resource-font-text parity-resize-native-system-font-text parity-forced-context-native-custom-font-text-image parity-forced-context-native-generic-font-text parity-forced-context-native-loaded-font-data-text parity-forced-context-native-resource-font-text parity-forced-context-native-system-font-text"
+      ;;
+    descriptor-lifecycle)
+      echo "parity-color-filter-handle parity-resize-color-filter-handle parity-forced-context-color-filter-handle parity-color-matrix-filter parity-lighting-filter parity-descriptor-eviction"
+      ;;
+    shader-rendering)
+      echo "parity-image-shader parity-color-shader parity-resize-color-shader parity-forced-context-color-shader parity-noise-shader parity-resize-noise-shader parity-forced-context-noise-shader parity-turbulence-shader parity-resize-turbulence-shader parity-forced-context-turbulence-shader parity-image-shader-color-filter parity-composite-shader parity-composite-noise-shader parity-resize-composite-noise-shader parity-forced-context-composite-noise-shader parity-composite-shader-color-filter parity-linear-gradient-shader-color-filter parity-transformed-shader"
+      ;;
+    runtime-effect)
+      echo "parity-runtime-effect-pure-color parity-resize-runtime-effect-pure-color parity-forced-context-runtime-effect-pure-color parity-runtime-effect-uniform-only parity-runtime-effect-child-only parity-runtime-effect-shader-source-cache-eviction parity-runtime-effect-shader parity-runtime-effect-shader-color-filter parity-runtime-effect-color-filter parity-runtime-effect-stable-color-filter parity-resize-runtime-effect-stable-color-filter parity-forced-context-runtime-effect-stable-color-filter parity-runtime-effect-color-filter-child parity-runtime-effect-source-cache-eviction"
+      ;;
+    graphics-layer-basic)
+      echo "parity-graphics-layer parity-graphics-layer-effects parity-graphics-layer-blend-mode parity-graphics-layer-color-filter parity-graphics-layer-color-matrix-filter parity-graphics-layer-blend-color-filter parity-graphics-layer-blend-color-matrix-filter"
+      ;;
+    graphics-layer-effects)
+      echo "parity-resize-graphics-layer-color-matrix-filter parity-forced-context-graphics-layer-color-matrix-filter parity-resize-graphics-layer-render-effect parity-forced-context-graphics-layer-render-effect parity-graphics-layer-offset-effect parity-graphics-layer-chained-render-effect parity-graphics-layer-render-effect-color-filter parity-graphics-layer-render-effect-blend-mode parity-graphics-layer-render-effect-color-matrix-filter parity-graphics-layer-render-effect-blend-color-filter parity-graphics-layer-render-effect-blend-color-matrix-filter parity-graphics-layer-offset-effect-blend-color-matrix-filter parity-graphics-layer-chained-render-effect-blend-color-matrix-filter parity-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter"
+      ;;
+    graphics-layer-clip-shadow-transform)
+      echo "parity-graphics-layer-clip parity-graphics-layer-round-clip parity-graphics-layer-path-clip parity-graphics-layer-shadow parity-graphics-layer-round-shadow parity-graphics-layer-path-shadow parity-graphics-layer-modulate-alpha parity-graphics-layer-offscreen parity-graphics-layer-rotationx parity-graphics-layer-rotationy parity-graphics-layer-rotationxy parity-graphics-layer-scale-translate parity-graphics-layer-near-camera parity-graphics-layer-offcenter-pivot"
+      ;;
+    *)
+      echo "Unknown CASE_GROUPS entry: $1" >&2
+      exit 2
+      ;;
+  esac
+}
+
+if [[ "${LIST_CASE_GROUPS}" == "true" ]]; then
+  list_case_groups
+  exit 0
+fi
+
+if [[ "${LIST_CASE_GROUP_COUNTS}" == "true" ]]; then
+  for group in $(list_case_groups); do
+    printf "%s\t%s\n" "${group}" "$(case_group_cases "${group}" | wc -w | tr -d ' ')"
+  done
+  exit 0
+fi
+
+case_in_words() {
+  local needle="$1"
+  shift
+  local word
+  for word in "$@"; do
+    if [[ "${word}" == "${needle}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+group_case_union() {
+  local seen=()
+  local group
+  local name
+  for group in $(list_case_groups); do
+    for name in $(case_group_cases "${group}"); do
+      if (( ${#seen[@]} == 0 )) || ! case_in_words "${name}" "${seen[@]}"; then
+        seen+=("${name}")
+        printf "%s\n" "${name}"
+      fi
+    done
+  done
+}
+
+list_ungrouped_cases() {
+  local grouped_cases
+  grouped_cases="$(group_case_union)"
+  local name
+  for name in ${CASES}; do
+    if ! case_in_words "${name}" ${grouped_cases}; then
+      printf "%s\n" "${name}"
+    fi
+  done
+}
+
+if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
+  CASES=""
+  for group in ${CASE_GROUPS}; do
+    CASES="${CASES} $(case_group_cases "${group}")"
+  done
+  CASES="${CASES# }"
+fi
 
 if [[ -n "${CASES_FROM:-}" || -n "${CASES_UNTIL:-}" ]]; then
   filtered=""
   include=false
+  started=false
+  ended=false
   [[ -z "${CASES_FROM:-}" ]] && include=true
   for case_name in ${CASES}; do
     if [[ -n "${CASES_FROM:-}" && "${case_name}" == "${CASES_FROM}" ]]; then
       include=true
+      started=true
     fi
     if [[ "${include}" == "true" ]]; then
       filtered="${filtered} ${case_name}"
     fi
     if [[ -n "${CASES_UNTIL:-}" && "${case_name}" == "${CASES_UNTIL}" ]]; then
+      ended=true
       break
     fi
   done
+  if [[ -n "${CASES_FROM:-}" && "${started}" != "true" ]]; then
+    echo "Unknown CASES_FROM: ${CASES_FROM}" >&2
+    exit 2
+  fi
+  if [[ -n "${CASES_UNTIL:-}" && "${ended}" != "true" ]]; then
+    echo "Unknown CASES_UNTIL: ${CASES_UNTIL}" >&2
+    exit 2
+  fi
   CASES="${filtered# }"
 fi
 
@@ -33,6 +156,11 @@ if [[ "${LIST_CASES:-false}" == "true" ]]; then
   for case_name in ${CASES}; do
     echo "${case_name}"
   done
+  exit 0
+fi
+
+if [[ "${LIST_UNGROUPED_CASES}" == "true" ]]; then
+  list_ungrouped_cases
   exit 0
 fi
 
