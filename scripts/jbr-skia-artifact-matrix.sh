@@ -23,13 +23,24 @@ OLD_API_EXPECTED_REASON="${OLD_API_EXPECTED_REASON:-public-api-missing}"
 OLD_SKIKO_EXPECTED_REASON="${OLD_SKIKO_EXPECTED_REASON:-native-abi-mismatch}"
 OLD_CMP_EXPECTED_REASON="${OLD_CMP_EXPECTED_REASON:-public-api-missing}"
 DRY_RUN="${DRY_RUN:-false}"
+CASES="${CASES:-}"
+LIST_CASES="${LIST_CASES:-false}"
+LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
 REQUIRE_OLD_ARTIFACT_ROWS="${REQUIRE_OLD_ARTIFACT_ROWS:-false}"
 EXPECT_BACKGROUND_WINDOW="${EXPECT_BACKGROUND_WINDOW:-true}"
 SKIPPED_OPTIONAL_ROWS=0
+MATRIX_INITIALIZED=false
 
-mkdir -p "${OUT_ROOT}"
 MATRIX_TSV="${OUT_ROOT}/matrix.tsv"
-printf "case\tstatus\texpected\tactual_fallbacks\tcommand_frames\tbackground_window\treport\tnote\n" >"${MATRIX_TSV}"
+ALL_CASES=(
+  current-all
+  missing-public-api
+  old-api-current-runtime
+  old-native-current-api
+  old-desktop-current-runtime
+  old-skiko-current-jbr
+  old-cmp-current-jbr
+)
 
 usage() {
   cat <<EOF_USAGE
@@ -61,6 +72,9 @@ Expected fallback variables for optional rows:
   OLD_CMP_EXPECTED_REASON     Default: public-api-missing
 
 Validation controls:
+  CASES                       Space-separated exact rows to run.
+  LIST_CASES                  Print selected rows without launching. Default: false
+  LIST_CASE_COUNT             Print selected row count without launching. Default: false
   REQUIRE_OLD_ARTIFACT_ROWS   When true, fail if any optional old-artifact row is skipped. Default: false
   EXPECT_BACKGROUND_WINDOW    Expected magic_jewel_background_window summary value. Default: true
 EOF_USAGE
@@ -102,7 +116,17 @@ require_dir() {
   fi
 }
 
+init_matrix() {
+  if [[ "${MATRIX_INITIALIZED}" == "true" ]]; then
+    return 0
+  fi
+  mkdir -p "${OUT_ROOT}"
+  printf "case\tstatus\texpected\tactual_fallbacks\tcommand_frames\tbackground_window\treport\tnote\n" >"${MATRIX_TSV}"
+  MATRIX_INITIALIZED=true
+}
+
 append_row() {
+  init_matrix
   local name="$1"
   local status="$2"
   local expected="$3"
@@ -113,6 +137,36 @@ append_row() {
   local note="$8"
   printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
     "${name}" "${status}" "${expected}" "${fallbacks}" "${command_frames}" "${background_window}" "${report}" "${note}" >>"${MATRIX_TSV}"
+}
+
+case_known() {
+  local needle="$1"
+  local item
+  for item in "${ALL_CASES[@]}"; do
+    if [[ "${item}" == "${needle}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+selected_cases() {
+  if [[ -n "${CASES}" ]]; then
+    printf "%s\n" ${CASES}
+  else
+    printf "%s\n" "${ALL_CASES[@]}"
+  fi
+}
+
+case_selected() {
+  local needle="$1"
+  local item
+  while IFS= read -r item; do
+    if [[ "${item}" == "${needle}" ]]; then
+      return 0
+    fi
+  done < <(selected_cases)
+  return 1
 }
 
 summary_value() {
@@ -210,65 +264,98 @@ skip_case() {
   append_row "${name}" "skipped" "-" "-" "-" "-" "-" "${reason}"
 }
 
-require_dir "current desktop patch" "${CURRENT_DESKTOP_PATCH}"
-require_file "current JBR API shim" "${CURRENT_JBR_API_SHIM}"
-require_file "current JBR Skia dylib" "${CURRENT_JBR_SKIA_LIB}"
-require_dir "current CMP output" "${CURRENT_CMP_OUT}"
+while IFS= read -r selected_case; do
+  if ! case_known "${selected_case}"; then
+    echo "Unknown CASES entry: ${selected_case}" >&2
+    exit 2
+  fi
+done < <(selected_cases)
+
+if [[ "${LIST_CASES}" == "true" ]]; then
+  selected_cases
+  exit 0
+fi
+
+if [[ "${LIST_CASE_COUNT}" == "true" ]]; then
+  selected_cases | wc -l | tr -d ' '
+  exit 0
+fi
 
 if [[ -n "${OLD_ARTIFACT_BUNDLE}" ]]; then
   load_old_artifact_bundle "${OLD_ARTIFACT_BUNDLE}"
 fi
 
-run_case \
-  current-all \
-  "${CURRENT_DESKTOP_PATCH}" \
-  "${CURRENT_JBR_API_SHIM}" \
-  "${CURRENT_JBR_SKIA_LIB}" \
-  "${CURRENT_SKIKO_VERSION}" \
-  "${CURRENT_CMP_OUT}" \
-  none
-
-run_case \
-  missing-public-api \
-  "${CURRENT_DESKTOP_PATCH}" \
-  /tmp/missing-jbr-api-shim.jar \
-  "${CURRENT_JBR_SKIA_LIB}" \
-  "${CURRENT_SKIKO_VERSION}" \
-  "${CURRENT_CMP_OUT}" \
-  public-api-missing
-
-if [[ -n "${OLD_JBR_API_SHIM}" ]]; then
-  require_file "old JBR API shim" "${OLD_JBR_API_SHIM}"
-  run_case old-api-current-runtime "${CURRENT_DESKTOP_PATCH}" "${OLD_JBR_API_SHIM}" "${CURRENT_JBR_SKIA_LIB}" "${CURRENT_SKIKO_VERSION}" "${CURRENT_CMP_OUT}" "${OLD_API_EXPECTED_REASON}"
-else
-  skip_case old-api-current-runtime "set OLD_JBR_API_SHIM to run"
+if case_selected current-all || case_selected missing-public-api || case_selected old-api-current-runtime || case_selected old-native-current-api || case_selected old-desktop-current-runtime || case_selected old-skiko-current-jbr || case_selected old-cmp-current-jbr; then
+  require_dir "current desktop patch" "${CURRENT_DESKTOP_PATCH}"
+  require_file "current JBR API shim" "${CURRENT_JBR_API_SHIM}"
+  require_file "current JBR Skia dylib" "${CURRENT_JBR_SKIA_LIB}"
+  require_dir "current CMP output" "${CURRENT_CMP_OUT}"
 fi
 
-if [[ -n "${OLD_JBR_SKIA_LIB}" ]]; then
-  require_file "old JBR Skia dylib" "${OLD_JBR_SKIA_LIB}"
-  run_case old-native-current-api "${CURRENT_DESKTOP_PATCH}" "${CURRENT_JBR_API_SHIM}" "${OLD_JBR_SKIA_LIB}" "${CURRENT_SKIKO_VERSION}" "${CURRENT_CMP_OUT}" "${OLD_JBR_EXPECTED_REASON}"
-else
-  skip_case old-native-current-api "set OLD_JBR_SKIA_LIB to run"
+if case_selected current-all; then
+  run_case \
+    current-all \
+    "${CURRENT_DESKTOP_PATCH}" \
+    "${CURRENT_JBR_API_SHIM}" \
+    "${CURRENT_JBR_SKIA_LIB}" \
+    "${CURRENT_SKIKO_VERSION}" \
+    "${CURRENT_CMP_OUT}" \
+    none
 fi
 
-if [[ -n "${OLD_DESKTOP_PATCH}" ]]; then
-  require_dir "old desktop patch" "${OLD_DESKTOP_PATCH}"
-  run_case old-desktop-current-runtime "${OLD_DESKTOP_PATCH}" "${CURRENT_JBR_API_SHIM}" "${CURRENT_JBR_SKIA_LIB}" "${CURRENT_SKIKO_VERSION}" "${CURRENT_CMP_OUT}" "${OLD_JBR_EXPECTED_REASON}"
-else
-  skip_case old-desktop-current-runtime "set OLD_DESKTOP_PATCH to run"
+if case_selected missing-public-api; then
+  run_case \
+    missing-public-api \
+    "${CURRENT_DESKTOP_PATCH}" \
+    /tmp/missing-jbr-api-shim.jar \
+    "${CURRENT_JBR_SKIA_LIB}" \
+    "${CURRENT_SKIKO_VERSION}" \
+    "${CURRENT_CMP_OUT}" \
+    public-api-missing
 fi
 
-if [[ -n "${OLD_SKIKO_VERSION}" ]]; then
-  run_case old-skiko-current-jbr "${CURRENT_DESKTOP_PATCH}" "${CURRENT_JBR_API_SHIM}" "${CURRENT_JBR_SKIA_LIB}" "${OLD_SKIKO_VERSION}" "${CURRENT_CMP_OUT}" "${OLD_SKIKO_EXPECTED_REASON}"
-else
-  skip_case old-skiko-current-jbr "set OLD_SKIKO_VERSION to run"
+if case_selected old-api-current-runtime; then
+  if [[ -n "${OLD_JBR_API_SHIM}" ]]; then
+    require_file "old JBR API shim" "${OLD_JBR_API_SHIM}"
+    run_case old-api-current-runtime "${CURRENT_DESKTOP_PATCH}" "${OLD_JBR_API_SHIM}" "${CURRENT_JBR_SKIA_LIB}" "${CURRENT_SKIKO_VERSION}" "${CURRENT_CMP_OUT}" "${OLD_API_EXPECTED_REASON}"
+  else
+    skip_case old-api-current-runtime "set OLD_JBR_API_SHIM to run"
+  fi
 fi
 
-if [[ -n "${OLD_CMP_OUT}" ]]; then
-  require_dir "old CMP output" "${OLD_CMP_OUT}"
-  run_case old-cmp-current-jbr "${CURRENT_DESKTOP_PATCH}" "${CURRENT_JBR_API_SHIM}" "${CURRENT_JBR_SKIA_LIB}" "${CURRENT_SKIKO_VERSION}" "${OLD_CMP_OUT}" "${OLD_CMP_EXPECTED_REASON}"
-else
-  skip_case old-cmp-current-jbr "set OLD_CMP_OUT to run"
+if case_selected old-native-current-api; then
+  if [[ -n "${OLD_JBR_SKIA_LIB}" ]]; then
+    require_file "old JBR Skia dylib" "${OLD_JBR_SKIA_LIB}"
+    run_case old-native-current-api "${CURRENT_DESKTOP_PATCH}" "${CURRENT_JBR_API_SHIM}" "${OLD_JBR_SKIA_LIB}" "${CURRENT_SKIKO_VERSION}" "${CURRENT_CMP_OUT}" "${OLD_JBR_EXPECTED_REASON}"
+  else
+    skip_case old-native-current-api "set OLD_JBR_SKIA_LIB to run"
+  fi
+fi
+
+if case_selected old-desktop-current-runtime; then
+  if [[ -n "${OLD_DESKTOP_PATCH}" ]]; then
+    require_dir "old desktop patch" "${OLD_DESKTOP_PATCH}"
+    run_case old-desktop-current-runtime "${OLD_DESKTOP_PATCH}" "${CURRENT_JBR_API_SHIM}" "${CURRENT_JBR_SKIA_LIB}" "${CURRENT_SKIKO_VERSION}" "${CURRENT_CMP_OUT}" "${OLD_JBR_EXPECTED_REASON}"
+  else
+    skip_case old-desktop-current-runtime "set OLD_DESKTOP_PATCH to run"
+  fi
+fi
+
+if case_selected old-skiko-current-jbr; then
+  if [[ -n "${OLD_SKIKO_VERSION}" ]]; then
+    run_case old-skiko-current-jbr "${CURRENT_DESKTOP_PATCH}" "${CURRENT_JBR_API_SHIM}" "${CURRENT_JBR_SKIA_LIB}" "${OLD_SKIKO_VERSION}" "${CURRENT_CMP_OUT}" "${OLD_SKIKO_EXPECTED_REASON}"
+  else
+    skip_case old-skiko-current-jbr "set OLD_SKIKO_VERSION to run"
+  fi
+fi
+
+if case_selected old-cmp-current-jbr; then
+  if [[ -n "${OLD_CMP_OUT}" ]]; then
+    require_dir "old CMP output" "${OLD_CMP_OUT}"
+    run_case old-cmp-current-jbr "${CURRENT_DESKTOP_PATCH}" "${CURRENT_JBR_API_SHIM}" "${CURRENT_JBR_SKIA_LIB}" "${CURRENT_SKIKO_VERSION}" "${OLD_CMP_OUT}" "${OLD_CMP_EXPECTED_REASON}"
+  else
+    skip_case old-cmp-current-jbr "set OLD_CMP_OUT to run"
+  fi
 fi
 
 if [[ "${REQUIRE_OLD_ARTIFACT_ROWS}" == "true" && "${SKIPPED_OPTIONAL_ROWS}" -gt 0 ]]; then
