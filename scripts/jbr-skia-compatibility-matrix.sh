@@ -10,14 +10,15 @@ WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 EXPECT_BACKGROUND_WINDOW="${EXPECT_BACKGROUND_WINDOW:-true}"
 CASES_FILTER="${CASES:-}"
-
-mkdir -p "${OUT_ROOT}"
+LIST_CASES="${LIST_CASES:-false}"
+LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
+LISTED_CASE_COUNT=0
+MATCHED_CASES=""
+MATRIX_INITIALIZED=false
 MATRIX_TSV="${OUT_ROOT}/matrix.tsv"
-printf "case\tstatus\tfallbacks\tcommand_frames\tbackground_window\treport\n" > "${MATRIX_TSV}"
 
-run_case() {
+case_selected() {
   local name="$1"
-  shift
   if [[ -n "${CASES_FILTER}" ]]; then
     local selected=false
     local filter
@@ -28,9 +29,51 @@ run_case() {
       fi
     done
     if [[ "${selected}" != "true" ]]; then
-      return 0
+      return 1
     fi
   fi
+  MATCHED_CASES="${MATCHED_CASES} ${name}"
+  return 0
+}
+
+validate_case_filter() {
+  if [[ -z "${CASES_FILTER}" ]]; then
+    return 0
+  fi
+  local filter
+  for filter in ${CASES_FILTER}; do
+    if [[ " ${MATCHED_CASES} " != *" ${filter} "* ]]; then
+      echo "Unknown CASES entry: ${filter}" >&2
+      exit 2
+    fi
+  done
+}
+
+init_matrix() {
+  if [[ "${MATRIX_INITIALIZED}" == "true" ]]; then
+    return
+  fi
+  mkdir -p "${OUT_ROOT}"
+  printf "case\tstatus\tfallbacks\tcommand_frames\tbackground_window\treport\n" > "${MATRIX_TSV}"
+  MATRIX_INITIALIZED=true
+}
+
+run_case() {
+  local name="$1"
+  shift
+  if ! case_selected "${name}"; then
+    return 0
+  fi
+  if [[ "${LIST_CASES}" == "true" ]]; then
+    echo "${name}"
+    LISTED_CASE_COUNT=$((LISTED_CASE_COUNT + 1))
+    return 0
+  fi
+  if [[ "${LIST_CASE_COUNT}" == "true" ]]; then
+    LISTED_CASE_COUNT=$((LISTED_CASE_COUNT + 1))
+    return 0
+  fi
+  init_matrix
   local out_dir="${OUT_ROOT}/${name}"
   echo "== ${name} =="
   env \
@@ -115,6 +158,17 @@ run_case shader-color-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COM
 run_case shader-perlin-noise-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=196607
 run_case draw-vertices-capability-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=command-capability-mismatch JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST=131071
 run_case public-api-missing EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=public-api-missing JBR_API_SHIM=/tmp/missing-jbr-api-shim.jar
+
+validate_case_filter
+
+if [[ "${LIST_CASE_COUNT}" == "true" ]]; then
+  echo "${LISTED_CASE_COUNT}"
+  exit 0
+fi
+
+if [[ "${LIST_CASES}" == "true" ]]; then
+  exit 0
+fi
 
 echo "JBR_SKIA_COMPATIBILITY_MATRIX passed out_root=${OUT_ROOT}"
 echo "matrix=${MATRIX_TSV}"
