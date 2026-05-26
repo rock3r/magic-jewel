@@ -9,11 +9,28 @@ DURATION_SECONDS="${DURATION_SECONDS:-20}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-5}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 ENABLE_ASPROF="${ENABLE_ASPROF:-false}"
-CASES="${CASES:-picture commands commands-stable-images commands-dynamic-images commands-resize-dynamic-images}"
+LIST_CASES="${LIST_CASES:-false}"
+LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
+ALL_CASES=(
+  picture
+  commands
+  commands-stable-images
+  commands-dynamic-images
+  commands-resize-dynamic-images
+)
+CASES="${CASES:-${ALL_CASES[*]}}"
+SUITE_INITIALIZED=false
 
-mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
-printf "case\tstatus\tfallbacks\told_samples\tnew_samples\told_avg_cpu\tnew_avg_cpu\tapp_old_fps\tapp_new_fps\tjbr_picture_fps\tjbr_command_fps\tjbr_command_frames\treport\n" > "${SUITE_TSV}"
+
+init_suite() {
+  if [[ "${SUITE_INITIALIZED}" == "true" ]]; then
+    return 0
+  fi
+  mkdir -p "${OUT_ROOT}"
+  printf "case\tstatus\tfallbacks\told_samples\tnew_samples\told_avg_cpu\tnew_avg_cpu\tapp_old_fps\tapp_new_fps\tjbr_picture_fps\tjbr_command_fps\tjbr_command_frames\treport\n" > "${SUITE_TSV}"
+  SUITE_INITIALIZED=true
+}
 
 summary_value() {
   local file="$1"
@@ -22,6 +39,7 @@ summary_value() {
 }
 
 run_case() {
+  init_suite
   local name="$1"
   shift
   local out_dir="${OUT_ROOT}/${name}"
@@ -76,6 +94,21 @@ run_case() {
   [[ "${status}" == "passed" ]]
 }
 
+case_known() {
+  local needle="$1"
+  local item
+  for item in "${ALL_CASES[@]}"; do
+    if [[ "${item}" == "${needle}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+selected_cases() {
+  printf "%s\n" ${CASES}
+}
+
 run_named_case() {
   case "$1" in
     picture)
@@ -99,6 +132,23 @@ run_named_case() {
       ;;
   esac
 }
+
+while IFS= read -r case_name; do
+  if ! case_known "${case_name}"; then
+    echo "Unknown benchmark case: ${case_name}" >&2
+    exit 2
+  fi
+done < <(selected_cases)
+
+if [[ "${LIST_CASES}" == "true" ]]; then
+  selected_cases
+  exit 0
+fi
+
+if [[ "${LIST_CASE_COUNT}" == "true" ]]; then
+  selected_cases | wc -l | tr -d ' '
+  exit 0
+fi
 
 for case_name in ${CASES}; do
   run_named_case "${case_name}"
