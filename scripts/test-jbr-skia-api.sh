@@ -29,6 +29,16 @@ require_dir() {
   fi
 }
 
+remove_desktop_stub() {
+  rm -f \
+    "${DESKTOP_PATCH_DIR}/com/jetbrains/exported/JBRApi.class" \
+    "${DESKTOP_PATCH_DIR}/com/jetbrains/exported/JBRApi\$Service.class" \
+    "${DESKTOP_PATCH_DIR}/com/jetbrains/exported/JBRApi\$Provides.class" \
+    "${DESKTOP_PATCH_DIR}/com/jetbrains/exported/JBRApi\$Provided.class" \
+    "${DESKTOP_PATCH_DIR}/com/jetbrains/exported/JBRApi\$ServiceNotAvailableException.class" 2>/dev/null || true
+  rmdir "${DESKTOP_PATCH_DIR}/com/jetbrains/exported" 2>/dev/null || true
+}
+
 safe_recreate_dir() {
   local path="$1"
   case "${path}" in
@@ -53,6 +63,8 @@ require_dir "${STUB_SRC_DIR}"
 require_file "${STUB_SRC_DIR}/com/jetbrains/exported/JBRApi.java"
 require_file "${NATIVE_LIB}"
 require_file "${JBR_ROOT}/test/jdk/jb/JBRSkia/JBRSkiaApiTest.java"
+
+trap remove_desktop_stub EXIT
 
 echo "== Patch temporary JBRApi stub into java.desktop overlay =="
 javac \

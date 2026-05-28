@@ -38,7 +38,7 @@ Parser/API-side JBR Skia smoke:
 ./scripts/test-jbr-skia-api.sh
 ```
 
-The helper rebuilds the local patched JBR artifacts by default, patches the temporary `JBRApi` stub back into the desktop overlay for the test runtime, compiles `test/jdk/jb/JBRSkia/JBRSkiaApiTest.java`, and runs it headlessly against `/tmp/jbr-skia-native/libjbrskiainterop.dylib`. Set `REBUILD_LOCAL_ARTIFACTS=false` to reuse an existing `/tmp/jbr-skia-run` overlay.
+The helper rebuilds the local patched JBR artifacts by default, patches the temporary `JBRApi` stub back into the desktop overlay for the test runtime, compiles `test/jdk/jb/JBRSkia/JBRSkiaApiTest.java`, runs it headlessly against `/tmp/jbr-skia-native/libjbrskiainterop.dylib`, and removes the temporary stub classes before exit. Set `REBUILD_LOCAL_ARTIFACTS=false` to reuse an existing `/tmp/jbr-skia-run` overlay.
 
 By default Magic Jewel compiles against and the interop run prepends patched CMP jars from the sibling `../cmp/out/compose-multiplatform-core` output when it exists, falling back to the sibling `../cmp` checkout. Override that with `LOCAL_CMP_OUT=/path/to/compose-multiplatform-core` or `-PlocalCmpOut=/path/to/compose-multiplatform-core` if the worktree moves. Keeping those jars on both classpaths is intentional: command probes that exercise new Compose APIs must not compile against published Compose jars and run against the patched local ABI.
 Set `JBR_SKIA_RENDER_MODE=commands` to exercise the lower-level command-list probe instead of the default Skia picture replay path.
