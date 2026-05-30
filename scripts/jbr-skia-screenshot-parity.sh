@@ -6,6 +6,7 @@ ROOT_DIR="${ROOT_DIR:-$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)}"
 OUT_DIR="${OUT_DIR:-${ROOT_DIR}/out/jbr-skia-screenshot-parity/$(date +%Y%m%d-%H%M%S)}"
 REPORT_SCRIPT="${REPORT_SCRIPT:-${SCRIPT_DIR}/jbr-skia-interop-report.sh}"
 COMPARE_SCRIPT="${COMPARE_SCRIPT:-${SCRIPT_DIR}/compare-jbr-skia-window-screenshots.sh}"
+EXPECT_SCREENSHOT_ASSERTION="${EXPECT_SCREENSHOT_ASSERTION:-true}"
 
 mkdir -p "${OUT_DIR}"
 
@@ -34,17 +35,27 @@ SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}" \
 "${REPORT_SCRIPT}"
 
 compare_status=0
-"${COMPARE_SCRIPT}" \
-  "${OUT_DIR}/report/old-window.png" \
-  "${OUT_DIR}/report/new-window.png" \
-  "${OUT_DIR}/report/parity-diff.png" \
-  > "${OUT_DIR}/parity.log" 2>&1 || compare_status=$?
+if [ "${EXPECT_SCREENSHOT_ASSERTION}" = "false" ]; then
+  cat > "${OUT_DIR}/parity.log" <<EOF_PARITY
+JBR_SKIA_SCREENSHOT_PARITY skipped reason=EXPECT_SCREENSHOT_ASSERTION_false
+EOF_PARITY
+else
+  "${COMPARE_SCRIPT}" \
+    "${OUT_DIR}/report/old-window.png" \
+    "${OUT_DIR}/report/new-window.png" \
+    "${OUT_DIR}/report/parity-diff.png" \
+    > "${OUT_DIR}/parity.log" 2>&1 || compare_status=$?
+fi
 
 {
   echo
   echo "## Screenshot Parity Diff"
   echo
-  echo "- diff image: parity-diff.png"
+  if [ "${EXPECT_SCREENSHOT_ASSERTION}" = "false" ]; then
+    echo "- diff image: skipped"
+  else
+    echo "- diff image: parity-diff.png"
+  fi
   echo "- parity log: ../parity.log"
   echo
   echo '```text'
