@@ -13,6 +13,7 @@ CASE_GROUPS="${CASE_GROUPS:-}"
 CASES_WAS_SET="${CASES+x}"
 LIST_CASE_GROUPS="${LIST_CASE_GROUPS:-false}"
 LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
+LIST_UNGROUPED_CASES="${LIST_UNGROUPED_CASES:-false}"
 LIST_CASES="${LIST_CASES:-false}"
 LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
 ALL_CASES=(
@@ -57,6 +58,48 @@ if [[ "${LIST_CASE_GROUP_COUNTS}" == "true" ]]; then
   for group in $(list_case_groups); do
     printf "%s\t%s\n" "${group}" "$(case_group_cases "${group}" | wc -w | tr -d ' ')"
   done
+  exit 0
+fi
+
+case_in_words() {
+  local needle="$1"
+  shift
+  local word
+  for word in "$@"; do
+    if [[ "${word}" == "${needle}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+group_case_union() {
+  local seen=()
+  local group
+  local name
+  for group in $(list_case_groups); do
+    for name in $(case_group_cases "${group}"); do
+      if (( ${#seen[@]} == 0 )) || ! case_in_words "${name}" "${seen[@]}"; then
+        seen+=("${name}")
+        printf "%s\n" "${name}"
+      fi
+    done
+  done
+}
+
+list_ungrouped_cases() {
+  local grouped_cases
+  grouped_cases="$(group_case_union)"
+  local name
+  for name in "${ALL_CASES[@]}"; do
+    if ! case_in_words "${name}" ${grouped_cases}; then
+      printf "%s\n" "${name}"
+    fi
+  done
+}
+
+if [[ "${LIST_UNGROUPED_CASES}" == "true" ]]; then
+  list_ungrouped_cases
   exit 0
 fi
 
