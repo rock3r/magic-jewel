@@ -9,6 +9,10 @@ DURATION_SECONDS="${DURATION_SECONDS:-20}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-5}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 ENABLE_ASPROF="${ENABLE_ASPROF:-false}"
+CASE_GROUPS="${CASE_GROUPS:-}"
+CASES_WAS_SET="${CASES+x}"
+LIST_CASE_GROUPS="${LIST_CASE_GROUPS:-false}"
+LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
 LIST_CASES="${LIST_CASES:-false}"
 LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
 ALL_CASES=(
@@ -22,6 +26,47 @@ CASES="${CASES:-${ALL_CASES[*]}}"
 SUITE_INITIALIZED=false
 
 SUITE_TSV="${OUT_ROOT}/suite.tsv"
+
+list_case_groups() {
+  printf "%s\n" \
+    baseline \
+    image-cache
+}
+
+case_group_cases() {
+  case "$1" in
+    baseline)
+      echo "picture commands"
+      ;;
+    image-cache)
+      echo "commands-stable-images commands-dynamic-images commands-resize-dynamic-images"
+      ;;
+    *)
+      echo "Unknown CASE_GROUPS entry: $1" >&2
+      exit 2
+      ;;
+  esac
+}
+
+if [[ "${LIST_CASE_GROUPS}" == "true" ]]; then
+  list_case_groups
+  exit 0
+fi
+
+if [[ "${LIST_CASE_GROUP_COUNTS}" == "true" ]]; then
+  for group in $(list_case_groups); do
+    printf "%s\t%s\n" "${group}" "$(case_group_cases "${group}" | wc -w | tr -d ' ')"
+  done
+  exit 0
+fi
+
+if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
+  CASES=""
+  for group in ${CASE_GROUPS}; do
+    CASES="${CASES} $(case_group_cases "${group}")"
+  done
+  CASES="${CASES# }"
+fi
 
 init_suite() {
   if [[ "${SUITE_INITIALIZED}" == "true" ]]; then
