@@ -144,6 +144,7 @@ private const val ComposeGradientShadersProperty = "magic.jewel.compose.gradient
 private const val ComposeRawLinearGradientShaderProperty = "magic.jewel.compose.rawLinearGradientShader"
 private const val ComposeRawRadialGradientShaderProperty = "magic.jewel.compose.rawRadialGradientShader"
 private const val ComposeRawSweepGradientShaderProperty = "magic.jewel.compose.rawSweepGradientShader"
+private const val ComposeRawConicalGradientShaderProperty = "magic.jewel.compose.rawConicalGradientShader"
 private const val ComposeRawNoiseShaderProperty = "magic.jewel.compose.rawNoiseShader"
 private const val ComposeRawTurbulenceShaderProperty = "magic.jewel.compose.rawTurbulenceShader"
 private const val ComposePictureShaderProperty = "magic.jewel.compose.pictureShader"
@@ -453,6 +454,9 @@ private fun MagicJewelApp() {
     }
     val composeRawSweepGradientShaderEnabled = remember {
         System.getProperty(ComposeRawSweepGradientShaderProperty, "false").toBoolean()
+    }
+    val composeRawConicalGradientShaderEnabled = remember {
+        System.getProperty(ComposeRawConicalGradientShaderProperty, "false").toBoolean()
     }
     val composeRawNoiseShaderEnabled = remember {
         System.getProperty(ComposeRawNoiseShaderProperty, "false").toBoolean()
@@ -1136,6 +1140,29 @@ private fun MagicJewelApp() {
                                 shader = makeRawSkiaSweepGradientShader(
                                     topLeft.x + 70f,
                                     topLeft.y + 58f,
+                                    RawGradientColors,
+                                    RawGradientStops,
+                                ).asComposeShader()
+                            },
+                        )
+                    }
+                }
+                if (composeRawConicalGradientShaderEnabled) {
+                    val topLeft = Offset(size.width - 744f, size.height - 232f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = topLeft.x,
+                            top = topLeft.y,
+                            right = topLeft.x + 140f,
+                            bottom = topLeft.y + 116f,
+                            paint = Paint().apply {
+                                shader = makeRawSkiaConicalGradientShader(
+                                    topLeft.x + 28f,
+                                    topLeft.y + 24f,
+                                    12f,
+                                    topLeft.x + 112f,
+                                    topLeft.y + 92f,
+                                    86f,
                                     RawGradientColors,
                                     RawGradientStops,
                                 ).asComposeShader()
@@ -3298,6 +3325,26 @@ private fun makeRawSkiaSweepGradientShader(
             method.parameterTypes[2].name == "org.jetbrains.skia.Gradient"
     }
     return newStyleMethod.invoke(companion, centerX, centerY, gradient, null) as org.jetbrains.skia.Shader
+}
+
+private fun makeRawSkiaConicalGradientShader(
+    x0: Float,
+    y0: Float,
+    r0: Float,
+    x1: Float,
+    y1: Float,
+    r1: Float,
+    colors: IntArray,
+    positions: FloatArray,
+): org.jetbrains.skia.Shader {
+    val companion = org.jetbrains.skia.Shader.Companion
+    val gradient = makeRawSkiaGradient(colors, positions)
+    val method = companion.javaClass.methods.first { method ->
+        method.name == "makeTwoPointConicalGradient" &&
+            method.parameterTypes.size == 8 &&
+            method.parameterTypes[6].name == "org.jetbrains.skia.Gradient"
+    }
+    return method.invoke(companion, x0, y0, r0, x1, y1, r1, gradient, null) as org.jetbrains.skia.Shader
 }
 
 private fun defaultSkiaGradientStyle(): Any {
