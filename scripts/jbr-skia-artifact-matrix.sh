@@ -23,7 +23,11 @@ OLD_API_EXPECTED_REASON="${OLD_API_EXPECTED_REASON:-public-api-missing}"
 OLD_SKIKO_EXPECTED_REASON="${OLD_SKIKO_EXPECTED_REASON:-native-abi-mismatch}"
 OLD_CMP_EXPECTED_REASON="${OLD_CMP_EXPECTED_REASON:-public-api-missing}"
 DRY_RUN="${DRY_RUN:-false}"
+CASE_GROUPS="${CASE_GROUPS:-}"
+CASES_WAS_SET="${CASES+x}"
 CASES="${CASES:-}"
+LIST_CASE_GROUPS="${LIST_CASE_GROUPS:-false}"
+LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
 LIST_CASES="${LIST_CASES:-false}"
 LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
 REQUIRE_OLD_ARTIFACT_ROWS="${REQUIRE_OLD_ARTIFACT_ROWS:-false}"
@@ -73,11 +77,35 @@ Expected fallback variables for optional rows:
 
 Validation controls:
   CASES                       Space-separated exact rows to run.
+  CASE_GROUPS                 Space-separated row groups to run when CASES is unset.
+  LIST_CASE_GROUPS            Print available row groups without launching. Default: false
+  LIST_CASE_GROUP_COUNTS      Print available row groups and sizes without launching. Default: false
   LIST_CASES                  Print selected rows without launching. Default: false
   LIST_CASE_COUNT             Print selected row count without launching. Default: false
   REQUIRE_OLD_ARTIFACT_ROWS   When true, fail if any optional old-artifact row is skipped. Default: false
   EXPECT_BACKGROUND_WINDOW    Expected magic_jewel_background_window summary value. Default: true
 EOF_USAGE
+}
+
+list_case_groups() {
+  printf "%s\n" \
+    required \
+    optional-old
+}
+
+case_group_cases() {
+  case "$1" in
+    required)
+      echo "current-all missing-public-api"
+      ;;
+    optional-old)
+      echo "old-api-current-runtime old-native-current-api old-desktop-current-runtime old-skiko-current-jbr old-cmp-current-jbr"
+      ;;
+    *)
+      echo "Unknown CASE_GROUPS entry: $1" >&2
+      exit 2
+      ;;
+  esac
 }
 
 while [[ $# -gt 0 ]]; do
@@ -97,6 +125,26 @@ while [[ $# -gt 0 ]]; do
   esac
   shift
 done
+
+if [[ "${LIST_CASE_GROUPS}" == "true" ]]; then
+  list_case_groups
+  exit 0
+fi
+
+if [[ "${LIST_CASE_GROUP_COUNTS}" == "true" ]]; then
+  for group in $(list_case_groups); do
+    printf "%s\t%s\n" "${group}" "$(case_group_cases "${group}" | wc -w | tr -d ' ')"
+  done
+  exit 0
+fi
+
+if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
+  CASES=""
+  for group in ${CASE_GROUPS}; do
+    CASES="${CASES} $(case_group_cases "${group}")"
+  done
+  CASES="${CASES# }"
+fi
 
 require_file() {
   local label="$1"
