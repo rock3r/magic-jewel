@@ -9,13 +9,70 @@ DURATION_SECONDS="${DURATION_SECONDS:-5}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 EXPECT_BACKGROUND_WINDOW="${EXPECT_BACKGROUND_WINDOW:-true}"
+CASE_GROUPS="${CASE_GROUPS:-}"
+CASES_WAS_SET="${CASES+x}"
 CASES_FILTER="${CASES:-}"
+LIST_CASE_GROUPS="${LIST_CASE_GROUPS:-false}"
+LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
 LIST_CASES="${LIST_CASES:-false}"
 LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
 LISTED_CASE_COUNT=0
 MATCHED_CASES=""
 MATRIX_INITIALIZED=false
 MATRIX_TSV="${OUT_ROOT}/matrix.tsv"
+
+list_case_groups() {
+  printf "%s\n" \
+    handshake \
+    low-word-gradients \
+    low-word-effects \
+    high-word-effects \
+    high-word-shader-ui
+}
+
+case_group_cases() {
+  case "$1" in
+    handshake)
+      echo "happy abi-mismatch native-abi-mismatch command-capability-mismatch command-capability-high-mismatch public-api-missing"
+      ;;
+    low-word-gradients)
+      echo "fill-rect-linear-gradient-capability-missing fill-round-rect-linear-gradient-capability-missing fill-rect-radial-gradient-capability-missing fill-round-rect-radial-gradient-capability-missing fill-path-linear-gradient-capability-missing fill-path-radial-gradient-capability-missing fill-rect-sweep-gradient-capability-missing fill-round-rect-sweep-gradient-capability-missing fill-path-sweep-gradient-capability-missing stroke-rect-linear-gradient-capability-missing stroke-round-rect-linear-gradient-capability-missing stroke-rect-radial-gradient-capability-missing stroke-round-rect-radial-gradient-capability-missing stroke-rect-sweep-gradient-capability-missing stroke-round-rect-sweep-gradient-capability-missing"
+      ;;
+    low-word-effects)
+      echo "text-font-family-capability-missing fill-rect-image-shader-capability-missing fill-rect-blend-mode-capability-missing fill-rect-color-filter-capability-missing stroke-line-dash-path-effect-capability-missing save-layer-color-filter-capability-missing draw-image-ref-color-filter-capability-missing define-color-filter-tint-capability-missing fill-rect-color-filter-ref-capability-missing evict-color-filter-handle-capability-missing define-effect-descriptor-capability-missing save-layer-blend-mode-capability-missing save-layer-blend-color-filter-capability-missing color-matrix-capability-missing lighting-capability-missing save-layer-color-filter-ref-capability-missing image-color-filter-ref-capability-missing save-layer-blend-color-filter-ref-capability-missing"
+      ;;
+    high-word-effects)
+      echo "image-filter-capability-missing offset-image-filter-capability-missing chained-image-filter-capability-missing runtime-color-filter-capability-missing stroke-rect-dash-path-effect-capability-missing stroke-round-rect-dash-path-effect-capability-missing stroke-path-dash-path-effect-capability-missing path-effect-capability-missing direct-shadow-capability-missing"
+      ;;
+    high-word-shader-ui)
+      echo "shader-descriptor-capability-missing concat-matrix-capability-missing shader-color-filter-capability-missing draw-points-capability-missing shader-transform-capability-missing font-data-capability-missing shader-color-capability-missing shader-perlin-noise-capability-missing draw-vertices-capability-missing"
+      ;;
+    *)
+      echo "Unknown CASE_GROUPS entry: $1" >&2
+      exit 2
+      ;;
+  esac
+}
+
+if [[ "${LIST_CASE_GROUPS}" == "true" ]]; then
+  list_case_groups
+  exit 0
+fi
+
+if [[ "${LIST_CASE_GROUP_COUNTS}" == "true" ]]; then
+  for group in $(list_case_groups); do
+    printf "%s\t%s\n" "${group}" "$(case_group_cases "${group}" | wc -w | tr -d ' ')"
+  done
+  exit 0
+fi
+
+if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
+  CASES_FILTER=""
+  for group in ${CASE_GROUPS}; do
+    CASES_FILTER="${CASES_FILTER} $(case_group_cases "${group}")"
+  done
+  CASES_FILTER="${CASES_FILTER# }"
+fi
 
 case_selected() {
   local name="$1"
