@@ -26,6 +26,7 @@ ALL_CASES=(
   abi-mismatch
   native-abi-mismatch
   command-capability-mismatch
+  command-capability-high-mismatch
   fill-rect-linear-gradient-capability-missing
   fill-round-rect-linear-gradient-capability-missing
   fill-rect-radial-gradient-capability-missing
@@ -77,7 +78,6 @@ ALL_CASES=(
   shader-color-capability-missing
   shader-perlin-noise-capability-missing
   draw-vertices-capability-missing
-  command-capability-high-mismatch
   public-api-missing
 )
 
