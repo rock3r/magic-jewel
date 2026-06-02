@@ -200,6 +200,8 @@ private const val ComposeGraphicsLayerBlendModeProperty = "magic.jewel.compose.g
 private const val ComposeGraphicsLayerColorFilterProperty = "magic.jewel.compose.graphicsLayerColorFilter"
 private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.compose.graphicsLayerColorMatrixFilter"
 private const val ComposeGraphicsLayerRawColorFilterProperty = "magic.jewel.compose.graphicsLayerRawColorFilter"
+private const val ComposeGraphicsLayerRawTableColorFilterProperty =
+    "magic.jewel.compose.graphicsLayerRawTableColorFilter"
 private const val ComposeGraphicsLayerRenderEffectProperty = "magic.jewel.compose.graphicsLayerRenderEffect"
 private const val ComposeGraphicsLayerRawImageFilterEffectProperty =
     "magic.jewel.compose.graphicsLayerRawImageFilterEffect"
@@ -603,6 +605,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerRawColorFilterEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRawColorFilterProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerRawTableColorFilterEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerRawTableColorFilterProperty, "false").toBoolean()
     }
     val composeGraphicsLayerRenderEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRenderEffectProperty, "false").toBoolean()
@@ -3043,6 +3048,10 @@ private fun MagicJewelApp() {
                                     Color(0xFF22D3EE).toArgb(),
                                     org.jetbrains.skia.BlendMode.SRC_IN,
                                 ).asComposeColorFilter()
+                            }
+                            if (composeGraphicsLayerRawTableColorFilterEnabled) {
+                                val table = ByteArray(256) { index -> (255 - index).toByte() }
+                                colorFilter = org.jetbrains.skia.ColorFilter.makeTable(table).asComposeColorFilter()
                             }
                             when {
                                 composeGraphicsLayerRawImageFilterEffectEnabled -> {
