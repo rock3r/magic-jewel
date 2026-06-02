@@ -183,6 +183,7 @@ private const val ComposeRuntimeEffectColorFilterInvalidNestedChildProperty =
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
 private const val ComposeRawBlendColorFilterProperty = "magic.jewel.compose.rawBlendColorFilter"
+private const val ComposeRawTableColorFilterProperty = "magic.jewel.compose.rawTableColorFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
 private const val ComposeColorMatrixFilterProperty = "magic.jewel.compose.colorMatrixFilter"
 private const val ComposeLightingFilterProperty = "magic.jewel.compose.lightingFilter"
@@ -550,6 +551,9 @@ private fun MagicJewelApp() {
     }
     val composeRawBlendColorFilterEnabled = remember {
         System.getProperty(ComposeRawBlendColorFilterProperty, "false").toBoolean()
+    }
+    val composeRawTableColorFilterEnabled = remember {
+        System.getProperty(ComposeRawTableColorFilterProperty, "false").toBoolean()
     }
     val composeColorFilterEnabled = remember {
         System.getProperty(ComposeColorFilterProperty, "false").toBoolean()
@@ -1738,6 +1742,22 @@ private fun MagicJewelApp() {
                             bottom = 112f,
                             paint = Paint().apply {
                                 color = Color(0xFFE879F9)
+                                this.colorFilter = colorFilter
+                            },
+                        )
+                    }
+                }
+                if (composeRawTableColorFilterEnabled) {
+                    val table = ByteArray(256) { index -> (255 - index).toByte() }
+                    val colorFilter = org.jetbrains.skia.ColorFilter.makeTable(table).asComposeColorFilter()
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 820f,
+                            top = 34f,
+                            right = size.width - 708f,
+                            bottom = 112f,
+                            paint = Paint().apply {
+                                color = Color(0xFF34D399)
                                 this.colorFilter = colorFilter
                             },
                         )
