@@ -302,6 +302,10 @@ val composeSaveLayerBlendModeEnabled = providers.gradleProperty("magicJewelCompo
 val composeSaveLayerRawColorFilterEnabled = providers.gradleProperty("magicJewelComposeSaveLayerRawColorFilter")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_SAVELAYER_RAW_COLOR_FILTER"))
     .orElse("false")
+val composeSaveLayerRawTableColorFilterEnabled =
+    providers.gradleProperty("magicJewelComposeSaveLayerRawTableColorFilter")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_SAVELAYER_RAW_TABLE_COLOR_FILTER"))
+        .orElse("false")
 val composeClipEnabled = providers.gradleProperty("magicJewelComposeClip")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_CLIP"))
     .orElse("false")
@@ -579,6 +583,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.saveLayerColorMatrixFilter", composeSaveLayerColorMatrixFilterEnabled.get())
     systemProperty("magic.jewel.compose.saveLayerBlendMode", composeSaveLayerBlendModeEnabled.get())
     systemProperty("magic.jewel.compose.saveLayerRawColorFilter", composeSaveLayerRawColorFilterEnabled.get())
+    systemProperty(
+        "magic.jewel.compose.saveLayerRawTableColorFilter",
+        composeSaveLayerRawTableColorFilterEnabled.get(),
+    )
     systemProperty("magic.jewel.compose.clip", composeClipEnabled.get())
     systemProperty("magic.jewel.compose.clipOut", composeClipOutEnabled.get())
     systemProperty("magic.jewel.compose.clipPath", composeClipPathEnabled.get())
