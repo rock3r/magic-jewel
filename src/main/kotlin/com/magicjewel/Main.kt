@@ -247,6 +247,7 @@ private const val ComposeRadialGradientPathProperty = "magic.jewel.compose.radia
 private const val ComposeSweepGradientProperty = "magic.jewel.compose.sweepGradient"
 private const val ComposeSweepGradientRoundRectProperty = "magic.jewel.compose.sweepGradientRoundRect"
 private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepGradientPath"
+private const val ComposeGradientPathStrokeProperty = "magic.jewel.compose.gradientPathStroke"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
 private const val ParagraphLayoutTextProperty = "magic.jewel.paragraphLayoutText"
 private const val GenericFontTextProperty = "magic.jewel.genericFontText"
@@ -742,6 +743,9 @@ private fun MagicJewelApp() {
     }
     val composeSweepGradientPathEnabled = remember {
         System.getProperty(ComposeSweepGradientPathProperty, "false").toBoolean()
+    }
+    val composeGradientPathStrokeEnabled = remember {
+        System.getProperty(ComposeGradientPathStrokeProperty, "false").toBoolean()
     }
     val unsupportedTextEnabled = remember {
         System.getProperty(UnsupportedTextProperty, "false").toBoolean()
@@ -2823,14 +2827,16 @@ private fun MagicJewelApp() {
                         lineTo(size.width - 344f, size.height - 276f)
                         close()
                     }
-                    drawPath(
-                        path = path,
-                        brush = Brush.linearGradient(
-                            colors = listOf(Color(0xFF14B8A6), Color(0xFFFDE047), Color(0xFFEC4899)),
-                            start = Offset(size.width - 350f, size.height - 360f),
-                            end = Offset(size.width - 216f, size.height - 254f),
-                        ),
+                    val brush = Brush.linearGradient(
+                        colors = listOf(Color(0xFF14B8A6), Color(0xFFFDE047), Color(0xFFEC4899)),
+                        start = Offset(size.width - 350f, size.height - 360f),
+                        end = Offset(size.width - 216f, size.height - 254f),
                     )
+                    if (composeGradientPathStrokeEnabled) {
+                        drawPath(path = path, brush = brush, style = Stroke(width = 8f))
+                    } else {
+                        drawPath(path = path, brush = brush)
+                    }
                     drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
                 }
                 if (composeRadialGradientEnabled) {
@@ -2894,14 +2900,16 @@ private fun MagicJewelApp() {
                         lineTo(size.width - 500f, size.height - 276f)
                         close()
                     }
-                    drawPath(
-                        path = path,
-                        brush = Brush.radialGradient(
-                            colors = listOf(Color(0xFFFFFBEB), Color(0xFFF97316), Color(0xFF7C3AED)),
-                            center = Offset(size.width - 438f, size.height - 304f),
-                            radius = 86f,
-                        ),
+                    val brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFFFFFBEB), Color(0xFFF97316), Color(0xFF7C3AED)),
+                        center = Offset(size.width - 438f, size.height - 304f),
+                        radius = 86f,
                     )
+                    if (composeGradientPathStrokeEnabled) {
+                        drawPath(path = path, brush = brush, style = Stroke(width = 8f))
+                    } else {
+                        drawPath(path = path, brush = brush)
+                    }
                     drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
                 }
                 if (composeSweepGradientEnabled) {
@@ -2973,13 +2981,15 @@ private fun MagicJewelApp() {
                         lineTo(size.width - 280f, size.height - 186f)
                         close()
                     }
-                    drawPath(
-                        path = path,
-                        brush = Brush.sweepGradient(
-                            colors = listOf(Color(0xFFEF4444), Color(0xFFF59E0B), Color(0xFF22D3EE), Color(0xFF7C3AED)),
-                            center = Offset(size.width - 216f, size.height - 212f),
-                        ),
+                    val brush = Brush.sweepGradient(
+                        colors = listOf(Color(0xFFEF4444), Color(0xFFF59E0B), Color(0xFF22D3EE), Color(0xFF7C3AED)),
+                        center = Offset(size.width - 216f, size.height - 212f),
                     )
+                    if (composeGradientPathStrokeEnabled) {
+                        drawPath(path = path, brush = brush, style = Stroke(width = 8f))
+                    } else {
+                        drawPath(path = path, brush = brush)
+                    }
                     drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
                 }
                 if (invalidSweepGradientEnabled) {

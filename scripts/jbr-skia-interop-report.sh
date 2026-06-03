@@ -391,6 +391,9 @@ fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE=false
+fi
 if [[ -z "${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM+x}" ]]; then
   MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=false
 fi
@@ -1334,6 +1337,7 @@ export MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_PATH
 export MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT
 export MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT
 export MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH
+export MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE
 export MAGIC_JEWEL_CORRUPT_COMMAND_STREAM
 export MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS
 export MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE
@@ -1848,6 +1852,7 @@ Environment:
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT Enables the Compose sweep-gradient rect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT Enables the Compose sweep-gradient round-rect command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH Enables the Compose sweep-gradient path command replay probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE Strokes enabled gradient path probes to exercise unsupported gradient-path stroke fallback. Default: false.
   MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS Corrupts the first command record flags word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE Corrupts the command stream coordinate-space header word after recording so JBR rejects the command stream. Default: false.
   MAGIC_JEWEL_CORRUPT_COMMAND_PAINT_FORMAT Corrupts the command stream paint-format header word after recording so JBR rejects the command stream. Default: false.
@@ -3056,6 +3061,7 @@ write_report() {
     echo "- MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT: ${MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT}"
     echo "- MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT: ${MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT}"
     echo "- MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH: ${MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH}"
+    echo "- MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE: ${MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_STREAM: ${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS: ${MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS}"
     echo "- MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE: ${MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE}"
