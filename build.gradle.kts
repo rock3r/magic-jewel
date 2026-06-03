@@ -236,6 +236,14 @@ val composeGraphicsLayerUnrecordedEnabled =
     providers.gradleProperty("magicJewelComposeGraphicsLayerUnrecorded")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_UNRECORDED"))
         .orElse("false")
+val composeGraphicsLayerInvalidSizeWidthEnabled =
+    providers.gradleProperty("magicJewelComposeGraphicsLayerInvalidSizeWidth")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SIZE_WIDTH"))
+        .orElse("false")
+val composeGraphicsLayerInvalidSizeHeightEnabled =
+    providers.gradleProperty("magicJewelComposeGraphicsLayerInvalidSizeHeight")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SIZE_HEIGHT"))
+        .orElse("false")
 val composeGraphicsLayerColorFilterEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerColorFilter")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_FILTER"))
     .orElse("false")
@@ -613,6 +621,8 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.graphicsLayerBlendMode", composeGraphicsLayerBlendModeEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerInvalidBlendMode", composeGraphicsLayerInvalidBlendModeEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerUnrecorded", composeGraphicsLayerUnrecordedEnabled.get())
+    systemProperty("magic.jewel.compose.graphicsLayerInvalidSizeWidth", composeGraphicsLayerInvalidSizeWidthEnabled.get())
+    systemProperty("magic.jewel.compose.graphicsLayerInvalidSizeHeight", composeGraphicsLayerInvalidSizeHeightEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerColorFilter", composeGraphicsLayerColorFilterEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerColorMatrixFilter", composeGraphicsLayerColorMatrixFilterEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerRawColorFilter", composeGraphicsLayerRawColorFilterEnabled.get())

@@ -97,6 +97,8 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -203,6 +205,10 @@ private const val ComposeGraphicsLayerBlendModeProperty = "magic.jewel.compose.g
 private const val ComposeGraphicsLayerInvalidBlendModeProperty =
     "magic.jewel.compose.graphicsLayerInvalidBlendMode"
 private const val ComposeGraphicsLayerUnrecordedProperty = "magic.jewel.compose.graphicsLayerUnrecorded"
+private const val ComposeGraphicsLayerInvalidSizeWidthProperty =
+    "magic.jewel.compose.graphicsLayerInvalidSizeWidth"
+private const val ComposeGraphicsLayerInvalidSizeHeightProperty =
+    "magic.jewel.compose.graphicsLayerInvalidSizeHeight"
 private const val ComposeGraphicsLayerColorFilterProperty = "magic.jewel.compose.graphicsLayerColorFilter"
 private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.compose.graphicsLayerColorMatrixFilter"
 private const val ComposeGraphicsLayerRawColorFilterProperty = "magic.jewel.compose.graphicsLayerRawColorFilter"
@@ -630,6 +636,12 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerUnrecordedEnabled = remember {
         System.getProperty(ComposeGraphicsLayerUnrecordedProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerInvalidSizeWidthEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerInvalidSizeWidthProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerInvalidSizeHeightEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerInvalidSizeHeightProperty, "false").toBoolean()
     }
     val composeGraphicsLayerColorFilterEnabled = remember {
         System.getProperty(ComposeGraphicsLayerColorFilterProperty, "false").toBoolean()
@@ -3096,6 +3108,38 @@ private fun MagicJewelApp() {
                             .size(width = 52.dp, height = 52.dp),
                     ) {
                         drawLayer(unrecordedLayer)
+                    }
+                }
+                if (composeGraphicsLayerInvalidSizeWidthEnabled) {
+                    val invalidSizeLayer = rememberGraphicsLayer()
+                    LaunchedEffect(invalidSizeLayer) {
+                        invalidSizeLayer.record(Density(1f), LayoutDirection.Ltr, IntSize(-1, 52)) {
+                            drawRect(Color(0xFFEF4444))
+                        }
+                    }
+                    Canvas(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .offset(x = (-228).dp, y = (-72).dp)
+                            .size(width = 52.dp, height = 52.dp),
+                    ) {
+                        drawLayer(invalidSizeLayer)
+                    }
+                }
+                if (composeGraphicsLayerInvalidSizeHeightEnabled) {
+                    val invalidSizeLayer = rememberGraphicsLayer()
+                    LaunchedEffect(invalidSizeLayer) {
+                        invalidSizeLayer.record(Density(1f), LayoutDirection.Ltr, IntSize(52, -1)) {
+                            drawRect(Color(0xFFEF4444))
+                        }
+                    }
+                    Canvas(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .offset(x = (-228).dp, y = (-72).dp)
+                            .size(width = 52.dp, height = 52.dp),
+                    ) {
+                        drawLayer(invalidSizeLayer)
                     }
                 }
                 Box(
