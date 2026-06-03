@@ -211,6 +211,8 @@ private const val ComposeGraphicsLayerChainedRenderEffectProperty = "magic.jewel
 private const val ComposeGraphicsLayerBlurChainedRenderEffectProperty =
     "magic.jewel.compose.graphicsLayerBlurChainedRenderEffect"
 private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.graphicsLayerShadow"
+private const val ComposeGraphicsLayerInvalidShadowElevationProperty =
+    "magic.jewel.compose.graphicsLayerInvalidShadowElevation"
 private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.graphicsLayerRotationX"
 private const val ComposeGraphicsLayerRotationYProperty = "magic.jewel.compose.graphicsLayerRotationY"
 private const val ComposeGraphicsLayerScaleTranslateProperty = "magic.jewel.compose.graphicsLayerScaleTranslate"
@@ -632,6 +634,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerShadowEnabled = remember {
         System.getProperty(ComposeGraphicsLayerShadowProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerInvalidShadowElevationEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerInvalidShadowElevationProperty, "false").toBoolean()
     }
     val composeGraphicsLayerRotationXEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRotationXProperty, "false").toBoolean()
@@ -3044,6 +3049,9 @@ private fun MagicJewelApp() {
                                 shadowElevation = 18f
                                 spotShadowColor = Color(0xFF111827)
                                 ambientShadowColor = Color(0xFF111827)
+                            }
+                            if (composeGraphicsLayerInvalidShadowElevationEnabled) {
+                                shadowElevation = -1f
                             }
                             if (composeGraphicsLayerRotationXEnabled) {
                                 rotationX = 28f
