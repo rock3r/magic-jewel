@@ -222,6 +222,8 @@ private const val ComposeGraphicsLayerInvalidRotationZProperty =
     "magic.jewel.compose.graphicsLayerInvalidRotationZ"
 private const val ComposeGraphicsLayerInvalidTranslationXProperty =
     "magic.jewel.compose.graphicsLayerInvalidTranslationX"
+private const val ComposeGraphicsLayerInvalidTranslationYProperty =
+    "magic.jewel.compose.graphicsLayerInvalidTranslationY"
 private const val ComposeGraphicsLayerScaleTranslateProperty = "magic.jewel.compose.graphicsLayerScaleTranslate"
 private const val ComposeGraphicsLayerNearCameraProperty = "magic.jewel.compose.graphicsLayerNearCamera"
 private const val ComposeGraphicsLayerInvalidCameraDistanceProperty =
@@ -667,6 +669,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerInvalidTranslationXEnabled = remember {
         System.getProperty(ComposeGraphicsLayerInvalidTranslationXProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerInvalidTranslationYEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerInvalidTranslationYProperty, "false").toBoolean()
     }
     val composeGraphicsLayerScaleTranslateEnabled = remember {
         System.getProperty(ComposeGraphicsLayerScaleTranslateProperty, "false").toBoolean()
@@ -3100,6 +3105,9 @@ private fun MagicJewelApp() {
                             }
                             if (composeGraphicsLayerInvalidTranslationXEnabled) {
                                 translationX = Float.NaN
+                            }
+                            if (composeGraphicsLayerInvalidTranslationYEnabled) {
+                                translationY = Float.NaN
                             }
                             if (composeGraphicsLayerScaleTranslateEnabled) {
                                 scaleX = 1.18f

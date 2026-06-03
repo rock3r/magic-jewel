@@ -288,6 +288,10 @@ val composeGraphicsLayerInvalidTranslationXEnabled =
     providers.gradleProperty("magicJewelComposeGraphicsLayerInvalidTranslationX")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_TRANSLATION_X"))
         .orElse("false")
+val composeGraphicsLayerInvalidTranslationYEnabled =
+    providers.gradleProperty("magicJewelComposeGraphicsLayerInvalidTranslationY")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_TRANSLATION_Y"))
+        .orElse("false")
 val composeGraphicsLayerScaleTranslateEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerScaleTranslate")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SCALE_TRANSLATE"))
     .orElse("false")
@@ -623,6 +627,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty(
         "magic.jewel.compose.graphicsLayerInvalidTranslationX",
         composeGraphicsLayerInvalidTranslationXEnabled.get()
+    )
+    systemProperty(
+        "magic.jewel.compose.graphicsLayerInvalidTranslationY",
+        composeGraphicsLayerInvalidTranslationYEnabled.get()
     )
     systemProperty("magic.jewel.compose.graphicsLayerScaleTranslate", composeGraphicsLayerScaleTranslateEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerNearCamera", composeGraphicsLayerNearCameraEnabled.get())
