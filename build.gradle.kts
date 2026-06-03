@@ -261,6 +261,9 @@ val composeGraphicsLayerBlurChainedRenderEffectEnabled =
 val composeGraphicsLayerShadowEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerShadow")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_SHADOW"))
     .orElse("false")
+val composeGraphicsLayerInvalidAlphaEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerInvalidAlpha")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ALPHA"))
+    .orElse("false")
 val composeGraphicsLayerInvalidShadowElevationEnabled =
     providers.gradleProperty("magicJewelComposeGraphicsLayerInvalidShadowElevation")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SHADOW_ELEVATION"))
@@ -589,6 +592,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
         composeGraphicsLayerBlurChainedRenderEffectEnabled.get()
     )
     systemProperty("magic.jewel.compose.graphicsLayerShadow", composeGraphicsLayerShadowEnabled.get())
+    systemProperty("magic.jewel.compose.graphicsLayerInvalidAlpha", composeGraphicsLayerInvalidAlphaEnabled.get())
     systemProperty(
         "magic.jewel.compose.graphicsLayerInvalidShadowElevation",
         composeGraphicsLayerInvalidShadowElevationEnabled.get()

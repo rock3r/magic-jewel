@@ -46,6 +46,7 @@ list_case_groups() {
     native-text \
     native-text-invalid \
     blend-mode-invalid \
+    graphics-layer-invalid \
     graphics-layer
 }
 
@@ -128,6 +129,9 @@ case_group_cases() {
       ;;
     blend-mode-invalid)
       echo "commands-invalid-fill-rect-blend-mode-width-fallback commands-invalid-fill-rect-blend-mode-height-fallback"
+      ;;
+    graphics-layer-invalid)
+      echo "commands-graphics-layer-invalid-alpha-fallback commands-graphics-layer-invalid-shadow-elevation-fallback"
       ;;
     graphics-layer)
       echo "commands-graphics-layer commands-graphics-layer-modulate-alpha commands-graphics-layer-offscreen commands-graphics-layer-clip commands-graphics-layer-round-clip commands-graphics-layer-path-clip commands-graphics-layer-blend-mode commands-graphics-layer-color-filter commands-graphics-layer-color-matrix-filter commands-graphics-layer-render-effect commands-graphics-layer-offset-effect commands-graphics-layer-chained-render-effect commands-graphics-layer-shadow commands-graphics-layer-invalid-shadow-elevation-fallback commands-graphics-layer-round-shadow commands-graphics-layer-path-shadow commands-graphics-layer-rotationx commands-graphics-layer-rotationy commands-graphics-layer-rotationxy commands-graphics-layer-scale-translate commands-graphics-layer-near-camera commands-graphics-layer-offcenter-pivot"
@@ -222,6 +226,7 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-image-filter commands-image-color-matrix-filter" "commands-image-filter commands-invalid-image-color-filter-use-fallback commands-invalid-image-color-filter-use-after-evict-fallback commands-invalid-image-color-filter-ref-width-fallback commands-invalid-image-color-filter-ref-height-fallback commands-invalid-image-color-filter-ref-alpha-fallback commands-invalid-image-color-filter-ref-filter-quality-fallback commands-invalid-image-color-filter-blend-mode-fallback commands-invalid-image-color-filter-ref-use-fallback commands-invalid-image-color-filter-ref-use-after-evict-fallback commands-invalid-image-color-filter-descriptor-ref-width-fallback commands-invalid-image-color-filter-descriptor-ref-height-fallback commands-invalid-image-color-filter-descriptor-ref-alpha-fallback commands-invalid-image-color-filter-descriptor-ref-filter-quality-fallback commands-image-color-matrix-filter"
   replace_default_case_segment "commands-raw-blend-color-filter-fallback commands-raw-table-color-filter-fallback commands-color-filter" "commands-raw-blend-color-filter-fallback commands-raw-table-color-filter-fallback commands-invalid-fill-rect-color-filter-blend-mode-fallback commands-invalid-fill-rect-color-filter-width-fallback commands-invalid-fill-rect-color-filter-height-fallback commands-invalid-fill-rect-color-filter-ref-width-fallback commands-invalid-fill-rect-color-filter-ref-height-fallback commands-color-filter"
   replace_default_case_segment "commands-blend-mode commands-graphics-layer" "commands-blend-mode commands-invalid-fill-rect-blend-mode-width-fallback commands-invalid-fill-rect-blend-mode-height-fallback commands-graphics-layer"
+  replace_default_case_segment "commands-graphics-layer commands-graphics-layer-modulate-alpha" "commands-graphics-layer commands-graphics-layer-invalid-alpha-fallback commands-graphics-layer-modulate-alpha"
   replace_default_case_segment "commands-graphics-layer-raw-color-filter-fallback commands-graphics-layer-render-effect" "commands-graphics-layer-raw-color-filter-fallback commands-graphics-layer-raw-table-color-filter-fallback commands-graphics-layer-render-effect"
   replace_default_case_segment "commands-save-layer-filter commands-save-layer-raw-color-filter-fallback" "commands-save-layer-filter commands-save-layer-blend-mode commands-invalid-save-layer-alpha-fallback commands-invalid-save-layer-record-flags-fallback commands-invalid-save-layer-color-filter-record-flags-fallback commands-invalid-save-layer-blend-mode-record-flags-fallback commands-invalid-save-layer-blend-color-filter-record-flags-fallback commands-invalid-save-layer-record-length-fallback commands-invalid-save-layer-color-filter-record-length-fallback commands-invalid-save-layer-blend-mode-record-length-fallback commands-invalid-save-layer-blend-color-filter-record-length-fallback commands-invalid-save-layer-color-filter-ref-record-flags-fallback commands-invalid-save-layer-blend-color-filter-ref-record-flags-fallback commands-invalid-save-layer-image-filter-ref-record-flags-fallback commands-invalid-save-layer-color-filter-ref-record-length-fallback commands-invalid-save-layer-blend-color-filter-ref-record-length-fallback commands-invalid-save-layer-image-filter-ref-record-length-fallback commands-invalid-save-layer-color-filter-width-fallback commands-invalid-save-layer-color-filter-height-fallback commands-invalid-save-layer-color-filter-alpha-fallback commands-invalid-save-layer-blend-mode-width-fallback commands-invalid-save-layer-blend-mode-height-fallback commands-invalid-save-layer-blend-mode-alpha-fallback commands-invalid-save-layer-blend-color-filter-width-fallback commands-invalid-save-layer-blend-color-filter-height-fallback commands-invalid-save-layer-blend-color-filter-alpha-fallback commands-invalid-save-layer-color-filter-blend-mode-fallback commands-invalid-save-layer-blend-mode-fallback commands-invalid-save-layer-blend-color-filter-blend-mode-fallback commands-invalid-save-layer-image-filter-alpha-fallback commands-invalid-save-layer-image-filter-width-fallback commands-invalid-save-layer-image-filter-height-fallback commands-invalid-save-layer-color-filter-ref-width-fallback commands-invalid-save-layer-color-filter-ref-height-fallback commands-invalid-save-layer-color-filter-ref-alpha-fallback commands-invalid-save-layer-blend-color-filter-ref-width-fallback commands-invalid-save-layer-blend-color-filter-ref-height-fallback commands-invalid-save-layer-blend-color-filter-ref-alpha-fallback commands-invalid-save-layer-blend-color-filter-ref-blend-mode-fallback commands-save-layer-raw-color-filter-fallback"
   replace_default_case_segment "commands-save-layer-raw-color-filter-fallback commands-opaque-shader-fallback" "commands-save-layer-raw-color-filter-fallback commands-save-layer-raw-table-color-filter-fallback commands-opaque-shader-fallback"
@@ -3720,6 +3725,13 @@ run_named_case() {
     commands-graphics-layer|commands-graphics-layer-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true
+      ;;
+    commands-graphics-layer-invalid-alpha-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ALPHA=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:alpha
       ;;
     commands-graphics-layer-modulate-alpha)
       run_case "$1" \
