@@ -221,6 +221,7 @@ private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeConcatTransformProperty = "magic.jewel.compose.concatTransform"
 private const val ComposeSkewTransformProperty = "magic.jewel.compose.skewTransform"
 private const val ComposeVerticesProperty = "magic.jewel.compose.vertices"
+private const val ComposeVerticesRawColorFilterProperty = "magic.jewel.compose.verticesRawColorFilter"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
 private const val ComposeSaveLayerColorMatrixFilterProperty = "magic.jewel.compose.saveLayerColorMatrixFilter"
@@ -662,6 +663,9 @@ private fun MagicJewelApp() {
     }
     val composeVerticesEnabled = remember {
         System.getProperty(ComposeVerticesProperty, "false").toBoolean()
+    }
+    val composeVerticesRawColorFilterEnabled = remember {
+        System.getProperty(ComposeVerticesRawColorFilterProperty, "false").toBoolean()
     }
     val composeSaveLayerEnabled = remember {
         System.getProperty(ComposeSaveLayerProperty, "false").toBoolean()
@@ -2443,7 +2447,14 @@ private fun MagicJewelApp() {
                                 indices = listOf(0, 1, 2),
                             ),
                             blendMode = BlendMode.SrcOver,
-                            paint = Paint(),
+                            paint = Paint().apply {
+                                if (composeVerticesRawColorFilterEnabled) {
+                                    colorFilter = org.jetbrains.skia.ColorFilter.makeBlend(
+                                        org.jetbrains.skia.Color.makeARGB(255, 34, 211, 238),
+                                        org.jetbrains.skia.BlendMode.SRC_IN,
+                                    ).asComposeColorFilter()
+                                }
+                            },
                         )
                     }
                 }
