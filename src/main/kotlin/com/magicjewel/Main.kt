@@ -82,6 +82,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -200,6 +202,7 @@ private const val ComposeGraphicsLayerPathClipProperty = "magic.jewel.compose.gr
 private const val ComposeGraphicsLayerBlendModeProperty = "magic.jewel.compose.graphicsLayerBlendMode"
 private const val ComposeGraphicsLayerInvalidBlendModeProperty =
     "magic.jewel.compose.graphicsLayerInvalidBlendMode"
+private const val ComposeGraphicsLayerUnrecordedProperty = "magic.jewel.compose.graphicsLayerUnrecorded"
 private const val ComposeGraphicsLayerColorFilterProperty = "magic.jewel.compose.graphicsLayerColorFilter"
 private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.compose.graphicsLayerColorMatrixFilter"
 private const val ComposeGraphicsLayerRawColorFilterProperty = "magic.jewel.compose.graphicsLayerRawColorFilter"
@@ -624,6 +627,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerInvalidBlendModeEnabled = remember {
         System.getProperty(ComposeGraphicsLayerInvalidBlendModeProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerUnrecordedEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerUnrecordedProperty, "false").toBoolean()
     }
     val composeGraphicsLayerColorFilterEnabled = remember {
         System.getProperty(ComposeGraphicsLayerColorFilterProperty, "false").toBoolean()
@@ -3081,6 +3087,17 @@ private fun MagicJewelApp() {
             }
 
             if (composeGraphicsLayerEnabled) {
+                if (composeGraphicsLayerUnrecordedEnabled) {
+                    val unrecordedLayer = rememberGraphicsLayer()
+                    Canvas(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .offset(x = (-228).dp, y = (-72).dp)
+                            .size(width = 52.dp, height = 52.dp),
+                    ) {
+                        drawLayer(unrecordedLayer)
+                    }
+                }
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
