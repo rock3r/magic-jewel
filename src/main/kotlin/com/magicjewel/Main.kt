@@ -260,7 +260,9 @@ private const val ComposeSaveLayerRawTableColorFilterProperty = "magic.jewel.com
 private const val ComposeClipProperty = "magic.jewel.compose.clip"
 private const val ComposeClipOutProperty = "magic.jewel.compose.clipOut"
 private const val ComposeClipPathProperty = "magic.jewel.compose.clipPath"
+private const val ComposeInvalidClipPathProperty = "magic.jewel.compose.invalidClipPath"
 private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
+private const val ComposeInvalidDrawPathProperty = "magic.jewel.compose.invalidDrawPath"
 private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
 private const val ComposePointLinesProperty = "magic.jewel.compose.pointLines"
@@ -769,8 +771,14 @@ private fun MagicJewelApp() {
     val composeClipPathEnabled = remember {
         System.getProperty(ComposeClipPathProperty, "false").toBoolean()
     }
+    val composeInvalidClipPathEnabled = remember {
+        System.getProperty(ComposeInvalidClipPathProperty, "false").toBoolean()
+    }
     val composeDrawPathEnabled = remember {
         System.getProperty(ComposeDrawPathProperty, "false").toBoolean()
+    }
+    val composeInvalidDrawPathEnabled = remember {
+        System.getProperty(ComposeInvalidDrawPathProperty, "false").toBoolean()
     }
     val composeDrawArcEnabled = remember {
         System.getProperty(ComposeDrawArcProperty, "false").toBoolean()
@@ -2716,7 +2724,11 @@ private fun MagicJewelApp() {
                 }
                 if (composeClipPathEnabled) {
                     val path = Path().apply {
-                        moveTo(size.width - 248f, size.height - 84f)
+                        if (composeInvalidClipPathEnabled) {
+                            moveTo(Float.NaN, size.height - 84f)
+                        } else {
+                            moveTo(size.width - 248f, size.height - 84f)
+                        }
                         lineTo(size.width - 156f, size.height - 132f)
                         lineTo(size.width - 68f, size.height - 84f)
                         lineTo(size.width - 156f, size.height - 36f)
@@ -2732,7 +2744,11 @@ private fun MagicJewelApp() {
                 }
                 if (composeDrawPathEnabled) {
                     val path = Path().apply {
-                        moveTo(size.width - 304f, size.height - 170f)
+                        if (composeInvalidDrawPathEnabled) {
+                            moveTo(Float.NaN, size.height - 170f)
+                        } else {
+                            moveTo(size.width - 304f, size.height - 170f)
+                        }
                         lineTo(size.width - 260f, size.height - 222f)
                         lineTo(size.width - 208f, size.height - 166f)
                         lineTo(size.width - 246f, size.height - 152f)
