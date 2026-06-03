@@ -280,6 +280,10 @@ val composeGraphicsLayerScaleTranslateEnabled = providers.gradleProperty("magicJ
 val composeGraphicsLayerNearCameraEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerNearCamera")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_NEAR_CAMERA"))
     .orElse("false")
+val composeGraphicsLayerInvalidCameraDistanceEnabled =
+    providers.gradleProperty("magicJewelComposeGraphicsLayerInvalidCameraDistance")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_CAMERA_DISTANCE"))
+        .orElse("false")
 val composeGraphicsLayerOffCenterPivotEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerOffCenterPivot")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_OFFCENTER_PIVOT"))
     .orElse("false")
@@ -601,6 +605,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.graphicsLayerRotationY", composeGraphicsLayerRotationYEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerScaleTranslate", composeGraphicsLayerScaleTranslateEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerNearCamera", composeGraphicsLayerNearCameraEnabled.get())
+    systemProperty(
+        "magic.jewel.compose.graphicsLayerInvalidCameraDistance",
+        composeGraphicsLayerInvalidCameraDistanceEnabled.get()
+    )
     systemProperty("magic.jewel.compose.graphicsLayerOffCenterPivot", composeGraphicsLayerOffCenterPivotEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerOffscreen", composeGraphicsLayerOffscreenEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerModulateAlpha", composeGraphicsLayerModulateAlphaEnabled.get())
