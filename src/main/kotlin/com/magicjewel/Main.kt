@@ -182,6 +182,7 @@ private const val ComposeRuntimeEffectColorFilterInvalidNestedChildProperty =
     "magic.jewel.compose.runtimeEffectColorFilterInvalidNestedChild"
 private const val ComposeImageFilterProperty = "magic.jewel.compose.imageFilter"
 private const val ComposeImageColorMatrixFilterProperty = "magic.jewel.compose.imageColorMatrixFilter"
+private const val ComposeImageRawTableColorFilterProperty = "magic.jewel.compose.imageRawTableColorFilter"
 private const val ComposeRawBlendColorFilterProperty = "magic.jewel.compose.rawBlendColorFilter"
 private const val ComposeRawTableColorFilterProperty = "magic.jewel.compose.rawTableColorFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
@@ -553,6 +554,9 @@ private fun MagicJewelApp() {
     val composeImageColorMatrixFilterEnabled = remember {
         System.getProperty(ComposeImageColorMatrixFilterProperty, "false").toBoolean()
     }
+    val composeImageRawTableColorFilterEnabled = remember {
+        System.getProperty(ComposeImageRawTableColorFilterProperty, "false").toBoolean()
+    }
     val composeRawBlendColorFilterEnabled = remember {
         System.getProperty(ComposeRawBlendColorFilterProperty, "false").toBoolean()
     }
@@ -780,6 +784,7 @@ private fun MagicJewelApp() {
         composeImageShaderColorFilterEnabled,
         composeImageFilterEnabled,
         composeImageColorMatrixFilterEnabled,
+        composeImageRawTableColorFilterEnabled,
     ) {
         if (composeImageEnabled ||
             composeImagePathEffectEnabled ||
@@ -787,7 +792,8 @@ private fun MagicJewelApp() {
             composeDescriptorStrokeShaderEnabled ||
             composeImageShaderColorFilterEnabled ||
             composeImageFilterEnabled ||
-            composeImageColorMatrixFilterEnabled
+            composeImageColorMatrixFilterEnabled ||
+            composeImageRawTableColorFilterEnabled
         ) {
             createImageProbe()
         } else {
@@ -1647,6 +1653,17 @@ private fun MagicJewelApp() {
                             image = it,
                             topLeft = Offset(size.width - 444f, size.height - 210f),
                             colorFilter = ColorFilter.colorMatrix(matrix),
+                        )
+                    }
+                }
+                if (composeImageRawTableColorFilterEnabled) {
+                    imageProbe?.let {
+                        val table = ByteArray(256) { index -> (index / 2).toByte() }
+                        val colorFilter = org.jetbrains.skia.ColorFilter.makeTable(table).asComposeColorFilter()
+                        drawImage(
+                            image = it,
+                            topLeft = Offset(size.width - 552f, size.height - 210f),
+                            colorFilter = colorFilter,
                         )
                     }
                 }
