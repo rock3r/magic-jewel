@@ -228,6 +228,10 @@ val composeGraphicsLayerPathClipEnabled = providers.gradleProperty("magicJewelCo
 val composeGraphicsLayerBlendModeEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerBlendMode")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLEND_MODE"))
     .orElse("false")
+val composeGraphicsLayerInvalidBlendModeEnabled =
+    providers.gradleProperty("magicJewelComposeGraphicsLayerInvalidBlendMode")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_BLEND_MODE"))
+        .orElse("false")
 val composeGraphicsLayerColorFilterEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerColorFilter")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_COLOR_FILTER"))
     .orElse("false")
@@ -603,6 +607,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.graphicsLayerRoundClip", composeGraphicsLayerRoundClipEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerPathClip", composeGraphicsLayerPathClipEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerBlendMode", composeGraphicsLayerBlendModeEnabled.get())
+    systemProperty("magic.jewel.compose.graphicsLayerInvalidBlendMode", composeGraphicsLayerInvalidBlendModeEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerColorFilter", composeGraphicsLayerColorFilterEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerColorMatrixFilter", composeGraphicsLayerColorMatrixFilterEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerRawColorFilter", composeGraphicsLayerRawColorFilterEnabled.get())

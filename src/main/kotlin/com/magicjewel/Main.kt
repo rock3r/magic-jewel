@@ -198,6 +198,8 @@ private const val ComposeGraphicsLayerClipProperty = "magic.jewel.compose.graphi
 private const val ComposeGraphicsLayerRoundClipProperty = "magic.jewel.compose.graphicsLayerRoundClip"
 private const val ComposeGraphicsLayerPathClipProperty = "magic.jewel.compose.graphicsLayerPathClip"
 private const val ComposeGraphicsLayerBlendModeProperty = "magic.jewel.compose.graphicsLayerBlendMode"
+private const val ComposeGraphicsLayerInvalidBlendModeProperty =
+    "magic.jewel.compose.graphicsLayerInvalidBlendMode"
 private const val ComposeGraphicsLayerColorFilterProperty = "magic.jewel.compose.graphicsLayerColorFilter"
 private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.compose.graphicsLayerColorMatrixFilter"
 private const val ComposeGraphicsLayerRawColorFilterProperty = "magic.jewel.compose.graphicsLayerRawColorFilter"
@@ -619,6 +621,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerBlendModeEnabled = remember {
         System.getProperty(ComposeGraphicsLayerBlendModeProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerInvalidBlendModeEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerInvalidBlendModeProperty, "false").toBoolean()
     }
     val composeGraphicsLayerColorFilterEnabled = remember {
         System.getProperty(ComposeGraphicsLayerColorFilterProperty, "false").toBoolean()
@@ -3089,6 +3094,9 @@ private fun MagicJewelApp() {
                             rotationZ = -4f
                             if (composeGraphicsLayerBlendModeEnabled) {
                                 blendMode = BlendMode.Plus
+                            }
+                            if (composeGraphicsLayerInvalidBlendModeEnabled) {
+                                blendMode = BlendMode.Clear
                             }
                             if (composeGraphicsLayerShadowEnabled) {
                                 shadowElevation = 18f

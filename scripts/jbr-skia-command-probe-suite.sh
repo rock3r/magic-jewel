@@ -131,7 +131,7 @@ case_group_cases() {
       echo "commands-invalid-fill-rect-blend-mode-width-fallback commands-invalid-fill-rect-blend-mode-height-fallback"
       ;;
     graphics-layer-invalid)
-      echo "commands-graphics-layer-invalid-alpha-fallback commands-graphics-layer-invalid-scale-x-fallback commands-graphics-layer-invalid-scale-y-fallback commands-graphics-layer-invalid-rotation-z-fallback commands-graphics-layer-invalid-translation-x-fallback commands-graphics-layer-invalid-translation-y-fallback commands-graphics-layer-invalid-rotation-x-fallback commands-graphics-layer-invalid-rotation-y-fallback commands-graphics-layer-invalid-camera-distance-fallback commands-graphics-layer-invalid-shadow-elevation-fallback"
+      echo "commands-graphics-layer-invalid-alpha-fallback commands-graphics-layer-invalid-scale-x-fallback commands-graphics-layer-invalid-scale-y-fallback commands-graphics-layer-invalid-rotation-z-fallback commands-graphics-layer-invalid-translation-x-fallback commands-graphics-layer-invalid-translation-y-fallback commands-graphics-layer-invalid-rotation-x-fallback commands-graphics-layer-invalid-rotation-y-fallback commands-graphics-layer-invalid-camera-distance-fallback commands-graphics-layer-invalid-shadow-elevation-fallback commands-graphics-layer-invalid-blend-mode-fallback"
       ;;
     graphics-layer)
       echo "commands-graphics-layer commands-graphics-layer-modulate-alpha commands-graphics-layer-offscreen commands-graphics-layer-clip commands-graphics-layer-round-clip commands-graphics-layer-path-clip commands-graphics-layer-blend-mode commands-graphics-layer-color-filter commands-graphics-layer-color-matrix-filter commands-graphics-layer-render-effect commands-graphics-layer-offset-effect commands-graphics-layer-chained-render-effect commands-graphics-layer-shadow commands-graphics-layer-invalid-shadow-elevation-fallback commands-graphics-layer-round-shadow commands-graphics-layer-path-shadow commands-graphics-layer-rotationx commands-graphics-layer-rotationy commands-graphics-layer-rotationxy commands-graphics-layer-scale-translate commands-graphics-layer-near-camera commands-graphics-layer-offcenter-pivot"
@@ -227,6 +227,7 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-raw-blend-color-filter-fallback commands-raw-table-color-filter-fallback commands-color-filter" "commands-raw-blend-color-filter-fallback commands-raw-table-color-filter-fallback commands-invalid-fill-rect-color-filter-blend-mode-fallback commands-invalid-fill-rect-color-filter-width-fallback commands-invalid-fill-rect-color-filter-height-fallback commands-invalid-fill-rect-color-filter-ref-width-fallback commands-invalid-fill-rect-color-filter-ref-height-fallback commands-color-filter"
   replace_default_case_segment "commands-blend-mode commands-graphics-layer" "commands-blend-mode commands-invalid-fill-rect-blend-mode-width-fallback commands-invalid-fill-rect-blend-mode-height-fallback commands-graphics-layer"
   replace_default_case_segment "commands-graphics-layer commands-graphics-layer-modulate-alpha" "commands-graphics-layer commands-graphics-layer-invalid-alpha-fallback commands-graphics-layer-modulate-alpha"
+  replace_default_case_segment "commands-graphics-layer-blend-mode commands-graphics-layer-color-filter" "commands-graphics-layer-blend-mode commands-graphics-layer-invalid-blend-mode-fallback commands-graphics-layer-color-filter"
   replace_default_case_segment "commands-graphics-layer-invalid-alpha-fallback commands-graphics-layer-modulate-alpha" "commands-graphics-layer-invalid-alpha-fallback commands-graphics-layer-invalid-scale-x-fallback commands-graphics-layer-modulate-alpha"
   replace_default_case_segment "commands-graphics-layer-invalid-scale-x-fallback commands-graphics-layer-modulate-alpha" "commands-graphics-layer-invalid-scale-x-fallback commands-graphics-layer-invalid-scale-y-fallback commands-graphics-layer-modulate-alpha"
   replace_default_case_segment "commands-graphics-layer-invalid-scale-y-fallback commands-graphics-layer-modulate-alpha" "commands-graphics-layer-invalid-scale-y-fallback commands-graphics-layer-invalid-rotation-z-fallback commands-graphics-layer-modulate-alpha"
@@ -3819,6 +3820,14 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_BLEND_MODE=true
+      ;;
+    commands-graphics-layer-invalid-blend-mode-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_BLEND_MODE=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:blendMode \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-graphics-layer-color-filter)
       run_case "$1" \
