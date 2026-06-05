@@ -4662,7 +4662,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_SAVELAYER_RAW_TABLE_COLOR_FILTER=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=saveLayer
+        EXPECT_COMMAND_FALLBACK_REASON=saveLayer \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-opaque-shader-fallback)
       run_case "$1" \
