@@ -225,6 +225,8 @@ private const val ComposeGraphicsLayerShadowProperty = "magic.jewel.compose.grap
 private const val ComposeGraphicsLayerInvalidAlphaProperty = "magic.jewel.compose.graphicsLayerInvalidAlpha"
 private const val ComposeGraphicsLayerInvalidShadowElevationProperty =
     "magic.jewel.compose.graphicsLayerInvalidShadowElevation"
+private const val ComposeGraphicsLayerInvalidShadowPathProperty =
+    "magic.jewel.compose.graphicsLayerInvalidShadowPath"
 private const val ComposeGraphicsLayerRotationXProperty = "magic.jewel.compose.graphicsLayerRotationX"
 private const val ComposeGraphicsLayerRotationYProperty = "magic.jewel.compose.graphicsLayerRotationY"
 private const val ComposeGraphicsLayerInvalidScaleXProperty = "magic.jewel.compose.graphicsLayerInvalidScaleX"
@@ -689,6 +691,9 @@ private fun MagicJewelApp() {
     }
     val composeGraphicsLayerInvalidShadowElevationEnabled = remember {
         System.getProperty(ComposeGraphicsLayerInvalidShadowElevationProperty, "false").toBoolean()
+    }
+    val composeGraphicsLayerInvalidShadowPathEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerInvalidShadowPathProperty, "false").toBoolean()
     }
     val composeGraphicsLayerRotationXEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRotationXProperty, "false").toBoolean()
@@ -3241,6 +3246,11 @@ private fun MagicJewelApp() {
                             if (composeGraphicsLayerInvalidShadowElevationEnabled) {
                                 shadowElevation = -1f
                             }
+                            if (composeGraphicsLayerInvalidShadowPathEnabled) {
+                                shadowElevation = 18f
+                                spotShadowColor = Color(0xFF111827)
+                                ambientShadowColor = Color(0xFF111827)
+                            }
                             if (composeGraphicsLayerRotationXEnabled) {
                                 rotationX = 28f
                             }
@@ -3346,6 +3356,14 @@ private fun MagicJewelApp() {
                                 composeGraphicsLayerRoundClipEnabled ||
                                 composeGraphicsLayerPathClipEnabled
                             when {
+                                composeGraphicsLayerInvalidShadowPathEnabled -> {
+                                    shape = GenericShape { outlineSize, _ ->
+                                        moveTo(Float.NaN, 0f)
+                                        lineTo(outlineSize.width, 0f)
+                                        lineTo(outlineSize.width, outlineSize.height)
+                                        close()
+                                    }
+                                }
                                 composeGraphicsLayerPathClipEnabled -> {
                                     shape = GenericShape { outlineSize, _ ->
                                         moveTo(0f, 0f)
