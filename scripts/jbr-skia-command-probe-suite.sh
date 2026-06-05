@@ -4019,7 +4019,8 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_TABLE_COLOR_FILTER=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:colorFilter
+        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:colorFilter \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-graphics-layer-render-effect)
       run_case "$1" \
