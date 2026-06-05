@@ -137,6 +137,7 @@ private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImagePathEffectProperty = "magic.jewel.compose.imagePathEffect"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
+private const val ComposeInvalidImageShaderImageProperty = "magic.jewel.compose.invalidImageShaderImage"
 private const val ComposeRawImageShaderProperty = "magic.jewel.compose.rawImageShader"
 private const val ComposeColorShaderProperty = "magic.jewel.compose.colorShader"
 private const val ComposeDescriptorStrokeShaderProperty = "magic.jewel.compose.descriptorStrokeShader"
@@ -470,6 +471,9 @@ private fun MagicJewelApp() {
     }
     val composeImageShaderEnabled = remember {
         System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
+    }
+    val composeInvalidImageShaderImageEnabled = remember {
+        System.getProperty(ComposeInvalidImageShaderImageProperty, "false").toBoolean()
     }
     val composeRawImageShaderEnabled = remember {
         System.getProperty(ComposeRawImageShaderProperty, "false").toBoolean()
@@ -896,6 +900,7 @@ private fun MagicJewelApp() {
         composeImageEnabled,
         composeImagePathEffectEnabled,
         composeImageShaderEnabled,
+        composeInvalidImageShaderImageEnabled,
         composeImageShaderColorFilterEnabled,
         composeImageFilterEnabled,
         composeImageColorMatrixFilterEnabled,
@@ -904,13 +909,14 @@ private fun MagicJewelApp() {
         if (composeImageEnabled ||
             composeImagePathEffectEnabled ||
             composeImageShaderEnabled ||
+            composeInvalidImageShaderImageEnabled ||
             composeDescriptorStrokeShaderEnabled ||
             composeImageShaderColorFilterEnabled ||
             composeImageFilterEnabled ||
             composeImageColorMatrixFilterEnabled ||
             composeImageRawTableColorFilterEnabled
         ) {
-            createImageProbe()
+            createImageProbe(oversized = composeInvalidImageShaderImageEnabled)
         } else {
             null
         }
@@ -3747,13 +3753,16 @@ private fun createRawSkiaImageShader(): org.jetbrains.skia.Shader {
     )
 }
 
-private fun createImageProbe(): ImageBitmap {
-    val bitmap = ImageBitmap(72, 72)
+private fun createImageProbe(oversized: Boolean = false): ImageBitmap {
+    val width = if (oversized) 2049 else 72
+    val height = if (oversized) 1 else 72
+    val bitmap = ImageBitmap(width, height)
     val canvas = androidx.compose.ui.graphics.Canvas(bitmap)
     val paint = Paint()
 
     paint.color = Color(0xFFE879F9)
-    canvas.drawRect(0f, 0f, 72f, 72f, paint)
+    canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+    if (oversized) return bitmap
     paint.color = Color(0xFF111827)
     canvas.drawRect(12f, 12f, 60f, 60f, paint)
     paint.color = Color(0xFF22D3EE)
