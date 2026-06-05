@@ -265,6 +265,7 @@ private const val ComposeClipPathProperty = "magic.jewel.compose.clipPath"
 private const val ComposeInvalidClipPathProperty = "magic.jewel.compose.invalidClipPath"
 private const val ComposeDrawPathProperty = "magic.jewel.compose.drawPath"
 private const val ComposeInvalidDrawPathProperty = "magic.jewel.compose.invalidDrawPath"
+private const val ComposeInvalidGradientPathProperty = "magic.jewel.compose.invalidGradientPath"
 private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
 private const val ComposePointLinesProperty = "magic.jewel.compose.pointLines"
@@ -793,6 +794,9 @@ private fun MagicJewelApp() {
     }
     val composeInvalidDrawPathEnabled = remember {
         System.getProperty(ComposeInvalidDrawPathProperty, "false").toBoolean()
+    }
+    val composeInvalidGradientPathEnabled = remember {
+        System.getProperty(ComposeInvalidGradientPathProperty, "false").toBoolean()
     }
     val composeDrawArcEnabled = remember {
         System.getProperty(ComposeDrawArcProperty, "false").toBoolean()
@@ -2944,7 +2948,11 @@ private fun MagicJewelApp() {
                 }
                 if (composeLinearGradientPathEnabled) {
                     val path = Path().apply {
-                        moveTo(size.width - 342f, size.height - 320f)
+                        if (composeInvalidGradientPathEnabled) {
+                            moveTo(Float.NaN, size.height - 320f)
+                        } else {
+                            moveTo(size.width - 342f, size.height - 320f)
+                        }
                         cubicTo(
                             size.width - 310f,
                             size.height - 366f,
@@ -3032,7 +3040,11 @@ private fun MagicJewelApp() {
                 }
                 if (composeRadialGradientPathEnabled) {
                     val path = Path().apply {
-                        moveTo(size.width - 492f, size.height - 318f)
+                        if (composeInvalidGradientPathEnabled) {
+                            moveTo(Float.NaN, size.height - 318f)
+                        } else {
+                            moveTo(size.width - 492f, size.height - 318f)
+                        }
                         cubicTo(
                             size.width - 452f,
                             size.height - 366f,
@@ -3117,7 +3129,11 @@ private fun MagicJewelApp() {
                 }
                 if (composeSweepGradientPathEnabled) {
                     val path = Path().apply {
-                        moveTo(size.width - 250f, size.height - 238f)
+                        if (composeInvalidGradientPathEnabled) {
+                            moveTo(Float.NaN, size.height - 238f)
+                        } else {
+                            moveTo(size.width - 250f, size.height - 238f)
+                        }
                         cubicTo(
                             size.width - 208f,
                             size.height - 282f,
