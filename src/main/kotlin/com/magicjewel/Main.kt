@@ -268,10 +268,12 @@ private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundR
 private const val ComposePointLinesProperty = "magic.jewel.compose.pointLines"
 private const val ComposePointDotsProperty = "magic.jewel.compose.pointDots"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
+private const val ComposeInvalidLinearGradientStopsProperty = "magic.jewel.compose.invalidLinearGradientStops"
 private const val ComposeLinearGradientStrokeProperty = "magic.jewel.compose.linearGradientStroke"
 private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
 private const val ComposeLinearGradientPathProperty = "magic.jewel.compose.linearGradientPath"
 private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
+private const val ComposeInvalidRadialGradientStopsProperty = "magic.jewel.compose.invalidRadialGradientStops"
 private const val ComposeRadialGradientRoundRectProperty = "magic.jewel.compose.radialGradientRoundRect"
 private const val ComposeRadialGradientPathProperty = "magic.jewel.compose.radialGradientPath"
 private const val ComposeSweepGradientProperty = "magic.jewel.compose.sweepGradient"
@@ -795,6 +797,9 @@ private fun MagicJewelApp() {
     val composeLinearGradientEnabled = remember {
         System.getProperty(ComposeLinearGradientProperty, "false").toBoolean()
     }
+    val composeInvalidLinearGradientStopsEnabled = remember {
+        System.getProperty(ComposeInvalidLinearGradientStopsProperty, "false").toBoolean()
+    }
     val composeLinearGradientStrokeEnabled = remember {
         System.getProperty(ComposeLinearGradientStrokeProperty, "false").toBoolean()
     }
@@ -806,6 +811,9 @@ private fun MagicJewelApp() {
     }
     val composeRadialGradientEnabled = remember {
         System.getProperty(ComposeRadialGradientProperty, "false").toBoolean()
+    }
+    val composeInvalidRadialGradientStopsEnabled = remember {
+        System.getProperty(ComposeInvalidRadialGradientStopsProperty, "false").toBoolean()
     }
     val composeRadialGradientRoundRectEnabled = remember {
         System.getProperty(ComposeRadialGradientRoundRectProperty, "false").toBoolean()
@@ -2848,11 +2856,20 @@ private fun MagicJewelApp() {
                 }
                 if (composeLinearGradientEnabled) {
                     drawRect(
-                        brush = Brush.linearGradient(
-                            colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6), Color(0xFFA855F7)),
-                            start = Offset(size.width - 188f, size.height - 106f),
-                            end = Offset(size.width - 48f, size.height - 34f),
-                        ),
+                        brush = if (composeInvalidLinearGradientStopsEnabled) {
+                            Brush.linearGradient(
+                                0.5f to Color(0xFF10B981),
+                                0.5f to Color(0xFF3B82F6),
+                                start = Offset(size.width - 188f, size.height - 106f),
+                                end = Offset(size.width - 48f, size.height - 34f),
+                            )
+                        } else {
+                            Brush.linearGradient(
+                                colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6), Color(0xFFA855F7)),
+                                start = Offset(size.width - 188f, size.height - 106f),
+                                end = Offset(size.width - 48f, size.height - 34f),
+                            )
+                        },
                         topLeft = Offset(size.width - 188f, size.height - 106f),
                         size = Size(140f, 72f),
                     )
@@ -2928,11 +2945,20 @@ private fun MagicJewelApp() {
                 if (composeRadialGradientEnabled) {
                     val topLeft = Offset(size.width - 164f, size.height - 198f)
                     drawRect(
-                        brush = Brush.radialGradient(
-                            colors = listOf(Color(0xFFFFF7ED), Color(0xFFF97316), Color(0xFF7C3AED)),
-                            center = topLeft + Offset(64f, 48f),
-                            radius = 72f,
-                        ),
+                        brush = if (composeInvalidRadialGradientStopsEnabled) {
+                            Brush.radialGradient(
+                                0.5f to Color(0xFFFFF7ED),
+                                0.5f to Color(0xFFF97316),
+                                center = topLeft + Offset(64f, 48f),
+                                radius = 72f,
+                            )
+                        } else {
+                            Brush.radialGradient(
+                                colors = listOf(Color(0xFFFFF7ED), Color(0xFFF97316), Color(0xFF7C3AED)),
+                                center = topLeft + Offset(64f, 48f),
+                                radius = 72f,
+                            )
+                        },
                         topLeft = topLeft,
                         size = Size(128f, 96f),
                     )
