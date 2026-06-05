@@ -269,14 +269,19 @@ private const val ComposePointLinesProperty = "magic.jewel.compose.pointLines"
 private const val ComposePointDotsProperty = "magic.jewel.compose.pointDots"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
 private const val ComposeInvalidLinearGradientStopsProperty = "magic.jewel.compose.invalidLinearGradientStops"
+private const val ComposeInvalidLinearGradientColorCountProperty =
+    "magic.jewel.compose.invalidLinearGradientColorCount"
 private const val ComposeLinearGradientStrokeProperty = "magic.jewel.compose.linearGradientStroke"
 private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
 private const val ComposeLinearGradientPathProperty = "magic.jewel.compose.linearGradientPath"
 private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
 private const val ComposeInvalidRadialGradientStopsProperty = "magic.jewel.compose.invalidRadialGradientStops"
+private const val ComposeInvalidRadialGradientColorCountProperty =
+    "magic.jewel.compose.invalidRadialGradientColorCount"
 private const val ComposeRadialGradientRoundRectProperty = "magic.jewel.compose.radialGradientRoundRect"
 private const val ComposeRadialGradientPathProperty = "magic.jewel.compose.radialGradientPath"
 private const val ComposeSweepGradientProperty = "magic.jewel.compose.sweepGradient"
+private const val ComposeInvalidSweepGradientColorCountProperty = "magic.jewel.compose.invalidSweepGradientColorCount"
 private const val ComposeSweepGradientRoundRectProperty = "magic.jewel.compose.sweepGradientRoundRect"
 private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepGradientPath"
 private const val ComposeGradientPathStrokeProperty = "magic.jewel.compose.gradientPathStroke"
@@ -317,6 +322,8 @@ private fun churnColor(index: Int): Color {
     val rgb = (index * 1103515245 + 12345) and 0x00ffffff
     return Color(0xff000000.toInt() or rgb)
 }
+
+private fun invalidGradientColors(): List<Color> = List(17, ::churnColor)
 
 fun main() {
     SwingUtilities.invokeLater(::showMagicJewel)
@@ -800,6 +807,9 @@ private fun MagicJewelApp() {
     val composeInvalidLinearGradientStopsEnabled = remember {
         System.getProperty(ComposeInvalidLinearGradientStopsProperty, "false").toBoolean()
     }
+    val composeInvalidLinearGradientColorCountEnabled = remember {
+        System.getProperty(ComposeInvalidLinearGradientColorCountProperty, "false").toBoolean()
+    }
     val composeLinearGradientStrokeEnabled = remember {
         System.getProperty(ComposeLinearGradientStrokeProperty, "false").toBoolean()
     }
@@ -815,6 +825,9 @@ private fun MagicJewelApp() {
     val composeInvalidRadialGradientStopsEnabled = remember {
         System.getProperty(ComposeInvalidRadialGradientStopsProperty, "false").toBoolean()
     }
+    val composeInvalidRadialGradientColorCountEnabled = remember {
+        System.getProperty(ComposeInvalidRadialGradientColorCountProperty, "false").toBoolean()
+    }
     val composeRadialGradientRoundRectEnabled = remember {
         System.getProperty(ComposeRadialGradientRoundRectProperty, "false").toBoolean()
     }
@@ -823,6 +836,9 @@ private fun MagicJewelApp() {
     }
     val composeSweepGradientEnabled = remember {
         System.getProperty(ComposeSweepGradientProperty, "false").toBoolean()
+    }
+    val composeInvalidSweepGradientColorCountEnabled = remember {
+        System.getProperty(ComposeInvalidSweepGradientColorCountProperty, "false").toBoolean()
     }
     val composeSweepGradientRoundRectEnabled = remember {
         System.getProperty(ComposeSweepGradientRoundRectProperty, "false").toBoolean()
@@ -2863,6 +2879,12 @@ private fun MagicJewelApp() {
                                 start = Offset(size.width - 188f, size.height - 106f),
                                 end = Offset(size.width - 48f, size.height - 34f),
                             )
+                        } else if (composeInvalidLinearGradientColorCountEnabled) {
+                            Brush.linearGradient(
+                                colors = invalidGradientColors(),
+                                start = Offset(size.width - 188f, size.height - 106f),
+                                end = Offset(size.width - 48f, size.height - 34f),
+                            )
                         } else {
                             Brush.linearGradient(
                                 colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6), Color(0xFFA855F7)),
@@ -2952,6 +2974,12 @@ private fun MagicJewelApp() {
                                 center = topLeft + Offset(64f, 48f),
                                 radius = 72f,
                             )
+                        } else if (composeInvalidRadialGradientColorCountEnabled) {
+                            Brush.radialGradient(
+                                colors = invalidGradientColors(),
+                                center = topLeft + Offset(64f, 48f),
+                                radius = 72f,
+                            )
                         } else {
                             Brush.radialGradient(
                                 colors = listOf(Color(0xFFFFF7ED), Color(0xFFF97316), Color(0xFF7C3AED)),
@@ -3028,7 +3056,11 @@ private fun MagicJewelApp() {
                     val topLeft = Offset(size.width - 518f, size.height - 126f)
                     drawRect(
                         brush = Brush.sweepGradient(
-                            colors = listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6)),
+                            colors = if (composeInvalidSweepGradientColorCountEnabled) {
+                                invalidGradientColors()
+                            } else {
+                                listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
+                            },
                             center = topLeft + Offset(72f, 42f),
                         ),
                         topLeft = topLeft,
