@@ -415,6 +415,9 @@ val composePointDotsEnabled = providers.gradleProperty("magicJewelComposePointDo
 val composeLinearGradientEnabled = providers.gradleProperty("magicJewelComposeLinearGradient")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT"))
     .orElse("false")
+val composeLinearGradientBlendModeEnabled = providers.gradleProperty("magicJewelComposeLinearGradientBlendMode")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_BLEND_MODE"))
+    .orElse("false")
 val composeInvalidLinearGradientStopsEnabled = providers.gradleProperty("magicJewelComposeInvalidLinearGradientStops")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_STOPS"))
     .orElse("false")
@@ -747,6 +750,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.pointLines", composePointLinesEnabled.get())
     systemProperty("magic.jewel.compose.pointDots", composePointDotsEnabled.get())
     systemProperty("magic.jewel.compose.linearGradient", composeLinearGradientEnabled.get())
+    systemProperty("magic.jewel.compose.linearGradientBlendMode", composeLinearGradientBlendModeEnabled.get())
     systemProperty("magic.jewel.compose.invalidLinearGradientStops", composeInvalidLinearGradientStopsEnabled.get())
     systemProperty(
         "magic.jewel.compose.invalidLinearGradientColorCount",

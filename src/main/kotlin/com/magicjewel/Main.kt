@@ -273,6 +273,7 @@ private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundR
 private const val ComposePointLinesProperty = "magic.jewel.compose.pointLines"
 private const val ComposePointDotsProperty = "magic.jewel.compose.pointDots"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
+private const val ComposeLinearGradientBlendModeProperty = "magic.jewel.compose.linearGradientBlendMode"
 private const val ComposeInvalidLinearGradientStopsProperty = "magic.jewel.compose.invalidLinearGradientStops"
 private const val ComposeInvalidLinearGradientColorCountProperty =
     "magic.jewel.compose.invalidLinearGradientColorCount"
@@ -820,6 +821,9 @@ private fun MagicJewelApp() {
     }
     val composeLinearGradientEnabled = remember {
         System.getProperty(ComposeLinearGradientProperty, "false").toBoolean()
+    }
+    val composeLinearGradientBlendModeEnabled = remember {
+        System.getProperty(ComposeLinearGradientBlendModeProperty, "false").toBoolean()
     }
     val composeInvalidLinearGradientStopsEnabled = remember {
         System.getProperty(ComposeInvalidLinearGradientStopsProperty, "false").toBoolean()
@@ -2932,6 +2936,24 @@ private fun MagicJewelApp() {
                     drawRect(
                         color = Color.White,
                         topLeft = Offset(size.width - 188f, size.height - 106f),
+                        size = Size(140f, 72f),
+                        style = Stroke(width = 3f),
+                    )
+                }
+                if (composeLinearGradientBlendModeEnabled) {
+                    drawRect(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF0EA5E9), Color(0xFFFACC15), Color(0xFFEC4899)),
+                            start = Offset(size.width - 524f, size.height - 106f),
+                            end = Offset(size.width - 384f, size.height - 34f),
+                        ),
+                        topLeft = Offset(size.width - 524f, size.height - 106f),
+                        size = Size(140f, 72f),
+                        blendMode = BlendMode.Plus,
+                    )
+                    drawRect(
+                        color = Color.White,
+                        topLeft = Offset(size.width - 524f, size.height - 106f),
                         size = Size(140f, 72f),
                         style = Stroke(width = 3f),
                     )
