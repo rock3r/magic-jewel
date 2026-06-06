@@ -434,6 +434,10 @@ val composeLinearGradientRoundRectEnabled = providers.gradleProperty("magicJewel
 val composeLinearGradientPathEnabled = providers.gradleProperty("magicJewelComposeLinearGradientPath")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH"))
     .orElse("false")
+val composeLinearGradientPathBlendModeEnabled =
+    providers.gradleProperty("magicJewelComposeLinearGradientPathBlendMode")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH_BLEND_MODE"))
+        .orElse("false")
 val composeRadialGradientEnabled = providers.gradleProperty("magicJewelComposeRadialGradient")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT"))
     .orElse("false")
@@ -759,6 +763,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.linearGradientStroke", composeLinearGradientStrokeEnabled.get())
     systemProperty("magic.jewel.compose.linearGradientRoundRect", composeLinearGradientRoundRectEnabled.get())
     systemProperty("magic.jewel.compose.linearGradientPath", composeLinearGradientPathEnabled.get())
+    systemProperty("magic.jewel.compose.linearGradientPathBlendMode", composeLinearGradientPathBlendModeEnabled.get())
     systemProperty("magic.jewel.compose.radialGradient", composeRadialGradientEnabled.get())
     systemProperty("magic.jewel.compose.invalidRadialGradientStops", composeInvalidRadialGradientStopsEnabled.get())
     systemProperty(

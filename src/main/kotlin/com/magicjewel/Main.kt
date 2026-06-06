@@ -280,6 +280,7 @@ private const val ComposeInvalidLinearGradientColorCountProperty =
 private const val ComposeLinearGradientStrokeProperty = "magic.jewel.compose.linearGradientStroke"
 private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
 private const val ComposeLinearGradientPathProperty = "magic.jewel.compose.linearGradientPath"
+private const val ComposeLinearGradientPathBlendModeProperty = "magic.jewel.compose.linearGradientPathBlendMode"
 private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
 private const val ComposeInvalidRadialGradientStopsProperty = "magic.jewel.compose.invalidRadialGradientStops"
 private const val ComposeInvalidRadialGradientColorCountProperty =
@@ -839,6 +840,9 @@ private fun MagicJewelApp() {
     }
     val composeLinearGradientPathEnabled = remember {
         System.getProperty(ComposeLinearGradientPathProperty, "false").toBoolean()
+    }
+    val composeLinearGradientPathBlendModeEnabled = remember {
+        System.getProperty(ComposeLinearGradientPathBlendModeProperty, "false").toBoolean()
     }
     val composeRadialGradientEnabled = remember {
         System.getProperty(ComposeRadialGradientProperty, "false").toBoolean()
@@ -3022,6 +3026,29 @@ private fun MagicJewelApp() {
                     } else {
                         drawPath(path = path, brush = brush)
                     }
+                    drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
+                }
+                if (composeLinearGradientPathBlendModeEnabled) {
+                    val path = Path().apply {
+                        moveTo(size.width - 524f, size.height - 260f)
+                        cubicTo(
+                            size.width - 486f,
+                            size.height - 312f,
+                            size.width - 414f,
+                            size.height - 292f,
+                            size.width - 394f,
+                            size.height - 232f,
+                        )
+                        lineTo(size.width - 448f, size.height - 206f)
+                        lineTo(size.width - 524f, size.height - 222f)
+                        close()
+                    }
+                    val brush = Brush.linearGradient(
+                        colors = listOf(Color(0xFF0F766E), Color(0xFFFDE047), Color(0xFFDB2777)),
+                        start = Offset(size.width - 528f, size.height - 312f),
+                        end = Offset(size.width - 390f, size.height - 204f),
+                    )
+                    drawPath(path = path, brush = brush, blendMode = BlendMode.Plus)
                     drawPath(path = path, color = Color.White, style = Stroke(width = 3f))
                 }
                 if (composeRadialGradientEnabled) {
