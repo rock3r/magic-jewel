@@ -138,6 +138,7 @@ private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageBlendModeProperty = "magic.jewel.compose.imageBlendMode"
 private const val ComposeImagePathEffectProperty = "magic.jewel.compose.imagePathEffect"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
+private const val ComposeImageShaderBlendModeProperty = "magic.jewel.compose.imageShaderBlendMode"
 private const val ComposeInvalidImageShaderImageProperty = "magic.jewel.compose.invalidImageShaderImage"
 private const val ComposeRawImageShaderProperty = "magic.jewel.compose.rawImageShader"
 private const val ComposeColorShaderProperty = "magic.jewel.compose.colorShader"
@@ -482,6 +483,9 @@ private fun MagicJewelApp() {
     }
     val composeImageShaderEnabled = remember {
         System.getProperty(ComposeImageShaderProperty, "false").toBoolean()
+    }
+    val composeImageShaderBlendModeEnabled = remember {
+        System.getProperty(ComposeImageShaderBlendModeProperty, "false").toBoolean()
     }
     val composeInvalidImageShaderImageEnabled = remember {
         System.getProperty(ComposeInvalidImageShaderImageProperty, "false").toBoolean()
@@ -927,6 +931,7 @@ private fun MagicJewelApp() {
         composeImageBlendModeEnabled,
         composeImagePathEffectEnabled,
         composeImageShaderEnabled,
+        composeImageShaderBlendModeEnabled,
         composeInvalidImageShaderImageEnabled,
         composeImageShaderColorFilterEnabled,
         composeImageFilterEnabled,
@@ -937,6 +942,7 @@ private fun MagicJewelApp() {
             composeImageBlendModeEnabled ||
             composeImagePathEffectEnabled ||
             composeImageShaderEnabled ||
+            composeImageShaderBlendModeEnabled ||
             composeInvalidImageShaderImageEnabled ||
             composeDescriptorStrokeShaderEnabled ||
             composeImageShaderColorFilterEnabled ||
@@ -1103,6 +1109,17 @@ private fun MagicJewelApp() {
                             topLeft = Offset(size.width - 224f, size.height - 224f),
                             size = Size(140f, 116f),
                             alpha = 0.92f,
+                        )
+                    }
+                }
+                if (composeImageShaderBlendModeEnabled) {
+                    imageProbe?.let {
+                        drawRect(
+                            brush = ShaderBrush(ImageShader(it, TileMode.Repeated, TileMode.Mirror)),
+                            topLeft = Offset(size.width - 704f, size.height - 378f),
+                            size = Size(140f, 116f),
+                            alpha = 0.92f,
+                            blendMode = BlendMode.Plus,
                         )
                     }
                 }
