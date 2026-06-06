@@ -286,10 +286,14 @@ private const val ComposeInvalidRadialGradientStopsProperty = "magic.jewel.compo
 private const val ComposeInvalidRadialGradientColorCountProperty =
     "magic.jewel.compose.invalidRadialGradientColorCount"
 private const val ComposeRadialGradientRoundRectProperty = "magic.jewel.compose.radialGradientRoundRect"
+private const val ComposeRadialGradientStrokeBlendModeProperty =
+    "magic.jewel.compose.radialGradientStrokeBlendMode"
 private const val ComposeRadialGradientPathProperty = "magic.jewel.compose.radialGradientPath"
 private const val ComposeSweepGradientProperty = "magic.jewel.compose.sweepGradient"
 private const val ComposeInvalidSweepGradientColorCountProperty = "magic.jewel.compose.invalidSweepGradientColorCount"
 private const val ComposeSweepGradientRoundRectProperty = "magic.jewel.compose.sweepGradientRoundRect"
+private const val ComposeSweepGradientRoundRectBlendModeProperty =
+    "magic.jewel.compose.sweepGradientRoundRectBlendMode"
 private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepGradientPath"
 private const val ComposeGradientPathStrokeProperty = "magic.jewel.compose.gradientPathStroke"
 private const val UnsupportedTextProperty = "magic.jewel.unsupportedText"
@@ -856,6 +860,9 @@ private fun MagicJewelApp() {
     val composeRadialGradientRoundRectEnabled = remember {
         System.getProperty(ComposeRadialGradientRoundRectProperty, "false").toBoolean()
     }
+    val composeRadialGradientStrokeBlendModeEnabled = remember {
+        System.getProperty(ComposeRadialGradientStrokeBlendModeProperty, "false").toBoolean()
+    }
     val composeRadialGradientPathEnabled = remember {
         System.getProperty(ComposeRadialGradientPathProperty, "false").toBoolean()
     }
@@ -867,6 +874,9 @@ private fun MagicJewelApp() {
     }
     val composeSweepGradientRoundRectEnabled = remember {
         System.getProperty(ComposeSweepGradientRoundRectProperty, "false").toBoolean()
+    }
+    val composeSweepGradientRoundRectBlendModeEnabled = remember {
+        System.getProperty(ComposeSweepGradientRoundRectBlendModeProperty, "false").toBoolean()
     }
     val composeSweepGradientPathEnabled = remember {
         System.getProperty(ComposeSweepGradientPathProperty, "false").toBoolean()
@@ -3088,6 +3098,20 @@ private fun MagicJewelApp() {
                         style = Stroke(width = 8f),
                     )
                 }
+                if (composeRadialGradientStrokeBlendModeEnabled) {
+                    val topLeft = Offset(size.width - 696f, size.height - 150f)
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0xFFBAE6FD), Color(0xFF0EA5E9), Color(0xFF7C3AED)),
+                            center = topLeft + Offset(76f, 52f),
+                            radius = 96f,
+                        ),
+                        topLeft = topLeft,
+                        size = Size(152f, 104f),
+                        style = Stroke(width = 12f),
+                        blendMode = BlendMode.Plus,
+                    )
+                }
                 if (composeRadialGradientRoundRectEnabled) {
                     val topLeft = Offset(size.width - 164f, size.height - 304f)
                     drawRoundRect(
@@ -3199,6 +3223,26 @@ private fun MagicJewelApp() {
                         size = Size(144f, 92f),
                         cornerRadius = androidx.compose.ui.geometry.CornerRadius(28f, 18f),
                         style = Stroke(width = 8f),
+                    )
+                }
+                if (composeSweepGradientRoundRectBlendModeEnabled) {
+                    val topLeft = Offset(size.width - 704f, size.height - 268f)
+                    drawRoundRect(
+                        brush = Brush.sweepGradient(
+                            colors = listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6)),
+                            center = topLeft + Offset(76f, 50f),
+                        ),
+                        topLeft = topLeft,
+                        size = Size(152f, 100f),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(28f, 18f),
+                        blendMode = BlendMode.Plus,
+                    )
+                    drawRoundRect(
+                        color = Color.White,
+                        topLeft = topLeft,
+                        size = Size(152f, 100f),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(28f, 18f),
+                        style = Stroke(width = 3f),
                     )
                 }
                 if (composeSweepGradientPathEnabled) {

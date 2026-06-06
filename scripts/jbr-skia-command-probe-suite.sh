@@ -60,7 +60,7 @@ case_group_cases() {
       echo "commands-live-animation commands-core-primitives commands-color-shader commands-color-filter-handle commands-color-matrix-filter commands-graphics-layer"
       ;;
     surface-transform-ui)
-      echo "commands-native-bridge-load-library commands-point-lines commands-point-dots commands-concat-transform commands-skew-transform commands-gradient-surfaces commands-linear-gradient-blend-mode commands-gradient-paths commands-linear-gradient-path-blend-mode commands-popup commands-popup-window commands-menu commands-text-image"
+      echo "commands-native-bridge-load-library commands-point-lines commands-point-dots commands-concat-transform commands-skew-transform commands-gradient-surfaces commands-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode commands-gradient-paths commands-linear-gradient-path-blend-mode commands-popup commands-popup-window commands-menu commands-text-image"
       ;;
     gradient-path-stroke-fallbacks)
       echo "commands-linear-gradient-path-stroke-fallback commands-radial-gradient-path-stroke-fallback commands-sweep-gradient-path-stroke-fallback"
@@ -243,6 +243,7 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-gradient-stroke commands-invalid-linear-gradient-stroke-width-fallback" "commands-gradient-stroke commands-linear-gradient-invalid-stops-fallback commands-radial-gradient-invalid-stops-fallback commands-invalid-linear-gradient-stroke-width-fallback"
   replace_default_case_segment "commands-radial-gradient-invalid-stops-fallback commands-invalid-linear-gradient-stroke-width-fallback" "commands-radial-gradient-invalid-stops-fallback commands-linear-gradient-invalid-color-count-fallback commands-radial-gradient-invalid-color-count-fallback commands-sweep-gradient-invalid-color-count-fallback commands-invalid-linear-gradient-stroke-width-fallback"
   replace_default_case_segment "commands-gradient-surfaces commands-gradient-paths" "commands-gradient-surfaces commands-linear-gradient-blend-mode commands-gradient-paths"
+  replace_default_case_segment "commands-linear-gradient-blend-mode commands-gradient-paths" "commands-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode commands-gradient-paths"
   replace_default_case_segment "commands-gradient-paths commands-linear-gradient-path-stroke-fallback" "commands-gradient-paths commands-linear-gradient-path-blend-mode commands-linear-gradient-path-invalid-fallback commands-radial-gradient-path-invalid-fallback commands-sweep-gradient-path-invalid-fallback commands-linear-gradient-path-stroke-fallback"
   replace_default_case_segment "commands-image-shader commands-raw-image-shader-fallback" "commands-image-shader commands-image-shader-invalid-image-fallback commands-raw-image-shader-fallback"
   replace_default_case_segment "commands-image-filter commands-image-color-matrix-filter" "commands-image-filter commands-invalid-image-color-filter-use-fallback commands-invalid-image-color-filter-use-after-evict-fallback commands-invalid-image-color-filter-ref-width-fallback commands-invalid-image-color-filter-ref-height-fallback commands-invalid-image-color-filter-ref-alpha-fallback commands-invalid-image-color-filter-ref-filter-quality-fallback commands-invalid-image-color-filter-blend-mode-fallback commands-invalid-image-color-filter-ref-use-fallback commands-invalid-image-color-filter-ref-use-after-evict-fallback commands-invalid-image-color-filter-descriptor-ref-width-fallback commands-invalid-image-color-filter-descriptor-ref-height-fallback commands-invalid-image-color-filter-descriptor-ref-alpha-fallback commands-invalid-image-color-filter-descriptor-ref-filter-quality-fallback commands-image-color-matrix-filter"
@@ -959,6 +960,14 @@ run_named_case() {
     commands-linear-gradient-blend-mode)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_BLEND_MODE=true
+      ;;
+    commands-radial-gradient-stroke-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_STROKE_BLEND_MODE=true
+      ;;
+    commands-sweep-gradient-round-rect-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT_BLEND_MODE=true
       ;;
     commands-linear-gradient-invalid-stops-fallback)
       run_case "$1" \
