@@ -79,6 +79,9 @@ SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST="${SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FO
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE=false
 fi
+if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_BLEND_MODE+x}" ]]; then
+  MAGIC_JEWEL_COMPOSE_IMAGE_BLEND_MODE=false
+fi
 if [[ -z "${MAGIC_JEWEL_COMPOSE_IMAGE_PATH_EFFECT+x}" ]]; then
   MAGIC_JEWEL_COMPOSE_IMAGE_PATH_EFFECT=false
 fi
@@ -1320,6 +1323,7 @@ if [[ -z "${MAGIC_JEWEL_MENU_STRESS+x}" ]]; then
 fi
 export MAGIC_JEWEL_COMPOSE_TEXT
 export MAGIC_JEWEL_COMPOSE_IMAGE
+export MAGIC_JEWEL_COMPOSE_IMAGE_BLEND_MODE
 export MAGIC_JEWEL_COMPOSE_IMAGE_PATH_EFFECT
 export MAGIC_JEWEL_COMPOSE_IMAGE_SHADER
 export MAGIC_JEWEL_COMPOSE_INVALID_IMAGE_SHADER_IMAGE
@@ -1866,6 +1870,7 @@ Environment:
   JBR_SKIA_NATIVE_TEXT Opt into experimental native text command recording instead of fidelity-first text image replay. Default: false.
   MAGIC_JEWEL_COMPOSE_TEXT Enables Compose text in the sample. Default: true.
   MAGIC_JEWEL_COMPOSE_IMAGE Enables the Compose image probe. Default: false.
+  MAGIC_JEWEL_COMPOSE_IMAGE_BLEND_MODE Enables an image-ref plus paint blend-mode command replay probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_PATH_EFFECT Enables an image draw with unsupported path-effect paint fallback probe. Default: false.
   MAGIC_JEWEL_COMPOSE_IMAGE_SHADER Enables a non-gradient image-shader rendering probe. Default: false.
   MAGIC_JEWEL_COMPOSE_INVALID_IMAGE_SHADER_IMAGE Uses an oversized ImageShader image to exercise strict fallback. Default: false.
@@ -3103,6 +3108,7 @@ write_report() {
     echo "- JBR_SKIA_RENDER_MODE: ${JBR_SKIA_RENDER_MODE:-picture}"
     echo "- MAGIC_JEWEL_COMPOSE_TEXT: ${MAGIC_JEWEL_COMPOSE_TEXT}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE: ${MAGIC_JEWEL_COMPOSE_IMAGE}"
+    echo "- MAGIC_JEWEL_COMPOSE_IMAGE_BLEND_MODE: ${MAGIC_JEWEL_COMPOSE_IMAGE_BLEND_MODE}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE_PATH_EFFECT: ${MAGIC_JEWEL_COMPOSE_IMAGE_PATH_EFFECT}"
     echo "- MAGIC_JEWEL_COMPOSE_IMAGE_SHADER: ${MAGIC_JEWEL_COMPOSE_IMAGE_SHADER}"
     echo "- MAGIC_JEWEL_COMPOSE_INVALID_IMAGE_SHADER_IMAGE: ${MAGIC_JEWEL_COMPOSE_INVALID_IMAGE_SHADER_IMAGE}"

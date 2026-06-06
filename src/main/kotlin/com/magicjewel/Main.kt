@@ -135,6 +135,7 @@ private const val FrameMarker = "MAGIC_JEWEL_COMPOSE_FRAME"
 private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
+private const val ComposeImageBlendModeProperty = "magic.jewel.compose.imageBlendMode"
 private const val ComposeImagePathEffectProperty = "magic.jewel.compose.imagePathEffect"
 private const val ComposeImageShaderProperty = "magic.jewel.compose.imageShader"
 private const val ComposeInvalidImageShaderImageProperty = "magic.jewel.compose.invalidImageShaderImage"
@@ -472,6 +473,9 @@ private fun MagicJewelApp() {
     }
     val composeImageEnabled = remember {
         System.getProperty(ComposeImageProperty, "false").toBoolean()
+    }
+    val composeImageBlendModeEnabled = remember {
+        System.getProperty(ComposeImageBlendModeProperty, "false").toBoolean()
     }
     val composeImagePathEffectEnabled = remember {
         System.getProperty(ComposeImagePathEffectProperty, "false").toBoolean()
@@ -920,6 +924,7 @@ private fun MagicJewelApp() {
     }
     val imageProbe = remember(
         composeImageEnabled,
+        composeImageBlendModeEnabled,
         composeImagePathEffectEnabled,
         composeImageShaderEnabled,
         composeInvalidImageShaderImageEnabled,
@@ -929,6 +934,7 @@ private fun MagicJewelApp() {
         composeImageRawTableColorFilterEnabled,
     ) {
         if (composeImageEnabled ||
+            composeImageBlendModeEnabled ||
             composeImagePathEffectEnabled ||
             composeImageShaderEnabled ||
             composeInvalidImageShaderImageEnabled ||
@@ -1056,6 +1062,22 @@ private fun MagicJewelApp() {
                 if (composeImageEnabled) {
                     imageProbe?.let {
                         drawImage(it, topLeft = Offset(size.width - 212f, size.height - 126f))
+                    }
+                }
+                if (composeImageBlendModeEnabled) {
+                    imageProbe?.let {
+                        drawIntoCanvas { canvas ->
+                            canvas.drawImageRect(
+                                image = it,
+                                srcOffset = IntOffset.Zero,
+                                srcSize = IntSize(it.width, it.height),
+                                dstOffset = IntOffset((size.width - 640f).toInt(), (size.height - 126f).toInt()),
+                                dstSize = IntSize(104, 104),
+                                paint = Paint().apply {
+                                    blendMode = BlendMode.Plus
+                                },
+                            )
+                        }
                     }
                 }
                 if (composeImagePathEffectEnabled) {
