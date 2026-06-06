@@ -191,6 +191,7 @@ private const val ComposeImageRawTableColorFilterProperty = "magic.jewel.compose
 private const val ComposeRawBlendColorFilterProperty = "magic.jewel.compose.rawBlendColorFilter"
 private const val ComposeRawTableColorFilterProperty = "magic.jewel.compose.rawTableColorFilter"
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
+private const val ComposeColorFilterBlendModeProperty = "magic.jewel.compose.colorFilterBlendMode"
 private const val ComposeColorMatrixFilterProperty = "magic.jewel.compose.colorMatrixFilter"
 private const val ComposeLightingFilterProperty = "magic.jewel.compose.lightingFilter"
 private const val ComposeDescriptorEvictionProperty = "magic.jewel.compose.descriptorEviction"
@@ -612,6 +613,9 @@ private fun MagicJewelApp() {
     }
     val composeColorFilterEnabled = remember {
         System.getProperty(ComposeColorFilterProperty, "false").toBoolean()
+    }
+    val composeColorFilterBlendModeEnabled = remember {
+        System.getProperty(ComposeColorFilterBlendModeProperty, "false").toBoolean()
     }
     val composeColorMatrixFilterEnabled = remember {
         System.getProperty(ComposeColorMatrixFilterProperty, "false").toBoolean()
@@ -1798,6 +1802,21 @@ private fun MagicJewelApp() {
                             paint = Paint().apply {
                                 color = Color(0xFFE879F9)
                                 colorFilter = ColorFilter.tint(Color(0xFF22D3EE))
+                            },
+                        )
+                    }
+                }
+                if (composeColorFilterBlendModeEnabled) {
+                    drawIntoCanvas { canvas ->
+                        canvas.drawRect(
+                            left = size.width - 380f,
+                            top = 124f,
+                            right = size.width - 268f,
+                            bottom = 202f,
+                            paint = Paint().apply {
+                                color = Color(0xFFE879F9)
+                                colorFilter = ColorFilter.tint(Color(0xFF22D3EE))
+                                blendMode = BlendMode.Plus
                             },
                         )
                     }
