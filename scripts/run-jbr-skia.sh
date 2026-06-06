@@ -1291,6 +1291,8 @@ case "${JBR_SKIA_RENDER_MODE}" in
   diagnostic)
     JBR_ARGS+=("-Dskiko.jbr.interop.renderDiagnostic=true")
     ;;
+  auto)
+    ;;
   *)
     JBR_ARGS+=("-Dskiko.jbr.interop.renderPicture=true")
     ;;

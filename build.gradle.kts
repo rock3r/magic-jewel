@@ -796,6 +796,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
         when (jbrSkiaRenderMode.get()) {
             "commands" -> systemProperty("skiko.jbr.interop.renderCommands", "true")
             "diagnostic" -> systemProperty("skiko.jbr.interop.renderDiagnostic", "true")
+            "auto" -> Unit
             else -> systemProperty("skiko.jbr.interop.renderPicture", "true")
         }
     }

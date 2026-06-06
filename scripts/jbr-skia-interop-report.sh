@@ -1786,7 +1786,8 @@ Environment:
   ENABLE_ASPROF            Collect async-profiler output when true. Default: false.
   ASPROF                   Explicit path to async-profiler's asprof executable. Defaults to PATH lookup.
   ASPROF_EVENT             async-profiler event. Default: cpu.
-  JBR_SKIA_RENDER_MODE     New-mode renderer: picture, commands, or diagnostic. Default: picture.
+  JBR_SKIA_RENDER_MODE     New-mode renderer: picture, commands, diagnostic, or auto.
+                           auto leaves Skiko render-mode properties unset to validate its default. Default: picture.
   DESKTOP_PATCH            Patched java.desktop classes. Default: /tmp/jbr-skia-run/desktop.
   JBR_API_SHIM             Public JBR API shim jar. Default: /tmp/jbr-api-shim.jar.
   JBR_SKIA_LIB             Native JBR Skia interop dylib. Default: /tmp/jbr-skia-native/libjbrskiainterop.dylib.
