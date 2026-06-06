@@ -78,7 +78,7 @@ case_group_cases() {
       echo "commands-image-shader-invalid-image-fallback"
       ;;
     shader-rendering)
-      echo "commands-forced-context-dynamic-images commands-image-blend-mode commands-image-path-effect-fallback commands-image-shader commands-image-shader-blend-mode commands-image-shader-invalid-image-fallback commands-raw-image-shader-fallback commands-descriptor-stroke-shader-fallback commands-gradient-shaders commands-noise-shader commands-turbulence-shader commands-raw-linear-gradient-shader-fallback commands-raw-radial-gradient-shader-fallback commands-raw-sweep-gradient-shader-fallback commands-raw-conical-gradient-shader-fallback commands-raw-noise-shader-fallback commands-raw-turbulence-shader-fallback"
+      echo "commands-forced-context-dynamic-images commands-image-blend-mode commands-image-path-effect-fallback commands-image-shader commands-image-shader-blend-mode commands-image-shader-invalid-image-fallback commands-raw-image-shader-fallback commands-color-shader-blend-mode commands-descriptor-stroke-shader-fallback commands-gradient-shaders commands-noise-shader commands-turbulence-shader commands-raw-linear-gradient-shader-fallback commands-raw-radial-gradient-shader-fallback commands-raw-sweep-gradient-shader-fallback commands-raw-conical-gradient-shader-fallback commands-raw-noise-shader-fallback commands-raw-turbulence-shader-fallback"
       ;;
     shader-composition-runtime)
       echo "commands-image-shader-color-filter commands-composite-shader commands-composite-noise-shader commands-composite-shader-color-filter commands-transformed-shader commands-runtime-effect-shader commands-raw-runtime-effect-shader-fallback commands-runtime-effect-shader-color-filter commands-linear-gradient-shader-color-filter commands-runtime-effect-pure-color commands-runtime-effect-uniform-only commands-runtime-effect-child-only commands-runtime-effect-color-filter commands-raw-runtime-effect-color-filter-fallback commands-runtime-effect-color-filter-child"
@@ -247,6 +247,7 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-gradient-paths commands-linear-gradient-path-stroke-fallback" "commands-gradient-paths commands-linear-gradient-path-blend-mode commands-linear-gradient-path-invalid-fallback commands-radial-gradient-path-invalid-fallback commands-sweep-gradient-path-invalid-fallback commands-linear-gradient-path-stroke-fallback"
   replace_default_case_segment "commands-image-shader commands-raw-image-shader-fallback" "commands-image-shader commands-image-shader-blend-mode commands-image-shader-invalid-image-fallback commands-raw-image-shader-fallback"
   replace_default_case_segment "commands-image-path-effect-fallback commands-image-shader" "commands-image-blend-mode commands-image-path-effect-fallback commands-image-shader"
+  replace_default_case_segment "commands-color-shader commands-descriptor-stroke-shader-fallback" "commands-color-shader commands-color-shader-blend-mode commands-descriptor-stroke-shader-fallback"
   replace_default_case_segment "commands-image-filter commands-image-color-matrix-filter" "commands-image-filter commands-invalid-image-color-filter-use-fallback commands-invalid-image-color-filter-use-after-evict-fallback commands-invalid-image-color-filter-ref-width-fallback commands-invalid-image-color-filter-ref-height-fallback commands-invalid-image-color-filter-ref-alpha-fallback commands-invalid-image-color-filter-ref-filter-quality-fallback commands-invalid-image-color-filter-blend-mode-fallback commands-invalid-image-color-filter-ref-use-fallback commands-invalid-image-color-filter-ref-use-after-evict-fallback commands-invalid-image-color-filter-descriptor-ref-width-fallback commands-invalid-image-color-filter-descriptor-ref-height-fallback commands-invalid-image-color-filter-descriptor-ref-alpha-fallback commands-invalid-image-color-filter-descriptor-ref-filter-quality-fallback commands-image-color-matrix-filter"
   replace_default_case_segment "commands-raw-blend-color-filter-fallback commands-raw-table-color-filter-fallback commands-color-filter" "commands-raw-blend-color-filter-fallback commands-raw-table-color-filter-fallback commands-invalid-fill-rect-color-filter-blend-mode-fallback commands-invalid-fill-rect-color-filter-width-fallback commands-invalid-fill-rect-color-filter-height-fallback commands-invalid-fill-rect-color-filter-ref-width-fallback commands-invalid-fill-rect-color-filter-ref-height-fallback commands-color-filter"
   replace_default_case_segment "commands-blend-mode commands-graphics-layer" "commands-blend-mode commands-invalid-fill-rect-blend-mode-width-fallback commands-invalid-fill-rect-blend-mode-height-fallback commands-graphics-layer"
@@ -1382,6 +1383,14 @@ run_named_case() {
     commands-color-shader)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_COLOR_SHADER=true \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=1
+      ;;
+    commands-color-shader-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_COLOR_SHADER_BLEND_MODE=true \
         EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \

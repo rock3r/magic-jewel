@@ -142,6 +142,7 @@ private const val ComposeImageShaderBlendModeProperty = "magic.jewel.compose.ima
 private const val ComposeInvalidImageShaderImageProperty = "magic.jewel.compose.invalidImageShaderImage"
 private const val ComposeRawImageShaderProperty = "magic.jewel.compose.rawImageShader"
 private const val ComposeColorShaderProperty = "magic.jewel.compose.colorShader"
+private const val ComposeColorShaderBlendModeProperty = "magic.jewel.compose.colorShaderBlendMode"
 private const val ComposeDescriptorStrokeShaderProperty = "magic.jewel.compose.descriptorStrokeShader"
 private const val ComposeOpaqueShaderProperty = "magic.jewel.compose.opaqueShader"
 private const val ComposeCompositeOpaqueShaderProperty = "magic.jewel.compose.compositeOpaqueShader"
@@ -495,6 +496,9 @@ private fun MagicJewelApp() {
     }
     val composeColorShaderEnabled = remember {
         System.getProperty(ComposeColorShaderProperty, "false").toBoolean()
+    }
+    val composeColorShaderBlendModeEnabled = remember {
+        System.getProperty(ComposeColorShaderBlendModeProperty, "false").toBoolean()
     }
     val composeDescriptorStrokeShaderEnabled = remember {
         System.getProperty(ComposeDescriptorStrokeShaderProperty, "false").toBoolean()
@@ -1145,6 +1149,15 @@ private fun MagicJewelApp() {
                         topLeft = Offset(size.width - 356f, size.height - 350f),
                         size = Size(112f, 78f),
                         alpha = 0.92f,
+                    )
+                }
+                if (composeColorShaderBlendModeEnabled) {
+                    drawRect(
+                        brush = ShaderBrush(ColorShader(Color(0xFFFACC15))),
+                        topLeft = Offset(size.width - 704f, size.height - 502f),
+                        size = Size(112f, 78f),
+                        alpha = 0.92f,
+                        blendMode = BlendMode.Plus,
                     )
                 }
                 if (composeDescriptorStrokeShaderEnabled) {
