@@ -256,6 +256,7 @@ private const val ComposeGraphicsLayerModulateAlphaProperty = "magic.jewel.compo
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
 private const val ComposeInvalidBlendLayerBoundsProperty = "magic.jewel.compose.invalidBlendLayerBounds"
 private const val ComposeConcatTransformProperty = "magic.jewel.compose.concatTransform"
+private const val ComposeInvalidConcatTransformProperty = "magic.jewel.compose.invalidConcatTransform"
 private const val ComposeSkewTransformProperty = "magic.jewel.compose.skewTransform"
 private const val ComposeVerticesProperty = "magic.jewel.compose.vertices"
 private const val ComposeVerticesRawColorFilterProperty = "magic.jewel.compose.verticesRawColorFilter"
@@ -781,6 +782,9 @@ private fun MagicJewelApp() {
     }
     val composeConcatTransformEnabled = remember {
         System.getProperty(ComposeConcatTransformProperty, "false").toBoolean()
+    }
+    val composeInvalidConcatTransformEnabled = remember {
+        System.getProperty(ComposeInvalidConcatTransformProperty, "false").toBoolean()
     }
     val composeSkewTransformEnabled = remember {
         System.getProperty(ComposeSkewTransformProperty, "false").toBoolean()
@@ -2651,6 +2655,26 @@ private fun MagicJewelApp() {
                             right = 104f,
                             bottom = 46f,
                             paint = Paint().apply { color = Color(0xFF22D3EE) },
+                        )
+                        canvas.restore()
+                    }
+                }
+                if (composeInvalidConcatTransformEnabled) {
+                    drawIntoCanvas { canvas ->
+                        val matrix = Matrix().apply {
+                            values[Matrix.ScaleX] = 1f
+                            values[Matrix.TranslateX] = Float.NaN
+                            values[Matrix.ScaleY] = 1f
+                            values[Matrix.TranslateY] = size.height - 172f
+                        }
+                        canvas.save()
+                        canvas.concat(matrix)
+                        canvas.drawRect(
+                            left = 0f,
+                            top = 0f,
+                            right = 104f,
+                            bottom = 46f,
+                            paint = Paint().apply { color = Color(0xFFF97316) },
                         )
                         canvas.restore()
                     }
