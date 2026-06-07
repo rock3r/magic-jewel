@@ -381,6 +381,9 @@ val composeSaveLayerColorMatrixFilterEnabled = providers.gradleProperty("magicJe
 val composeSaveLayerBlendModeEnabled = providers.gradleProperty("magicJewelComposeSaveLayerBlendMode")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_SAVELAYER_BLEND_MODE"))
     .orElse("false")
+val composeSaveLayerBlendColorFilterEnabled = providers.gradleProperty("magicJewelComposeSaveLayerBlendColorFilter")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_SAVELAYER_BLEND_COLOR_FILTER"))
+    .orElse("false")
 val composeSaveLayerRawColorFilterEnabled = providers.gradleProperty("magicJewelComposeSaveLayerRawColorFilter")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_SAVELAYER_RAW_COLOR_FILTER"))
     .orElse("false")
@@ -757,6 +760,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.saveLayerFilter", composeSaveLayerFilterEnabled.get())
     systemProperty("magic.jewel.compose.saveLayerColorMatrixFilter", composeSaveLayerColorMatrixFilterEnabled.get())
     systemProperty("magic.jewel.compose.saveLayerBlendMode", composeSaveLayerBlendModeEnabled.get())
+    systemProperty("magic.jewel.compose.saveLayerBlendColorFilter", composeSaveLayerBlendColorFilterEnabled.get())
     systemProperty("magic.jewel.compose.saveLayerRawColorFilter", composeSaveLayerRawColorFilterEnabled.get())
     systemProperty(
         "magic.jewel.compose.saveLayerRawTableColorFilter",
