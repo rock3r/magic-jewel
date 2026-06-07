@@ -277,6 +277,7 @@ private const val ComposeDrawArcProperty = "magic.jewel.compose.drawArc"
 private const val ComposeDrawRoundRectProperty = "magic.jewel.compose.drawRoundRect"
 private const val ComposePointLinesProperty = "magic.jewel.compose.pointLines"
 private const val ComposePointDotsProperty = "magic.jewel.compose.pointDots"
+private const val ComposeInvalidPointDotsProperty = "magic.jewel.compose.invalidPointDots"
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
 private const val ComposeLinearGradientBlendModeProperty = "magic.jewel.compose.linearGradientBlendMode"
 private const val ComposeInvalidLinearGradientStopsProperty = "magic.jewel.compose.invalidLinearGradientStops"
@@ -843,6 +844,9 @@ private fun MagicJewelApp() {
     }
     val composePointDotsEnabled = remember {
         System.getProperty(ComposePointDotsProperty, "false").toBoolean()
+    }
+    val composeInvalidPointDotsEnabled = remember {
+        System.getProperty(ComposeInvalidPointDotsProperty, "false").toBoolean()
     }
     val composeLinearGradientEnabled = remember {
         System.getProperty(ComposeLinearGradientProperty, "false").toBoolean()
@@ -3009,6 +3013,24 @@ private fun MagicJewelApp() {
                             ),
                             paint = Paint().apply {
                                 color = Color(0xFFFB7185)
+                                strokeWidth = 14f
+                                strokeCap = StrokeCap.Round
+                            },
+                        )
+                    }
+                }
+                if (composeInvalidPointDotsEnabled) {
+                    val topLeft = Offset(size.width - 300f, size.height - 112f)
+                    drawIntoCanvas { canvas ->
+                        canvas.drawPoints(
+                            pointMode = PointMode.Points,
+                            points = listOf(
+                                topLeft,
+                                Offset(Float.NaN, topLeft.y - 18f),
+                                topLeft + Offset(48f, 0f),
+                            ),
+                            paint = Paint().apply {
+                                color = Color(0xFFF97316)
                                 strokeWidth = 14f
                                 strokeCap = StrokeCap.Round
                             },
