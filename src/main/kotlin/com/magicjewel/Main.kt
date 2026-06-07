@@ -260,6 +260,7 @@ private const val ComposeInvalidConcatTransformProperty = "magic.jewel.compose.i
 private const val ComposeSkewTransformProperty = "magic.jewel.compose.skewTransform"
 private const val ComposeVerticesProperty = "magic.jewel.compose.vertices"
 private const val ComposeVerticesRawColorFilterProperty = "magic.jewel.compose.verticesRawColorFilter"
+private const val ComposeVerticesInvalidBlendModeProperty = "magic.jewel.compose.verticesInvalidBlendMode"
 private const val ComposeSaveLayerProperty = "magic.jewel.compose.saveLayer"
 private const val ComposeSaveLayerFilterProperty = "magic.jewel.compose.saveLayerFilter"
 private const val ComposeSaveLayerColorMatrixFilterProperty = "magic.jewel.compose.saveLayerColorMatrixFilter"
@@ -794,6 +795,9 @@ private fun MagicJewelApp() {
     }
     val composeVerticesRawColorFilterEnabled = remember {
         System.getProperty(ComposeVerticesRawColorFilterProperty, "false").toBoolean()
+    }
+    val composeVerticesInvalidBlendModeEnabled = remember {
+        System.getProperty(ComposeVerticesInvalidBlendModeProperty, "false").toBoolean()
     }
     val composeSaveLayerEnabled = remember {
         System.getProperty(ComposeSaveLayerProperty, "false").toBoolean()
@@ -2718,6 +2722,26 @@ private fun MagicJewelApp() {
                                     ).asComposeColorFilter()
                                 }
                             },
+                        )
+                    }
+                }
+                if (composeVerticesInvalidBlendModeEnabled) {
+                    drawIntoCanvas { canvas ->
+                        val topLeft = Offset(size.width - 216f, size.height - 154f)
+                        canvas.drawVertices(
+                            vertices = Vertices(
+                                vertexMode = VertexMode.Triangles,
+                                positions = listOf(
+                                    topLeft,
+                                    topLeft + Offset(112f, 12f),
+                                    topLeft + Offset(32f, 88f),
+                                ),
+                                textureCoordinates = listOf(Offset.Zero, Offset(1f, 0f), Offset(0f, 1f)),
+                                colors = listOf(Color(0xFFF97316), Color(0xFF22D3EE), Color(0xFFFDE047)),
+                                indices = listOf(0, 1, 2),
+                            ),
+                            blendMode = BlendMode.Clear,
+                            paint = Paint(),
                         )
                     }
                 }
