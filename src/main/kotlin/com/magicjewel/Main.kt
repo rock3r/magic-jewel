@@ -254,6 +254,7 @@ private const val ComposeGraphicsLayerOffCenterPivotProperty = "magic.jewel.comp
 private const val ComposeGraphicsLayerOffscreenProperty = "magic.jewel.compose.graphicsLayerOffscreen"
 private const val ComposeGraphicsLayerModulateAlphaProperty = "magic.jewel.compose.graphicsLayerModulateAlpha"
 private const val ComposeTransformProperty = "magic.jewel.compose.transform"
+private const val ComposeInvalidBlendLayerBoundsProperty = "magic.jewel.compose.invalidBlendLayerBounds"
 private const val ComposeConcatTransformProperty = "magic.jewel.compose.concatTransform"
 private const val ComposeSkewTransformProperty = "magic.jewel.compose.skewTransform"
 private const val ComposeVerticesProperty = "magic.jewel.compose.vertices"
@@ -773,6 +774,9 @@ private fun MagicJewelApp() {
     }
     val composeTransformEnabled = remember {
         System.getProperty(ComposeTransformProperty, "false").toBoolean()
+    }
+    val composeInvalidBlendLayerBoundsEnabled = remember {
+        System.getProperty(ComposeInvalidBlendLayerBoundsProperty, "false").toBoolean()
     }
     val composeConcatTransformEnabled = remember {
         System.getProperty(ComposeConcatTransformProperty, "false").toBoolean()
@@ -2877,6 +2881,15 @@ private fun MagicJewelApp() {
                             size = Size(176f, 120f),
                         )
                     }
+                }
+                if (composeInvalidBlendLayerBoundsEnabled) {
+                    drawLine(
+                        color = Color(0xFFF97316),
+                        start = Offset(Float.NaN, size.height - 118f),
+                        end = Offset(122f, size.height - 48f),
+                        strokeWidth = 8f,
+                        blendMode = BlendMode.Plus,
+                    )
                 }
                 if (composeClipPathEnabled) {
                     val path = Path().apply {
