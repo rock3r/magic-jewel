@@ -2837,7 +2837,7 @@ max_command_recorder_field() {
     index($0, marker) {
       for (i = 1; i <= NF; i++) {
         split($i, value, "=")
-        if (value[1] == field && value[2] > maxValue) {
+        if (value[1] == field && value[2] ~ /^[0-9]+$/ && value[2] > maxValue) {
           maxValue = value[2]
         }
       }
