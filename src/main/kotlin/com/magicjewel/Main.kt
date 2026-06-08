@@ -283,6 +283,7 @@ private const val ComposeInvalidPointDotsProperty = "magic.jewel.compose.invalid
 private const val ComposeLinearGradientProperty = "magic.jewel.compose.linearGradient"
 private const val ComposeLinearGradientBlendModeProperty = "magic.jewel.compose.linearGradientBlendMode"
 private const val ComposeInvalidLinearGradientStopsProperty = "magic.jewel.compose.invalidLinearGradientStops"
+private const val ComposeInvalidLinearGradientPointsProperty = "magic.jewel.compose.invalidLinearGradientPoints"
 private const val ComposeInvalidLinearGradientColorCountProperty =
     "magic.jewel.compose.invalidLinearGradientColorCount"
 private const val ComposeLinearGradientStrokeProperty = "magic.jewel.compose.linearGradientStroke"
@@ -864,6 +865,9 @@ private fun MagicJewelApp() {
     }
     val composeInvalidLinearGradientStopsEnabled = remember {
         System.getProperty(ComposeInvalidLinearGradientStopsProperty, "false").toBoolean()
+    }
+    val composeInvalidLinearGradientPointsEnabled = remember {
+        System.getProperty(ComposeInvalidLinearGradientPointsProperty, "false").toBoolean()
     }
     val composeInvalidLinearGradientColorCountEnabled = remember {
         System.getProperty(ComposeInvalidLinearGradientColorCountProperty, "false").toBoolean()
@@ -3092,6 +3096,12 @@ private fun MagicJewelApp() {
                                 0.5f to Color(0xFF10B981),
                                 0.5f to Color(0xFF3B82F6),
                                 start = Offset(size.width - 188f, size.height - 106f),
+                                end = Offset(size.width - 48f, size.height - 34f),
+                            )
+                        } else if (composeInvalidLinearGradientPointsEnabled) {
+                            Brush.linearGradient(
+                                colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6)),
+                                start = Offset(Float.NaN, size.height - 106f),
                                 end = Offset(size.width - 48f, size.height - 34f),
                             )
                         } else if (composeInvalidLinearGradientColorCountEnabled) {
