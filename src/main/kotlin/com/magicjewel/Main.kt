@@ -292,6 +292,7 @@ private const val ComposeLinearGradientPathProperty = "magic.jewel.compose.linea
 private const val ComposeLinearGradientPathBlendModeProperty = "magic.jewel.compose.linearGradientPathBlendMode"
 private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
 private const val ComposeInvalidRadialGradientStopsProperty = "magic.jewel.compose.invalidRadialGradientStops"
+private const val ComposeInvalidRadialGradientGeometryProperty = "magic.jewel.compose.invalidRadialGradientGeometry"
 private const val ComposeInvalidRadialGradientColorCountProperty =
     "magic.jewel.compose.invalidRadialGradientColorCount"
 private const val ComposeRadialGradientRoundRectProperty = "magic.jewel.compose.radialGradientRoundRect"
@@ -300,6 +301,7 @@ private const val ComposeRadialGradientStrokeBlendModeProperty =
 private const val ComposeRadialGradientPathProperty = "magic.jewel.compose.radialGradientPath"
 private const val ComposeSweepGradientProperty = "magic.jewel.compose.sweepGradient"
 private const val ComposeInvalidSweepGradientColorCountProperty = "magic.jewel.compose.invalidSweepGradientColorCount"
+private const val ComposeInvalidSweepGradientGeometryProperty = "magic.jewel.compose.invalidSweepGradientGeometry"
 private const val ComposeSweepGradientRoundRectProperty = "magic.jewel.compose.sweepGradientRoundRect"
 private const val ComposeSweepGradientRoundRectBlendModeProperty =
     "magic.jewel.compose.sweepGradientRoundRectBlendMode"
@@ -890,6 +892,9 @@ private fun MagicJewelApp() {
     val composeInvalidRadialGradientStopsEnabled = remember {
         System.getProperty(ComposeInvalidRadialGradientStopsProperty, "false").toBoolean()
     }
+    val composeInvalidRadialGradientGeometryEnabled = remember {
+        System.getProperty(ComposeInvalidRadialGradientGeometryProperty, "false").toBoolean()
+    }
     val composeInvalidRadialGradientColorCountEnabled = remember {
         System.getProperty(ComposeInvalidRadialGradientColorCountProperty, "false").toBoolean()
     }
@@ -907,6 +912,9 @@ private fun MagicJewelApp() {
     }
     val composeInvalidSweepGradientColorCountEnabled = remember {
         System.getProperty(ComposeInvalidSweepGradientColorCountProperty, "false").toBoolean()
+    }
+    val composeInvalidSweepGradientGeometryEnabled = remember {
+        System.getProperty(ComposeInvalidSweepGradientGeometryProperty, "false").toBoolean()
     }
     val composeSweepGradientRoundRectEnabled = remember {
         System.getProperty(ComposeSweepGradientRoundRectProperty, "false").toBoolean()
@@ -3244,6 +3252,12 @@ private fun MagicJewelApp() {
                                 center = topLeft + Offset(64f, 48f),
                                 radius = 72f,
                             )
+                        } else if (composeInvalidRadialGradientGeometryEnabled) {
+                            Brush.radialGradient(
+                                colors = listOf(Color(0xFFFFF7ED), Color(0xFFF97316)),
+                                center = topLeft + Offset(64f, 48f),
+                                radius = Float.NaN,
+                            )
                         } else if (composeInvalidRadialGradientColorCountEnabled) {
                             Brush.radialGradient(
                                 colors = invalidGradientColors(),
@@ -3349,7 +3363,11 @@ private fun MagicJewelApp() {
                             } else {
                                 listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
                             },
-                            center = topLeft + Offset(72f, 42f),
+                            center = if (composeInvalidSweepGradientGeometryEnabled) {
+                                Offset(Float.NaN, topLeft.y + 42f)
+                            } else {
+                                topLeft + Offset(72f, 42f)
+                            },
                         ),
                         topLeft = topLeft,
                         size = Size(144f, 84f),

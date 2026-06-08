@@ -472,6 +472,10 @@ val composeInvalidRadialGradientStopsEnabled =
     providers.gradleProperty("magicJewelComposeInvalidRadialGradientStops")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_STOPS"))
         .orElse("false")
+val composeInvalidRadialGradientGeometryEnabled =
+    providers.gradleProperty("magicJewelComposeInvalidRadialGradientGeometry")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_GEOMETRY"))
+        .orElse("false")
 val composeInvalidRadialGradientColorCountEnabled =
     providers.gradleProperty("magicJewelComposeInvalidRadialGradientColorCount")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_COLOR_COUNT"))
@@ -492,6 +496,10 @@ val composeSweepGradientEnabled = providers.gradleProperty("magicJewelComposeSwe
 val composeInvalidSweepGradientColorCountEnabled =
     providers.gradleProperty("magicJewelComposeInvalidSweepGradientColorCount")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_COLOR_COUNT"))
+        .orElse("false")
+val composeInvalidSweepGradientGeometryEnabled =
+    providers.gradleProperty("magicJewelComposeInvalidSweepGradientGeometry")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_GEOMETRY"))
         .orElse("false")
 val composeSweepGradientRoundRectEnabled = providers.gradleProperty("magicJewelComposeSweepGradientRoundRect")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT"))
@@ -811,6 +819,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.compose.radialGradient", composeRadialGradientEnabled.get())
     systemProperty("magic.jewel.compose.invalidRadialGradientStops", composeInvalidRadialGradientStopsEnabled.get())
     systemProperty(
+        "magic.jewel.compose.invalidRadialGradientGeometry",
+        composeInvalidRadialGradientGeometryEnabled.get()
+    )
+    systemProperty(
         "magic.jewel.compose.invalidRadialGradientColorCount",
         composeInvalidRadialGradientColorCountEnabled.get()
     )
@@ -824,6 +836,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty(
         "magic.jewel.compose.invalidSweepGradientColorCount",
         composeInvalidSweepGradientColorCountEnabled.get()
+    )
+    systemProperty(
+        "magic.jewel.compose.invalidSweepGradientGeometry",
+        composeInvalidSweepGradientGeometryEnabled.get()
     )
     systemProperty("magic.jewel.compose.sweepGradientRoundRect", composeSweepGradientRoundRectEnabled.get())
     systemProperty(
