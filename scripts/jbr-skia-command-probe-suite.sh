@@ -27,6 +27,8 @@ list_case_groups() {
     gradient-stop-invalid \
     gradient-geometry-invalid \
     gradient-color-count-invalid \
+    gradient-stroke-width-invalid \
+    gradient-round-rect-radius-invalid \
     image-shader-invalid \
     shader-rendering \
     shader-composition-runtime \
@@ -77,6 +79,12 @@ case_group_cases() {
       ;;
     gradient-color-count-invalid)
       echo "commands-linear-gradient-invalid-color-count-fallback commands-radial-gradient-invalid-color-count-fallback commands-sweep-gradient-invalid-color-count-fallback"
+      ;;
+    gradient-stroke-width-invalid)
+      echo "commands-linear-gradient-invalid-stroke-width-public-fallback commands-radial-gradient-invalid-stroke-width-public-fallback commands-sweep-gradient-invalid-stroke-width-public-fallback"
+      ;;
+    gradient-round-rect-radius-invalid)
+      echo "commands-linear-gradient-round-rect-invalid-radius-fallback commands-radial-gradient-round-rect-invalid-radius-fallback commands-sweep-gradient-round-rect-invalid-radius-fallback"
       ;;
     image-shader-invalid)
       echo "commands-image-shader-invalid-image-fallback"
@@ -246,6 +254,7 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-gradient-stroke commands-image-filter" "commands-gradient-stroke commands-invalid-linear-gradient-stroke-width-fallback commands-invalid-linear-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-stroke-width-fallback commands-invalid-radial-gradient-round-rect-stroke-width-fallback commands-invalid-sweep-gradient-stroke-width-fallback commands-invalid-sweep-gradient-round-rect-stroke-width-fallback commands-invalid-linear-gradient-tile-mode-fallback commands-invalid-linear-gradient-round-rect-tile-mode-fallback commands-invalid-linear-gradient-stroke-tile-mode-fallback commands-invalid-linear-gradient-round-rect-stroke-tile-mode-fallback commands-invalid-linear-gradient-color-count-fallback commands-invalid-linear-gradient-round-rect-color-count-fallback commands-invalid-linear-gradient-stroke-color-count-fallback commands-invalid-linear-gradient-round-rect-stroke-color-count-fallback commands-invalid-linear-gradient-stop-order-fallback commands-invalid-linear-gradient-round-rect-stop-order-fallback commands-invalid-linear-gradient-stroke-stop-order-fallback commands-invalid-linear-gradient-round-rect-stroke-stop-order-fallback commands-invalid-linear-gradient-path-tile-mode-fallback commands-invalid-linear-gradient-path-color-count-fallback commands-invalid-linear-gradient-path-stop-order-fallback commands-invalid-linear-gradient-path-fill-type-fallback commands-invalid-linear-gradient-path-data-length-fallback commands-invalid-linear-gradient-path-verb-fallback commands-invalid-radial-gradient-path-radius-fallback commands-invalid-radial-gradient-path-tile-mode-fallback commands-invalid-radial-gradient-path-color-count-fallback commands-invalid-radial-gradient-path-stop-order-fallback commands-invalid-radial-gradient-path-fill-type-fallback commands-invalid-radial-gradient-path-data-length-fallback commands-invalid-radial-gradient-path-verb-fallback commands-invalid-sweep-gradient-path-color-count-fallback commands-invalid-sweep-gradient-path-stop-order-fallback commands-invalid-sweep-gradient-path-fill-type-fallback commands-invalid-sweep-gradient-path-data-length-fallback commands-invalid-sweep-gradient-path-verb-fallback commands-invalid-sweep-gradient-color-count-fallback commands-invalid-sweep-gradient-round-rect-color-count-fallback commands-invalid-sweep-gradient-stroke-color-count-fallback commands-invalid-sweep-gradient-round-rect-stroke-color-count-fallback commands-invalid-sweep-gradient-stop-order-fallback commands-invalid-sweep-gradient-round-rect-stop-order-fallback commands-invalid-sweep-gradient-stroke-stop-order-fallback commands-invalid-sweep-gradient-round-rect-stroke-stop-order-fallback commands-invalid-radial-gradient-radius-fallback commands-invalid-radial-gradient-round-rect-radius-fallback commands-invalid-radial-gradient-stroke-radius-fallback commands-invalid-radial-gradient-round-rect-stroke-radius-fallback commands-invalid-radial-gradient-tile-mode-fallback commands-invalid-radial-gradient-round-rect-tile-mode-fallback commands-invalid-radial-gradient-stroke-tile-mode-fallback commands-invalid-radial-gradient-round-rect-stroke-tile-mode-fallback commands-invalid-radial-gradient-color-count-fallback commands-invalid-radial-gradient-round-rect-color-count-fallback commands-invalid-radial-gradient-stroke-color-count-fallback commands-invalid-radial-gradient-round-rect-stroke-color-count-fallback commands-invalid-radial-gradient-stop-order-fallback commands-invalid-radial-gradient-round-rect-stop-order-fallback commands-invalid-radial-gradient-stroke-stop-order-fallback commands-invalid-radial-gradient-round-rect-stroke-stop-order-fallback commands-image-filter"
   replace_default_case_segment "commands-gradient-stroke commands-invalid-linear-gradient-stroke-width-fallback" "commands-gradient-stroke commands-linear-gradient-invalid-stops-fallback commands-linear-gradient-invalid-points-fallback commands-radial-gradient-invalid-stops-fallback commands-invalid-linear-gradient-stroke-width-fallback"
   replace_default_case_segment "commands-radial-gradient-invalid-stops-fallback commands-invalid-linear-gradient-stroke-width-fallback" "commands-radial-gradient-invalid-stops-fallback commands-radial-gradient-invalid-geometry-fallback commands-sweep-gradient-invalid-geometry-fallback commands-linear-gradient-invalid-color-count-fallback commands-radial-gradient-invalid-color-count-fallback commands-sweep-gradient-invalid-color-count-fallback commands-invalid-linear-gradient-stroke-width-fallback"
+  replace_default_case_segment "commands-sweep-gradient-invalid-color-count-fallback commands-invalid-linear-gradient-stroke-width-fallback" "commands-sweep-gradient-invalid-color-count-fallback commands-linear-gradient-invalid-stroke-width-public-fallback commands-radial-gradient-invalid-stroke-width-public-fallback commands-sweep-gradient-invalid-stroke-width-public-fallback commands-linear-gradient-round-rect-invalid-radius-fallback commands-radial-gradient-round-rect-invalid-radius-fallback commands-sweep-gradient-round-rect-invalid-radius-fallback commands-invalid-linear-gradient-stroke-width-fallback"
   replace_default_case_segment "commands-gradient-surfaces commands-gradient-paths" "commands-gradient-surfaces commands-linear-gradient-blend-mode commands-gradient-paths"
   replace_default_case_segment "commands-linear-gradient-blend-mode commands-gradient-paths" "commands-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode commands-gradient-paths"
   replace_default_case_segment "commands-gradient-paths commands-linear-gradient-path-stroke-fallback" "commands-gradient-paths commands-linear-gradient-path-blend-mode commands-linear-gradient-path-invalid-fallback commands-radial-gradient-path-invalid-fallback commands-sweep-gradient-path-invalid-fallback commands-linear-gradient-path-stroke-fallback"
@@ -1058,6 +1067,51 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_GEOMETRY=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=sweepGradientGeometry \
+        EXPECT_SCREENSHOT_ASSERTION=false
+      ;;
+    commands-linear-gradient-invalid-stroke-width-public-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_STROKE_WIDTH=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=linearGradientStrokeWidth \
+        EXPECT_SCREENSHOT_ASSERTION=false
+      ;;
+    commands-radial-gradient-invalid-stroke-width-public-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_STROKE_WIDTH=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=radialGradientStrokeWidth \
+        EXPECT_SCREENSHOT_ASSERTION=false
+      ;;
+    commands-sweep-gradient-invalid-stroke-width-public-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_STROKE_WIDTH=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=sweepGradientStrokeWidth \
+        EXPECT_SCREENSHOT_ASSERTION=false
+      ;;
+    commands-linear-gradient-round-rect-invalid-radius-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT=true \
+        MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_ROUND_RECT_RADIUS=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=linearGradientRoundRectRadius \
+        EXPECT_SCREENSHOT_ASSERTION=false
+      ;;
+    commands-radial-gradient-round-rect-invalid-radius-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT=true \
+        MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_ROUND_RECT_RADIUS=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=radialGradientRoundRectRadius \
+        EXPECT_SCREENSHOT_ASSERTION=false
+      ;;
+    commands-sweep-gradient-round-rect-invalid-radius-fallback)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT=true \
+        MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_ROUND_RECT_RADIUS=true \
+        EXPECT_COMMAND_FALLBACK=true \
+        EXPECT_COMMAND_FALLBACK_REASON=sweepGradientRoundRectRadius \
         EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-gradient-paths)
