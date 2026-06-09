@@ -127,7 +127,88 @@ case_group_cases() {
       echo "commands-invalid-fill-rect-shader-ref-horizontal-bounds-fallback commands-invalid-fill-rect-shader-ref-vertical-bounds-fallback commands-invalid-fill-rect-shader-ref-alpha-fallback"
       ;;
     gradient-invalid)
-      echo "commands-linear-gradient-invalid-stops-fallback commands-linear-gradient-invalid-points-fallback commands-radial-gradient-invalid-geometry-fallback commands-sweep-gradient-invalid-geometry-fallback commands-radial-gradient-invalid-stops-fallback commands-invalid-gradient-fallback commands-linear-gradient-invalid-color-count-fallback commands-radial-gradient-invalid-color-count-fallback commands-sweep-gradient-invalid-color-count-fallback commands-linear-gradient-path-invalid-fallback commands-radial-gradient-path-invalid-fallback commands-sweep-gradient-path-invalid-fallback commands-invalid-linear-gradient-stroke-width-fallback commands-invalid-linear-gradient-round-rect-stroke-width-fallback commands-invalid-radial-gradient-stroke-width-fallback commands-invalid-radial-gradient-round-rect-stroke-width-fallback commands-invalid-sweep-gradient-stroke-width-fallback commands-invalid-sweep-gradient-round-rect-stroke-width-fallback commands-invalid-linear-gradient-tile-mode-fallback commands-invalid-linear-gradient-round-rect-tile-mode-fallback commands-invalid-linear-gradient-stroke-tile-mode-fallback commands-invalid-linear-gradient-round-rect-stroke-tile-mode-fallback commands-invalid-linear-gradient-color-count-fallback commands-invalid-linear-gradient-round-rect-color-count-fallback commands-invalid-linear-gradient-stroke-color-count-fallback commands-invalid-linear-gradient-round-rect-stroke-color-count-fallback commands-invalid-linear-gradient-stop-order-fallback commands-invalid-linear-gradient-round-rect-stop-order-fallback commands-invalid-linear-gradient-stroke-stop-order-fallback commands-invalid-linear-gradient-round-rect-stroke-stop-order-fallback commands-invalid-linear-gradient-path-tile-mode-fallback commands-invalid-linear-gradient-path-color-count-fallback commands-invalid-linear-gradient-path-stop-order-fallback commands-invalid-linear-gradient-path-fill-type-fallback commands-invalid-linear-gradient-path-data-length-fallback commands-invalid-linear-gradient-path-verb-fallback commands-invalid-radial-gradient-path-radius-fallback commands-invalid-radial-gradient-path-tile-mode-fallback commands-invalid-radial-gradient-path-color-count-fallback commands-invalid-radial-gradient-path-stop-order-fallback commands-invalid-radial-gradient-path-fill-type-fallback commands-invalid-radial-gradient-path-data-length-fallback commands-invalid-radial-gradient-path-verb-fallback commands-invalid-sweep-gradient-path-color-count-fallback commands-invalid-sweep-gradient-path-stop-order-fallback commands-invalid-sweep-gradient-path-fill-type-fallback commands-invalid-sweep-gradient-path-data-length-fallback commands-invalid-sweep-gradient-path-verb-fallback commands-invalid-sweep-gradient-color-count-fallback commands-invalid-sweep-gradient-round-rect-color-count-fallback commands-invalid-sweep-gradient-stroke-color-count-fallback commands-invalid-sweep-gradient-round-rect-stroke-color-count-fallback commands-invalid-sweep-gradient-stop-order-fallback commands-invalid-sweep-gradient-round-rect-stop-order-fallback commands-invalid-sweep-gradient-stroke-stop-order-fallback commands-invalid-sweep-gradient-round-rect-stroke-stop-order-fallback commands-invalid-radial-gradient-radius-fallback commands-invalid-radial-gradient-round-rect-radius-fallback commands-invalid-radial-gradient-stroke-radius-fallback commands-invalid-radial-gradient-round-rect-stroke-radius-fallback commands-invalid-radial-gradient-tile-mode-fallback commands-invalid-radial-gradient-round-rect-tile-mode-fallback commands-invalid-radial-gradient-stroke-tile-mode-fallback commands-invalid-radial-gradient-round-rect-stroke-tile-mode-fallback commands-invalid-radial-gradient-color-count-fallback commands-invalid-radial-gradient-round-rect-color-count-fallback commands-invalid-radial-gradient-stroke-color-count-fallback commands-invalid-radial-gradient-round-rect-stroke-color-count-fallback commands-invalid-radial-gradient-stop-order-fallback commands-invalid-radial-gradient-round-rect-stop-order-fallback commands-invalid-radial-gradient-stroke-stop-order-fallback commands-invalid-radial-gradient-round-rect-stroke-stop-order-fallback"
+      printf "%s\n" \
+        commands-linear-gradient-invalid-stops-fallback \
+        commands-linear-gradient-invalid-points-fallback \
+        commands-radial-gradient-invalid-geometry-fallback \
+        commands-sweep-gradient-invalid-geometry-fallback \
+        commands-radial-gradient-invalid-stops-fallback \
+        commands-invalid-gradient-fallback \
+        commands-linear-gradient-invalid-color-count-fallback \
+        commands-radial-gradient-invalid-color-count-fallback \
+        commands-sweep-gradient-invalid-color-count-fallback \
+        commands-linear-gradient-invalid-stroke-width-public-fallback \
+        commands-radial-gradient-invalid-stroke-width-public-fallback \
+        commands-sweep-gradient-invalid-stroke-width-public-fallback \
+        commands-linear-gradient-round-rect-invalid-radius-fallback \
+        commands-radial-gradient-round-rect-invalid-radius-fallback \
+        commands-sweep-gradient-round-rect-invalid-radius-fallback \
+        commands-linear-gradient-stroke-round-rect-invalid-radius-fallback \
+        commands-radial-gradient-stroke-round-rect-invalid-radius-fallback \
+        commands-sweep-gradient-stroke-round-rect-invalid-radius-fallback \
+        commands-linear-gradient-path-invalid-fallback \
+        commands-radial-gradient-path-invalid-fallback \
+        commands-sweep-gradient-path-invalid-fallback \
+        commands-invalid-linear-gradient-stroke-width-fallback \
+        commands-invalid-linear-gradient-round-rect-stroke-width-fallback \
+        commands-invalid-radial-gradient-stroke-width-fallback \
+        commands-invalid-radial-gradient-round-rect-stroke-width-fallback \
+        commands-invalid-sweep-gradient-stroke-width-fallback \
+        commands-invalid-sweep-gradient-round-rect-stroke-width-fallback \
+        commands-invalid-linear-gradient-tile-mode-fallback \
+        commands-invalid-linear-gradient-round-rect-tile-mode-fallback \
+        commands-invalid-linear-gradient-stroke-tile-mode-fallback \
+        commands-invalid-linear-gradient-round-rect-stroke-tile-mode-fallback \
+        commands-invalid-linear-gradient-color-count-fallback \
+        commands-invalid-linear-gradient-round-rect-color-count-fallback \
+        commands-invalid-linear-gradient-stroke-color-count-fallback \
+        commands-invalid-linear-gradient-round-rect-stroke-color-count-fallback \
+        commands-invalid-linear-gradient-stop-order-fallback \
+        commands-invalid-linear-gradient-round-rect-stop-order-fallback \
+        commands-invalid-linear-gradient-stroke-stop-order-fallback \
+        commands-invalid-linear-gradient-round-rect-stroke-stop-order-fallback \
+        commands-invalid-linear-gradient-path-tile-mode-fallback \
+        commands-invalid-linear-gradient-path-color-count-fallback \
+        commands-invalid-linear-gradient-path-stop-order-fallback \
+        commands-invalid-linear-gradient-path-fill-type-fallback \
+        commands-invalid-linear-gradient-path-data-length-fallback \
+        commands-invalid-linear-gradient-path-verb-fallback \
+        commands-invalid-radial-gradient-path-radius-fallback \
+        commands-invalid-radial-gradient-path-tile-mode-fallback \
+        commands-invalid-radial-gradient-path-color-count-fallback \
+        commands-invalid-radial-gradient-path-stop-order-fallback \
+        commands-invalid-radial-gradient-path-fill-type-fallback \
+        commands-invalid-radial-gradient-path-data-length-fallback \
+        commands-invalid-radial-gradient-path-verb-fallback \
+        commands-invalid-sweep-gradient-path-color-count-fallback \
+        commands-invalid-sweep-gradient-path-stop-order-fallback \
+        commands-invalid-sweep-gradient-path-fill-type-fallback \
+        commands-invalid-sweep-gradient-path-data-length-fallback \
+        commands-invalid-sweep-gradient-path-verb-fallback \
+        commands-invalid-sweep-gradient-color-count-fallback \
+        commands-invalid-sweep-gradient-round-rect-color-count-fallback \
+        commands-invalid-sweep-gradient-stroke-color-count-fallback \
+        commands-invalid-sweep-gradient-round-rect-stroke-color-count-fallback \
+        commands-invalid-sweep-gradient-stop-order-fallback \
+        commands-invalid-sweep-gradient-round-rect-stop-order-fallback \
+        commands-invalid-sweep-gradient-stroke-stop-order-fallback \
+        commands-invalid-sweep-gradient-round-rect-stroke-stop-order-fallback \
+        commands-invalid-radial-gradient-radius-fallback \
+        commands-invalid-radial-gradient-round-rect-radius-fallback \
+        commands-invalid-radial-gradient-stroke-radius-fallback \
+        commands-invalid-radial-gradient-round-rect-stroke-radius-fallback \
+        commands-invalid-radial-gradient-tile-mode-fallback \
+        commands-invalid-radial-gradient-round-rect-tile-mode-fallback \
+        commands-invalid-radial-gradient-stroke-tile-mode-fallback \
+        commands-invalid-radial-gradient-round-rect-stroke-tile-mode-fallback \
+        commands-invalid-radial-gradient-color-count-fallback \
+        commands-invalid-radial-gradient-round-rect-color-count-fallback \
+        commands-invalid-radial-gradient-stroke-color-count-fallback \
+        commands-invalid-radial-gradient-round-rect-stroke-color-count-fallback \
+        commands-invalid-radial-gradient-stop-order-fallback \
+        commands-invalid-radial-gradient-round-rect-stop-order-fallback \
+        commands-invalid-radial-gradient-stroke-stop-order-fallback \
+        commands-invalid-radial-gradient-round-rect-stroke-stop-order-fallback
       ;;
     gradient-path-invalid)
       echo "commands-linear-gradient-path-invalid-fallback commands-radial-gradient-path-invalid-fallback commands-sweep-gradient-path-invalid-fallback commands-invalid-linear-gradient-path-tile-mode-fallback commands-invalid-linear-gradient-path-color-count-fallback commands-invalid-linear-gradient-path-stop-order-fallback commands-invalid-linear-gradient-path-fill-type-fallback commands-invalid-linear-gradient-path-data-length-fallback commands-invalid-linear-gradient-path-verb-fallback commands-invalid-radial-gradient-path-radius-fallback commands-invalid-radial-gradient-path-tile-mode-fallback commands-invalid-radial-gradient-path-color-count-fallback commands-invalid-radial-gradient-path-stop-order-fallback commands-invalid-radial-gradient-path-fill-type-fallback commands-invalid-radial-gradient-path-data-length-fallback commands-invalid-radial-gradient-path-verb-fallback commands-invalid-sweep-gradient-path-color-count-fallback commands-invalid-sweep-gradient-path-stop-order-fallback commands-invalid-sweep-gradient-path-fill-type-fallback commands-invalid-sweep-gradient-path-data-length-fallback commands-invalid-sweep-gradient-path-verb-fallback"
