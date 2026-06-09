@@ -473,6 +473,10 @@ val composeInvalidLinearGradientRoundRectRadiusEnabled =
     providers.gradleProperty("magicJewelComposeInvalidLinearGradientRoundRectRadius")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_ROUND_RECT_RADIUS"))
         .orElse("false")
+val composeInvalidLinearGradientStrokeRoundRectRadiusEnabled =
+    providers.gradleProperty("magicJewelComposeInvalidLinearGradientStrokeRoundRectRadius")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_STROKE_ROUND_RECT_RADIUS"))
+        .orElse("false")
 val composeLinearGradientPathEnabled = providers.gradleProperty("magicJewelComposeLinearGradientPath")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH"))
     .orElse("false")
@@ -506,6 +510,10 @@ val composeInvalidRadialGradientRoundRectRadiusEnabled =
     providers.gradleProperty("magicJewelComposeInvalidRadialGradientRoundRectRadius")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_ROUND_RECT_RADIUS"))
         .orElse("false")
+val composeInvalidRadialGradientStrokeRoundRectRadiusEnabled =
+    providers.gradleProperty("magicJewelComposeInvalidRadialGradientStrokeRoundRectRadius")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_STROKE_ROUND_RECT_RADIUS"))
+        .orElse("false")
 val composeRadialGradientStrokeBlendModeEnabled =
     providers.gradleProperty("magicJewelComposeRadialGradientStrokeBlendMode")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_STROKE_BLEND_MODE"))
@@ -534,6 +542,10 @@ val composeSweepGradientRoundRectEnabled = providers.gradleProperty("magicJewelC
 val composeInvalidSweepGradientRoundRectRadiusEnabled =
     providers.gradleProperty("magicJewelComposeInvalidSweepGradientRoundRectRadius")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_ROUND_RECT_RADIUS"))
+        .orElse("false")
+val composeInvalidSweepGradientStrokeRoundRectRadiusEnabled =
+    providers.gradleProperty("magicJewelComposeInvalidSweepGradientStrokeRoundRectRadius")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_STROKE_ROUND_RECT_RADIUS"))
         .orElse("false")
 val composeSweepGradientRoundRectBlendModeEnabled =
     providers.gradleProperty("magicJewelComposeSweepGradientRoundRectBlendMode")
@@ -855,6 +867,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
         "magic.jewel.compose.invalidLinearGradientRoundRectRadius",
         composeInvalidLinearGradientRoundRectRadiusEnabled.get()
     )
+    systemProperty(
+        "magic.jewel.compose.invalidLinearGradientStrokeRoundRectRadius",
+        composeInvalidLinearGradientStrokeRoundRectRadiusEnabled.get()
+    )
     systemProperty("magic.jewel.compose.linearGradientPath", composeLinearGradientPathEnabled.get())
     systemProperty("magic.jewel.compose.linearGradientPathBlendMode", composeLinearGradientPathBlendModeEnabled.get())
     systemProperty("magic.jewel.compose.radialGradient", composeRadialGradientEnabled.get())
@@ -875,6 +891,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty(
         "magic.jewel.compose.invalidRadialGradientRoundRectRadius",
         composeInvalidRadialGradientRoundRectRadiusEnabled.get()
+    )
+    systemProperty(
+        "magic.jewel.compose.invalidRadialGradientStrokeRoundRectRadius",
+        composeInvalidRadialGradientStrokeRoundRectRadiusEnabled.get()
     )
     systemProperty(
         "magic.jewel.compose.radialGradientStrokeBlendMode",
@@ -898,6 +918,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty(
         "magic.jewel.compose.invalidSweepGradientRoundRectRadius",
         composeInvalidSweepGradientRoundRectRadiusEnabled.get()
+    )
+    systemProperty(
+        "magic.jewel.compose.invalidSweepGradientStrokeRoundRectRadius",
+        composeInvalidSweepGradientStrokeRoundRectRadiusEnabled.get()
     )
     systemProperty(
         "magic.jewel.compose.sweepGradientRoundRectBlendMode",

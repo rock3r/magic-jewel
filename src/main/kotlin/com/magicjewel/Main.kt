@@ -295,6 +295,8 @@ private const val ComposeInvalidLinearGradientStrokeWidthProperty =
 private const val ComposeLinearGradientRoundRectProperty = "magic.jewel.compose.linearGradientRoundRect"
 private const val ComposeInvalidLinearGradientRoundRectRadiusProperty =
     "magic.jewel.compose.invalidLinearGradientRoundRectRadius"
+private const val ComposeInvalidLinearGradientStrokeRoundRectRadiusProperty =
+    "magic.jewel.compose.invalidLinearGradientStrokeRoundRectRadius"
 private const val ComposeLinearGradientPathProperty = "magic.jewel.compose.linearGradientPath"
 private const val ComposeLinearGradientPathBlendModeProperty = "magic.jewel.compose.linearGradientPathBlendMode"
 private const val ComposeRadialGradientProperty = "magic.jewel.compose.radialGradient"
@@ -307,6 +309,8 @@ private const val ComposeInvalidRadialGradientStrokeWidthProperty =
 private const val ComposeRadialGradientRoundRectProperty = "magic.jewel.compose.radialGradientRoundRect"
 private const val ComposeInvalidRadialGradientRoundRectRadiusProperty =
     "magic.jewel.compose.invalidRadialGradientRoundRectRadius"
+private const val ComposeInvalidRadialGradientStrokeRoundRectRadiusProperty =
+    "magic.jewel.compose.invalidRadialGradientStrokeRoundRectRadius"
 private const val ComposeRadialGradientStrokeBlendModeProperty =
     "magic.jewel.compose.radialGradientStrokeBlendMode"
 private const val ComposeRadialGradientPathProperty = "magic.jewel.compose.radialGradientPath"
@@ -318,6 +322,8 @@ private const val ComposeInvalidSweepGradientStrokeWidthProperty =
 private const val ComposeSweepGradientRoundRectProperty = "magic.jewel.compose.sweepGradientRoundRect"
 private const val ComposeInvalidSweepGradientRoundRectRadiusProperty =
     "magic.jewel.compose.invalidSweepGradientRoundRectRadius"
+private const val ComposeInvalidSweepGradientStrokeRoundRectRadiusProperty =
+    "magic.jewel.compose.invalidSweepGradientStrokeRoundRectRadius"
 private const val ComposeSweepGradientRoundRectBlendModeProperty =
     "magic.jewel.compose.sweepGradientRoundRectBlendMode"
 private const val ComposeSweepGradientPathProperty = "magic.jewel.compose.sweepGradientPath"
@@ -907,6 +913,9 @@ private fun MagicJewelApp() {
     val composeInvalidLinearGradientRoundRectRadiusEnabled = remember {
         System.getProperty(ComposeInvalidLinearGradientRoundRectRadiusProperty, "false").toBoolean()
     }
+    val composeInvalidLinearGradientStrokeRoundRectRadiusEnabled = remember {
+        System.getProperty(ComposeInvalidLinearGradientStrokeRoundRectRadiusProperty, "false").toBoolean()
+    }
     val composeLinearGradientPathEnabled = remember {
         System.getProperty(ComposeLinearGradientPathProperty, "false").toBoolean()
     }
@@ -934,6 +943,9 @@ private fun MagicJewelApp() {
     val composeInvalidRadialGradientRoundRectRadiusEnabled = remember {
         System.getProperty(ComposeInvalidRadialGradientRoundRectRadiusProperty, "false").toBoolean()
     }
+    val composeInvalidRadialGradientStrokeRoundRectRadiusEnabled = remember {
+        System.getProperty(ComposeInvalidRadialGradientStrokeRoundRectRadiusProperty, "false").toBoolean()
+    }
     val composeRadialGradientStrokeBlendModeEnabled = remember {
         System.getProperty(ComposeRadialGradientStrokeBlendModeProperty, "false").toBoolean()
     }
@@ -957,6 +969,9 @@ private fun MagicJewelApp() {
     }
     val composeInvalidSweepGradientRoundRectRadiusEnabled = remember {
         System.getProperty(ComposeInvalidSweepGradientRoundRectRadiusProperty, "false").toBoolean()
+    }
+    val composeInvalidSweepGradientStrokeRoundRectRadiusEnabled = remember {
+        System.getProperty(ComposeInvalidSweepGradientStrokeRoundRectRadiusProperty, "false").toBoolean()
     }
     val composeSweepGradientRoundRectBlendModeEnabled = remember {
         System.getProperty(ComposeSweepGradientRoundRectBlendModeProperty, "false").toBoolean()
@@ -3272,6 +3287,30 @@ private fun MagicJewelApp() {
                             )
                         }
                     }
+                    if (composeInvalidLinearGradientStrokeRoundRectRadiusEnabled) {
+                        val topLeft = Offset(size.width - 348f, size.height - 112f)
+                        drawIntoCanvas { canvas ->
+                            canvas.drawRoundRect(
+                                left = topLeft.x,
+                                top = topLeft.y,
+                                right = topLeft.x + 136f,
+                                bottom = topLeft.y + 74f,
+                                radiusX = 26f,
+                                radiusY = -6f,
+                                paint = Paint().apply {
+                                    style = PaintingStyle.Stroke
+                                    strokeWidth = 6f
+                                    shader = LinearGradientShader(
+                                        from = topLeft,
+                                        to = topLeft + Offset(136f, 74f),
+                                        colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316)),
+                                        colorStops = listOf(0.25f, 0.75f),
+                                        tileMode = TileMode.Clamp,
+                                    )
+                                },
+                            )
+                        }
+                    }
                 }
                 if (composeLinearGradientPathEnabled) {
                     val path = Path().apply {
@@ -3451,6 +3490,29 @@ private fun MagicJewelApp() {
                             )
                         }
                     }
+                    if (composeInvalidRadialGradientStrokeRoundRectRadiusEnabled) {
+                        drawIntoCanvas { canvas ->
+                            canvas.drawRoundRect(
+                                left = topLeft.x,
+                                top = topLeft.y,
+                                right = topLeft.x + 128f,
+                                bottom = topLeft.y + 96f,
+                                radiusX = -6f,
+                                radiusY = 18f,
+                                paint = Paint().apply {
+                                    style = PaintingStyle.Stroke
+                                    strokeWidth = 8f
+                                    shader = RadialGradientShader(
+                                        center = topLeft + Offset(64f, 48f),
+                                        radius = 78f,
+                                        colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316)),
+                                        colorStops = listOf(0.25f, 0.75f),
+                                        tileMode = TileMode.Clamp,
+                                    )
+                                },
+                            )
+                        }
+                    }
                 }
                 if (composeRadialGradientPathEnabled) {
                     val path = Path().apply {
@@ -3581,6 +3643,31 @@ private fun MagicJewelApp() {
                                             Color(0xFFDC2626),
                                             Color(0xFFFACC15),
                                             Color(0xFF0EA5E9),
+                                            Color(0xFF9333EA),
+                                        ),
+                                    )
+                                },
+                            )
+                        }
+                    }
+                    if (composeInvalidSweepGradientStrokeRoundRectRadiusEnabled) {
+                        drawIntoCanvas { canvas ->
+                            canvas.drawRoundRect(
+                                left = topLeft.x,
+                                top = topLeft.y,
+                                right = topLeft.x + 144f,
+                                bottom = topLeft.y + 92f,
+                                radiusX = 28f,
+                                radiusY = -8f,
+                                paint = Paint().apply {
+                                    style = PaintingStyle.Stroke
+                                    strokeWidth = 8f
+                                    shader = SweepGradientShader(
+                                        center = topLeft + Offset(72f, 46f),
+                                        colors = listOf(
+                                            Color(0xFF22D3EE),
+                                            Color(0xFFF97316),
+                                            Color(0xFFFACC15),
                                             Color(0xFF9333EA),
                                         ),
                                     )
