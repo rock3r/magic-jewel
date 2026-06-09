@@ -272,6 +272,10 @@ val composeGraphicsLayerRawTableColorFilterEnabled =
     providers.gradleProperty("magicJewelComposeGraphicsLayerRawTableColorFilter")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_TABLE_COLOR_FILTER"))
         .orElse("false")
+val composeGraphicsLayerChildUnsupportedEnabled =
+    providers.gradleProperty("magicJewelComposeGraphicsLayerChildUnsupported")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHILD_UNSUPPORTED"))
+        .orElse("false")
 val composeGraphicsLayerRenderEffectEnabled = providers.gradleProperty("magicJewelComposeGraphicsLayerRenderEffect")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RENDER_EFFECT"))
     .orElse("false")
@@ -723,6 +727,7 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
         "magic.jewel.compose.graphicsLayerRawTableColorFilter",
         composeGraphicsLayerRawTableColorFilterEnabled.get(),
     )
+    systemProperty("magic.jewel.compose.graphicsLayerChildUnsupported", composeGraphicsLayerChildUnsupportedEnabled.get())
     systemProperty("magic.jewel.compose.graphicsLayerRenderEffect", composeGraphicsLayerRenderEffectEnabled.get())
     systemProperty(
         "magic.jewel.compose.graphicsLayerRawImageFilterEffect",

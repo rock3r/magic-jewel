@@ -219,6 +219,8 @@ private const val ComposeGraphicsLayerColorMatrixFilterProperty = "magic.jewel.c
 private const val ComposeGraphicsLayerRawColorFilterProperty = "magic.jewel.compose.graphicsLayerRawColorFilter"
 private const val ComposeGraphicsLayerRawTableColorFilterProperty =
     "magic.jewel.compose.graphicsLayerRawTableColorFilter"
+private const val ComposeGraphicsLayerChildUnsupportedProperty =
+    "magic.jewel.compose.graphicsLayerChildUnsupported"
 private const val ComposeGraphicsLayerRenderEffectProperty = "magic.jewel.compose.graphicsLayerRenderEffect"
 private const val ComposeGraphicsLayerRawImageFilterEffectProperty =
     "magic.jewel.compose.graphicsLayerRawImageFilterEffect"
@@ -703,6 +705,9 @@ private fun MagicJewelApp() {
     val composeGraphicsLayerRawTableColorFilterEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRawTableColorFilterProperty, "false").toBoolean()
     }
+    val composeGraphicsLayerChildUnsupportedEnabled = remember {
+        System.getProperty(ComposeGraphicsLayerChildUnsupportedProperty, "false").toBoolean()
+    }
     val composeGraphicsLayerRenderEffectEnabled = remember {
         System.getProperty(ComposeGraphicsLayerRenderEffectProperty, "false").toBoolean()
     }
@@ -991,8 +996,8 @@ private fun MagicJewelApp() {
             null
         }
     }
-    val rawImageShader = remember(composeRawImageShaderEnabled) {
-        if (composeRawImageShaderEnabled) {
+    val rawImageShader = remember(composeRawImageShaderEnabled, composeGraphicsLayerChildUnsupportedEnabled) {
+        if (composeRawImageShaderEnabled || composeGraphicsLayerChildUnsupportedEnabled) {
             createRawSkiaImageShader().asComposeShader()
         } else {
             null
@@ -3716,6 +3721,27 @@ private fun MagicJewelApp() {
                                 .size(width = 180.dp, height = 96.dp)
                                 .background(Color(0xFF22D3EE)),
                         )
+                    }
+                    if (composeGraphicsLayerChildUnsupportedEnabled) {
+                        Canvas(
+                            modifier = Modifier
+                                .offset(x = 16.dp, y = 12.dp)
+                                .size(width = 80.dp, height = 48.dp),
+                        ) {
+                            rawImageShader?.let { shader ->
+                                drawIntoCanvas { canvas ->
+                                    canvas.drawRect(
+                                        left = 0f,
+                                        top = 0f,
+                                        right = size.width,
+                                        bottom = size.height,
+                                        paint = Paint().apply {
+                                            this.shader = shader
+                                        },
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
