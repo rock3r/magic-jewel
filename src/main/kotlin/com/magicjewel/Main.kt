@@ -196,6 +196,7 @@ private const val ComposeRawTableColorFilterProperty = "magic.jewel.compose.rawT
 private const val ComposeColorFilterProperty = "magic.jewel.compose.colorFilter"
 private const val ComposeColorFilterBlendModeProperty = "magic.jewel.compose.colorFilterBlendMode"
 private const val ComposeColorMatrixFilterProperty = "magic.jewel.compose.colorMatrixFilter"
+private const val ComposeInvalidColorMatrixFilterProperty = "magic.jewel.compose.invalidColorMatrixFilter"
 private const val ComposeLightingFilterProperty = "magic.jewel.compose.lightingFilter"
 private const val ComposeDescriptorEvictionProperty = "magic.jewel.compose.descriptorEviction"
 private const val ComposePathEffectProperty = "magic.jewel.compose.pathEffect"
@@ -647,6 +648,9 @@ private fun MagicJewelApp() {
     }
     val composeColorMatrixFilterEnabled = remember {
         System.getProperty(ComposeColorMatrixFilterProperty, "false").toBoolean()
+    }
+    val composeInvalidColorMatrixFilterEnabled = remember {
+        System.getProperty(ComposeInvalidColorMatrixFilterProperty, "false").toBoolean()
     }
     val composeLightingFilterEnabled = remember {
         System.getProperty(ComposeLightingFilterProperty, "false").toBoolean()
@@ -2104,8 +2108,9 @@ private fun MagicJewelApp() {
                         )
                     }
                 }
-                if (composeColorMatrixFilterEnabled) {
+                if (composeColorMatrixFilterEnabled || composeInvalidColorMatrixFilterEnabled) {
                     val matrix = ColorMatrix().apply {
+                        this[0, 0] = if (composeInvalidColorMatrixFilterEnabled) Float.NaN else this[0, 0]
                         this[0, 4] = 64f
                         this[1, 1] = 0.78f
                         this[2, 2] = 1.14f
