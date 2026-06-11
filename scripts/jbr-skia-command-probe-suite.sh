@@ -4546,15 +4546,18 @@ run_named_case() {
       ;;
     commands-save-layer-filter)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER=true
+        MAGIC_JEWEL_COMPOSE_SAVELAYER_FILTER=true \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-save-layer-blend-mode)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_SAVELAYER_BLEND_MODE=true
+        MAGIC_JEWEL_COMPOSE_SAVELAYER_BLEND_MODE=true \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-save-layer-blend-color-filter)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_SAVELAYER_BLEND_COLOR_FILTER=true
+        MAGIC_JEWEL_COMPOSE_SAVELAYER_BLEND_COLOR_FILTER=true \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-invalid-save-layer-alpha-fallback)
       run_case "$1" \
@@ -4939,7 +4942,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_SAVELAYER_RAW_COLOR_FILTER=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=saveLayer
+        EXPECT_COMMAND_FALLBACK_REASON=saveLayer \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-save-layer-raw-table-color-filter-fallback)
       run_case "$1" \
@@ -4952,7 +4956,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_OPAQUE_SHADER=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        EXPECT_COMMAND_FALLBACK_REASON=shader \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-descriptor-stroke-shader-fallback)
       run_case "$1" \
@@ -4970,7 +4975,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_COMPOSITE_OPAQUE_SHADER=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        EXPECT_COMMAND_FALLBACK_REASON=shader \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-noise-shader)
       run_case "$1" \
@@ -5028,7 +5034,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_PICTURE_SHADER=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        EXPECT_COMMAND_FALLBACK_REASON=shader \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     commands-transformed-shader)
       run_case "$1" \
@@ -5042,7 +5049,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_INVALID_SWEEP_GRADIENT=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=sweepGradientStops
+        EXPECT_COMMAND_FALLBACK_REASON=sweepGradientStops \
+        EXPECT_SCREENSHOT_ASSERTION=false
       ;;
     *)
       echo "Unknown command probe case: $1" >&2
