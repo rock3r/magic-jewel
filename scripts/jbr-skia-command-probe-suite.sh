@@ -1590,7 +1590,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE_PATH_EFFECT=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=pathEffect
+        EXPECT_COMMAND_FALLBACK_REASON=pathEffect \
+        EXPECT_COMMAND_FALLBACK_MARKER=image=1
       ;;
     commands-color-shader)
       run_case "$1" \
@@ -3245,7 +3246,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE_RAW_TABLE_COLOR_FILTER=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilter
+        EXPECT_COMMAND_FALLBACK_REASON=colorFilter \
+        EXPECT_COMMAND_FALLBACK_MARKER=image=1
       ;;
     commands-gradient-stroke)
       run_case "$1" \
