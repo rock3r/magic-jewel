@@ -1262,21 +1262,21 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH=true \
         MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=linearGradientPaint
+        EXPECT_COMMAND_FALLBACK_REASON=linearGradientPathPaint
       ;;
     commands-radial-gradient-path-stroke-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_PATH=true \
         MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=radialGradientPaint
+        EXPECT_COMMAND_FALLBACK_REASON=radialGradientPathPaint
       ;;
     commands-sweep-gradient-path-stroke-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH=true \
         MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=sweepGradientPaint
+        EXPECT_COMMAND_FALLBACK_REASON=sweepGradientPathPaint
       ;;
     commands-popup)
       run_case "$1" \
