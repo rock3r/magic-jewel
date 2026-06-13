@@ -618,6 +618,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_CLIP=true \
         MAGIC_JEWEL_COMPOSE_CLIP_OUT=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=24 \
         MAX_BAD_PIXEL_RATIO=0.06 \
         MAX_COMPOSE_CANVAS_BAD_PIXEL_RATIO=0.08
       ;;
