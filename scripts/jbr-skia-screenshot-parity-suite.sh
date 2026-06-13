@@ -696,6 +696,8 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE_FILTER=true \
         EXPECT_MIN_IMAGE_REFS=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=32 \
         MAX_BAD_PIXEL_RATIO=0.06
       ;;
     parity-image-color-matrix-filter)
