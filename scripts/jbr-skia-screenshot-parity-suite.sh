@@ -577,7 +577,9 @@ run_named_case() {
       ;;
     parity-point-dots)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_POINT_DOTS=true
+        MAGIC_JEWEL_COMPOSE_POINT_DOTS=true \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=24
       ;;
     parity-path-effect)
       run_case "$1" \
