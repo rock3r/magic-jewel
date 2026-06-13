@@ -605,7 +605,9 @@ run_named_case() {
         EXPECT_MIN_SURFACE_CHANGES=1 \
         EXPECT_SURFACE_CONTEXT_CHANGED=true \
         EXPECT_SURFACE_CHANGED=false \
-        EXPECT_MIN_COMMAND_CACHE_CLEARS=1
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=48
       ;;
     parity-point-dots)
       run_case "$1" \
