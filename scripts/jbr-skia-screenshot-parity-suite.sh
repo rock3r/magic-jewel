@@ -1168,7 +1168,8 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
         EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=12 \
         EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_HITS=1 \
-        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1
+        EXPECT_MAX_JBR_RUNTIME_EFFECT_CACHE_MISSES=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=32
       ;;
     parity-runtime-effect-shader-source-cache-eviction)
       run_case "$1" \
