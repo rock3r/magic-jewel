@@ -264,7 +264,9 @@ run_case() {
 run_named_case() {
   case "$1" in
     parity-rich)
-      run_case "$1"
+      run_case "$1" \
+        EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=1 \
+        EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=32
       ;;
     parity-button-chrome)
       run_case "$1" \
