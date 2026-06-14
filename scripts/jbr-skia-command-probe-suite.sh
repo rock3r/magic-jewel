@@ -1562,7 +1562,9 @@ run_named_case() {
         EXPECT_MIN_IMAGE_REFS=1 \
         EXPECT_MIN_SURFACE_CHANGES=1 \
         EXPECT_SURFACE_CONTEXT_CHANGED=true \
-        EXPECT_MIN_COMMAND_CACHE_CLEARS=1
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
     commands-forced-context-dynamic-images)
       run_case "$1" \
