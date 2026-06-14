@@ -1480,7 +1480,9 @@ run_named_case() {
         EXPECT_MIN_JBR_FONT_DATA_DEFINES=2 \
         EXPECT_MIN_SURFACE_CHANGES=1 \
         EXPECT_SURFACE_CONTEXT_CHANGED=false \
-        EXPECT_MIN_COMMAND_CACHE_CLEARS=1
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
     commands-resize-native-system-font-text)
       run_case "$1" \
@@ -1532,7 +1534,9 @@ run_named_case() {
         EXPECT_MIN_JBR_FONT_DATA_DEFINES=2 \
         EXPECT_MIN_SURFACE_CHANGES=1 \
         EXPECT_SURFACE_CONTEXT_CHANGED=true \
-        EXPECT_MIN_COMMAND_CACHE_CLEARS=1
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
     commands-forced-context-native-system-font-text)
       run_case "$1" \
