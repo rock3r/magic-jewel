@@ -49,11 +49,12 @@ To validate deliberate fallback paths, run with `EXPECT_COMMAND_FALLBACK=true` a
 
 Whole-suite validation is intentionally capped to one broad slot per local calendar day, not every N focused changes.
 The default command-probe sweep, screenshot parity suite, benchmark suite, compatibility matrix, and artifact matrix
-share `out/.jbr-skia-daily-validation/broad.<date>.stamp`; after one default broad runner starts for the local date,
-the other default broad runners exit 3 before launching cases. Normal iteration should use exact `CASES=...` or a small
-`CASE_GROUPS=...` selection. Default-list `CASES_FROM`/`CASES_UNTIL` range launches count as broad validation, while
-`LIST_CASES`, `LIST_CASE_COUNT`, `LIST_CASE_GROUPS`, `LIST_CASE_GROUP_COUNTS`, and `LIST_UNGROUPED_CASES` are no-launch
-discovery helpers and do not consume the daily slot. Set `JBR_SKIA_ALLOW_EXTRA_BROAD_VALIDATION=true` only for an
+share `out/.jbr-skia-daily-validation/broad.<date>.stamp`; after one broad runner starts for the local date, other
+broad runners exit 3 before launching cases. Normal iteration should use exact small `CASES=...` or `CASE_GROUPS=...`
+selections. Default launches, default-list `CASES_FROM`/`CASES_UNTIL` range launches, and any resolved selection above
+`JBR_SKIA_BROAD_VALIDATION_CASE_LIMIT` rows count as broad validation; the default broad limit is 10 rows. `LIST_CASES`,
+`LIST_CASE_COUNT`, `LIST_CASE_GROUPS`, `LIST_CASE_GROUP_COUNTS`, and `LIST_UNGROUPED_CASES` are no-launch discovery
+helpers and do not consume the daily slot. Set `JBR_SKIA_ALLOW_EXTRA_BROAD_VALIDATION=true` only for an
 explicit user override or an emergency ABI/capability gate.
 
 Old/new process and marker report:

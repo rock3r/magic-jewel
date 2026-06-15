@@ -191,10 +191,6 @@ if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   CASES="${CASES# }"
 fi
 
-if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && "${DRY_RUN}" != "true" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
-  jbr_skia_daily_broad_validation_guard "artifact matrix"
-fi
-
 require_file() {
   local label="$1"
   local path="$2"
@@ -376,6 +372,19 @@ fi
 if [[ "${LIST_CASE_COUNT}" == "true" ]]; then
   selected_cases | wc -l | tr -d ' '
   exit 0
+fi
+
+selection_reason="exact"
+if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+  selection_reason="default"
+elif [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
+  selection_reason="case-groups"
+fi
+if [[ "${DRY_RUN}" != "true" ]]; then
+  jbr_skia_daily_broad_validation_guard_for_selection \
+    "artifact matrix" \
+    "$(selected_cases | wc -l | tr -d ' ')" \
+    "${selection_reason}"
 fi
 
 if [[ -n "${OLD_ARTIFACT_BUNDLE}" ]]; then

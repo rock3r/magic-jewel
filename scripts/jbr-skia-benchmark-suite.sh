@@ -239,9 +239,16 @@ if [[ "${LIST_CASE_COUNT}" == "true" ]]; then
   exit 0
 fi
 
-if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
-  jbr_skia_daily_broad_validation_guard "benchmark default suite"
+selection_reason="exact"
+if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+  selection_reason="default"
+elif [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
+  selection_reason="case-groups"
 fi
+jbr_skia_daily_broad_validation_guard_for_selection \
+  "benchmark suite" \
+  "$(selected_cases | wc -l | tr -d ' ')" \
+  "${selection_reason}"
 
 for case_name in ${CASES}; do
   run_named_case "${case_name}"

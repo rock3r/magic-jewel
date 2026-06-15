@@ -177,10 +177,6 @@ if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   CASES_FILTER="${CASES_FILTER# }"
 fi
 
-if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
-  jbr_skia_daily_broad_validation_guard "compatibility matrix"
-fi
-
 case_selected() {
   local name="$1"
   if [[ -n "${CASES_FILTER}" ]]; then
@@ -264,6 +260,27 @@ run_case() {
   [[ "${background_window}" == "${EXPECT_BACKGROUND_WINDOW}" ]]
   [[ "${status}" == "passed" ]]
 }
+
+selected_case_count() {
+  if [[ -n "${CASES_FILTER}" ]]; then
+    echo "${CASES_FILTER}" | wc -w | tr -d ' '
+  else
+    printf "%s\n" "${ALL_CASES[@]}" | wc -l | tr -d ' '
+  fi
+}
+
+selection_reason="exact"
+if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+  selection_reason="default"
+elif [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
+  selection_reason="case-groups"
+fi
+if [[ "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
+  jbr_skia_daily_broad_validation_guard_for_selection \
+    "compatibility matrix" \
+    "$(selected_case_count)" \
+    "${selection_reason}"
+fi
 
 run_case happy EXPECT_MIN_IMAGE_REFS=1
 run_case abi-mismatch EXPECT_COMMAND_FALLBACK=true EXPECT_COMMAND_FALLBACK_REASON=abi-mismatch SKIKO_EXPECTED_ABI_ID_FOR_TEST=999

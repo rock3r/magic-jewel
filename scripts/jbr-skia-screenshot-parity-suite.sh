@@ -19,9 +19,6 @@ LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
 LIST_CASES="${LIST_CASES:-false}"
 LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
 LIST_UNGROUPED_CASES="${LIST_UNGROUPED_CASES:-false}"
-if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" && "${LIST_UNGROUPED_CASES}" != "true" ]]; then
-  jbr_skia_daily_broad_validation_guard "screenshot parity default suite"
-fi
 if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   CASES="__CASE_GROUPS_SELECTED__"
 fi
@@ -183,6 +180,23 @@ if [[ "${LIST_CASE_COUNT:-false}" == "true" ]]; then
   echo "${count}"
   exit 0
 fi
+
+selection_reason="exact"
+if [[ -n "${CASES_FROM:-}" || -n "${CASES_UNTIL:-}" ]]; then
+  selection_reason="range"
+elif [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+  selection_reason="default"
+elif [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
+  selection_reason="case-groups"
+fi
+selected_count=0
+for case_name in ${CASES}; do
+  selected_count=$((selected_count + 1))
+done
+jbr_skia_daily_broad_validation_guard_for_selection \
+  "screenshot parity suite" \
+  "${selected_count}" \
+  "${selection_reason}"
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"

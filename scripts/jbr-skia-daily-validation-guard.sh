@@ -18,7 +18,7 @@ jbr_skia_daily_broad_validation_guard() {
     echo "Broad JBR Skia validation is capped to once per local day." >&2
     echo "Today's slot (${today}) was already consumed:" >&2
     sed 's/^/  /' "${stamp_file}" >&2
-    echo "Use exact CASES/CASE_GROUPS for focused validation, or set JBR_SKIA_ALLOW_EXTRA_BROAD_VALIDATION=true for an explicit override." >&2
+    echo "Use exact small CASES/CASE_GROUPS for focused validation, or set JBR_SKIA_ALLOW_EXTRA_BROAD_VALIDATION=true for an explicit override." >&2
     exit 3
   fi
 
@@ -29,4 +29,15 @@ jbr_skia_daily_broad_validation_guard() {
     echo "out=${OUT_ROOT:-${OUT_DIR:-}}"
   } >"${stamp_file}"
   echo "Recorded daily broad JBR Skia validation slot: ${stamp_file}" >&2
+}
+
+jbr_skia_daily_broad_validation_guard_for_selection() {
+  local label="$1"
+  local selected_count="$2"
+  local reason="$3"
+  local limit="${JBR_SKIA_BROAD_VALIDATION_CASE_LIMIT:-10}"
+
+  if [[ "${reason}" == "default" || "${reason}" == "range" || "${selected_count}" -gt "${limit}" ]]; then
+    jbr_skia_daily_broad_validation_guard "${label} (${selected_count} rows, ${reason}, broad limit ${limit})"
+  fi
 }
