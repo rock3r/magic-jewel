@@ -239,7 +239,7 @@ if [[ "${LIST_CASE_COUNT}" == "true" ]]; then
   exit 0
 fi
 
-if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
   jbr_skia_daily_broad_validation_guard "benchmark default suite"
 fi
 

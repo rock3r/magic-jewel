@@ -191,7 +191,7 @@ if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   CASES="${CASES# }"
 fi
 
-if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && "${DRY_RUN}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
+if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && "${DRY_RUN}" != "true" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
   jbr_skia_daily_broad_validation_guard "artifact matrix"
 fi
 
