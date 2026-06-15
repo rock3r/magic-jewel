@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ROOT_DIR="${ROOT_DIR:-$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)}"
+source "${SCRIPT_DIR}/jbr-skia-daily-validation-guard.sh"
 OUT_ROOT="${OUT_ROOT:-${ROOT_DIR}/out/jbr-skia-benchmark-suite/$(date +%Y%m%d-%H%M%S)}"
 SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 DURATION_SECONDS="${DURATION_SECONDS:-20}"
@@ -236,6 +237,10 @@ fi
 if [[ "${LIST_CASE_COUNT}" == "true" ]]; then
   selected_cases | wc -l | tr -d ' '
   exit 0
+fi
+
+if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+  jbr_skia_daily_broad_validation_guard "benchmark default suite"
 fi
 
 for case_name in ${CASES}; do
