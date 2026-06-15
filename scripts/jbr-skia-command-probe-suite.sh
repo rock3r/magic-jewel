@@ -108,7 +108,7 @@ case_group_cases() {
       echo "commands-image-shader-color-filter commands-resize-image-shader-color-filter commands-forced-context-image-shader-color-filter commands-composite-shader commands-resize-composite-shader commands-forced-context-composite-shader commands-resize-composite-shader-descriptor-redefine commands-forced-context-composite-shader-descriptor-redefine commands-composite-noise-shader commands-resize-composite-noise-shader commands-forced-context-composite-noise-shader commands-composite-shader-color-filter commands-transformed-shader commands-runtime-effect-shader commands-raw-runtime-effect-shader-fallback commands-runtime-effect-shader-color-filter commands-linear-gradient-shader-color-filter commands-radial-gradient-shader-color-filter commands-sweep-gradient-shader-color-filter commands-runtime-effect-pure-color commands-runtime-effect-uniform-only commands-runtime-effect-child-only commands-runtime-effect-color-filter commands-raw-runtime-effect-color-filter-fallback commands-runtime-effect-color-filter-child"
       ;;
     core-effects)
-      echo "commands-gradient-stroke commands-image-filter commands-resize-image-filter commands-forced-context-image-filter commands-path-effect commands-resize-path-effect commands-forced-context-path-effect commands-path-effect-color-filter-fallback commands-raw-discrete-path-effect-fallback commands-vertices commands-vertices-raw-color-filter-fallback commands-blend-mode"
+      echo "commands-gradient-stroke commands-image-filter commands-resize-image-filter commands-forced-context-image-filter commands-path-effect commands-resize-path-effect commands-forced-context-path-effect commands-path-effect-color-filter-fallback commands-raw-discrete-path-effect-fallback commands-vertices commands-resize-vertices commands-forced-context-vertices commands-vertices-raw-color-filter-fallback commands-blend-mode commands-resize-blend-mode commands-forced-context-blend-mode"
       ;;
     graphics-layer-extras)
       echo "commands-resize-graphics-layer commands-forced-context-graphics-layer commands-resize-graphics-layer-modulate-alpha commands-forced-context-graphics-layer-modulate-alpha commands-resize-graphics-layer-offscreen commands-forced-context-graphics-layer-offscreen commands-resize-graphics-layer-clip commands-forced-context-graphics-layer-clip commands-resize-graphics-layer-round-clip commands-forced-context-graphics-layer-round-clip commands-resize-graphics-layer-path-clip commands-forced-context-graphics-layer-path-clip commands-resize-graphics-layer-blend-mode commands-forced-context-graphics-layer-blend-mode commands-resize-graphics-layer-shadow commands-forced-context-graphics-layer-shadow commands-resize-graphics-layer-round-shadow commands-forced-context-graphics-layer-round-shadow commands-resize-graphics-layer-path-shadow commands-forced-context-graphics-layer-path-shadow commands-resize-graphics-layer-rotationx commands-forced-context-graphics-layer-rotationx commands-resize-graphics-layer-rotationy commands-forced-context-graphics-layer-rotationy commands-resize-graphics-layer-rotationxy commands-forced-context-graphics-layer-rotationxy commands-resize-graphics-layer-scale-translate commands-forced-context-graphics-layer-scale-translate commands-resize-graphics-layer-near-camera commands-forced-context-graphics-layer-near-camera commands-resize-graphics-layer-offcenter-pivot commands-forced-context-graphics-layer-offcenter-pivot commands-resize-graphics-layer-color-filter commands-forced-context-graphics-layer-color-filter commands-resize-graphics-layer-color-matrix-filter commands-forced-context-graphics-layer-color-matrix-filter commands-resize-graphics-layer-blend-color-filter commands-forced-context-graphics-layer-blend-color-filter commands-resize-graphics-layer-blend-color-matrix-filter commands-forced-context-graphics-layer-blend-color-matrix-filter commands-graphics-layer-raw-color-filter-fallback commands-graphics-layer-raw-table-color-filter-fallback commands-graphics-layer-unsupported-child-fallback commands-resize-graphics-layer-render-effect commands-forced-context-graphics-layer-render-effect commands-graphics-layer-raw-image-filter-effect-fallback commands-resize-graphics-layer-offset-effect commands-forced-context-graphics-layer-offset-effect commands-resize-graphics-layer-chained-render-effect commands-forced-context-graphics-layer-chained-render-effect commands-resize-graphics-layer-render-effect-color-filter commands-forced-context-graphics-layer-render-effect-color-filter commands-resize-graphics-layer-render-effect-blend-mode commands-forced-context-graphics-layer-render-effect-blend-mode commands-graphics-layer-render-effect-color-filter commands-graphics-layer-render-effect-blend-mode commands-graphics-layer-render-effect-color-matrix-filter commands-resize-graphics-layer-render-effect-color-matrix-filter commands-forced-context-graphics-layer-render-effect-color-matrix-filter commands-graphics-layer-render-effect-blend-color-filter commands-resize-graphics-layer-render-effect-blend-color-filter commands-forced-context-graphics-layer-render-effect-blend-color-filter commands-graphics-layer-render-effect-blend-color-matrix-filter commands-resize-graphics-layer-render-effect-blend-color-matrix-filter commands-forced-context-graphics-layer-render-effect-blend-color-matrix-filter commands-graphics-layer-offset-effect-blend-color-matrix-filter commands-resize-graphics-layer-offset-effect-blend-color-matrix-filter commands-forced-context-graphics-layer-offset-effect-blend-color-matrix-filter commands-graphics-layer-chained-render-effect-blend-color-matrix-filter commands-resize-graphics-layer-chained-render-effect-blend-color-matrix-filter commands-forced-context-graphics-layer-chained-render-effect-blend-color-matrix-filter commands-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter commands-resize-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter commands-forced-context-graphics-layer-near-camera-chained-render-effect-blend-color-matrix-filter"
@@ -340,7 +340,7 @@ fi
 if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-native-bridge-load-library commands-core-primitives" "commands-native-bridge-load-library commands-invalid-stroke-cap-fallback commands-invalid-blend-layer-bounds-fallback commands-invalid-concat-transform-fallback commands-invalid-transform-record-flags-fallback commands-invalid-clip-operation-fallback commands-core-primitives"
   replace_default_case_segment "commands-point-lines commands-point-dots" "commands-point-lines commands-invalid-point-dots-fallback commands-invalid-draw-points-point-count-fallback commands-invalid-draw-points-max-point-count-fallback commands-invalid-draw-points-record-length-fallback commands-point-dots"
-  replace_default_case_segment "commands-vertices commands-blend-mode" "commands-vertices commands-vertices-raw-color-filter-fallback commands-vertices-invalid-blend-mode-fallback commands-invalid-draw-vertices-vertex-count-fallback commands-invalid-draw-vertices-max-vertex-count-fallback commands-invalid-draw-vertices-record-length-fallback commands-invalid-draw-vertices-vertex-mode-fallback commands-invalid-draw-vertices-blend-mode-fallback commands-invalid-draw-vertices-index-count-fallback commands-invalid-draw-vertices-max-index-count-fallback commands-blend-mode"
+  replace_default_case_segment "commands-vertices commands-blend-mode" "commands-vertices commands-resize-vertices commands-forced-context-vertices commands-vertices-raw-color-filter-fallback commands-vertices-invalid-blend-mode-fallback commands-invalid-draw-vertices-vertex-count-fallback commands-invalid-draw-vertices-max-vertex-count-fallback commands-invalid-draw-vertices-record-length-fallback commands-invalid-draw-vertices-vertex-mode-fallback commands-invalid-draw-vertices-blend-mode-fallback commands-invalid-draw-vertices-index-count-fallback commands-invalid-draw-vertices-max-index-count-fallback commands-blend-mode commands-resize-blend-mode commands-forced-context-blend-mode"
   replace_default_case_segment "commands-core-primitives commands-point-lines" "commands-core-primitives commands-invalid-image-define-record-flags-fallback commands-invalid-image-cache-clear-record-flags-fallback commands-invalid-image-evict-record-flags-fallback commands-invalid-image-define-width-fallback commands-invalid-image-define-max-width-fallback commands-invalid-image-define-height-fallback commands-invalid-image-define-max-height-fallback commands-invalid-image-define-pixel-count-fallback commands-invalid-image-use-fallback commands-invalid-image-use-after-evict-fallback commands-invalid-image-ref-width-fallback commands-invalid-image-ref-height-fallback commands-invalid-image-ref-alpha-fallback commands-invalid-image-ref-filter-quality-fallback commands-invalid-clip-path-verb-fallback commands-invalid-draw-path-verb-fallback commands-invalid-draw-path-path-effect-verb-fallback commands-invalid-stroke-line-dash-path-effect-interval-count-fallback commands-invalid-stroke-rect-dash-path-effect-interval-count-fallback commands-invalid-stroke-rect-dash-path-effect-width-fallback commands-invalid-stroke-rect-dash-path-effect-height-fallback commands-invalid-stroke-round-rect-dash-path-effect-interval-count-fallback commands-invalid-stroke-round-rect-dash-path-effect-right-fallback commands-invalid-stroke-round-rect-dash-path-effect-bottom-fallback commands-invalid-stroke-round-rect-dash-path-effect-radius-x-fallback commands-invalid-stroke-round-rect-dash-path-effect-radius-y-fallback commands-invalid-stroke-round-rect-dash-path-effect-stroke-width-fallback commands-invalid-stroke-round-rect-dash-path-effect-stroke-cap-fallback commands-invalid-stroke-round-rect-dash-path-effect-stroke-join-fallback commands-invalid-stroke-round-rect-dash-path-effect-stroke-miter-fallback commands-invalid-stroke-round-rect-dash-path-effect-phase-fallback commands-invalid-stroke-round-rect-dash-path-effect-interval-fallback commands-invalid-stroke-path-dash-path-effect-verb-fallback commands-invalid-stroke-path-dash-path-effect-interval-count-fallback commands-invalid-stroke-path-dash-path-effect-interval-fallback commands-invalid-draw-shadow-path-verb-fallback commands-point-lines"
   replace_default_case_segment "commands-invalid-clip-path-verb-fallback commands-invalid-draw-path-verb-fallback" "commands-clip-path-invalid-fallback commands-draw-path-invalid-fallback commands-invalid-clip-path-verb-fallback commands-invalid-draw-path-verb-fallback"
   replace_default_case_segment "commands-native-generic-font-text commands-native-loaded-font-data-text" "commands-native-generic-font-text commands-invalid-text-font-size-fallback commands-invalid-text-font-weight-fallback commands-invalid-text-font-width-fallback commands-invalid-text-font-slant-fallback commands-invalid-text-font-family-count-fallback commands-invalid-paragraph-font-size-fallback commands-invalid-paragraph-font-weight-fallback commands-invalid-paragraph-font-width-fallback commands-invalid-paragraph-font-slant-fallback commands-invalid-paragraph-font-family-count-fallback commands-invalid-font-data-record-flags-fallback commands-native-loaded-font-data-text"
@@ -5007,6 +5007,28 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_VERTICES=true
       ;;
+    commands-resize-vertices)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_VERTICES=true \
+        MAGIC_JEWEL_AUTO_RESIZE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=false \
+        EXPECT_SURFACE_CHANGED=true \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
+    commands-forced-context-vertices)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_VERTICES=true \
+        MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=true \
+        EXPECT_SURFACE_CHANGED=false \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
     commands-vertices-raw-color-filter-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_VERTICES=true \
@@ -5080,6 +5102,28 @@ run_named_case() {
     commands-blend-mode|commands-blend-mode-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_BLEND_MODE=true
+      ;;
+    commands-resize-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=true \
+        MAGIC_JEWEL_AUTO_RESIZE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=false \
+        EXPECT_SURFACE_CHANGED=true \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
+    commands-forced-context-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_BLEND_MODE=true \
+        MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=true \
+        EXPECT_SURFACE_CHANGED=false \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
     commands-invalid-fill-rect-blend-mode-width-fallback)
       run_case "$1" \
