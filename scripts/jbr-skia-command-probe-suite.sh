@@ -72,7 +72,7 @@ case_group_cases() {
       echo "commands-live-animation commands-core-primitives commands-color-shader commands-color-filter-handle commands-color-matrix-filter commands-graphics-layer"
       ;;
     surface-transform-ui)
-      echo "commands-native-bridge-load-library commands-point-lines commands-resize-point-lines commands-forced-context-point-lines commands-point-dots commands-resize-point-dots commands-forced-context-point-dots commands-concat-transform commands-resize-concat-transform commands-forced-context-concat-transform commands-skew-transform commands-resize-skew-transform commands-forced-context-skew-transform commands-gradient-surfaces commands-resize-gradient-surfaces commands-forced-context-gradient-surfaces commands-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode commands-gradient-paths commands-resize-gradient-paths commands-forced-context-gradient-paths commands-linear-gradient-path-blend-mode commands-popup commands-popup-window commands-menu commands-text-image"
+      echo "commands-native-bridge-load-library commands-point-lines commands-resize-point-lines commands-forced-context-point-lines commands-point-dots commands-resize-point-dots commands-forced-context-point-dots commands-concat-transform commands-resize-concat-transform commands-forced-context-concat-transform commands-skew-transform commands-resize-skew-transform commands-forced-context-skew-transform commands-gradient-surfaces commands-resize-gradient-surfaces commands-forced-context-gradient-surfaces commands-linear-gradient-blend-mode commands-resize-linear-gradient-blend-mode commands-forced-context-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode commands-resize-radial-gradient-stroke-blend-mode commands-forced-context-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode commands-resize-sweep-gradient-round-rect-blend-mode commands-forced-context-sweep-gradient-round-rect-blend-mode commands-gradient-paths commands-resize-gradient-paths commands-forced-context-gradient-paths commands-linear-gradient-path-blend-mode commands-popup commands-popup-window commands-menu commands-text-image"
       ;;
     gradient-path-stroke-fallbacks)
       echo "commands-linear-gradient-path-stroke-fallback commands-radial-gradient-path-stroke-fallback commands-sweep-gradient-path-stroke-fallback"
@@ -351,6 +351,9 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-sweep-gradient-invalid-color-count-fallback commands-invalid-linear-gradient-stroke-width-fallback" "commands-sweep-gradient-invalid-color-count-fallback commands-linear-gradient-invalid-stroke-width-public-fallback commands-radial-gradient-invalid-stroke-width-public-fallback commands-sweep-gradient-invalid-stroke-width-public-fallback commands-linear-gradient-round-rect-invalid-radius-fallback commands-radial-gradient-round-rect-invalid-radius-fallback commands-sweep-gradient-round-rect-invalid-radius-fallback commands-linear-gradient-stroke-round-rect-invalid-radius-fallback commands-radial-gradient-stroke-round-rect-invalid-radius-fallback commands-sweep-gradient-stroke-round-rect-invalid-radius-fallback commands-invalid-linear-gradient-stroke-width-fallback"
   replace_default_case_segment "commands-gradient-surfaces commands-gradient-paths" "commands-gradient-surfaces commands-linear-gradient-blend-mode commands-gradient-paths"
   replace_default_case_segment "commands-gradient-surfaces commands-linear-gradient-blend-mode" "commands-gradient-surfaces commands-resize-gradient-surfaces commands-forced-context-gradient-surfaces commands-linear-gradient-blend-mode"
+  replace_default_case_segment "commands-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode" "commands-linear-gradient-blend-mode commands-resize-linear-gradient-blend-mode commands-forced-context-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode"
+  replace_default_case_segment "commands-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode" "commands-radial-gradient-stroke-blend-mode commands-resize-radial-gradient-stroke-blend-mode commands-forced-context-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode"
+  replace_default_case_segment "commands-sweep-gradient-round-rect-blend-mode commands-gradient-paths" "commands-sweep-gradient-round-rect-blend-mode commands-resize-sweep-gradient-round-rect-blend-mode commands-forced-context-sweep-gradient-round-rect-blend-mode commands-gradient-paths"
   replace_default_case_segment "commands-gradient-paths commands-linear-gradient-path-blend-mode" "commands-gradient-paths commands-resize-gradient-paths commands-forced-context-gradient-paths commands-linear-gradient-path-blend-mode"
   replace_default_case_segment "commands-linear-gradient-blend-mode commands-gradient-paths" "commands-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode commands-gradient-paths"
   replace_default_case_segment "commands-gradient-paths commands-linear-gradient-path-stroke-fallback" "commands-gradient-paths commands-linear-gradient-path-blend-mode commands-linear-gradient-path-invalid-fallback commands-radial-gradient-path-invalid-fallback commands-sweep-gradient-path-invalid-fallback commands-linear-gradient-path-stroke-fallback"
@@ -1235,13 +1238,79 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_BLEND_MODE=true
       ;;
+    commands-resize-linear-gradient-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_BLEND_MODE=true \
+        MAGIC_JEWEL_AUTO_RESIZE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=false \
+        EXPECT_SURFACE_CHANGED=true \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
+    commands-forced-context-linear-gradient-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_BLEND_MODE=true \
+        MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=true \
+        EXPECT_SURFACE_CHANGED=false \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
     commands-radial-gradient-stroke-blend-mode)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_STROKE_BLEND_MODE=true
       ;;
+    commands-resize-radial-gradient-stroke-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_STROKE_BLEND_MODE=true \
+        MAGIC_JEWEL_AUTO_RESIZE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=false \
+        EXPECT_SURFACE_CHANGED=true \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
+    commands-forced-context-radial-gradient-stroke-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_STROKE_BLEND_MODE=true \
+        MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=true \
+        EXPECT_SURFACE_CHANGED=false \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
     commands-sweep-gradient-round-rect-blend-mode)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT_BLEND_MODE=true
+      ;;
+    commands-resize-sweep-gradient-round-rect-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT_BLEND_MODE=true \
+        MAGIC_JEWEL_AUTO_RESIZE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=false \
+        EXPECT_SURFACE_CHANGED=true \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
+    commands-forced-context-sweep-gradient-round-rect-blend-mode)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT_BLEND_MODE=true \
+        MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=true \
+        EXPECT_SURFACE_CHANGED=false \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
     commands-linear-gradient-invalid-stops-fallback)
       run_case "$1" \
