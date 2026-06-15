@@ -45,6 +45,17 @@ Set `JBR_SKIA_RENDER_MODE=commands` to exercise the lower-level command-list pro
 Command mode currently supports Magic Jewel text through a temporary text-as-inline-ARGB bridge by default: CMP rasterizes Skia Paragraph output into the existing image command so the sample stays on JBR command replay while preserving the resolved Jewel font, size, and alignment. This is useful for mixed-content validation, but it is not the final JBR-owned font/typeface solution. Set `JBR_SKIA_NATIVE_TEXT=true` to probe native text commands; true file-backed/custom Jewel font families intentionally remain image-backed until JBR owns a negotiated file/font descriptor. Set `MAGIC_JEWEL_GENERIC_FONT_TEXT=true` with native text to add generic `sans-serif`/`serif`/`monospace`/`cursive` family probes, which now validate mixed frames containing custom-font image refs plus generic-family native text commands. Set `MAGIC_JEWEL_LOADED_FONT_DATA_TEXT=true` to add a loaded byte-array font probe that must emit JBR font-data define markers and native text commands. Set `MAGIC_JEWEL_RESOURCE_FONT_TEXT=true` to add a classpath resource font probe; the resource font is copied into the app resources as `magicjewel-fonts/MagicJewelResourceFont.ttf` and must emit JBR font-data define markers plus native text commands. Set `MAGIC_JEWEL_SYSTEM_FONT_TEXT=true` to add a concrete Menlo system-family probe that must emit native text commands. The default remains text-as-image until broader typography parity is proven.
 To validate deliberate fallback paths, run with `EXPECT_COMMAND_FALLBACK=true` and set `EXPECT_COMMAND_FALLBACK_REASON` to the unsupported operation being probed.
 
+## Validation cadence
+
+Whole-suite validation is intentionally capped to one broad slot per local calendar day, not every N focused changes.
+The default command-probe sweep, screenshot parity suite, benchmark suite, compatibility matrix, and artifact matrix
+share `out/.jbr-skia-daily-validation/broad.<date>.stamp`; after one default broad runner starts for the local date,
+the other default broad runners exit 3 before launching cases. Normal iteration should use exact `CASES=...` or a small
+`CASE_GROUPS=...` selection. Default-list `CASES_FROM`/`CASES_UNTIL` range launches count as broad validation, while
+`LIST_CASES`, `LIST_CASE_COUNT`, `LIST_CASE_GROUPS`, `LIST_CASE_GROUP_COUNTS`, and `LIST_UNGROUPED_CASES` are no-launch
+discovery helpers and do not consume the daily slot. Set `JBR_SKIA_ALLOW_EXTRA_BROAD_VALIDATION=true` only for an
+explicit user override or an emergency ABI/capability gate.
+
 Old/new process and marker report:
 
 ```bash
