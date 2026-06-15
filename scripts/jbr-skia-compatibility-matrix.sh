@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ROOT_DIR="${ROOT_DIR:-$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)}"
+source "${SCRIPT_DIR}/jbr-skia-daily-validation-guard.sh"
 OUT_ROOT="${OUT_ROOT:-${ROOT_DIR}/out/jbr-skia-compatibility-matrix/$(date +%Y%m%d-%H%M%S)}"
 SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 DURATION_SECONDS="${DURATION_SECONDS:-5}"
@@ -174,6 +175,10 @@ if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
     CASES_FILTER="${CASES_FILTER} $(case_group_cases "${group}")"
   done
   CASES_FILTER="${CASES_FILTER# }"
+fi
+
+if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
+  jbr_skia_daily_broad_validation_guard "compatibility matrix"
 fi
 
 case_selected() {

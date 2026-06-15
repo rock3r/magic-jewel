@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ROOT_DIR="${ROOT_DIR:-$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)}"
+source "${SCRIPT_DIR}/jbr-skia-daily-validation-guard.sh"
 OUT_ROOT="${OUT_ROOT:-${ROOT_DIR}/out/jbr-skia-command-probe-suite/$(date +%Y%m%d-%H%M%S)}"
 SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
 DURATION_SECONDS="${DURATION_SECONDS:-8}"
@@ -436,6 +437,10 @@ fi
 if [[ "${LIST_UNGROUPED_CASES}" == "true" ]]; then
   list_ungrouped_cases
   exit 0
+fi
+
+if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && -z "${CASES_FROM}" && -z "${CASES_UNTIL}" ]]; then
+  jbr_skia_daily_broad_validation_guard "command-probe default sweep"
 fi
 
 mkdir -p "${OUT_ROOT}"

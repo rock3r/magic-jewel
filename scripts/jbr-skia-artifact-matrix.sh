@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ROOT_DIR="${ROOT_DIR:-$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)}"
+source "${SCRIPT_DIR}/jbr-skia-daily-validation-guard.sh"
 OUT_ROOT="${OUT_ROOT:-${ROOT_DIR}/out/jbr-skia-artifact-matrix/$(date +%Y%m%d-%H%M%S)}"
 DURATION_SECONDS="${DURATION_SECONDS:-5}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-1}"
@@ -188,6 +189,10 @@ if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
     CASES="${CASES} $(case_group_cases "${group}")"
   done
   CASES="${CASES# }"
+fi
+
+if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && "${DRY_RUN}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
+  jbr_skia_daily_broad_validation_guard "artifact matrix"
 fi
 
 require_file() {
