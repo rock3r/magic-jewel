@@ -105,7 +105,7 @@ case_group_cases() {
       echo "commands-forced-context-dynamic-images commands-image-blend-mode commands-image-path-effect-fallback commands-image-shader commands-resize-image-shader commands-forced-context-image-shader commands-image-shader-blend-mode commands-image-shader-invalid-image-fallback commands-raw-image-shader-fallback commands-resize-color-shader commands-forced-context-color-shader commands-color-shader-blend-mode commands-resize-color-shader-blend-mode commands-forced-context-color-shader-blend-mode commands-descriptor-stroke-shader-fallback commands-gradient-shaders commands-noise-shader commands-turbulence-shader commands-raw-linear-gradient-shader-fallback commands-raw-radial-gradient-shader-fallback commands-raw-sweep-gradient-shader-fallback commands-raw-conical-gradient-shader-fallback commands-raw-noise-shader-fallback commands-raw-turbulence-shader-fallback"
       ;;
     shader-composition-runtime)
-      echo "commands-image-shader-color-filter commands-resize-image-shader-color-filter commands-forced-context-image-shader-color-filter commands-composite-shader commands-resize-composite-shader-descriptor-redefine commands-forced-context-composite-shader-descriptor-redefine commands-composite-noise-shader commands-composite-shader-color-filter commands-transformed-shader commands-runtime-effect-shader commands-raw-runtime-effect-shader-fallback commands-runtime-effect-shader-color-filter commands-linear-gradient-shader-color-filter commands-radial-gradient-shader-color-filter commands-sweep-gradient-shader-color-filter commands-runtime-effect-pure-color commands-runtime-effect-uniform-only commands-runtime-effect-child-only commands-runtime-effect-color-filter commands-raw-runtime-effect-color-filter-fallback commands-runtime-effect-color-filter-child"
+      echo "commands-image-shader-color-filter commands-resize-image-shader-color-filter commands-forced-context-image-shader-color-filter commands-composite-shader commands-resize-composite-shader commands-forced-context-composite-shader commands-resize-composite-shader-descriptor-redefine commands-forced-context-composite-shader-descriptor-redefine commands-composite-noise-shader commands-composite-shader-color-filter commands-transformed-shader commands-runtime-effect-shader commands-raw-runtime-effect-shader-fallback commands-runtime-effect-shader-color-filter commands-linear-gradient-shader-color-filter commands-radial-gradient-shader-color-filter commands-sweep-gradient-shader-color-filter commands-runtime-effect-pure-color commands-runtime-effect-uniform-only commands-runtime-effect-child-only commands-runtime-effect-color-filter commands-raw-runtime-effect-color-filter-fallback commands-runtime-effect-color-filter-child"
       ;;
     core-effects)
       echo "commands-gradient-stroke commands-image-filter commands-path-effect commands-path-effect-color-filter-fallback commands-raw-discrete-path-effect-fallback commands-vertices commands-vertices-raw-color-filter-fallback commands-blend-mode"
@@ -355,7 +355,7 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-image-path-effect-fallback commands-image-shader" "commands-image-blend-mode commands-image-path-effect-fallback commands-image-shader"
   replace_default_case_segment "commands-color-shader commands-descriptor-stroke-shader-fallback" "commands-color-shader commands-resize-color-shader commands-forced-context-color-shader commands-color-shader-blend-mode commands-resize-color-shader-blend-mode commands-forced-context-color-shader-blend-mode commands-descriptor-stroke-shader-fallback"
   replace_default_case_segment "commands-image-shader-color-filter commands-composite-shader" "commands-image-shader-color-filter commands-resize-image-shader-color-filter commands-forced-context-image-shader-color-filter commands-composite-shader"
-  replace_default_case_segment "commands-composite-shader commands-composite-noise-shader" "commands-composite-shader commands-resize-composite-shader-descriptor-redefine commands-forced-context-composite-shader-descriptor-redefine commands-composite-noise-shader"
+  replace_default_case_segment "commands-composite-shader commands-composite-noise-shader" "commands-composite-shader commands-resize-composite-shader commands-forced-context-composite-shader commands-resize-composite-shader-descriptor-redefine commands-forced-context-composite-shader-descriptor-redefine commands-composite-noise-shader"
   replace_default_case_segment "commands-image-filter commands-image-color-matrix-filter" "commands-image-filter commands-invalid-image-color-filter-use-fallback commands-invalid-image-color-filter-use-after-evict-fallback commands-invalid-image-color-filter-ref-width-fallback commands-invalid-image-color-filter-ref-height-fallback commands-invalid-image-color-filter-ref-alpha-fallback commands-invalid-image-color-filter-ref-filter-quality-fallback commands-invalid-image-color-filter-blend-mode-fallback commands-invalid-image-color-filter-ref-use-fallback commands-invalid-image-color-filter-ref-use-after-evict-fallback commands-invalid-image-color-filter-descriptor-ref-width-fallback commands-invalid-image-color-filter-descriptor-ref-height-fallback commands-invalid-image-color-filter-descriptor-ref-alpha-fallback commands-invalid-image-color-filter-descriptor-ref-filter-quality-fallback commands-image-color-matrix-filter commands-resize-image-color-matrix-filter commands-forced-context-image-color-matrix-filter"
   replace_default_case_segment "commands-raw-blend-color-filter-fallback commands-raw-table-color-filter-fallback commands-color-filter" "commands-raw-blend-color-filter-fallback commands-raw-table-color-filter-fallback commands-invalid-fill-rect-color-filter-blend-mode-fallback commands-invalid-fill-rect-color-filter-width-fallback commands-invalid-fill-rect-color-filter-height-fallback commands-invalid-fill-rect-color-filter-ref-width-fallback commands-invalid-fill-rect-color-filter-ref-height-fallback commands-color-filter"
   replace_default_case_segment "commands-color-matrix-filter commands-color-matrix-filter-nonfinite-fallback" "commands-color-matrix-filter commands-resize-color-matrix-filter commands-forced-context-color-matrix-filter commands-color-matrix-filter-nonfinite-fallback"
@@ -1796,6 +1796,36 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=3 \
         EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=3
+      ;;
+    commands-resize-composite-shader)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER=true \
+        MAGIC_JEWEL_AUTO_RESIZE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=false \
+        EXPECT_SURFACE_CHANGED=true \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=6 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=3 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=9
+      ;;
+    commands-forced-context-composite-shader)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_COMPOSITE_SHADER=true \
+        MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=true \
+        EXPECT_SURFACE_CHANGED=false \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_DEFINES=6 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_USES=1 \
+        EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=3 \
+        EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=9
       ;;
     commands-resize-composite-shader-descriptor-redefine)
       run_case "$1" \
