@@ -72,7 +72,7 @@ case_group_cases() {
       echo "commands-live-animation commands-core-primitives commands-color-shader commands-color-filter-handle commands-color-matrix-filter commands-graphics-layer"
       ;;
     surface-transform-ui)
-      echo "commands-native-bridge-load-library commands-point-lines commands-point-dots commands-concat-transform commands-skew-transform commands-gradient-surfaces commands-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode commands-gradient-paths commands-linear-gradient-path-blend-mode commands-popup commands-popup-window commands-menu commands-text-image"
+      echo "commands-native-bridge-load-library commands-point-lines commands-point-dots commands-concat-transform commands-resize-concat-transform commands-forced-context-concat-transform commands-skew-transform commands-resize-skew-transform commands-forced-context-skew-transform commands-gradient-surfaces commands-linear-gradient-blend-mode commands-radial-gradient-stroke-blend-mode commands-sweep-gradient-round-rect-blend-mode commands-gradient-paths commands-linear-gradient-path-blend-mode commands-popup commands-popup-window commands-menu commands-text-image"
       ;;
     gradient-path-stroke-fallbacks)
       echo "commands-linear-gradient-path-stroke-fallback commands-radial-gradient-path-stroke-fallback commands-sweep-gradient-path-stroke-fallback"
@@ -339,6 +339,7 @@ if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
 fi
 if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
   replace_default_case_segment "commands-native-bridge-load-library commands-core-primitives" "commands-native-bridge-load-library commands-invalid-stroke-cap-fallback commands-invalid-blend-layer-bounds-fallback commands-invalid-concat-transform-fallback commands-invalid-transform-record-flags-fallback commands-invalid-clip-operation-fallback commands-core-primitives"
+  replace_default_case_segment "commands-concat-transform commands-skew-transform" "commands-concat-transform commands-resize-concat-transform commands-forced-context-concat-transform commands-skew-transform commands-resize-skew-transform commands-forced-context-skew-transform"
   replace_default_case_segment "commands-point-lines commands-point-dots" "commands-point-lines commands-invalid-point-dots-fallback commands-invalid-draw-points-point-count-fallback commands-invalid-draw-points-max-point-count-fallback commands-invalid-draw-points-record-length-fallback commands-point-dots"
   replace_default_case_segment "commands-vertices commands-blend-mode" "commands-vertices commands-resize-vertices commands-forced-context-vertices commands-vertices-raw-color-filter-fallback commands-vertices-invalid-blend-mode-fallback commands-invalid-draw-vertices-vertex-count-fallback commands-invalid-draw-vertices-max-vertex-count-fallback commands-invalid-draw-vertices-record-length-fallback commands-invalid-draw-vertices-vertex-mode-fallback commands-invalid-draw-vertices-blend-mode-fallback commands-invalid-draw-vertices-index-count-fallback commands-invalid-draw-vertices-max-index-count-fallback commands-blend-mode commands-resize-blend-mode commands-forced-context-blend-mode"
   replace_default_case_segment "commands-core-primitives commands-point-lines" "commands-core-primitives commands-invalid-image-define-record-flags-fallback commands-invalid-image-cache-clear-record-flags-fallback commands-invalid-image-evict-record-flags-fallback commands-invalid-image-define-width-fallback commands-invalid-image-define-max-width-fallback commands-invalid-image-define-height-fallback commands-invalid-image-define-max-height-fallback commands-invalid-image-define-pixel-count-fallback commands-invalid-image-use-fallback commands-invalid-image-use-after-evict-fallback commands-invalid-image-ref-width-fallback commands-invalid-image-ref-height-fallback commands-invalid-image-ref-alpha-fallback commands-invalid-image-ref-filter-quality-fallback commands-invalid-clip-path-verb-fallback commands-invalid-draw-path-verb-fallback commands-invalid-draw-path-path-effect-verb-fallback commands-invalid-stroke-line-dash-path-effect-interval-count-fallback commands-invalid-stroke-rect-dash-path-effect-interval-count-fallback commands-invalid-stroke-rect-dash-path-effect-width-fallback commands-invalid-stroke-rect-dash-path-effect-height-fallback commands-invalid-stroke-round-rect-dash-path-effect-interval-count-fallback commands-invalid-stroke-round-rect-dash-path-effect-right-fallback commands-invalid-stroke-round-rect-dash-path-effect-bottom-fallback commands-invalid-stroke-round-rect-dash-path-effect-radius-x-fallback commands-invalid-stroke-round-rect-dash-path-effect-radius-y-fallback commands-invalid-stroke-round-rect-dash-path-effect-stroke-width-fallback commands-invalid-stroke-round-rect-dash-path-effect-stroke-cap-fallback commands-invalid-stroke-round-rect-dash-path-effect-stroke-join-fallback commands-invalid-stroke-round-rect-dash-path-effect-stroke-miter-fallback commands-invalid-stroke-round-rect-dash-path-effect-phase-fallback commands-invalid-stroke-round-rect-dash-path-effect-interval-fallback commands-invalid-stroke-path-dash-path-effect-verb-fallback commands-invalid-stroke-path-dash-path-effect-interval-count-fallback commands-invalid-stroke-path-dash-path-effect-interval-fallback commands-invalid-draw-shadow-path-verb-fallback commands-point-lines"
@@ -1087,9 +1088,53 @@ run_named_case() {
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_CONCAT_TRANSFORM=true
       ;;
+    commands-resize-concat-transform)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_CONCAT_TRANSFORM=true \
+        MAGIC_JEWEL_AUTO_RESIZE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=false \
+        EXPECT_SURFACE_CHANGED=true \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
+    commands-forced-context-concat-transform)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_CONCAT_TRANSFORM=true \
+        MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=true \
+        EXPECT_SURFACE_CHANGED=false \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
     commands-skew-transform)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_SKEW_TRANSFORM=true
+      ;;
+    commands-resize-skew-transform)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_SKEW_TRANSFORM=true \
+        MAGIC_JEWEL_AUTO_RESIZE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=false \
+        EXPECT_SURFACE_CHANGED=true \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
+      ;;
+    commands-forced-context-skew-transform)
+      run_case "$1" \
+        MAGIC_JEWEL_COMPOSE_SKEW_TRANSFORM=true \
+        MAGIC_JEWEL_FORCE_CONTEXT_CHANGE=true \
+        EXPECT_MIN_SURFACE_CHANGES=1 \
+        EXPECT_SURFACE_CONTEXT_CHANGED=true \
+        EXPECT_SURFACE_CHANGED=false \
+        EXPECT_MIN_COMMAND_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
+        EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
     commands-point-lines)
       run_case "$1" \
