@@ -18,6 +18,11 @@ LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
 LIST_CASES="${LIST_CASES:-false}"
 LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
 LIST_UNGROUPED_CASES="${LIST_UNGROUPED_CASES:-false}"
+EARLY_DEFAULT_BROAD_VALIDATION_GUARDED=false
+if [[ "${LIST_CASE_GROUPS}" != "true" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" && "${LIST_UNGROUPED_CASES}" != "true" && -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" && -z "${CASES_FROM}" && -z "${CASES_UNTIL}" ]]; then
+  jbr_skia_daily_broad_validation_guard "command-probe suite (default launch)"
+  EARLY_DEFAULT_BROAD_VALIDATION_GUARDED=true
+fi
 if [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   CASES="__CASE_GROUPS_SELECTED__"
 fi
@@ -480,10 +485,12 @@ elif [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
 elif [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   selection_reason="case-groups"
 fi
-jbr_skia_daily_broad_validation_guard_for_selection \
-  "command-probe suite" \
-  "$(echo "${CASES}" | wc -w | tr -d ' ')" \
-  "${selection_reason}"
+if [[ "${EARLY_DEFAULT_BROAD_VALIDATION_GUARDED}" != "true" ]]; then
+  jbr_skia_daily_broad_validation_guard_for_selection \
+    "command-probe suite" \
+    "$(echo "${CASES}" | wc -w | tr -d ' ')" \
+    "${selection_reason}"
+fi
 
 mkdir -p "${OUT_ROOT}"
 SUITE_TSV="${OUT_ROOT}/suite.tsv"

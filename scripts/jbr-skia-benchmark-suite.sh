@@ -17,6 +17,11 @@ LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
 LIST_UNGROUPED_CASES="${LIST_UNGROUPED_CASES:-false}"
 LIST_CASES="${LIST_CASES:-false}"
 LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
+EARLY_DEFAULT_BROAD_VALIDATION_GUARDED=false
+if [[ "${LIST_CASE_GROUPS}" != "true" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" && "${LIST_UNGROUPED_CASES}" != "true" && -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+  jbr_skia_daily_broad_validation_guard "benchmark suite (default launch)"
+  EARLY_DEFAULT_BROAD_VALIDATION_GUARDED=true
+fi
 ALL_CASES=(
   picture
   commands
@@ -245,10 +250,12 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
 elif [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   selection_reason="case-groups"
 fi
-jbr_skia_daily_broad_validation_guard_for_selection \
-  "benchmark suite" \
-  "$(selected_cases | wc -l | tr -d ' ')" \
-  "${selection_reason}"
+if [[ "${EARLY_DEFAULT_BROAD_VALIDATION_GUARDED}" != "true" ]]; then
+  jbr_skia_daily_broad_validation_guard_for_selection \
+    "benchmark suite" \
+    "$(selected_cases | wc -l | tr -d ' ')" \
+    "${selection_reason}"
+fi
 
 for case_name in ${CASES}; do
   run_named_case "${case_name}"

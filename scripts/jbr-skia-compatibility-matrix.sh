@@ -18,6 +18,11 @@ LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
 LIST_UNGROUPED_CASES="${LIST_UNGROUPED_CASES:-false}"
 LIST_CASES="${LIST_CASES:-false}"
 LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
+EARLY_DEFAULT_BROAD_VALIDATION_GUARDED=false
+if [[ "${LIST_CASE_GROUPS}" != "true" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" && "${LIST_UNGROUPED_CASES}" != "true" && -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+  jbr_skia_daily_broad_validation_guard "compatibility matrix (default launch)"
+  EARLY_DEFAULT_BROAD_VALIDATION_GUARDED=true
+fi
 LISTED_CASE_COUNT=0
 MATCHED_CASES=""
 MATRIX_INITIALIZED=false
@@ -275,7 +280,7 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
 elif [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   selection_reason="case-groups"
 fi
-if [[ "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" ]]; then
+if [[ "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" && "${EARLY_DEFAULT_BROAD_VALIDATION_GUARDED}" != "true" ]]; then
   jbr_skia_daily_broad_validation_guard_for_selection \
     "compatibility matrix" \
     "$(selected_case_count)" \

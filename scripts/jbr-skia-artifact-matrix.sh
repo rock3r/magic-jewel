@@ -32,6 +32,11 @@ LIST_CASE_GROUP_COUNTS="${LIST_CASE_GROUP_COUNTS:-false}"
 LIST_UNGROUPED_CASES="${LIST_UNGROUPED_CASES:-false}"
 LIST_CASES="${LIST_CASES:-false}"
 LIST_CASE_COUNT="${LIST_CASE_COUNT:-false}"
+EARLY_DEFAULT_BROAD_VALIDATION_GUARDED=false
+if [[ "${DRY_RUN}" != "true" && "${LIST_CASE_GROUPS}" != "true" && "${LIST_CASE_GROUP_COUNTS}" != "true" && "${LIST_CASES}" != "true" && "${LIST_CASE_COUNT}" != "true" && "${LIST_UNGROUPED_CASES}" != "true" && -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
+  jbr_skia_daily_broad_validation_guard "artifact matrix (default launch)"
+  EARLY_DEFAULT_BROAD_VALIDATION_GUARDED=true
+fi
 REQUIRE_OLD_ARTIFACT_ROWS="${REQUIRE_OLD_ARTIFACT_ROWS:-false}"
 EXPECT_BACKGROUND_WINDOW="${EXPECT_BACKGROUND_WINDOW:-true}"
 SKIPPED_OPTIONAL_ROWS=0
@@ -380,7 +385,7 @@ if [[ -z "${CASES_WAS_SET}" && -z "${CASE_GROUPS}" ]]; then
 elif [[ -z "${CASES_WAS_SET}" && -n "${CASE_GROUPS}" ]]; then
   selection_reason="case-groups"
 fi
-if [[ "${DRY_RUN}" != "true" ]]; then
+if [[ "${DRY_RUN}" != "true" && "${EARLY_DEFAULT_BROAD_VALIDATION_GUARDED}" != "true" ]]; then
   jbr_skia_daily_broad_validation_guard_for_selection \
     "artifact matrix" \
     "$(selected_cases | wc -l | tr -d ' ')" \
