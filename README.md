@@ -52,7 +52,7 @@ The default command-probe sweep, screenshot parity suite, benchmark suite, compa
 share `out/.jbr-skia-daily-validation/broad.<date>.stamp`; after one broad runner starts for the local date, other
 broad runners exit 3 before launching cases. Normal iteration should use exact small `CASES=...` or `CASE_GROUPS=...`
 selections. Default launches, default-list `CASES_FROM`/`CASES_UNTIL` range launches, and any resolved selection above
-`JBR_SKIA_BROAD_VALIDATION_CASE_LIMIT` rows count as broad validation; the default broad limit is 10 rows. `LIST_CASES`,
+`JBR_SKIA_BROAD_VALIDATION_CASE_LIMIT` rows count as broad validation; the default broad limit is 2 rows. `LIST_CASES`,
 `LIST_CASE_COUNT`, `LIST_CASE_GROUPS`, `LIST_CASE_GROUP_COUNTS`, and `LIST_UNGROUPED_CASES` are no-launch discovery
 helpers and do not consume the daily slot. Set `JBR_SKIA_ALLOW_EXTRA_BROAD_VALIDATION=true` only for an
 explicit user override or an emergency ABI/capability gate.
