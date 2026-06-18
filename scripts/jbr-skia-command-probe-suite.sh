@@ -7254,9 +7254,7 @@ run_named_case() {
       ;;
     commands-descriptor-stroke-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_DESCRIPTOR_STROKE_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=paintStyle
+        MAGIC_JEWEL_COMPOSE_DESCRIPTOR_STROKE_SHADER=true
       ;;
     commands-raw-image-shader-fallback)
       run_case "$1" \
