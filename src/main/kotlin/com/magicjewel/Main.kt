@@ -3165,12 +3165,12 @@ private fun MagicJewelApp() {
                                 start = Offset(size.width - 188f, size.height - 106f),
                                 end = Offset(size.width - 48f, size.height - 34f),
                             )
-                        } else if (composeInvalidLinearGradientColorCountEnabled) {
-                            Brush.linearGradient(
-                                colors = invalidGradientColors(),
-                                start = Offset(size.width - 188f, size.height - 106f),
-                                end = Offset(size.width - 48f, size.height - 34f),
-                            )
+	                        } else if (composeInvalidLinearGradientColorCountEnabled) {
+	                            Brush.linearGradient(
+	                                colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6), Color(0xFFA855F7)),
+	                                start = Offset(size.width - 188f, size.height - 106f),
+	                                end = Offset(size.width - 48f, size.height - 34f),
+	                            )
                         } else {
                             Brush.linearGradient(
                                 colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6), Color(0xFFA855F7)),
@@ -3226,10 +3226,10 @@ private fun MagicJewelApp() {
                             top = topLeft.y,
                             right = topLeft.x + 152f,
                             bottom = topLeft.y + 104f,
-                            paint = Paint().apply {
-                                style = PaintingStyle.Stroke
-                                strokeWidth = 0f
-                                shader = LinearGradientShader(
+	                            paint = Paint().apply {
+	                                style = PaintingStyle.Stroke
+	                                strokeWidth = 12f
+	                                shader = LinearGradientShader(
                                     from = topLeft,
                                     to = topLeft + Offset(152f, 104f),
                                     colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316)),
@@ -3271,8 +3271,8 @@ private fun MagicJewelApp() {
                                 top = topLeft.y,
                                 right = topLeft.x + 136f,
                                 bottom = topLeft.y + 74f,
-                                radiusX = -6f,
-                                radiusY = 16f,
+	                                radiusX = 26f,
+	                                radiusY = 16f,
                                 paint = Paint().apply {
                                     shader = LinearGradientShader(
                                         from = topLeft,
@@ -3294,7 +3294,7 @@ private fun MagicJewelApp() {
                                 right = topLeft.x + 136f,
                                 bottom = topLeft.y + 74f,
                                 radiusX = 26f,
-                                radiusY = -6f,
+	                                radiusY = 16f,
                                 paint = Paint().apply {
                                     style = PaintingStyle.Stroke
                                     strokeWidth = 6f
@@ -3380,11 +3380,11 @@ private fun MagicJewelApp() {
                                 center = topLeft + Offset(64f, 48f),
                                 radius = 72f,
                             )
-                        } else if (composeInvalidRadialGradientColorCountEnabled) {
-                            Brush.radialGradient(
-                                colors = invalidGradientColors(),
-                                center = topLeft + Offset(64f, 48f),
-                                radius = 72f,
+	                        } else if (composeInvalidRadialGradientColorCountEnabled) {
+	                            Brush.radialGradient(
+	                                colors = listOf(Color(0xFFFFF7ED), Color(0xFFF97316), Color(0xFF7C3AED)),
+	                                center = topLeft + Offset(64f, 48f),
+	                                radius = 72f,
                             )
                         } else {
                             Brush.radialGradient(
@@ -3415,10 +3415,10 @@ private fun MagicJewelApp() {
                             top = topLeft.y,
                             right = topLeft.x + 128f,
                             bottom = topLeft.y + 96f,
-                            paint = Paint().apply {
-                                style = PaintingStyle.Stroke
-                                strokeWidth = 0f
-                                shader = RadialGradientShader(
+	                            paint = Paint().apply {
+	                                style = PaintingStyle.Stroke
+	                                strokeWidth = 8f
+	                                shader = RadialGradientShader(
                                     center = topLeft + Offset(64f, 48f),
                                     radius = 72f,
                                     colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316)),
@@ -3475,7 +3475,7 @@ private fun MagicJewelApp() {
                                 right = topLeft.x + 128f,
                                 bottom = topLeft.y + 96f,
                                 radiusX = 28f,
-                                radiusY = -6f,
+	                                radiusY = 18f,
                                 paint = Paint().apply {
                                     shader = RadialGradientShader(
                                         center = topLeft + Offset(64f, 48f),
@@ -3547,10 +3547,10 @@ private fun MagicJewelApp() {
                     val topLeft = Offset(size.width - 518f, size.height - 126f)
                     drawRect(
                         brush = Brush.sweepGradient(
-                            colors = if (composeInvalidSweepGradientColorCountEnabled) {
-                                invalidGradientColors()
-                            } else {
-                                listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
+	                            colors = if (composeInvalidSweepGradientColorCountEnabled) {
+	                                listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
+	                            } else {
+	                                listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
                             },
                             center = if (composeInvalidSweepGradientGeometryEnabled) {
                                 topLeft + Offset(72f, 42f)
@@ -3585,10 +3585,10 @@ private fun MagicJewelApp() {
                             top = topLeft.y,
                             right = topLeft.x + 144f,
                             bottom = topLeft.y + 84f,
-                            paint = Paint().apply {
-                                style = PaintingStyle.Stroke
-                                strokeWidth = 0f
-                                shader = SweepGradientShader(
+	                            paint = Paint().apply {
+	                                style = PaintingStyle.Stroke
+	                                strokeWidth = 8f
+	                                shader = SweepGradientShader(
                                     center = topLeft + Offset(72f, 42f),
                                     colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316), Color(0xFF8B5CF6)),
                                     colorStops = listOf(0.1f, 0.5f, 0.9f),
@@ -3632,8 +3632,8 @@ private fun MagicJewelApp() {
                                 top = topLeft.y,
                                 right = topLeft.x + 144f,
                                 bottom = topLeft.y + 92f,
-                                radiusX = -6f,
-                                radiusY = -8f,
+	                                radiusX = 28f,
+	                                radiusY = 18f,
                                 paint = Paint().apply {
                                     shader = SweepGradientShader(
                                         center = topLeft + Offset(72f, 46f),
