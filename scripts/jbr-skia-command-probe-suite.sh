@@ -5317,9 +5317,7 @@ run_named_case() {
     commands-vertices-raw-color-filter-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_VERTICES=true \
-        MAGIC_JEWEL_COMPOSE_VERTICES_RAW_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=vertices
+        MAGIC_JEWEL_COMPOSE_VERTICES_RAW_COLOR_FILTER=true
       ;;
     commands-vertices-invalid-blend-mode-fallback)
       run_case "$1" \
@@ -7215,10 +7213,7 @@ run_named_case() {
       ;;
     commands-opaque-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_OPAQUE_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader \
-        EXPECT_SCREENSHOT_ASSERTION=false
+        MAGIC_JEWEL_COMPOSE_OPAQUE_SHADER=true
       ;;
     commands-descriptor-stroke-shader-fallback)
       run_case "$1" \
@@ -7230,10 +7225,7 @@ run_named_case() {
       ;;
     commands-composite-opaque-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_COMPOSITE_OPAQUE_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader \
-        EXPECT_SCREENSHOT_ASSERTION=false
+        MAGIC_JEWEL_COMPOSE_COMPOSITE_OPAQUE_SHADER=true
       ;;
     commands-noise-shader)
       run_case "$1" \
@@ -7329,9 +7321,7 @@ run_named_case() {
       ;;
     commands-raw-conical-gradient-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_CONICAL_GRADIENT_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        MAGIC_JEWEL_COMPOSE_RAW_CONICAL_GRADIENT_SHADER=true
       ;;
     commands-raw-turbulence-shader-fallback)
       run_case "$1" \
@@ -7339,10 +7329,7 @@ run_named_case() {
       ;;
     commands-picture-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_PICTURE_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader \
-        EXPECT_SCREENSHOT_ASSERTION=false
+        MAGIC_JEWEL_COMPOSE_PICTURE_SHADER=true
       ;;
     commands-transformed-shader)
       run_case "$1" \

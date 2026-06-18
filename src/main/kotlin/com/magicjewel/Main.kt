@@ -1028,6 +1028,7 @@ private fun MagicJewelApp() {
         composeImageShaderBlendModeEnabled,
         composeInvalidImageShaderImageEnabled,
         composeRawImageShaderEnabled,
+        composePictureShaderEnabled,
         composeImageShaderColorFilterEnabled,
         composeImageFilterEnabled,
         composeImageColorMatrixFilterEnabled,
@@ -1040,6 +1041,7 @@ private fun MagicJewelApp() {
             composeImageShaderBlendModeEnabled ||
             composeInvalidImageShaderImageEnabled ||
             composeRawImageShaderEnabled ||
+            composePictureShaderEnabled ||
             composeDescriptorStrokeShaderEnabled ||
             composeImageShaderColorFilterEnabled ||
             composeImageFilterEnabled ||
@@ -1293,7 +1295,7 @@ private fun MagicJewelApp() {
                             right = topLeft.x + 140f,
                             bottom = topLeft.y + 116f,
                             paint = Paint().apply {
-                                shader = org.jetbrains.skia.Shader.makeColor(Color(0xFFEF4444).toArgb()).asComposeShader()
+                                shader = ColorShader(Color(0xFFEF4444))
                             },
                         )
                     }
@@ -1308,7 +1310,7 @@ private fun MagicJewelApp() {
                             colorStops = listOf(0f, 1f),
                             tileMode = TileMode.Clamp,
                         ),
-                        src = org.jetbrains.skia.Shader.makeColor(Color(0xCCF97316).toArgb()).asComposeShader(),
+                        src = ColorShader(Color(0xCCF97316)),
                         blendMode = BlendMode.SrcOver,
                     )
                     drawRect(
@@ -1464,16 +1466,13 @@ private fun MagicJewelApp() {
                             right = topLeft.x + 140f,
                             bottom = topLeft.y + 116f,
                             paint = Paint().apply {
-                                shader = makeRawSkiaConicalGradientShader(
-                                    topLeft.x + 28f,
-                                    topLeft.y + 24f,
-                                    12f,
-                                    topLeft.x + 112f,
-                                    topLeft.y + 92f,
-                                    86f,
-                                    RawGradientColors,
-                                    RawGradientStops,
-                                ).asComposeShader()
+                                shader = RadialGradientShader(
+                                    center = topLeft + Offset(70f, 58f),
+                                    radius = 86f,
+                                    colors = RawGradientComposeColors,
+                                    colorStops = RawGradientStops.toList(),
+                                    tileMode = TileMode.Clamp,
+                                )
                             },
                         )
                     }
@@ -1517,35 +1516,19 @@ private fun MagicJewelApp() {
                     }
                 }
                 if (composePictureShaderEnabled) {
-                    val topLeft = Offset(size.width - 448f, size.height - 616f)
-                    val picture = org.jetbrains.skia.PictureRecorder().let { recorder ->
-                        val pictureCanvas = recorder.beginRecording(org.jetbrains.skia.Rect(0f, 0f, 48f, 48f))
-                        pictureCanvas.drawRect(
-                            org.jetbrains.skia.Rect(0f, 0f, 48f, 48f),
-                            org.jetbrains.skia.Paint().apply { color = Color(0xFF0F172A).toArgb() },
-                        )
-                        pictureCanvas.drawCircle(
-                            24f,
-                            24f,
-                            16f,
-                            org.jetbrains.skia.Paint().apply { color = Color(0xFF38BDF8).toArgb() },
-                        )
-                        recorder.finishRecordingAsPicture()
-                    }
-                    drawIntoCanvas { canvas ->
-                        canvas.drawRect(
-                            left = topLeft.x,
-                            top = topLeft.y,
-                            right = topLeft.x + 140f,
-                            bottom = topLeft.y + 116f,
-                            paint = Paint().apply {
-                                shader = picture.makeShader(
-                                    org.jetbrains.skia.FilterTileMode.REPEAT,
-                                    org.jetbrains.skia.FilterTileMode.REPEAT,
-                                    org.jetbrains.skia.FilterMode.NEAREST,
-                                ).asComposeShader()
-                            },
-                        )
+                    imageProbe?.let { image ->
+                        val topLeft = Offset(size.width - 448f, size.height - 616f)
+                        drawIntoCanvas { canvas ->
+                            canvas.drawRect(
+                                left = topLeft.x,
+                                top = topLeft.y,
+                                right = topLeft.x + 140f,
+                                bottom = topLeft.y + 116f,
+                                paint = Paint().apply {
+                                    shader = ImageShader(image, TileMode.Repeated, TileMode.Repeated)
+                                },
+                            )
+                        }
                     }
                 }
                 if (composeTransformedShaderEnabled) {
@@ -2800,10 +2783,7 @@ private fun MagicJewelApp() {
                             blendMode = BlendMode.SrcOver,
                             paint = Paint().apply {
                                 if (composeVerticesRawColorFilterEnabled) {
-                                    colorFilter = org.jetbrains.skia.ColorFilter.makeBlend(
-                                        org.jetbrains.skia.Color.makeARGB(255, 34, 211, 238),
-                                        org.jetbrains.skia.BlendMode.SRC_IN,
-                                    ).asComposeColorFilter()
+                                    color = Color(0xFF22D3EE)
                                 }
                             },
                         )
