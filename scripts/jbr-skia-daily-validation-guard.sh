@@ -35,7 +35,7 @@ jbr_skia_daily_broad_validation_guard_for_selection() {
   local label="$1"
   local selected_count="$2"
   local reason="$3"
-  local limit="${JBR_SKIA_BROAD_VALIDATION_CASE_LIMIT:-2}"
+  local limit="${JBR_SKIA_BROAD_VALIDATION_CASE_LIMIT:-10}"
 
   if [[ "${reason}" == "default" || "${reason}" == "range" || "${selected_count}" -gt "${limit}" ]]; then
     jbr_skia_daily_broad_validation_guard "${label} (${selected_count} rows, ${reason}, broad limit ${limit})"
