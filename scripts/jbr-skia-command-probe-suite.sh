@@ -2308,9 +2308,7 @@ run_named_case() {
       ;;
     commands-raw-runtime-effect-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_RUNTIME_EFFECT_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        MAGIC_JEWEL_COMPOSE_RAW_RUNTIME_EFFECT_SHADER=true
       ;;
     commands-runtime-effect-shader-color-filter)
       run_case "$1" \
@@ -3150,9 +3148,7 @@ run_named_case() {
       ;;
     commands-raw-runtime-effect-color-filter-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_RUNTIME_EFFECT_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilter
+        MAGIC_JEWEL_COMPOSE_RAW_RUNTIME_EFFECT_COLOR_FILTER=true
       ;;
     commands-runtime-effect-color-filter-child)
       run_case "$1" \
@@ -4926,9 +4922,7 @@ run_named_case() {
       ;;
     commands-raw-blend-color-filter-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_BLEND_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilter
+        MAGIC_JEWEL_COMPOSE_RAW_BLEND_COLOR_FILTER=true
       ;;
     commands-raw-table-color-filter-fallback)
       run_case "$1" \

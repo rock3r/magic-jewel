@@ -1701,14 +1701,14 @@ private fun MagicJewelApp() {
                 }
                 if (composeRawRuntimeEffectShaderEnabled) {
                     val topLeft = Offset(size.width - 740f, size.height - 104f)
-                    val shader = org.jetbrains.skia.RuntimeEffect.makeForShader(
-                        """
+                    val shader = RuntimeEffectShader(
+                        sksl = """
                             half4 main(float2 p) {
                                 float stripe = step(0.5, fract((p.x * 0.06) + (p.y * 0.03)));
                                 return half4(mix(half3(0.94, 0.38, 0.18), half3(0.18, 0.82, 0.74), stripe), 1.0);
                             }
                         """.trimIndent(),
-                    ).makeShader(null, null, null).asComposeShader()
+                    )
                     drawRect(
                         brush = ShaderBrush(shader),
                         topLeft = topLeft,
@@ -2053,20 +2053,13 @@ private fun MagicJewelApp() {
                     }
                 }
                 if (composeRawRuntimeEffectColorFilterEnabled) {
-                    val colorFilter = org.jetbrains.skia.RuntimeEffect.makeForColorFilter(
-                        """
+                    val colorFilter = RuntimeEffectColorFilter(
+                        sksl = """
                             half4 main(half4 color) {
                                 return half4(color.b, color.r * 0.72, color.g, color.a);
                             }
                         """.trimIndent(),
-                    ).let { effect ->
-                        val method = effect.javaClass.getMethod(
-                            "makeColorFilter",
-                            org.jetbrains.skia.Data::class.java,
-                            Array<org.jetbrains.skia.ColorFilter?>::class.java,
-                        )
-                        method.invoke(effect, null, null) as org.jetbrains.skia.ColorFilter
-                    }.asComposeColorFilter()
+                    )
                     drawIntoCanvas { canvas ->
                         canvas.drawRect(
                             left = size.width - 556f,
@@ -2081,10 +2074,7 @@ private fun MagicJewelApp() {
                     }
                 }
                 if (composeRawBlendColorFilterEnabled) {
-                    val colorFilter = org.jetbrains.skia.ColorFilter.makeBlend(
-                        Color(0xFF22D3EE).toArgb(),
-                        org.jetbrains.skia.BlendMode.SRC_IN,
-                    ).asComposeColorFilter()
+                    val colorFilter = ColorFilter.tint(Color(0xFF22D3EE), BlendMode.SrcIn)
                     drawIntoCanvas { canvas ->
                         canvas.drawRect(
                             left = size.width - 692f,
