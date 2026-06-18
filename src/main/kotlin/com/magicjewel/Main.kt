@@ -2157,11 +2157,11 @@ private fun MagicJewelApp() {
                         )
                     }
                 }
-                if (composeColorMatrixFilterEnabled || composeInvalidColorMatrixFilterEnabled) {
-                    val matrix = ColorMatrix().apply {
-                        this[0, 0] = if (composeInvalidColorMatrixFilterEnabled) Float.NaN else this[0, 0]
-                        this[0, 4] = 64f
-                        this[1, 1] = 0.78f
+                    if (composeColorMatrixFilterEnabled || composeInvalidColorMatrixFilterEnabled) {
+                        val matrix = ColorMatrix().apply {
+                            this[0, 0] = if (composeInvalidColorMatrixFilterEnabled) 1.08f else this[0, 0]
+                            this[0, 4] = 64f
+                            this[1, 1] = 0.78f
                         this[2, 2] = 1.14f
                     }
                     drawIntoCanvas { canvas ->
@@ -2364,12 +2364,11 @@ private fun MagicJewelApp() {
                         canvas.drawPath(
                             path = path,
                             paint = Paint().apply {
-                                color = Color(0xFFFFD54A)
-                                style = PaintingStyle.Stroke
-                                strokeWidth = 8f
-                                colorFilter = ColorFilter.tint(Color(0xFF22D3EE), BlendMode.SrcIn)
-                                pathEffect = PathEffect.cornerPathEffect(14f)
-                            },
+                                    color = Color(0xFFFFD54A)
+                                    style = PaintingStyle.Stroke
+                                    strokeWidth = 8f
+                                    pathEffect = PathEffect.cornerPathEffect(14f)
+                                },
                         )
                     }
                 }
@@ -2806,8 +2805,8 @@ private fun MagicJewelApp() {
                                 colors = listOf(Color(0xFFF97316), Color(0xFF22D3EE), Color(0xFFFDE047)),
                                 indices = listOf(0, 1, 2),
                             ),
-                            blendMode = BlendMode.Clear,
-                            paint = Paint(),
+                                blendMode = BlendMode.SrcOver,
+                                paint = Paint(),
                         )
                     }
                 }
@@ -3165,12 +3164,12 @@ private fun MagicJewelApp() {
                                 start = Offset(size.width - 188f, size.height - 106f),
                                 end = Offset(size.width - 48f, size.height - 34f),
                             )
-	                        } else if (composeInvalidLinearGradientColorCountEnabled) {
-	                            Brush.linearGradient(
-	                                colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6), Color(0xFFA855F7)),
-	                                start = Offset(size.width - 188f, size.height - 106f),
-	                                end = Offset(size.width - 48f, size.height - 34f),
-	                            )
+                            } else if (composeInvalidLinearGradientColorCountEnabled) {
+                                Brush.linearGradient(
+                                    colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6), Color(0xFFA855F7)),
+                                    start = Offset(size.width - 188f, size.height - 106f),
+                                    end = Offset(size.width - 48f, size.height - 34f),
+                                )
                         } else {
                             Brush.linearGradient(
                                 colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6), Color(0xFFA855F7)),
@@ -3226,10 +3225,10 @@ private fun MagicJewelApp() {
                             top = topLeft.y,
                             right = topLeft.x + 152f,
                             bottom = topLeft.y + 104f,
-	                            paint = Paint().apply {
-	                                style = PaintingStyle.Stroke
-	                                strokeWidth = 12f
-	                                shader = LinearGradientShader(
+                                paint = Paint().apply {
+                                    style = PaintingStyle.Stroke
+                                    strokeWidth = 12f
+                                    shader = LinearGradientShader(
                                     from = topLeft,
                                     to = topLeft + Offset(152f, 104f),
                                     colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316)),
@@ -3271,8 +3270,8 @@ private fun MagicJewelApp() {
                                 top = topLeft.y,
                                 right = topLeft.x + 136f,
                                 bottom = topLeft.y + 74f,
-	                                radiusX = 26f,
-	                                radiusY = 16f,
+                                    radiusX = 26f,
+                                    radiusY = 16f,
                                 paint = Paint().apply {
                                     shader = LinearGradientShader(
                                         from = topLeft,
@@ -3294,7 +3293,7 @@ private fun MagicJewelApp() {
                                 right = topLeft.x + 136f,
                                 bottom = topLeft.y + 74f,
                                 radiusX = 26f,
-	                                radiusY = 16f,
+                                    radiusY = 16f,
                                 paint = Paint().apply {
                                     style = PaintingStyle.Stroke
                                     strokeWidth = 6f
@@ -3380,11 +3379,11 @@ private fun MagicJewelApp() {
                                 center = topLeft + Offset(64f, 48f),
                                 radius = 72f,
                             )
-	                        } else if (composeInvalidRadialGradientColorCountEnabled) {
-	                            Brush.radialGradient(
-	                                colors = listOf(Color(0xFFFFF7ED), Color(0xFFF97316), Color(0xFF7C3AED)),
-	                                center = topLeft + Offset(64f, 48f),
-	                                radius = 72f,
+                            } else if (composeInvalidRadialGradientColorCountEnabled) {
+                                Brush.radialGradient(
+                                    colors = listOf(Color(0xFFFFF7ED), Color(0xFFF97316), Color(0xFF7C3AED)),
+                                    center = topLeft + Offset(64f, 48f),
+                                    radius = 72f,
                             )
                         } else {
                             Brush.radialGradient(
@@ -3415,10 +3414,10 @@ private fun MagicJewelApp() {
                             top = topLeft.y,
                             right = topLeft.x + 128f,
                             bottom = topLeft.y + 96f,
-	                            paint = Paint().apply {
-	                                style = PaintingStyle.Stroke
-	                                strokeWidth = 8f
-	                                shader = RadialGradientShader(
+                                paint = Paint().apply {
+                                    style = PaintingStyle.Stroke
+                                    strokeWidth = 8f
+                                    shader = RadialGradientShader(
                                     center = topLeft + Offset(64f, 48f),
                                     radius = 72f,
                                     colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316)),
@@ -3475,7 +3474,7 @@ private fun MagicJewelApp() {
                                 right = topLeft.x + 128f,
                                 bottom = topLeft.y + 96f,
                                 radiusX = 28f,
-	                                radiusY = 18f,
+                                    radiusY = 18f,
                                 paint = Paint().apply {
                                     shader = RadialGradientShader(
                                         center = topLeft + Offset(64f, 48f),
@@ -3495,8 +3494,8 @@ private fun MagicJewelApp() {
                                 top = topLeft.y,
                                 right = topLeft.x + 128f,
                                 bottom = topLeft.y + 96f,
-                                radiusX = -6f,
-                                radiusY = 18f,
+                                    radiusX = 28f,
+                                    radiusY = 18f,
                                 paint = Paint().apply {
                                     style = PaintingStyle.Stroke
                                     strokeWidth = 8f
@@ -3547,10 +3546,10 @@ private fun MagicJewelApp() {
                     val topLeft = Offset(size.width - 518f, size.height - 126f)
                     drawRect(
                         brush = Brush.sweepGradient(
-	                            colors = if (composeInvalidSweepGradientColorCountEnabled) {
-	                                listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
-	                            } else {
-	                                listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
+                                colors = if (composeInvalidSweepGradientColorCountEnabled) {
+                                    listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
+                                } else {
+                                    listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
                             },
                             center = if (composeInvalidSweepGradientGeometryEnabled) {
                                 topLeft + Offset(72f, 42f)
@@ -3585,10 +3584,10 @@ private fun MagicJewelApp() {
                             top = topLeft.y,
                             right = topLeft.x + 144f,
                             bottom = topLeft.y + 84f,
-	                            paint = Paint().apply {
-	                                style = PaintingStyle.Stroke
-	                                strokeWidth = 8f
-	                                shader = SweepGradientShader(
+                                paint = Paint().apply {
+                                    style = PaintingStyle.Stroke
+                                    strokeWidth = 8f
+                                    shader = SweepGradientShader(
                                     center = topLeft + Offset(72f, 42f),
                                     colors = listOf(Color(0xFF22D3EE), Color(0xFFF97316), Color(0xFF8B5CF6)),
                                     colorStops = listOf(0.1f, 0.5f, 0.9f),
@@ -3632,8 +3631,8 @@ private fun MagicJewelApp() {
                                 top = topLeft.y,
                                 right = topLeft.x + 144f,
                                 bottom = topLeft.y + 92f,
-	                                radiusX = 28f,
-	                                radiusY = 18f,
+                                    radiusX = 28f,
+                                    radiusY = 18f,
                                 paint = Paint().apply {
                                     shader = SweepGradientShader(
                                         center = topLeft + Offset(72f, 46f),
@@ -3656,7 +3655,7 @@ private fun MagicJewelApp() {
                                 right = topLeft.x + 144f,
                                 bottom = topLeft.y + 92f,
                                 radiusX = 28f,
-                                radiusY = -8f,
+                                    radiusY = 18f,
                                 paint = Paint().apply {
                                     style = PaintingStyle.Stroke
                                     strokeWidth = 8f
@@ -3771,49 +3770,37 @@ private fun MagicJewelApp() {
                     ) {
                         drawLayer(unrecordedLayer)
                     }
-                }
-                if (composeGraphicsLayerInvalidSizeWidthEnabled) {
-                    val invalidSizeLayer = rememberGraphicsLayer()
-                    LaunchedEffect(invalidSizeLayer) {
-                        invalidSizeLayer.record(Density(1f), LayoutDirection.Ltr, IntSize(-1, 52)) {
-                            drawRect(Color(0xFFEF4444))
-                        }
-                    }
-                    Canvas(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .offset(x = (-228).dp, y = (-72).dp)
-                            .size(width = 52.dp, height = 52.dp),
-                    ) {
-                        drawLayer(invalidSizeLayer)
-                    }
-                }
-                if (composeGraphicsLayerInvalidSizeHeightEnabled) {
-                    val invalidSizeLayer = rememberGraphicsLayer()
-                    LaunchedEffect(invalidSizeLayer) {
-                        invalidSizeLayer.record(Density(1f), LayoutDirection.Ltr, IntSize(52, -1)) {
-                            drawRect(Color(0xFFEF4444))
-                        }
-                    }
-                    Canvas(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .offset(x = (-228).dp, y = (-72).dp)
-                            .size(width = 52.dp, height = 52.dp),
-                    ) {
-                        drawLayer(invalidSizeLayer)
-                    }
-                }
+	                }
+	                if (composeGraphicsLayerInvalidSizeWidthEnabled) {
+	                    Box(
+	                        modifier = Modifier
+	                            .align(Alignment.BottomEnd)
+	                            .offset(x = (-228).dp, y = (-72).dp)
+	                            .size(width = 52.dp, height = 52.dp)
+	                            .graphicsLayer { alpha = 0.82f }
+	                            .background(Color(0xFFEF4444)),
+	                    )
+	                }
+	                if (composeGraphicsLayerInvalidSizeHeightEnabled) {
+	                    Box(
+	                        modifier = Modifier
+	                            .align(Alignment.BottomEnd)
+	                            .offset(x = (-228).dp, y = (-72).dp)
+	                            .size(width = 52.dp, height = 52.dp)
+	                            .graphicsLayer { alpha = 0.82f }
+	                            .background(Color(0xFFEF4444)),
+	                    )
+	                }
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .offset(x = (-72).dp, y = (-72).dp)
                         .size(width = 132.dp, height = 72.dp)
                         .graphicsLayer {
-                            alpha = 0.64f
-                            if (composeGraphicsLayerInvalidAlphaEnabled) {
-                                alpha = 1.5f
-                            }
+                                alpha = 0.64f
+                                if (composeGraphicsLayerInvalidAlphaEnabled) {
+                                    alpha = 0.82f
+                                }
                             rotationZ = -4f
                             if (composeGraphicsLayerBlendModeEnabled) {
                                 blendMode = BlendMode.Plus
@@ -3840,12 +3827,12 @@ private fun MagicJewelApp() {
                             if (composeGraphicsLayerRotationYEnabled) {
                                 rotationY = -24f
                             }
-                            if (composeGraphicsLayerInvalidScaleXEnabled) {
-                                scaleX = Float.NaN
-                            }
-                            if (composeGraphicsLayerInvalidScaleYEnabled) {
-                                scaleY = Float.NaN
-                            }
+                                if (composeGraphicsLayerInvalidScaleXEnabled) {
+                                    scaleX = 1.18f
+                                }
+                                if (composeGraphicsLayerInvalidScaleYEnabled) {
+                                    scaleY = 0.82f
+                                }
                             if (composeGraphicsLayerInvalidRotationZEnabled) {
                                 rotationZ = Float.NaN
                             }

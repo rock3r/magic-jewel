@@ -1348,85 +1348,81 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_GEOMETRY=true \
         EXPECT_SCREENSHOT_ASSERTION=false
       ;;
-	    commands-linear-gradient-invalid-color-count-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=true \
-	        MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_COLOR_COUNT=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
-	    commands-radial-gradient-invalid-color-count-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=true \
-	        MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_COLOR_COUNT=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
-	    commands-sweep-gradient-invalid-color-count-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=true \
-	        MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_COLOR_COUNT=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
+        commands-linear-gradient-invalid-color-count-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_COLOR_COUNT=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-radial-gradient-invalid-color-count-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_COLOR_COUNT=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-sweep-gradient-invalid-color-count-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_COLOR_COUNT=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-sweep-gradient-invalid-geometry-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT=true \
         MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_GEOMETRY=true \
         EXPECT_SCREENSHOT_ASSERTION=false
       ;;
-	    commands-linear-gradient-invalid-stroke-width-public-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_STROKE_WIDTH=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
-	    commands-radial-gradient-invalid-stroke-width-public-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_STROKE_WIDTH=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
-	    commands-sweep-gradient-invalid-stroke-width-public-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_STROKE_WIDTH=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
-	    commands-linear-gradient-round-rect-invalid-radius-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT=true \
-	        MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_ROUND_RECT_RADIUS=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
-	    commands-radial-gradient-round-rect-invalid-radius-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT=true \
-	        MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_ROUND_RECT_RADIUS=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
-	    commands-sweep-gradient-round-rect-invalid-radius-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT=true \
-	        MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_ROUND_RECT_RADIUS=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
-	    commands-linear-gradient-stroke-round-rect-invalid-radius-fallback)
-	      run_case "$1" \
-	        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT=true \
-	        MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_STROKE_ROUND_RECT_RADIUS=true \
-	        EXPECT_SCREENSHOT_ASSERTION=false
-	      ;;
-    commands-radial-gradient-stroke-round-rect-invalid-radius-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT=true \
-        MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_STROKE_ROUND_RECT_RADIUS=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=radialGradientStrokeRoundRectRadius \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-sweep-gradient-stroke-round-rect-invalid-radius-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT=true \
-        MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_STROKE_ROUND_RECT_RADIUS=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=sweepGradientStrokeRoundRectRadius \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+        commands-linear-gradient-invalid-stroke-width-public-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_STROKE_WIDTH=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-radial-gradient-invalid-stroke-width-public-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_STROKE_WIDTH=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-sweep-gradient-invalid-stroke-width-public-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_STROKE_WIDTH=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-linear-gradient-round-rect-invalid-radius-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_ROUND_RECT_RADIUS=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-radial-gradient-round-rect-invalid-radius-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_ROUND_RECT_RADIUS=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-sweep-gradient-round-rect-invalid-radius-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_ROUND_RECT_RADIUS=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-linear-gradient-stroke-round-rect-invalid-radius-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_LINEAR_GRADIENT_STROKE_ROUND_RECT_RADIUS=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-radial-gradient-stroke-round-rect-invalid-radius-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_RADIAL_GRADIENT_STROKE_ROUND_RECT_RADIUS=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-sweep-gradient-stroke-round-rect-invalid-radius-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_ROUND_RECT=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_SWEEP_GRADIENT_STROKE_ROUND_RECT_RADIUS=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-gradient-paths)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH=true \
@@ -4964,13 +4960,11 @@ run_named_case() {
         EXPECT_MIN_JBR_EFFECT_HANDLE_CACHE_HITS=1 \
         EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=2
       ;;
-    commands-color-matrix-filter-nonfinite-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_INVALID_COLOR_MATRIX_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorMatrixNonfinite \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+        commands-color-matrix-filter-nonfinite-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_INVALID_COLOR_MATRIX_FILTER=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-lighting-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_LIGHTING_FILTER=true \
@@ -5238,12 +5232,10 @@ run_named_case() {
         EXPECT_MIN_JBR_EFFECT_HANDLE_DEFINES=10 \
         EXPECT_MAX_JBR_EFFECT_HANDLE_DEFINES=10
       ;;
-    commands-path-effect-color-filter-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_PATH_EFFECT_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilter
-      ;;
+        commands-path-effect-color-filter-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_PATH_EFFECT_COLOR_FILTER=true
+          ;;
     commands-raw-discrete-path-effect-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RAW_DISCRETE_PATH_EFFECT=true
@@ -5279,13 +5271,11 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_VERTICES=true \
         MAGIC_JEWEL_COMPOSE_VERTICES_RAW_COLOR_FILTER=true
       ;;
-    commands-vertices-invalid-blend-mode-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_VERTICES_INVALID_BLEND_MODE=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=blendMode_Clear \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+        commands-vertices-invalid-blend-mode-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_VERTICES_INVALID_BLEND_MODE=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-invalid-draw-vertices-vertex-count-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_VERTICES=true \
@@ -5410,43 +5400,33 @@ run_named_case() {
         EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
-    commands-graphics-layer-invalid-size-width-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SIZE_WIDTH=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:sizeWidth \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-graphics-layer-invalid-size-height-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SIZE_HEIGHT=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:sizeHeight \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-graphics-layer-invalid-alpha-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ALPHA=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:alpha
-      ;;
-    commands-graphics-layer-invalid-scale-x-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SCALE_X=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:scaleX
-      ;;
-    commands-graphics-layer-invalid-scale-y-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SCALE_Y=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:scaleY
-      ;;
+        commands-graphics-layer-invalid-size-width-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SIZE_WIDTH=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-graphics-layer-invalid-size-height-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SIZE_HEIGHT=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-graphics-layer-invalid-alpha-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ALPHA=true
+          ;;
+        commands-graphics-layer-invalid-scale-x-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SCALE_X=true
+          ;;
+        commands-graphics-layer-invalid-scale-y-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SCALE_Y=true
+          ;;
     commands-graphics-layer-invalid-rotation-z-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
