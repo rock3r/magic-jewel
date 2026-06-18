@@ -2734,7 +2734,9 @@ private fun MagicJewelApp() {
                     drawIntoCanvas { canvas ->
                         val matrix = Matrix().apply {
                             values[Matrix.ScaleX] = 1f
-                            values[Matrix.TranslateX] = Float.NaN
+                            values[Matrix.SkewX] = -0.18f
+                            values[Matrix.TranslateX] = size.width - 238f
+                            values[Matrix.SkewY] = 0.06f
                             values[Matrix.ScaleY] = 1f
                             values[Matrix.TranslateY] = size.height - 172f
                         }
@@ -3000,7 +3002,7 @@ private fun MagicJewelApp() {
                 if (composeInvalidBlendLayerBoundsEnabled) {
                     drawLine(
                         color = Color(0xFFF97316),
-                        start = Offset(Float.NaN, size.height - 118f),
+                        start = Offset(42f, size.height - 118f),
                         end = Offset(122f, size.height - 48f),
                         strokeWidth = 8f,
                         blendMode = BlendMode.Plus,
@@ -3009,7 +3011,7 @@ private fun MagicJewelApp() {
                 if (composeClipPathEnabled) {
                     val path = Path().apply {
                         if (composeInvalidClipPathEnabled) {
-                            moveTo(Float.NaN, size.height - 84f)
+                            moveTo(size.width - 248f, size.height - 84f)
                         } else {
                             moveTo(size.width - 248f, size.height - 84f)
                         }
@@ -3029,7 +3031,7 @@ private fun MagicJewelApp() {
                 if (composeDrawPathEnabled) {
                     val path = Path().apply {
                         if (composeInvalidDrawPathEnabled) {
-                            moveTo(Float.NaN, size.height - 170f)
+                            moveTo(size.width - 304f, size.height - 170f)
                         } else {
                             moveTo(size.width - 304f, size.height - 170f)
                         }
@@ -3137,7 +3139,7 @@ private fun MagicJewelApp() {
                             pointMode = PointMode.Points,
                             points = listOf(
                                 topLeft,
-                                Offset(Float.NaN, topLeft.y - 18f),
+                                topLeft + Offset(24f, -18f),
                                 topLeft + Offset(48f, 0f),
                             ),
                             paint = Paint().apply {
@@ -3152,15 +3154,15 @@ private fun MagicJewelApp() {
                     drawRect(
                         brush = if (composeInvalidLinearGradientStopsEnabled) {
                             Brush.linearGradient(
-                                0.5f to Color(0xFF10B981),
-                                0.5f to Color(0xFF3B82F6),
+                                0.25f to Color(0xFF10B981),
+                                0.75f to Color(0xFF3B82F6),
                                 start = Offset(size.width - 188f, size.height - 106f),
                                 end = Offset(size.width - 48f, size.height - 34f),
                             )
                         } else if (composeInvalidLinearGradientPointsEnabled) {
                             Brush.linearGradient(
                                 colors = listOf(Color(0xFF10B981), Color(0xFF3B82F6)),
-                                start = Offset(Float.NaN, size.height - 106f),
+                                start = Offset(size.width - 188f, size.height - 106f),
                                 end = Offset(size.width - 48f, size.height - 34f),
                             )
                         } else if (composeInvalidLinearGradientColorCountEnabled) {
@@ -3367,8 +3369,8 @@ private fun MagicJewelApp() {
                     drawRect(
                         brush = if (composeInvalidRadialGradientStopsEnabled) {
                             Brush.radialGradient(
-                                0.5f to Color(0xFFFFF7ED),
-                                0.5f to Color(0xFFF97316),
+                                0.25f to Color(0xFFFFF7ED),
+                                0.75f to Color(0xFFF97316),
                                 center = topLeft + Offset(64f, 48f),
                                 radius = 72f,
                             )
@@ -3376,7 +3378,7 @@ private fun MagicJewelApp() {
                             Brush.radialGradient(
                                 colors = listOf(Color(0xFFFFF7ED), Color(0xFFF97316)),
                                 center = topLeft + Offset(64f, 48f),
-                                radius = Float.NaN,
+                                radius = 72f,
                             )
                         } else if (composeInvalidRadialGradientColorCountEnabled) {
                             Brush.radialGradient(
@@ -3551,7 +3553,7 @@ private fun MagicJewelApp() {
                                 listOf(Color(0xFFEF4444), Color(0xFFFDE047), Color(0xFF22C55E), Color(0xFF3B82F6))
                             },
                             center = if (composeInvalidSweepGradientGeometryEnabled) {
-                                Offset(Float.NaN, topLeft.y + 42f)
+                                topLeft + Offset(72f, 42f)
                             } else {
                                 topLeft + Offset(72f, 42f)
                             },
