@@ -5291,9 +5291,7 @@ run_named_case() {
       ;;
     commands-raw-discrete-path-effect-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_DISCRETE_PATH_EFFECT=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=pathEffect
+        MAGIC_JEWEL_COMPOSE_RAW_DISCRETE_PATH_EFFECT=true
       ;;
     commands-vertices)
       run_case "$1" \

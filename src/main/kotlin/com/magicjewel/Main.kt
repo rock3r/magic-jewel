@@ -2385,11 +2385,7 @@ private fun MagicJewelApp() {
                     }
                 }
                 if (composeRawDiscretePathEffectEnabled) {
-                    val pathEffect = org.jetbrains.skia.PathEffect.makeDiscrete(
-                        segLength = 10f,
-                        dev = 4f,
-                        seed = 7,
-                    ).asComposePathEffect()
+                    val pathEffect = PathEffect.cornerPathEffect(14f)
                     val rawEffectPath = Path().apply {
                         moveTo(size.width - 738f, 326f)
                         cubicTo(size.width - 694f, 284f, size.width - 640f, 366f, size.width - 588f, 324f)
