@@ -4312,10 +4312,7 @@ run_named_case() {
       ;;
     commands-image-raw-table-color-filter-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_IMAGE_RAW_TABLE_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilter \
-        EXPECT_COMMAND_FALLBACK_MARKER=image=1
+        MAGIC_JEWEL_COMPOSE_IMAGE_RAW_TABLE_COLOR_FILTER=true
       ;;
     commands-gradient-stroke)
       run_case "$1" \
@@ -4926,9 +4923,7 @@ run_named_case() {
       ;;
     commands-raw-table-color-filter-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_TABLE_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilter
+        MAGIC_JEWEL_COMPOSE_RAW_TABLE_COLOR_FILTER=true
       ;;
     commands-color-filter-handle)
       run_case "$1" \
@@ -5792,17 +5787,12 @@ run_named_case() {
     commands-graphics-layer-raw-color-filter-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:colorFilter
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_COLOR_FILTER=true
       ;;
     commands-graphics-layer-raw-table-color-filter-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_TABLE_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:colorFilter \
-        EXPECT_SCREENSHOT_ASSERTION=false
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_TABLE_COLOR_FILTER=true
       ;;
     commands-graphics-layer-unsupported-child-fallback)
       run_case "$1" \
@@ -5856,9 +5846,7 @@ run_named_case() {
     commands-graphics-layer-raw-image-filter-effect-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_IMAGE_FILTER_EFFECT=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:renderEffect
+        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_IMAGE_FILTER_EFFECT=true
       ;;
     commands-graphics-layer-offset-effect)
       run_case "$1" \
@@ -7219,17 +7207,11 @@ run_named_case() {
       ;;
     commands-save-layer-raw-color-filter-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_SAVELAYER_RAW_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=saveLayer \
-        EXPECT_SCREENSHOT_ASSERTION=false
+        MAGIC_JEWEL_COMPOSE_SAVELAYER_RAW_COLOR_FILTER=true
       ;;
     commands-save-layer-raw-table-color-filter-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_SAVELAYER_RAW_TABLE_COLOR_FILTER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=saveLayer \
-        EXPECT_SCREENSHOT_ASSERTION=false
+        MAGIC_JEWEL_COMPOSE_SAVELAYER_RAW_TABLE_COLOR_FILTER=true
       ;;
     commands-opaque-shader-fallback)
       run_case "$1" \

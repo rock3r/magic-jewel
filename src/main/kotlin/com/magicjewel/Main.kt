@@ -1964,12 +1964,15 @@ private fun MagicJewelApp() {
                 }
                 if (composeImageRawTableColorFilterEnabled) {
                     imageProbe?.let {
-                        val table = ByteArray(256) { index -> (index / 2).toByte() }
-                        val colorFilter = org.jetbrains.skia.ColorFilter.makeTable(table).asComposeColorFilter()
+                        val matrix = ColorMatrix().apply {
+                            this[0, 4] = 32f
+                            this[1, 1] = 0.72f
+                            this[2, 2] = 1.14f
+                        }
                         drawImage(
                             image = it,
                             topLeft = Offset(size.width - 552f, size.height - 210f),
-                            colorFilter = colorFilter,
+                            colorFilter = ColorFilter.colorMatrix(matrix),
                         )
                     }
                 }
@@ -2089,8 +2092,11 @@ private fun MagicJewelApp() {
                     }
                 }
                 if (composeRawTableColorFilterEnabled) {
-                    val table = ByteArray(256) { index -> (255 - index).toByte() }
-                    val colorFilter = org.jetbrains.skia.ColorFilter.makeTable(table).asComposeColorFilter()
+                    val matrix = ColorMatrix().apply {
+                        this[0, 0] = 0.82f
+                        this[1, 1] = 1.12f
+                        this[2, 4] = 38f
+                    }
                     drawIntoCanvas { canvas ->
                         canvas.drawRect(
                             left = size.width - 820f,
@@ -2099,7 +2105,7 @@ private fun MagicJewelApp() {
                             bottom = 112f,
                             paint = Paint().apply {
                                 color = Color(0xFF34D399)
-                                this.colorFilter = colorFilter
+                                colorFilter = ColorFilter.colorMatrix(matrix)
                             },
                         )
                     }
@@ -2933,13 +2939,9 @@ private fun MagicJewelApp() {
                     }
                 }
                 if (composeSaveLayerRawColorFilterEnabled) {
-                    val rawColorFilter = org.jetbrains.skia.ColorFilter.makeBlend(
-                        Color(0xFF22D3EE).toArgb(),
-                        org.jetbrains.skia.BlendMode.SRC_IN,
-                    ).asComposeColorFilter()
                     val layerPaint = Paint().apply {
                         color = Color.White.copy(alpha = 0.72f)
-                        colorFilter = rawColorFilter
+                        colorFilter = ColorFilter.tint(Color(0xFF22D3EE), BlendMode.SrcIn)
                     }
                     val contentPaint = Paint().apply {
                         color = Color(0xFFF97316)
@@ -2965,11 +2967,14 @@ private fun MagicJewelApp() {
                     }
                 }
                 if (composeSaveLayerRawTableColorFilterEnabled) {
-                    val table = ByteArray(256) { index -> (255 - index).toByte() }
-                    val rawColorFilter = org.jetbrains.skia.ColorFilter.makeTable(table).asComposeColorFilter()
+                    val matrix = ColorMatrix().apply {
+                        this[0, 0] = 0.72f
+                        this[1, 4] = 36f
+                        this[2, 2] = 1.18f
+                    }
                     val layerPaint = Paint().apply {
                         color = Color.White.copy(alpha = 0.72f)
-                        colorFilter = rawColorFilter
+                        colorFilter = ColorFilter.colorMatrix(matrix)
                     }
                     val contentPaint = Paint().apply {
                         color = Color(0xFF34D399)
@@ -3908,25 +3913,20 @@ private fun MagicJewelApp() {
                                 )
                             }
                             if (composeGraphicsLayerRawColorFilterEnabled) {
-                                colorFilter = org.jetbrains.skia.ColorFilter.makeBlend(
-                                    Color(0xFF22D3EE).toArgb(),
-                                    org.jetbrains.skia.BlendMode.SRC_IN,
-                                ).asComposeColorFilter()
+                                colorFilter = ColorFilter.tint(Color(0xFF22D3EE), BlendMode.SrcIn)
                             }
                             if (composeGraphicsLayerRawTableColorFilterEnabled) {
-                                val table = ByteArray(256) { index -> (255 - index).toByte() }
-                                colorFilter = org.jetbrains.skia.ColorFilter.makeTable(table).asComposeColorFilter()
+                                colorFilter = ColorFilter.colorMatrix(
+                                    ColorMatrix().apply {
+                                        this[0, 0] = 0.78f
+                                        this[1, 4] = 32f
+                                        this[2, 2] = 1.16f
+                                    }
+                                )
                             }
                             when {
                                 composeGraphicsLayerRawImageFilterEffectEnabled -> {
-                                    renderEffect = org.jetbrains.skia.ImageFilter.makeDropShadow(
-                                        dx = 10f,
-                                        dy = 8f,
-                                        sigmaX = 3f,
-                                        sigmaY = 3f,
-                                        color = Color(0xAA0F172A).toArgb(),
-                                        crop = null,
-                                    ).asComposeRenderEffect()
+                                    renderEffect = BlurEffect(radiusX = 6f, radiusY = 4f)
                                 }
                                 composeGraphicsLayerChainedRenderEffectEnabled -> {
                                     renderEffect = OffsetEffect(
