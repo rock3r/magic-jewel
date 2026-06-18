@@ -1027,6 +1027,7 @@ private fun MagicJewelApp() {
         composeImageShaderEnabled,
         composeImageShaderBlendModeEnabled,
         composeInvalidImageShaderImageEnabled,
+        composeRawImageShaderEnabled,
         composeImageShaderColorFilterEnabled,
         composeImageFilterEnabled,
         composeImageColorMatrixFilterEnabled,
@@ -1038,6 +1039,7 @@ private fun MagicJewelApp() {
             composeImageShaderEnabled ||
             composeImageShaderBlendModeEnabled ||
             composeInvalidImageShaderImageEnabled ||
+            composeRawImageShaderEnabled ||
             composeDescriptorStrokeShaderEnabled ||
             composeImageShaderColorFilterEnabled ||
             composeImageFilterEnabled ||
@@ -1049,8 +1051,8 @@ private fun MagicJewelApp() {
             null
         }
     }
-    val rawImageShader = remember(composeRawImageShaderEnabled, composeGraphicsLayerChildUnsupportedEnabled) {
-        if (composeRawImageShaderEnabled || composeGraphicsLayerChildUnsupportedEnabled) {
+    val rawImageShader = remember(composeGraphicsLayerChildUnsupportedEnabled) {
+        if (composeGraphicsLayerChildUnsupportedEnabled) {
             createRawSkiaImageShader().asComposeShader()
         } else {
             null
@@ -1218,7 +1220,7 @@ private fun MagicJewelApp() {
                     }
                 }
                 if (composeRawImageShaderEnabled) {
-                    rawImageShader?.let { shader ->
+                    imageProbe?.let { image ->
                         val topLeft = Offset(size.width - 300f, size.height - 488f)
                         drawIntoCanvas { canvas ->
                             canvas.drawRect(
@@ -1227,7 +1229,7 @@ private fun MagicJewelApp() {
                                 right = topLeft.x + 140f,
                                 bottom = topLeft.y + 116f,
                                 paint = Paint().apply {
-                                    this.shader = shader
+                                    shader = ImageShader(image, TileMode.Repeated, TileMode.Mirror)
                                 },
                             )
                         }
@@ -1404,14 +1406,13 @@ private fun MagicJewelApp() {
                             right = topLeft.x + 140f,
                             bottom = topLeft.y + 116f,
                             paint = Paint().apply {
-                                shader = makeRawSkiaLinearGradientShader(
-                                    topLeft.x,
-                                    topLeft.y,
-                                    topLeft.x + 140f,
-                                    topLeft.y + 116f,
-                                    RawGradientColors,
-                                    RawGradientStops,
-                                ).asComposeShader()
+                                shader = LinearGradientShader(
+                                    from = topLeft,
+                                    to = topLeft + Offset(140f, 116f),
+                                    colors = RawGradientComposeColors,
+                                    colorStops = RawGradientStops.toList(),
+                                    tileMode = TileMode.Clamp,
+                                )
                             },
                         )
                     }
@@ -1425,13 +1426,13 @@ private fun MagicJewelApp() {
                             right = topLeft.x + 140f,
                             bottom = topLeft.y + 116f,
                             paint = Paint().apply {
-                                shader = makeRawSkiaRadialGradientShader(
-                                    topLeft.x + 70f,
-                                    topLeft.y + 58f,
-                                    76f,
-                                    RawGradientColors,
-                                    RawGradientStops,
-                                ).asComposeShader()
+                                shader = RadialGradientShader(
+                                    center = topLeft + Offset(70f, 58f),
+                                    radius = 76f,
+                                    colors = RawGradientComposeColors,
+                                    colorStops = RawGradientStops.toList(),
+                                    tileMode = TileMode.Clamp,
+                                )
                             },
                         )
                     }
@@ -1445,12 +1446,11 @@ private fun MagicJewelApp() {
                             right = topLeft.x + 140f,
                             bottom = topLeft.y + 116f,
                             paint = Paint().apply {
-                                shader = makeRawSkiaSweepGradientShader(
-                                    topLeft.x + 70f,
-                                    topLeft.y + 58f,
-                                    RawGradientColors,
-                                    RawGradientStops,
-                                ).asComposeShader()
+                                shader = SweepGradientShader(
+                                    center = topLeft + Offset(70f, 58f),
+                                    colors = RawGradientComposeColors,
+                                    colorStops = RawGradientStops.toList(),
+                                )
                             },
                         )
                     }
@@ -1487,13 +1487,12 @@ private fun MagicJewelApp() {
                             right = topLeft.x + 140f,
                             bottom = topLeft.y + 116f,
                             paint = Paint().apply {
-                                shader = org.jetbrains.skia.Shader.makeFractalNoise(
-                                    0.04f,
-                                    0.06f,
-                                    4,
-                                    3.5f,
-                                    org.jetbrains.skia.ISize.make(0, 0),
-                                ).asComposeShader()
+                                shader = FractalNoiseShader(
+                                    baseFrequencyX = 0.04f,
+                                    baseFrequencyY = 0.06f,
+                                    numOctaves = 4,
+                                    seed = 3.5f,
+                                )
                             },
                         )
                     }
@@ -1507,13 +1506,12 @@ private fun MagicJewelApp() {
                             right = topLeft.x + 140f,
                             bottom = topLeft.y + 116f,
                             paint = Paint().apply {
-                                shader = org.jetbrains.skia.Shader.makeTurbulence(
-                                    0.035f,
-                                    0.055f,
-                                    3,
-                                    7.25f,
-                                    org.jetbrains.skia.ISize.make(0, 0),
-                                ).asComposeShader()
+                                shader = TurbulenceShader(
+                                    baseFrequencyX = 0.035f,
+                                    baseFrequencyY = 0.055f,
+                                    numOctaves = 3,
+                                    seed = 7.25f,
+                                )
                             },
                         )
                     }
@@ -4205,6 +4203,7 @@ private val RawGradientColors = intArrayOf(
     Color(0xFFFDBA2D).toArgb(),
     Color(0xFFEF1C24).toArgb(),
 )
+private val RawGradientComposeColors = RawGradientColors.map(::Color)
 private val RawGradientStops = floatArrayOf(0f, 0.5f, 1f)
 
 private fun makeRawSkiaLinearGradientShader(

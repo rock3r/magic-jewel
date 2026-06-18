@@ -7252,9 +7252,7 @@ run_named_case() {
       ;;
     commands-raw-image-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_IMAGE_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        MAGIC_JEWEL_COMPOSE_RAW_IMAGE_SHADER=true
       ;;
     commands-composite-opaque-shader-fallback)
       run_case "$1" \
@@ -7341,27 +7339,19 @@ run_named_case() {
       ;;
     commands-raw-noise-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_NOISE_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        MAGIC_JEWEL_COMPOSE_RAW_NOISE_SHADER=true
       ;;
     commands-raw-linear-gradient-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_LINEAR_GRADIENT_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        MAGIC_JEWEL_COMPOSE_RAW_LINEAR_GRADIENT_SHADER=true
       ;;
     commands-raw-radial-gradient-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_RADIAL_GRADIENT_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        MAGIC_JEWEL_COMPOSE_RAW_RADIAL_GRADIENT_SHADER=true
       ;;
     commands-raw-sweep-gradient-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_SWEEP_GRADIENT_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        MAGIC_JEWEL_COMPOSE_RAW_SWEEP_GRADIENT_SHADER=true
       ;;
     commands-raw-conical-gradient-shader-fallback)
       run_case "$1" \
@@ -7371,9 +7361,7 @@ run_named_case() {
       ;;
     commands-raw-turbulence-shader-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RAW_TURBULENCE_SHADER=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shader
+        MAGIC_JEWEL_COMPOSE_RAW_TURBULENCE_SHADER=true
       ;;
     commands-picture-shader-fallback)
       run_case "$1" \
