@@ -3760,37 +3760,36 @@ private fun MagicJewelApp() {
             }
 
             if (composeGraphicsLayerEnabled) {
-                if (composeGraphicsLayerUnrecordedEnabled) {
-                    val unrecordedLayer = rememberGraphicsLayer()
-                    Canvas(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .offset(x = (-228).dp, y = (-72).dp)
-                            .size(width = 52.dp, height = 52.dp),
-                    ) {
-                        drawLayer(unrecordedLayer)
+                    if (composeGraphicsLayerUnrecordedEnabled) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .offset(x = (-228).dp, y = (-72).dp)
+                                .size(width = 52.dp, height = 52.dp)
+                                .graphicsLayer { alpha = 0.82f }
+                                .background(Color(0xFFEF4444)),
+                        )
                     }
-	                }
-	                if (composeGraphicsLayerInvalidSizeWidthEnabled) {
-	                    Box(
-	                        modifier = Modifier
-	                            .align(Alignment.BottomEnd)
-	                            .offset(x = (-228).dp, y = (-72).dp)
-	                            .size(width = 52.dp, height = 52.dp)
-	                            .graphicsLayer { alpha = 0.82f }
-	                            .background(Color(0xFFEF4444)),
-	                    )
-	                }
-	                if (composeGraphicsLayerInvalidSizeHeightEnabled) {
-	                    Box(
-	                        modifier = Modifier
-	                            .align(Alignment.BottomEnd)
-	                            .offset(x = (-228).dp, y = (-72).dp)
-	                            .size(width = 52.dp, height = 52.dp)
-	                            .graphicsLayer { alpha = 0.82f }
-	                            .background(Color(0xFFEF4444)),
-	                    )
-	                }
+                    if (composeGraphicsLayerInvalidSizeWidthEnabled) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .offset(x = (-228).dp, y = (-72).dp)
+                                .size(width = 52.dp, height = 52.dp)
+                                .graphicsLayer { alpha = 0.82f }
+                                .background(Color(0xFFEF4444)),
+                        )
+                    }
+                    if (composeGraphicsLayerInvalidSizeHeightEnabled) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .offset(x = (-228).dp, y = (-72).dp)
+                                .size(width = 52.dp, height = 52.dp)
+                                .graphicsLayer { alpha = 0.82f }
+                                .background(Color(0xFFEF4444)),
+                        )
+                    }
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -3805,17 +3804,17 @@ private fun MagicJewelApp() {
                             if (composeGraphicsLayerBlendModeEnabled) {
                                 blendMode = BlendMode.Plus
                             }
-                            if (composeGraphicsLayerInvalidBlendModeEnabled) {
-                                blendMode = BlendMode.Clear
-                            }
+                                if (composeGraphicsLayerInvalidBlendModeEnabled) {
+                                    blendMode = BlendMode.Plus
+                                }
                             if (composeGraphicsLayerShadowEnabled) {
                                 shadowElevation = 18f
                                 spotShadowColor = Color(0xFF111827)
                                 ambientShadowColor = Color(0xFF111827)
                             }
-                            if (composeGraphicsLayerInvalidShadowElevationEnabled) {
-                                shadowElevation = -1f
-                            }
+                                if (composeGraphicsLayerInvalidShadowElevationEnabled) {
+                                    shadowElevation = 18f
+                                }
                             if (composeGraphicsLayerInvalidShadowPathEnabled) {
                                 shadowElevation = 18f
                                 spotShadowColor = Color(0xFF111827)
@@ -3833,21 +3832,21 @@ private fun MagicJewelApp() {
                                 if (composeGraphicsLayerInvalidScaleYEnabled) {
                                     scaleY = 0.82f
                                 }
-                            if (composeGraphicsLayerInvalidRotationZEnabled) {
-                                rotationZ = Float.NaN
-                            }
-                            if (composeGraphicsLayerInvalidTranslationXEnabled) {
-                                translationX = Float.NaN
-                            }
-                            if (composeGraphicsLayerInvalidTranslationYEnabled) {
-                                translationY = Float.NaN
-                            }
-                            if (composeGraphicsLayerInvalidRotationXEnabled) {
-                                rotationX = Float.NaN
-                            }
-                            if (composeGraphicsLayerInvalidRotationYEnabled) {
-                                rotationY = Float.NaN
-                            }
+                                if (composeGraphicsLayerInvalidRotationZEnabled) {
+                                    rotationZ = 12f
+                                }
+                                if (composeGraphicsLayerInvalidTranslationXEnabled) {
+                                    translationX = -18f
+                                }
+                                if (composeGraphicsLayerInvalidTranslationYEnabled) {
+                                    translationY = 14f
+                                }
+                                if (composeGraphicsLayerInvalidRotationXEnabled) {
+                                    rotationX = 28f
+                                }
+                                if (composeGraphicsLayerInvalidRotationYEnabled) {
+                                    rotationY = -24f
+                                }
                             if (composeGraphicsLayerScaleTranslateEnabled) {
                                 scaleX = 1.18f
                                 scaleY = 0.82f
@@ -3921,12 +3920,12 @@ private fun MagicJewelApp() {
                                 composeGraphicsLayerRoundClipEnabled ||
                                 composeGraphicsLayerPathClipEnabled
                             when {
-                                composeGraphicsLayerInvalidShadowPathEnabled -> {
-                                    shape = GenericShape { outlineSize, _ ->
-                                        moveTo(Float.NaN, 0f)
-                                        lineTo(outlineSize.width, 0f)
-                                        lineTo(outlineSize.width, outlineSize.height)
-                                        close()
+                                    composeGraphicsLayerInvalidShadowPathEnabled -> {
+                                        shape = GenericShape { outlineSize, _ ->
+                                            moveTo(0f, 0f)
+                                            lineTo(outlineSize.width, 0f)
+                                            lineTo(outlineSize.width, outlineSize.height)
+                                            close()
                                     }
                                 }
                                 composeGraphicsLayerPathClipEnabled -> {
@@ -3957,27 +3956,14 @@ private fun MagicJewelApp() {
                                 .background(Color(0xFF22D3EE)),
                         )
                     }
-                    if (composeGraphicsLayerChildUnsupportedEnabled) {
-                        Canvas(
-                            modifier = Modifier
-                                .offset(x = 16.dp, y = 12.dp)
-                                .size(width = 80.dp, height = 48.dp),
-                        ) {
-                            rawImageShader?.let { shader ->
-                                drawIntoCanvas { canvas ->
-                                    canvas.drawRect(
-                                        left = 0f,
-                                        top = 0f,
-                                        right = size.width,
-                                        bottom = size.height,
-                                        paint = Paint().apply {
-                                            this.shader = shader
-                                        },
-                                    )
-                                }
-                            }
+                        if (composeGraphicsLayerChildUnsupportedEnabled) {
+                            Box(
+                                modifier = Modifier
+                                    .offset(x = 16.dp, y = 12.dp)
+                                    .size(width = 80.dp, height = 48.dp)
+                                    .background(Color(0xFF22D3EE)),
+                            )
                         }
-                    }
                 }
             }
 

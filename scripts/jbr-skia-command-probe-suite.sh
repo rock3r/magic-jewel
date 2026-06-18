@@ -5427,41 +5427,31 @@ run_named_case() {
             MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
             MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SCALE_Y=true
           ;;
-    commands-graphics-layer-invalid-rotation-z-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ROTATION_Z=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:rotationZ
-      ;;
-    commands-graphics-layer-invalid-translation-x-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_TRANSLATION_X=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:translationX
-      ;;
-    commands-graphics-layer-invalid-translation-y-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_TRANSLATION_Y=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:translationY
-      ;;
-    commands-graphics-layer-invalid-rotation-x-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ROTATION_X=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:rotationX
-      ;;
-    commands-graphics-layer-invalid-rotation-y-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ROTATION_Y=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:rotationY
-      ;;
+        commands-graphics-layer-invalid-rotation-z-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ROTATION_Z=true
+          ;;
+        commands-graphics-layer-invalid-translation-x-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_TRANSLATION_X=true
+          ;;
+        commands-graphics-layer-invalid-translation-y-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_TRANSLATION_Y=true
+          ;;
+        commands-graphics-layer-invalid-rotation-x-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ROTATION_X=true
+          ;;
+        commands-graphics-layer-invalid-rotation-y-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_ROTATION_Y=true
+          ;;
     commands-graphics-layer-modulate-alpha)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
@@ -5636,22 +5626,18 @@ run_named_case() {
         EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
-    commands-graphics-layer-invalid-blend-mode-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_BLEND_MODE=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:blendMode \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-graphics-layer-unrecorded-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_UNRECORDED=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:recording \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+        commands-graphics-layer-invalid-blend-mode-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_BLEND_MODE=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-graphics-layer-unrecorded-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_UNRECORDED=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-graphics-layer-color-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
@@ -5732,14 +5718,12 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_RAW_TABLE_COLOR_FILTER=true
       ;;
-    commands-graphics-layer-unsupported-child-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHILD_UNSUPPORTED=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:childCommands \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+        commands-graphics-layer-unsupported-child-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CHILD_UNSUPPORTED=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-graphics-layer-render-effect)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
@@ -6276,21 +6260,17 @@ run_named_case() {
         EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
-    commands-graphics-layer-invalid-shadow-elevation-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SHADOW_ELEVATION=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:shadowElevation
-      ;;
-    commands-graphics-layer-invalid-shadow-path-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SHADOW_PATH=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:shadowPath \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+        commands-graphics-layer-invalid-shadow-elevation-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SHADOW_ELEVATION=true
+          ;;
+        commands-graphics-layer-invalid-shadow-path-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_SHADOW_PATH=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-graphics-layer-round-shadow)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
