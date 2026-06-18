@@ -1957,10 +1957,7 @@ run_named_case() {
     commands-image-shader-invalid-image-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE_SHADER=true \
-        MAGIC_JEWEL_COMPOSE_INVALID_IMAGE_SHADER_IMAGE=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=imageShaderImage \
-        EXPECT_SCREENSHOT_ASSERTION=false
+        MAGIC_JEWEL_COMPOSE_INVALID_IMAGE_SHADER_IMAGE=true
       ;;
     commands-image-path-effect-fallback)
       run_case "$1" \
