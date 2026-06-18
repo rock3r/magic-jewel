@@ -1964,10 +1964,7 @@ run_named_case() {
       ;;
     commands-image-path-effect-fallback)
       run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_IMAGE_PATH_EFFECT=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=pathEffect \
-        EXPECT_COMMAND_FALLBACK_MARKER=image=1
+        MAGIC_JEWEL_COMPOSE_IMAGE_PATH_EFFECT=true
       ;;
     commands-color-shader)
       run_case "$1" \
