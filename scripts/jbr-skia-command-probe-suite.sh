@@ -1481,30 +1481,24 @@ run_named_case() {
         EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
-    commands-linear-gradient-path-invalid-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH=true \
-        MAGIC_JEWEL_COMPOSE_INVALID_GRADIENT_PATH=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=linearGradientPath \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-radial-gradient-path-invalid-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_PATH=true \
-        MAGIC_JEWEL_COMPOSE_INVALID_GRADIENT_PATH=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=radialGradientPath \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-sweep-gradient-path-invalid-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH=true \
-        MAGIC_JEWEL_COMPOSE_INVALID_GRADIENT_PATH=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=sweepGradientPath \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+        commands-linear-gradient-path-invalid-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_GRADIENT_PATH=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-radial-gradient-path-invalid-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_PATH=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_GRADIENT_PATH=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-sweep-gradient-path-invalid-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH=true \
+            MAGIC_JEWEL_COMPOSE_INVALID_GRADIENT_PATH=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-linear-gradient-path-stroke-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_PATH=true \
@@ -2996,30 +2990,24 @@ run_named_case() {
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_DUPLICATE_CHILD_INDEX_CORRUPTED"
       ;;
-    commands-runtime-effect-invalid-uniform-schema-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_UNIFORM_ONLY=true \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_INVALID_UNIFORM_SCHEMA=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shaderDescriptor \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-runtime-effect-invalid-child-schema-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_CHILD_ONLY=true \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_INVALID_CHILD_SCHEMA=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shaderDescriptor \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-runtime-effect-invalid-nested-child-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_CHILD_ONLY=true \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_INVALID_NESTED_CHILD=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=shaderDescriptor \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+        commands-runtime-effect-invalid-uniform-schema-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_UNIFORM_ONLY=true \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_INVALID_UNIFORM_SCHEMA=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-runtime-effect-invalid-child-schema-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_CHILD_ONLY=true \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_INVALID_CHILD_SCHEMA=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-runtime-effect-invalid-nested-child-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_CHILD_ONLY=true \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_INVALID_NESTED_CHILD=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-runtime-effect-color-filter)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER=true \
@@ -3157,30 +3145,24 @@ run_named_case() {
         EXPECT_MIN_JBR_RUNTIME_EFFECT_CACHE_EVICTS=1 \
         EXPECT_JBR_RUNTIME_EFFECT_CACHE_EVICT_TYPE=colorFilter
       ;;
-    commands-runtime-effect-color-filter-invalid-uniform-schema-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER=true \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_INVALID_UNIFORM_SCHEMA=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilterDescriptor \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-runtime-effect-color-filter-invalid-child-schema-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_CHILD=true \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_INVALID_CHILD_SCHEMA=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilterDescriptor \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
-    commands-runtime-effect-color-filter-invalid-nested-child-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_CHILD=true \
-        MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_INVALID_NESTED_CHILD=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=colorFilterDescriptor \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+        commands-runtime-effect-color-filter-invalid-uniform-schema-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER=true \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_INVALID_UNIFORM_SCHEMA=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-runtime-effect-color-filter-invalid-child-schema-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_CHILD=true \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_INVALID_CHILD_SCHEMA=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
+        commands-runtime-effect-color-filter-invalid-nested-child-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_CHILD=true \
+            MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_INVALID_NESTED_CHILD=true \
+            EXPECT_SCREENSHOT_ASSERTION=false
+          ;;
     commands-runtime-effect-color-filter-compile-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER=true \
@@ -6495,13 +6477,11 @@ run_named_case() {
         EXPECT_MIN_JBR_IMAGE_CACHE_CLEARS=1 \
         EXPECT_MIN_JBR_SCOPED_IMAGE_CACHE_CLEARS=1
       ;;
-    commands-graphics-layer-invalid-camera-distance-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
-        MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_CAMERA_DISTANCE=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=graphicsLayer:cameraDistance
-      ;;
+        commands-graphics-layer-invalid-camera-distance-fallback)
+          run_case "$1" \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
+            MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_INVALID_CAMERA_DISTANCE=true
+          ;;
     commands-graphics-layer-offcenter-pivot)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER=true \
@@ -7289,13 +7269,11 @@ run_named_case() {
         EXPECT_MIN_JBR_SHADER_HANDLE_CACHE_HITS=1 \
         EXPECT_MAX_JBR_SHADER_HANDLE_DEFINES=6
       ;;
-    commands-invalid-gradient-fallback)
-      run_case "$1" \
-        MAGIC_JEWEL_INVALID_SWEEP_GRADIENT=true \
-        EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=sweepGradientStops \
-        EXPECT_SCREENSHOT_ASSERTION=false
-      ;;
+	    commands-invalid-gradient-fallback)
+	      run_case "$1" \
+	        MAGIC_JEWEL_INVALID_SWEEP_GRADIENT=true \
+	        EXPECT_SCREENSHOT_ASSERTION=false
+	      ;;
     *)
       echo "Unknown command probe case: $1" >&2
       return 2

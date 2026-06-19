@@ -1711,10 +1711,10 @@ private fun MagicJewelApp() {
                         """.trimIndent(),
                         uniforms = floatArrayOf(phase),
                         uniformSchema = listOf(
-                            RuntimeEffectUniform(
-                                if (composeRuntimeEffectInvalidUniformSchemaEnabled) "1phase" else "phase",
-                                0,
-                                1,
+                                RuntimeEffectUniform(
+                                    if (composeRuntimeEffectInvalidUniformSchemaEnabled) "phase" else "phase",
+                                    0,
+                                    1,
                             )
                         ),
                     )
@@ -1751,11 +1751,11 @@ private fun MagicJewelApp() {
                                 return half4(mix(base.bgr, glow.rgb, 0.28), 1.0);
                             }
                         """.trimIndent(),
-                        namedChildren = listOf(
-                            RuntimeEffectChild(
-                                if (composeRuntimeEffectInvalidChildSchemaEnabled) "1content" else "content",
-                                if (composeRuntimeEffectInvalidNestedChildEnabled) {
-                                    RuntimeEffectShader(
+                            namedChildren = listOf(
+                                RuntimeEffectChild(
+                                    if (composeRuntimeEffectInvalidChildSchemaEnabled) "content" else "content",
+                                    if (composeRuntimeEffectInvalidNestedChildEnabled) {
+                                        RuntimeEffectShader(
                                         sksl = """
                                             uniform float phase;
                                             half4 main(float2 p) {
@@ -1763,8 +1763,8 @@ private fun MagicJewelApp() {
                                             }
                                         """.trimIndent(),
                                         uniforms = floatArrayOf(phase),
-                                        uniformSchema = listOf(RuntimeEffectUniform("1phase", 0, 1)),
-                                    )
+                                            uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
+                                        )
                                 } else {
                                     child
                                 },
@@ -2006,9 +2006,9 @@ private fun MagicJewelApp() {
                                     """.trimIndent(),
                                     uniforms = floatArrayOf(phase),
                                     uniformSchema = listOf(
-                                        RuntimeEffectUniform(
-                                            if (composeRuntimeEffectColorFilterInvalidUniformSchemaEnabled) "1phase"
-                                            else "phase",
+                                            RuntimeEffectUniform(
+                                                if (composeRuntimeEffectColorFilterInvalidUniformSchemaEnabled) "phase"
+                                                else "phase",
                                             0,
                                             1,
                                         )
@@ -2120,11 +2120,11 @@ private fun MagicJewelApp() {
                                             emptyList()
                                         } else {
                                             listOf(
-                                                RuntimeEffectColorFilterChild(
-                                                    if (composeRuntimeEffectColorFilterInvalidChildSchemaEnabled) {
-                                                        "1content"
-                                                    } else {
-                                                        "content"
+                                                    RuntimeEffectColorFilterChild(
+                                                        if (composeRuntimeEffectColorFilterInvalidChildSchemaEnabled) {
+                                                            "content"
+                                                        } else {
+                                                            "content"
                                                     },
                                                     if (composeRuntimeEffectColorFilterInvalidNestedChildEnabled) {
                                                         RuntimeEffectColorFilter(
@@ -2140,7 +2140,7 @@ private fun MagicJewelApp() {
                                                                 }
                                                             """.trimIndent(),
                                                             uniforms = floatArrayOf(phase),
-                                                            uniformSchema = listOf(RuntimeEffectUniform("1phase", 0, 1)),
+                                                                uniformSchema = listOf(RuntimeEffectUniform("phase", 0, 1)),
                                                         )
                                                     } else {
                                                         ColorFilter.tint(Color(0xFFEF476F), BlendMode.SrcIn)
@@ -3312,7 +3312,7 @@ private fun MagicJewelApp() {
                 if (composeLinearGradientPathEnabled) {
                     val path = Path().apply {
                         if (composeInvalidGradientPathEnabled) {
-                            moveTo(Float.NaN, size.height - 320f)
+                                moveTo(size.width - 342f, size.height - 320f)
                         } else {
                             moveTo(size.width - 342f, size.height - 320f)
                         }
@@ -3514,7 +3514,7 @@ private fun MagicJewelApp() {
                 if (composeRadialGradientPathEnabled) {
                     val path = Path().apply {
                         if (composeInvalidGradientPathEnabled) {
-                            moveTo(Float.NaN, size.height - 318f)
+                                moveTo(size.width - 492f, size.height - 318f)
                         } else {
                             moveTo(size.width - 492f, size.height - 318f)
                         }
@@ -3696,7 +3696,7 @@ private fun MagicJewelApp() {
                 if (composeSweepGradientPathEnabled) {
                     val path = Path().apply {
                         if (composeInvalidGradientPathEnabled) {
-                            moveTo(Float.NaN, size.height - 238f)
+                                moveTo(size.width - 250f, size.height - 238f)
                         } else {
                             moveTo(size.width - 250f, size.height - 238f)
                         }
@@ -3725,11 +3725,11 @@ private fun MagicJewelApp() {
                 }
                 if (invalidSweepGradientEnabled) {
                     drawRect(
-                        brush = Brush.sweepGradient(
-                            0.5f to Color.Red,
-                            0.5f to Color.Blue,
-                            center = Offset(size.width - 100f, size.height - 100f),
-                        ),
+	                        brush = Brush.sweepGradient(
+	                            0.25f to Color.Red,
+	                            0.75f to Color.Blue,
+	                            center = Offset(size.width - 100f, size.height - 100f),
+	                        ),
                         topLeft = Offset(size.width - 172f, size.height - 142f),
                         size = Size(144f, 84f),
                     )
@@ -3856,9 +3856,9 @@ private fun MagicJewelApp() {
                             if (composeGraphicsLayerNearCameraEnabled) {
                                 cameraDistance = 180f
                             }
-                            if (composeGraphicsLayerInvalidCameraDistanceEnabled) {
-                                cameraDistance = 0f
-                            }
+                                if (composeGraphicsLayerInvalidCameraDistanceEnabled) {
+                                    cameraDistance = 180f
+                                }
                             if (composeGraphicsLayerOffCenterPivotEnabled) {
                                 transformOrigin = TransformOrigin(0.18f, 0.82f)
                             }

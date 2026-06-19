@@ -2793,6 +2793,7 @@ command_recorder_summary() {
       frames++
       frameUnsupported = 0
       fieldCount = split(line, fields, " ")
+      delete frameReasons
       for (i = 1; i <= fieldCount; i++) {
         split(fields[i], value, "=")
         if (value[1] == "commands") {
@@ -2821,7 +2822,12 @@ command_recorder_summary() {
           imageCacheEvicts += value[2]
           if (value[2] > maxImageCacheEvicts) maxImageCacheEvicts = value[2]
         } else if (value[2] ~ /^[0-9]+$/) {
-          reasons[value[1]] += value[2]
+          frameReasons[value[1]] += value[2]
+        }
+      }
+      if (frameUnsupported > 0) {
+        for (reason in frameReasons) {
+          reasons[reason] += frameReasons[reason]
         }
       }
       if (frameUnsupported > 0) unsupportedFrames++
@@ -2934,18 +2940,26 @@ command_recorder_reasons() {
       }
       line = substr($0, markerStart)
       fieldCount = split(line, fields, " ")
+      unsupported = 0
+      delete frameReasons
       for (i = 1; i <= fieldCount; i++) {
         split(fields[i], value, "=")
-        if (value[2] ~ /^[0-9]+$/ &&
+        if (value[1] == "unsupported" && value[2] ~ /^[0-9]+$/) {
+          unsupported = value[2]
+        } else if (value[2] ~ /^[0-9]+$/ &&
             value[1] != "commands" &&
-            value[1] != "unsupported" &&
             value[1] != "textCommands" &&
             value[1] != "paragraphTextCommands" &&
             value[1] != "imageDefines" &&
             value[1] != "imageRefs" &&
             value[1] != "imageCacheClears" &&
             value[1] != "imageCacheEvicts") {
-          reasons[value[1]] += value[2]
+          frameReasons[value[1]] += value[2]
+        }
+      }
+      if (unsupported > 0) {
+        for (reason in frameReasons) {
+          reasons[reason] += frameReasons[reason]
         }
       }
     }

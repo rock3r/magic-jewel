@@ -1054,6 +1054,22 @@ command_recorder_summary_ignores_concatenated_prefix_fields() {
   grep -q "^cmp_unsupported_reasons=none$" "${dir}/summary.properties"
 }
 
+command_recorder_summary_ignores_concatenated_suffix_fields() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    printf 'CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0 textCommands=0 paragraphTextCommands=0 imageDefines=0 imageRefs=1 imageCacheClears=0 imageCacheEvicts=0'
+    echo '[SKIKO] info: SKIKO_JBR_INTEROP_SCOPE_ACQUIRED abi=106 build=skia=test;abi=106;native=3 scopeId=99'
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}" EXPECT_MIN_IMAGE_REFS=1
+  grep -q "^validation_status=passed$" "${dir}/summary.properties"
+  grep -q "^cmp_unsupported_max=0$" "${dir}/summary.properties"
+  grep -q "^cmp_unsupported_reasons=none$" "${dir}/summary.properties"
+}
+
 expected_nested_fallback_reason_passes() {
   local dir
   dir="$(make_report_dir)"
@@ -1404,6 +1420,7 @@ strict_command_requires_menu_marker_and_min_frames
 strict_command_fails_without_menu_marker
 expected_image_fallback_passes
 command_recorder_summary_ignores_concatenated_prefix_fields
+command_recorder_summary_ignores_concatenated_suffix_fields
 expected_nested_fallback_reason_passes
 expected_fallback_requires_reason
 command_stream_invalid_fallback_passes
