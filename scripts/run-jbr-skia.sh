@@ -8,6 +8,7 @@ JBR_SKIA_LIB=${JBR_SKIA_LIB-/tmp/jbr-skia-native/libjbrskiainterop.dylib}
 JBR_SKIA_LIBRARY_PATH=${JBR_SKIA_LIBRARY_PATH:-}
 JAVA_HOME_FOR_BOOT_LIBRARY_PATH=${JAVA_HOME:-$(/usr/libexec/java_home -v 21)}
 SKIKO_VERSION=${SKIKO_VERSION:-0.0.0-SNAPSHOT}
+GRADLE_TASK=${GRADLE_TASK:-runJbrSkiaInterop}
 LOCAL_CMP_OUT=${LOCAL_CMP_OUT:-}
 JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
 JBR_SKIA_NATIVE_TEXT=${JBR_SKIA_NATIVE_TEXT:-false}
@@ -1320,7 +1321,7 @@ fi
 printf -v JOINED_ARGS "%s " "${JBR_ARGS[@]}"
 cd "$ROOT"
 GRADLE_ARGS=(
-  runJbrSkiaInterop
+  "${GRADLE_TASK}"
   "-PjbrSkiaInteropJvmArgs=${JOINED_ARGS% }"
   "-PjbrSkiaRenderMode=${JBR_SKIA_RENDER_MODE}"
 )

@@ -57,6 +57,24 @@ selections. Default launches, default-list `CASES_FROM`/`CASES_UNTIL` range laun
 helpers and do not consume the daily slot. Set `JBR_SKIA_ALLOW_EXTRA_BROAD_VALIDATION=true` only for an
 explicit user override or an emergency ABI/capability gate.
 
+Copied Jewel standalone demo benchmark:
+
+```bash
+DURATION_SECONDS=30 WARMUP_SECONDS=5 SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jewel-standalone-benchmark-suite.sh
+```
+
+The suite runs the copied IntelliJ Jewel standalone sample through Swing-hosted `ComposePanel` tasks:
+`runJewelStandalone` for the baseline SwingGraphics path and `runJewelStandaloneJbrSkiaInterop` for the JBR Skia
+command path. It launches directly into the top-level `Hypnotoad` page, an always-redrawing animation designed to
+stress Swing compositing while staying command-clean. Results land in
+`out/jewel-standalone-benchmark-suite/<timestamp>/suite.tsv` with machine-load metadata, process samples, old/new
+app-frame rates, JBR command-frame rates, fallback counts, and strict command validation.
+
+If a Spectre runner is available, pass it through `SPECTRE_CMD` and optional `SPECTRE_ARGS`; the suite starts it beside
+the benchmark and records the Spectre log/status in the same output directory. The public `spectre.dev` endpoints were
+not reachable during the initial harness setup, so the hook is command-based instead of pinned to a guessed package
+name.
+
 Old/new process and marker report:
 
 ```bash

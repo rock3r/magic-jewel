@@ -10,6 +10,17 @@ kotlin {
         languageVersion.set(JavaLanguageVersion.of(21))
         vendor.set(JvmVendorSpec.JETBRAINS)
     }
+
+    sourceSets.all {
+        languageSettings {
+            optIn("androidx.compose.foundation.ExperimentalFoundationApi")
+            optIn("androidx.compose.ui.ExperimentalComposeUiApi")
+            optIn("kotlin.experimental.ExperimentalTypeInference")
+            optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            optIn("org.jetbrains.jewel.foundation.ExperimentalJewelApi")
+            optIn("org.jetbrains.jewel.foundation.InternalJewelApi")
+        }
+    }
 }
 
 val localSkikoVersion = providers.environmentVariable("SKIKO_VERSION")
@@ -29,6 +40,12 @@ val jbrSkiaRenderMode = providers.gradleProperty("jbrSkiaRenderMode")
 val forceTinyFullSceneOnceForTesting = providers.gradleProperty("skikoForceTinyFullSceneOnceForTesting")
     .orElse(providers.environmentVariable("SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST"))
     .orElse("false")
+val jewelStandaloneInitialView = providers.gradleProperty("jewelStandaloneInitialView")
+    .orElse(providers.environmentVariable("JEWEL_STANDALONE_INITIAL_VIEW"))
+    .orElse("Welcome")
+val jewelStandaloneInitialComponent = providers.gradleProperty("jewelStandaloneInitialComponent")
+    .orElse(providers.environmentVariable("JEWEL_STANDALONE_INITIAL_COMPONENT"))
+    .orElse("")
 val composeTextEnabled = providers.gradleProperty("magicJewelComposeText")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_TEXT"))
     .orElse("true")
@@ -640,6 +657,11 @@ dependencies {
     }
     implementation(libs.jewel.int.ui.standalone)
     implementation(libs.jewel.int.ui.decorated.window)
+    implementation(libs.jewel.markdown.core)
+    implementation(libs.jewel.markdown.extensions.autolink)
+    implementation(libs.jewel.markdown.extensions.gfm.tables)
+    implementation(libs.jewel.markdown.int.ui.standalone.styling)
+    implementation(compose.components.resources)
     implementation(libs.kotlinx.coroutines.swing)
 }
 
@@ -988,6 +1010,54 @@ tasks.register<JavaExec>("runJbrSkiaInterop") {
     classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
     mainClass.set("com.magicjewel.MainKt")
     configureMagicJewelJvm(interoperable = true)
+    doFirst {
+        logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
+    }
+}
+
+fun JavaExec.configureJewelStandaloneJvm(interoperable: Boolean) {
+    systemProperty("compose.swing.render.on.graphics", "true")
+    systemProperty("apple.awt.application.name", "Jewel Standalone Sample")
+    systemProperty("jewel.standalone.initialView", jewelStandaloneInitialView.get())
+    jewelStandaloneInitialComponent.orNull?.takeIf { it.isNotBlank() }?.let {
+        systemProperty("jewel.standalone.initialComponent", it)
+    }
+    if (interoperable) {
+        systemProperty("compose.swing.render.on.jbr.skia", "true")
+        systemProperty("skiko.jbr.interop.debugOverlay", "true")
+        systemProperty("skiko.jbr.interop.forceTinyFullSceneOnceForTesting", forceTinyFullSceneOnceForTesting.get())
+        when (jbrSkiaRenderMode.get()) {
+            "commands" -> systemProperty("skiko.jbr.interop.renderCommands", "true")
+            "diagnostic" -> systemProperty("skiko.jbr.interop.renderDiagnostic", "true")
+            "auto" -> Unit
+            else -> systemProperty("skiko.jbr.interop.renderPicture", "true")
+        }
+    }
+    jbrSkiaJvmArgs.orNull
+        ?.split(Regex("\\s+"))
+        ?.filter { it.isNotBlank() }
+        ?.let(::jvmArgs)
+}
+
+tasks.register<JavaExec>("runJewelStandalone") {
+    group = ApplicationPlugin.APPLICATION_GROUP
+    description = "Run the copied Jewel standalone sample through SwingGraphics."
+    val patchedCompose = patchedComposeRuntimeJars()
+    classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
+    mainClass.set("org.jetbrains.jewel.samples.standalone.SwingMainKt")
+    configureJewelStandaloneJvm(interoperable = false)
+    doFirst {
+        logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
+    }
+}
+
+tasks.register<JavaExec>("runJewelStandaloneJbrSkiaInterop") {
+    group = ApplicationPlugin.APPLICATION_GROUP
+    description = "Run the copied Jewel standalone sample through SwingGraphics with the JBR Skia fast path enabled."
+    val patchedCompose = patchedComposeRuntimeJars()
+    classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
+    mainClass.set("org.jetbrains.jewel.samples.standalone.SwingMainKt")
+    configureJewelStandaloneJvm(interoperable = true)
     doFirst {
         logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
     }

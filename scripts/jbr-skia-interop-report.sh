@@ -10,6 +10,8 @@ SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 STARTUP_TIMEOUT_SECONDS="${STARTUP_TIMEOUT_SECONDS:-45}"
 GRADLE="${GRADLE:-${ROOT_DIR}/gradlew}"
 SKIKO_VERSION="${SKIKO_VERSION:-0.0.0-SNAPSHOT}"
+OLD_GRADLE_TASK="${OLD_GRADLE_TASK:-run}"
+NEW_GRADLE_TASK="${NEW_GRADLE_TASK:-runJbrSkiaInterop}"
 ENABLE_ASPROF="${ENABLE_ASPROF:-false}"
 ASPROF="${ASPROF:-}"
 ASPROF_EVENT="${ASPROF_EVENT:-cpu}"
@@ -1839,7 +1841,7 @@ export JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST
 export JBR_SKIA_RUNTIME_EFFECT_CACHE_LIMIT_FOR_TEST
 export SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
-APP_FRAME_MARKER="MAGIC_JEWEL_COMPOSE_FRAME"
+APP_FRAME_MARKER="${APP_FRAME_MARKER:-MAGIC_JEWEL_COMPOSE_FRAME}"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
 POPUP_FRAME_MARKER="MAGIC_JEWEL_POPUP_FRAME"
 POPUP_SHOWN_MARKER="MAGIC_JEWEL_POPUP_SHOWN"
@@ -2521,9 +2523,9 @@ launch_mode() {
   local mode="$1"
   cd "${ROOT_DIR}"
   if [[ "${mode}" == "old" ]]; then
-    "${GRADLE}" --no-daemon run
+    "${GRADLE}" --no-daemon "${OLD_GRADLE_TASK}"
   else
-    SKIKO_VERSION="${SKIKO_VERSION}" "${SCRIPT_DIR}/run-jbr-skia.sh"
+    GRADLE_TASK="${NEW_GRADLE_TASK}" SKIKO_VERSION="${SKIKO_VERSION}" "${SCRIPT_DIR}/run-jbr-skia.sh"
   fi
 }
 
@@ -3714,8 +3716,8 @@ write_report() {
     echo
     echo "## Modes"
     echo
-    echo "- old: ./gradlew --no-daemon run"
-    echo "- new: ./scripts/run-jbr-skia.sh"
+    echo "- old: ./gradlew --no-daemon ${OLD_GRADLE_TASK}"
+    echo "- new: GRADLE_TASK=${NEW_GRADLE_TASK} ./scripts/run-jbr-skia.sh"
     echo
     echo "## Process Samples"
     echo
