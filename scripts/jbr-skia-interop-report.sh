@@ -15,6 +15,10 @@ NEW_GRADLE_TASK="${NEW_GRADLE_TASK:-runJbrSkiaInterop}"
 ENABLE_ASPROF="${ENABLE_ASPROF:-false}"
 ASPROF="${ASPROF:-}"
 ASPROF_EVENT="${ASPROF_EVENT:-cpu}"
+COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS:-false}"
+POWERMETRICS="${POWERMETRICS:-/usr/bin/powermetrics}"
+POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-1000}"
+POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
 CAPTURE_WINDOW_QUERY="${CAPTURE_WINDOW_QUERY:-MagicJewelJbrSkiaWindow}"
 APP_PROCESS_QUERY="${APP_PROCESS_QUERY:-com.magicjewel.MainKt}"
 CMP_SCRIPTS_DIR="${CMP_SCRIPTS_DIR:-$(cd -- "${ROOT_DIR}/../cmp/compose/desktop/desktop/samples/scripts" >/dev/null && pwd)}"
@@ -2493,6 +2497,47 @@ stop_profiler() {
   fi
 }
 
+start_powermetrics() {
+  local mode="$1"
+  local output="${OUT_DIR}/${mode}-powermetrics.txt"
+  local status="${OUT_DIR}/${mode}-powermetrics-status.txt"
+
+  if [[ "${COLLECT_POWERMETRICS}" != "true" ]]; then
+    echo "disabled" > "${status}"
+    return
+  fi
+  if [[ ! -x "${POWERMETRICS}" ]]; then
+    echo "missing path=${POWERMETRICS}" > "${status}"
+    return
+  fi
+  if ! sudo -n true >/dev/null 2>&1; then
+    echo "sudo-unavailable run 'sudo -v' before benchmark to collect powermetrics" > "${status}"
+    return
+  fi
+
+  sudo -n "${POWERMETRICS}" \
+    --samplers "${POWERMETRICS_SAMPLERS}" \
+    -i "${POWERMETRICS_INTERVAL_MS}" \
+    -o "${output}" >/dev/null 2>"${OUT_DIR}/${mode}-powermetrics.log" &
+  echo "started pid=$! samplers=${POWERMETRICS_SAMPLERS} intervalMs=${POWERMETRICS_INTERVAL_MS} file=$(basename "${output}")" > "${status}"
+  echo "$!"
+}
+
+stop_powermetrics() {
+  local mode="$1"
+  local pid="$2"
+  local status="${OUT_DIR}/${mode}-powermetrics-status.txt"
+
+  if [[ -z "${pid}" ]]; then
+    return
+  fi
+  kill "${pid}" 2>/dev/null || true
+  wait "${pid}" >/dev/null 2>&1 || true
+  if grep -q "^started " "${status}" 2>/dev/null; then
+    echo "$(cat "${status}") stopped=true" > "${status}"
+  fi
+}
+
 kill_process_tree() {
   local root_pid="$1"
   local pids
@@ -2586,6 +2631,7 @@ run_mode() {
   local profiler_path=""
   local profiler_pid=""
   local profiler_started=false
+  local powermetrics_pid=""
 
   profiler_path="$(resolve_asprof)"
 
@@ -2610,6 +2656,7 @@ run_mode() {
         profiler_pid="$(app_pid)"
         start_profiler "${mode}" "${profiler_pid}" "${profiler_path}"
         profiler_started=true
+        powermetrics_pid="$(start_powermetrics "${mode}")"
       fi
       sample_process_tree "${mode}" "${root_pid}" "${csv}"
     fi
@@ -2666,6 +2713,7 @@ run_mode() {
   if [[ "${profiler_started}" == "true" ]]; then
     stop_profiler "${mode}" "${profiler_pid}" "${profiler_path}"
   fi
+  stop_powermetrics "${mode}" "${powermetrics_pid}"
 
   kill_process_tree "${root_pid}"
   wait "${root_pid}" >/dev/null 2>&1
@@ -3126,6 +3174,8 @@ write_machine_summary() {
     write_screenshot_count_properties "${OUT_DIR}/new-popup-window-screenshot-assertion.log" "popup_window_screenshot_"
     echo "asprof_old_status=$(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not-run)"
     echo "asprof_new_status=$(cat "${OUT_DIR}/new-asprof-status.txt" 2>/dev/null || echo not-run)"
+    echo "powermetrics_old_status=$(cat "${OUT_DIR}/old-powermetrics-status.txt" 2>/dev/null || echo not-run)"
+    echo "powermetrics_new_status=$(cat "${OUT_DIR}/new-powermetrics-status.txt" 2>/dev/null || echo not-run)"
     echo "report_path=${OUT_DIR}/report.md"
   } > "${summary}"
 }
@@ -3783,6 +3833,13 @@ write_report() {
     echo "- old: $(cat "${OUT_DIR}/old-asprof-status.txt" 2>/dev/null || echo not run)"
     echo "- new: $(cat "${OUT_DIR}/new-asprof-status.txt" 2>/dev/null || echo not run)"
     echo
+    echo "## Powermetrics"
+    echo
+    echo "- old: $(cat "${OUT_DIR}/old-powermetrics-status.txt" 2>/dev/null || echo not run)"
+    echo "- new: $(cat "${OUT_DIR}/new-powermetrics-status.txt" 2>/dev/null || echo not run)"
+    echo "- samplers: ${POWERMETRICS_SAMPLERS}"
+    echo "- interval_ms: ${POWERMETRICS_INTERVAL_MS}"
+    echo
     echo "## Screenshot Assertion"
     echo
     if [[ -n "${screenshot_counts}" ]]; then
@@ -3819,6 +3876,12 @@ write_report() {
     if [[ -f "${OUT_DIR}/new-asprof-${ASPROF_EVENT}.html" ]]; then
       echo "- new async-profiler html: new-asprof-${ASPROF_EVENT}.html"
     fi
+    if [[ -f "${OUT_DIR}/old-powermetrics.txt" ]]; then
+      echo "- old powermetrics: old-powermetrics.txt"
+    fi
+    if [[ -f "${OUT_DIR}/new-powermetrics.txt" ]]; then
+      echo "- new powermetrics: new-powermetrics.txt"
+    fi
     echo "- machine summary: summary.properties"
     echo
     echo "## Notes"
@@ -3827,6 +3890,7 @@ write_report() {
     echo "App draw FPS and Skiko/JBR marker FPS count draw/replay calls during the measurement window, not display-presented frames; they can exceed monitor refresh when rendering is not vsync-throttled."
     echo "Picture/command marker counts come from structured Skiko/JBR logs and are the primary signal that the JBR-owned replay path was used."
     echo "Surface identity markers show when Skiko observed a different JBR destination surface and discarded cached surface-bound state."
+    echo "Powermetrics capture is optional and requires a cached sudo credential; run 'sudo -v' before the suite to enable per-core CPU residency and GPU/Metal power counters where macOS exposes them."
     echo "The new mode depends on patched local JBR, Skiko, and CMP artifacts; see README.md for the required paths and overrides."
   } > "${report}"
 

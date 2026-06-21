@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.dp
 import java.awt.Desktop.getDesktop
 import java.net.URI.create
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 import org.jetbrains.jewel.foundation.code.highlighting.NoOpCodeHighlighter
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.markdown.standalone.ProvideMarkdownStyling
@@ -93,6 +95,25 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
 
     ProvideMarkdownStyling(markdownStyling, blockRenderer, NoOpCodeHighlighter) {
         val lazyListState = rememberLazyListState()
+        val autoScroll = remember {
+            java.lang.Boolean.getBoolean("jewel.standalone.markdownAutoScroll") ||
+                System.getProperty("jewel.standalone.spectreStressMode") == "markdownScroll"
+        }
+        LaunchedEffect(autoScroll, markdownBlocks.size) {
+            if (autoScroll && markdownBlocks.isNotEmpty()) {
+                var index = 0
+                var direction = 1
+                while (true) {
+                    lazyListState.animateScrollToItem(index)
+                    println("JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL index=$index")
+                    delay(120.milliseconds)
+                    val lastIndex = (markdownBlocks.size - 1).coerceAtLeast(0)
+                    if (index >= lastIndex) direction = -1
+                    if (index <= 0) direction = 1
+                    index = (index + direction * 3).coerceIn(0, lastIndex)
+                }
+            }
+        }
         VerticallyScrollableContainer(lazyListState as ScrollableState, modifier.background(background)) {
             LazyMarkdown(
                 blocks = markdownBlocks,

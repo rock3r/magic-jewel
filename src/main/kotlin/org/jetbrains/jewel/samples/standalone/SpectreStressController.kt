@@ -34,18 +34,32 @@ internal object SpectreStressController {
         thread(name = "jewel-standalone-spectre-stress", isDaemon = true) {
             runBlocking {
                 val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.synthetic(frame))
-                automator.waitForNode(tag = "jewel.page.hypnotoad", timeout = 10.seconds)
+                val startupTag =
+                    when (mode) {
+                        SpectreStressMode.MarkdownScroll -> "jewel.page.markdown"
+                        else -> "jewel.page.hypnotoad"
+                    }
+                automator.waitForNode(tag = startupTag, timeout = 10.seconds)
                 println("JEWEL_STANDALONE_SPECTRE status=started mode=$mode intervalMillis=$intervalMillis")
-                if (mode.runsTour) {
-                    runCatching { automator.runShowcaseTour(componentSlice) }
-                        .onFailure { println("JEWEL_STANDALONE_SPECTRE status=tour-error message=${it.message}") }
-                    selectTopLevelView("Hypnotoad")
-                    automator.waitForNode(tag = "jewel.page.hypnotoad", timeout = 5.seconds)
+                when (mode) {
+                    SpectreStressMode.TourThenHypnotoad,
+                    SpectreStressMode.FullShowcaseThenHypnotoad -> {
+                        runCatching { automator.runShowcaseTour(componentSlice) }
+                            .onFailure { println("JEWEL_STANDALONE_SPECTRE status=tour-error message=${it.message}") }
+                        selectTopLevelView("Hypnotoad")
+                        automator.waitForNode(tag = "jewel.page.hypnotoad", timeout = 5.seconds)
+                    }
+                    SpectreStressMode.MarkdownScroll -> {
+                        selectTopLevelView("Markdown")
+                        automator.waitForNode(tag = "jewel.page.markdown", timeout = TourWaitTimeout)
+                        println("JEWEL_STANDALONE_SPECTRE phase=focused-view target=Markdown")
+                    }
+                    SpectreStressMode.Hypnotoad -> Unit
                 }
 
                 var cycle = 0
                 while (true) {
-                    runCatching { automator.stressOnce(cycle) }
+                    runCatching { automator.stressOnce(mode, cycle) }
                         .onFailure { println("JEWEL_STANDALONE_SPECTRE status=error message=${it.message}") }
                     cycle += 1
                     delay(intervalMillis.milliseconds)
@@ -104,13 +118,24 @@ internal object SpectreStressController {
         }
     }
 
-    private suspend fun ComposeAutomator.stressOnce(cycle: Int) {
+    private suspend fun ComposeAutomator.stressOnce(mode: SpectreStressMode, cycle: Int) {
         refreshWindows()
-        when (cycle % 6) {
-            0, 1, 2, 3 -> clickIfPresent("jewel.hypnotoad.warp", "hypnotoad-warp", cycle)
-            4 -> clickIfPresent("jewel.hypnotoad.calm", "hypnotoad-calm", cycle)
-            else -> clickIfPresent("jewel.hypnotoad.reset", "hypnotoad-reset", cycle)
+        when (mode) {
+            SpectreStressMode.MarkdownScroll -> scrollMarkdownOnce(cycle)
+            else ->
+                when (cycle % 6) {
+                    0, 1, 2, 3 -> clickIfPresent("jewel.hypnotoad.warp", "hypnotoad-warp", cycle)
+                    4 -> clickIfPresent("jewel.hypnotoad.calm", "hypnotoad-calm", cycle)
+                    else -> clickIfPresent("jewel.hypnotoad.reset", "hypnotoad-reset", cycle)
+                }
         }
+    }
+
+    private suspend fun ComposeAutomator.scrollMarkdownOnce(cycle: Int) {
+        val node = findOneByTestTag("jewel.page.markdown") ?: return
+        val ticks = if ((cycle / 10) % 2 == 0) 7 else -7
+        scrollWheel(node, ticks)
+        println("JEWEL_STANDALONE_SPECTRE phase=markdown-scroll cycle=$cycle ticks=$ticks")
     }
 
     private suspend fun ComposeAutomator.clickIfPresent(tag: String, phase: String, cycle: Int) {
@@ -127,14 +152,16 @@ internal object SpectreStressController {
         }
     }
 
-    private enum class SpectreStressMode(val runsTour: Boolean) {
-        Hypnotoad(runsTour = false),
-        TourThenHypnotoad(runsTour = true),
-        FullShowcaseThenHypnotoad(runsTour = true);
+    private enum class SpectreStressMode {
+        Hypnotoad,
+        MarkdownScroll,
+        TourThenHypnotoad,
+        FullShowcaseThenHypnotoad;
 
         companion object {
             fun from(value: String): SpectreStressMode =
                 when (value) {
+                    "markdownScroll" -> MarkdownScroll
                     "tourThenHypnotoad" -> TourThenHypnotoad
                     "fullShowcaseThenHypnotoad" -> FullShowcaseThenHypnotoad
                     else -> Hypnotoad
