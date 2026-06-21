@@ -1107,7 +1107,7 @@ tasks.register<JavaExec>("runJewelStandaloneDecorated") {
     val patchedCompose = patchedComposeRuntimeJars()
     classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
     mainClass.set("org.jetbrains.jewel.samples.standalone.MainKt")
-    configureJewelStandaloneJvm(interoperable = false, swingCompositing = false)
+    configureJewelStandaloneJvm(interoperable = false)
     systemProperty("compose.accessibility.enable", "false")
     doFirst {
         logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
@@ -1120,7 +1120,7 @@ tasks.register<JavaExec>("runJewelStandaloneDecoratedJbrSkiaInterop") {
     val patchedCompose = patchedComposeRuntimeJars()
     classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
     mainClass.set("org.jetbrains.jewel.samples.standalone.MainKt")
-    configureJewelStandaloneJvm(interoperable = true, swingCompositing = false)
+    configureJewelStandaloneJvm(interoperable = true)
     systemProperty("compose.accessibility.enable", "false")
     doFirst {
         logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
