@@ -36,12 +36,14 @@ internal object SpectreStressController {
                 val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.synthetic(frame))
                 val startupTag =
                     when (mode) {
+                        SpectreStressMode.IdleRedraw -> "jewel.page.idle-redraw"
                         SpectreStressMode.MarkdownWheel -> "jewel.page.markdown"
                         else -> "jewel.page.hypnotoad"
                     }
                 automator.waitForNode(tag = startupTag, timeout = 10.seconds)
                 println("JEWEL_STANDALONE_SPECTRE status=started mode=$mode intervalMillis=$intervalMillis")
                 when (mode) {
+                    SpectreStressMode.IdleRedraw -> Unit
                     SpectreStressMode.TourThenHypnotoad,
                     SpectreStressMode.FullShowcaseThenHypnotoad -> {
                         runCatching { automator.runShowcaseTour(componentSlice) }
@@ -121,6 +123,7 @@ internal object SpectreStressController {
     private suspend fun ComposeAutomator.stressOnce(mode: SpectreStressMode, cycle: Int) {
         refreshWindows()
         when (mode) {
+            SpectreStressMode.IdleRedraw -> Unit
             SpectreStressMode.MarkdownWheel -> scrollMarkdownOnce(cycle)
             else ->
                 when (cycle % 6) {
@@ -153,6 +156,7 @@ internal object SpectreStressController {
     }
 
     private enum class SpectreStressMode {
+        IdleRedraw,
         Hypnotoad,
         MarkdownWheel,
         TourThenHypnotoad,
@@ -161,6 +165,7 @@ internal object SpectreStressController {
         companion object {
             fun from(value: String): SpectreStressMode =
                 when (value) {
+                    "idleRedraw" -> IdleRedraw
                     "markdownScroll", "markdownWheel" -> MarkdownWheel
                     "tourThenHypnotoad" -> TourThenHypnotoad
                     "fullShowcaseThenHypnotoad" -> FullShowcaseThenHypnotoad

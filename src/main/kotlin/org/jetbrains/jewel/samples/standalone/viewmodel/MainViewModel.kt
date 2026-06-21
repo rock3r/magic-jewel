@@ -16,6 +16,7 @@ import org.jetbrains.jewel.intui.standalone.styling.default
 import org.jetbrains.jewel.intui.standalone.styling.defaults
 import org.jetbrains.jewel.samples.showcase.ShowcaseIcons
 import org.jetbrains.jewel.samples.showcase.components.Hypnotoad
+import org.jetbrains.jewel.samples.showcase.components.IdleRedraw
 import org.jetbrains.jewel.samples.showcase.views.ComponentsView
 import org.jetbrains.jewel.samples.showcase.views.ComponentsViewModel
 import org.jetbrains.jewel.samples.showcase.views.KeyBinding
@@ -95,6 +96,11 @@ private val mainMenuItems =
             title = "Hypnotoad",
             iconKey = ShowcaseIcons.Components.hypnotoad,
             content = { Hypnotoad() },
+        ),
+        ViewInfo(
+            title = "IdleRedraw",
+            iconKey = ShowcaseIcons.Components.borders,
+            content = { IdleRedraw() },
         ),
         ViewInfo(
             title = "Markdown",
