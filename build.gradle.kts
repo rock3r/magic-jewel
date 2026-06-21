@@ -23,7 +23,7 @@ kotlin {
     }
 }
 
-val localSkikoVersion = providers.environmentVariable("SKIKO_VERSION")
+val localSkikoVersion = providers.environmentVariable("SKIKO_VERSION").orElse("0.0.0-SNAPSHOT")
 val generatedLocalCmpOut = layout.projectDirectory.dir("../cmp/out/compose-multiplatform-core").asFile
 val defaultLocalCmpOut = if (generatedLocalCmpOut.isDirectory) {
     generatedLocalCmpOut.absolutePath
@@ -1032,8 +1032,10 @@ tasks.register<JavaExec>("runJbrSkiaInterop") {
     }
 }
 
-fun JavaExec.configureJewelStandaloneJvm(interoperable: Boolean) {
-    systemProperty("compose.swing.render.on.graphics", "true")
+fun JavaExec.configureJewelStandaloneJvm(interoperable: Boolean, swingCompositing: Boolean = true) {
+    if (swingCompositing) {
+        systemProperty("compose.swing.render.on.graphics", "true")
+    }
     systemProperty("apple.awt.application.name", "Jewel Standalone Sample")
     systemProperty("jewel.standalone.initialView", jewelStandaloneInitialView.get())
     systemProperty("jewel.standalone.spectreStress", jewelStandaloneSpectreStress.get())
@@ -1079,6 +1081,32 @@ tasks.register<JavaExec>("runJewelStandaloneJbrSkiaInterop") {
     classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
     mainClass.set("org.jetbrains.jewel.samples.standalone.SwingMainKt")
     configureJewelStandaloneJvm(interoperable = true)
+    doFirst {
+        logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
+    }
+}
+
+tasks.register<JavaExec>("runJewelStandaloneDecorated") {
+    group = ApplicationPlugin.APPLICATION_GROUP
+    description = "Run the copied Jewel standalone sample with Jewel decorated-window setup."
+    val patchedCompose = patchedComposeRuntimeJars()
+    classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
+    mainClass.set("org.jetbrains.jewel.samples.standalone.MainKt")
+    configureJewelStandaloneJvm(interoperable = false, swingCompositing = false)
+    systemProperty("compose.accessibility.enable", "false")
+    doFirst {
+        logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
+    }
+}
+
+tasks.register<JavaExec>("runJewelStandaloneDecoratedJbrSkiaInterop") {
+    group = ApplicationPlugin.APPLICATION_GROUP
+    description = "Run the copied Jewel standalone sample with Jewel decorated-window setup and the JBR Skia fast path enabled."
+    val patchedCompose = patchedComposeRuntimeJars()
+    classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
+    mainClass.set("org.jetbrains.jewel.samples.standalone.MainKt")
+    configureJewelStandaloneJvm(interoperable = true, swingCompositing = false)
+    systemProperty("compose.accessibility.enable", "false")
     doFirst {
         logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
     }

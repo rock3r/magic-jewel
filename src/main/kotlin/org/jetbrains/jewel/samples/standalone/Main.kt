@@ -1,6 +1,7 @@
 package org.jetbrains.jewel.samples.standalone
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
@@ -76,6 +77,9 @@ public fun main() {
                     processKeyShortcuts(keyEvent = keyEvent, onNavigateTo = MainViewModel::onNavigateTo)
                 },
                 content = {
+                    LaunchedEffect(window) {
+                        SpectreStressController.startIfRequested(window)
+                    }
                     TitleBarView()
                     ProvideMarkdownStyling { currentView.content() }
                 },

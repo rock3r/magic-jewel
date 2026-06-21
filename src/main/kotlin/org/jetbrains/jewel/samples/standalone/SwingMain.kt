@@ -8,6 +8,7 @@ import java.awt.Dimension
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import org.jetbrains.jewel.foundation.LocalComponent
+import org.jetbrains.jewel.foundation.enableNewSwingCompositing
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.intui.markdown.standalone.ProvideMarkdownStyling
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
@@ -21,6 +22,7 @@ import org.jetbrains.jewel.ui.ComponentStyling
 
 @OptIn(ExperimentalLayoutApi::class)
 public fun main() {
+    enableNewSwingCompositing()
     SwingUtilities.invokeLater {
         JFrame("JewelStandaloneJbrSkiaWindow").apply {
             defaultCloseOperation = JFrame.EXIT_ON_CLOSE

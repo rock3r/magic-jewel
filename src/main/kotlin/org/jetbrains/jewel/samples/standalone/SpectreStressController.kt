@@ -3,6 +3,7 @@ package org.jetbrains.jewel.samples.standalone
 import dev.sebastiano.spectre.core.AutomatorNode
 import dev.sebastiano.spectre.core.ComposeAutomator
 import dev.sebastiano.spectre.core.RobotDriver
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import kotlin.concurrent.thread
@@ -14,9 +15,11 @@ import org.jetbrains.jewel.samples.standalone.viewmodel.MainViewModel
 
 internal object SpectreStressController {
     private val TourWaitTimeout = 60.seconds
+    private val started = AtomicBoolean(false)
 
     fun startIfRequested(frame: JFrame) {
         if (!java.lang.Boolean.getBoolean("jewel.standalone.spectreStress")) return
+        if (!started.compareAndSet(false, true)) return
 
         val intervalMillis =
             System.getProperty("jewel.standalone.spectreStressIntervalMillis")?.toLongOrNull()
