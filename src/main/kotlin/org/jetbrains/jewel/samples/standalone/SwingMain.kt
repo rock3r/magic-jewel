@@ -53,6 +53,7 @@ public fun main() {
             pack()
             setLocationRelativeTo(null)
             isVisible = true
+            SpectreStressController.startIfRequested(this)
         }
     }
 }

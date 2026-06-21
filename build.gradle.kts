@@ -46,6 +46,13 @@ val jewelStandaloneInitialView = providers.gradleProperty("jewelStandaloneInitia
 val jewelStandaloneInitialComponent = providers.gradleProperty("jewelStandaloneInitialComponent")
     .orElse(providers.environmentVariable("JEWEL_STANDALONE_INITIAL_COMPONENT"))
     .orElse("")
+val jewelStandaloneSpectreStress = providers.gradleProperty("jewelStandaloneSpectreStress")
+    .orElse(providers.environmentVariable("JEWEL_STANDALONE_SPECTRE_STRESS"))
+    .orElse("false")
+val jewelStandaloneSpectreStressIntervalMillis =
+    providers.gradleProperty("jewelStandaloneSpectreStressIntervalMillis")
+        .orElse(providers.environmentVariable("JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS"))
+        .orElse("350")
 val composeTextEnabled = providers.gradleProperty("magicJewelComposeText")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_TEXT"))
     .orElse("true")
@@ -663,6 +670,7 @@ dependencies {
     implementation(libs.jewel.markdown.int.ui.standalone.styling)
     implementation(compose.components.resources)
     implementation(libs.kotlinx.coroutines.swing)
+    implementation("dev.sebastiano.spectre:spectre-core:0.2.1")
 }
 
 application {
@@ -1019,6 +1027,8 @@ fun JavaExec.configureJewelStandaloneJvm(interoperable: Boolean) {
     systemProperty("compose.swing.render.on.graphics", "true")
     systemProperty("apple.awt.application.name", "Jewel Standalone Sample")
     systemProperty("jewel.standalone.initialView", jewelStandaloneInitialView.get())
+    systemProperty("jewel.standalone.spectreStress", jewelStandaloneSpectreStress.get())
+    systemProperty("jewel.standalone.spectreStressIntervalMillis", jewelStandaloneSpectreStressIntervalMillis.get())
     jewelStandaloneInitialComponent.orNull?.takeIf { it.isNotBlank() }?.let {
         systemProperty("jewel.standalone.initialComponent", it)
     }

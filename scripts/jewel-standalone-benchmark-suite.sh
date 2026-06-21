@@ -9,8 +9,8 @@ DURATION_SECONDS="${DURATION_SECONDS:-30}"
 WARMUP_SECONDS="${WARMUP_SECONDS:-5}"
 SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS:-1}"
 JBR_SKIA_RENDER_MODE="${JBR_SKIA_RENDER_MODE:-commands}"
-SPECTRE_CMD="${SPECTRE_CMD:-}"
-SPECTRE_ARGS="${SPECTRE_ARGS:-}"
+JEWEL_STANDALONE_SPECTRE_STRESS="${JEWEL_STANDALONE_SPECTRE_STRESS:-true}"
+JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS="${JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS:-350}"
 
 mkdir -p "${OUT_ROOT}"
 
@@ -19,35 +19,11 @@ machine_snapshot() {
     echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     echo "uname=$(uname -a)"
     echo "uptime=$(uptime)"
-    echo "spectre_cmd=${SPECTRE_CMD:-unavailable}"
+    echo "spectre_stress=${JEWEL_STANDALONE_SPECTRE_STRESS}"
+    echo "spectre_stress_interval_millis=${JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS}"
     echo "top_processes:"
     ps -Ao pid,pcpu,pmem,comm | sort -k2 -nr | head -20 || true
   } > "${OUT_ROOT}/machine-snapshot.txt"
-}
-
-run_spectre_if_available() {
-  local phase="$1"
-  if [[ -z "${SPECTRE_CMD}" ]]; then
-    echo "spectre_status=not-configured" > "${OUT_ROOT}/spectre-${phase}.txt"
-    return 0
-  fi
-  if ! command -v "${SPECTRE_CMD}" >/dev/null 2>&1 && [[ ! -x "${SPECTRE_CMD}" ]]; then
-    echo "spectre_status=missing command=${SPECTRE_CMD}" > "${OUT_ROOT}/spectre-${phase}.txt"
-    return 0
-  fi
-  "${SPECTRE_CMD}" ${SPECTRE_ARGS} > "${OUT_ROOT}/spectre-${phase}.log" 2>&1 &
-  echo "$!" > "${OUT_ROOT}/spectre-${phase}.pid"
-  echo "spectre_status=started pid=$!" > "${OUT_ROOT}/spectre-${phase}.txt"
-}
-
-stop_spectre_if_running() {
-  local phase="$1"
-  local pid_file="${OUT_ROOT}/spectre-${phase}.pid"
-  [[ -f "${pid_file}" ]] || return 0
-  local pid
-  pid="$(cat "${pid_file}")"
-  kill "${pid}" 2>/dev/null || true
-  wait "${pid}" >/dev/null 2>&1 || true
 }
 
 summary_value() {
@@ -61,7 +37,6 @@ run_case() {
   local out_dir="${OUT_ROOT}/${name}"
   echo "== ${name} =="
   mkdir -p "${out_dir}"
-  run_spectre_if_available "${name}"
   env \
     OUT_DIR="${out_dir}" \
     SKIKO_VERSION="${SKIKO_VERSION}" \
@@ -78,8 +53,9 @@ run_case() {
     EXPECT_MIN_APP_NEW_FRAMES=1 \
     JEWEL_STANDALONE_INITIAL_VIEW=Hypnotoad \
     JEWEL_STANDALONE_INITIAL_COMPONENT= \
+    JEWEL_STANDALONE_SPECTRE_STRESS="${JEWEL_STANDALONE_SPECTRE_STRESS}" \
+    JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS="${JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS}" \
     "${SCRIPT_DIR}/jbr-skia-interop-report.sh" > "${out_dir}/report-path.txt"
-  stop_spectre_if_running "${name}"
 }
 
 write_suite_summary() {

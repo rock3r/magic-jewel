@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import java.awt.Desktop
 import java.net.URI
@@ -32,7 +33,7 @@ internal fun DecoratedWindowScope.TitleBarView() {
     TitleBar(Modifier.newFullscreenControls(), gradientStartColor = MainViewModel.projectColor) {
         Row(Modifier.align(Alignment.Start)) {
             Dropdown(
-                Modifier.height(30.dp),
+                Modifier.height(30.dp).testTag("jewel.nav.currentView"),
                 menuContent = {
                     MainViewModel.views.forEach {
                         selectableItem(
@@ -73,7 +74,7 @@ internal fun DecoratedWindowScope.TitleBarView() {
                 val jewelGithubLink = "https://github.com/JetBrains/intellij-community/tree/master/platform/jewel"
                 IconButton(
                     { Desktop.getDesktop().browse(URI.create(jewelGithubLink)) },
-                    Modifier.size(40.dp).padding(5.dp),
+                    Modifier.size(40.dp).padding(5.dp).testTag("jewel.action.openGithub"),
                 ) {
                     Icon(ShowcaseIcons.gitHub, "Github")
                 }
@@ -99,7 +100,7 @@ internal fun DecoratedWindowScope.TitleBarView() {
                                 IntUiThemes.System -> IntUiThemes.Light
                             }
                     },
-                    Modifier.size(40.dp).padding(5.dp),
+                    Modifier.size(40.dp).padding(5.dp).testTag("jewel.action.cycleTheme"),
                 ) {
                     when (MainViewModel.theme) {
                         IntUiThemes.Light ->

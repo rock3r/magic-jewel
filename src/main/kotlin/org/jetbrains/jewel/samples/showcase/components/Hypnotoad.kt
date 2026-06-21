@@ -8,13 +8,20 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -23,14 +30,19 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
+import org.jetbrains.jewel.ui.component.DefaultButton
+import org.jetbrains.jewel.ui.component.OutlinedButton
+import org.jetbrains.jewel.ui.component.Text
 
 @Composable
 internal fun Hypnotoad() {
+    var intensity by remember { mutableIntStateOf(0) }
     val transition = rememberInfiniteTransition(label = "hypnotoad")
     val phase by
         transition.animateFloat(
@@ -51,7 +63,7 @@ internal fun Hypnotoad() {
             label = "pulse",
         )
 
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize().testTag("jewel.page.hypnotoad")) {
         Canvas(Modifier.fillMaxWidth().height(720.dp)) {
             val w = size.width
             val h = size.height
@@ -60,7 +72,7 @@ internal fun Hypnotoad() {
             drawRect(Color(0xFF090014), size = size)
 
             repeat(9) { ring ->
-                val radius = short * (0.08f + ring * 0.052f + pulse * 0.01f)
+                val radius = short * (0.08f + ring * 0.052f + pulse * 0.01f + intensity * 0.004f)
                 drawCircle(
                     color = palette[(ring + (phase * 20f).toInt()) % palette.size],
                     radius = radius,
@@ -70,7 +82,7 @@ internal fun Hypnotoad() {
                 )
             }
 
-            repeat(42) { index ->
+            repeat(42 + intensity * 4) { index ->
                 val t = phase * 2f * PI.toFloat() + index * 0.37f
                 val orbit = short * (0.09f + (index % 11) * 0.027f)
                 val p = Offset(center.x + cos(t) * orbit, center.y + sin(t * 1.21f) * orbit * 0.72f)
@@ -121,7 +133,31 @@ internal fun Hypnotoad() {
             drawCircle(Color(0xFF05000A), radius = short * 0.065f, center = center)
             drawCircle(Color(0xFFFFFFFF), radius = short * (0.024f + pulse * 0.011f), center = center)
 
-            println("JEWEL_STANDALONE_FRAME page=Hypnotoad phase=$phase")
+            println("JEWEL_STANDALONE_FRAME page=Hypnotoad phase=$phase intensity=$intensity")
+        }
+
+        Row(
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            OutlinedButton(
+                onClick = { intensity = (intensity + 1).coerceAtMost(4) },
+                modifier = Modifier.testTag("jewel.hypnotoad.warp"),
+            ) {
+                Text("Warp")
+            }
+            DefaultButton(
+                onClick = { intensity = 0 },
+                modifier = Modifier.testTag("jewel.hypnotoad.reset"),
+            ) {
+                Text("Reset")
+            }
+            OutlinedButton(
+                onClick = { intensity = (intensity - 1).coerceAtLeast(0) },
+                modifier = Modifier.testTag("jewel.hypnotoad.calm"),
+            ) {
+                Text("Calm")
+            }
         }
     }
 }

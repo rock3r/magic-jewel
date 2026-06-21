@@ -18,6 +18,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -80,6 +81,7 @@ public fun ComponentsToolBar(
                     contentDescription = "Show ${viewInfo.title}",
                     selected = currentView == viewInfo,
                     onClick = { setCurrentView(viewInfo) },
+                    modifier = Modifier.testTag("jewel.components.${viewInfo.title}"),
                     style = style,
                     tooltip = { Text(viewInfo.title) },
                     tooltipPlacement = TooltipPlacement.ComponentRect(Alignment.CenterEnd, Alignment.CenterEnd),
