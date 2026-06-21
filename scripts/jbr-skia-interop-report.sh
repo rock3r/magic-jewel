@@ -3161,6 +3161,20 @@ write_screenshot_count_properties() {
   ' <<< "${line}"
 }
 
+analysis_log() {
+  local sampled_log="$1"
+  local full_log="$2"
+  [[ -f "${sampled_log}" ]] || sampled_log="${full_log}"
+  [[ -f "${full_log}" ]] || full_log="${sampled_log}"
+  if [[ -f "${full_log}" &&
+      "$(grep -Ec "${CMP_COMMAND_RECORDER_MARKER}|${SKIKO_COMMAND_MARKER}|${JBR_COMMAND_MARKER}|${SKIKO_PICTURE_MARKER}|${JBR_PICTURE_MARKER}|${APP_FRAME_MARKER}" "${sampled_log}" 2>/dev/null || true)" -eq 0 &&
+      "$(grep -Ec "${CMP_COMMAND_RECORDER_MARKER}|${SKIKO_COMMAND_MARKER}|${JBR_COMMAND_MARKER}|${SKIKO_PICTURE_MARKER}|${JBR_PICTURE_MARKER}|${APP_FRAME_MARKER}" "${full_log}" 2>/dev/null || true)" -gt 0 ]]; then
+    printf "%s\n" "${full_log}"
+  else
+    printf "%s\n" "${sampled_log}"
+  fi
+}
+
 write_machine_summary() {
   local validation_status="$1"
   shift
@@ -3169,10 +3183,10 @@ write_machine_summary() {
   local new_log="${OUT_DIR}/new-sampled.log"
   local old_full_log="${OUT_DIR}/old.log"
   local new_full_log="${OUT_DIR}/new.log"
-  [[ -f "${old_log}" ]] || old_log="${OUT_DIR}/old.log"
-  [[ -f "${new_log}" ]] || new_log="${OUT_DIR}/new.log"
   [[ -f "${old_full_log}" ]] || old_full_log="${old_log}"
   [[ -f "${new_full_log}" ]] || new_full_log="${new_log}"
+  old_log="$(analysis_log "${old_log}" "${old_full_log}")"
+  new_log="$(analysis_log "${new_log}" "${new_full_log}")"
 
   local failures="none"
   if [[ "$#" -gt 0 ]]; then
@@ -3305,10 +3319,10 @@ write_report() {
   local new_log="${OUT_DIR}/new-sampled.log"
   local old_full_log="${OUT_DIR}/old.log"
   local new_full_log="${OUT_DIR}/new.log"
-  [[ -f "${old_log}" ]] || old_log="${OUT_DIR}/old.log"
-  [[ -f "${new_log}" ]] || new_log="${OUT_DIR}/new.log"
   [[ -f "${old_full_log}" ]] || old_full_log="${old_log}"
   [[ -f "${new_full_log}" ]] || new_full_log="${new_log}"
+  old_log="$(analysis_log "${old_log}" "${old_full_log}")"
+  new_log="$(analysis_log "${new_log}" "${new_full_log}")"
 
   old_summary="$(summarize_csv "${OUT_DIR}/old-ps.csv")"
   new_summary="$(summarize_csv "${OUT_DIR}/new-ps.csv")"
@@ -4000,8 +4014,8 @@ validate_report() {
   local failures=()
   local new_log="${OUT_DIR}/new-sampled.log"
   local new_full_log="${OUT_DIR}/new.log"
-  [[ -f "${new_log}" ]] || new_log="${OUT_DIR}/new.log"
   [[ -f "${new_full_log}" ]] || new_full_log="${new_log}"
+  new_log="$(analysis_log "${new_log}" "${new_full_log}")"
 
   if [[ "${mode}" == "commands" && "${expect_strict}" == "true" ]]; then
     local recorder_frames

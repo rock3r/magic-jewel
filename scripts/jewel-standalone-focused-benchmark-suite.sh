@@ -51,6 +51,8 @@ run_case() {
   local markdown_preview_only="${6:-false}"
   local markdown_auto_scroll="${7:-false}"
   local spectre_stress="${8:-${JEWEL_STANDALONE_SPECTRE_STRESS}}"
+  local initial_component="${9:-}"
+  local expect_min_app_new_frames="${10:-1}"
   local out_dir="${OUT_ROOT}/${name}"
   echo "== ${name} (${mode}) =="
   mkdir -p "${out_dir}"
@@ -68,12 +70,12 @@ run_case() {
     APP_PROCESS_QUERY=org.jetbrains.jewel.samples.standalone.SwingMainKt \
     CAPTURE_WINDOW_QUERY=JewelStandaloneJbrSkiaWindow \
     APP_FRAME_MARKER="${frame_marker}" \
-    EXPECT_MIN_APP_NEW_FRAMES=1 \
+    EXPECT_MIN_APP_NEW_FRAMES="${expect_min_app_new_frames}" \
     COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS}" \
     POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS}" \
     POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS}" \
     JEWEL_STANDALONE_INITIAL_VIEW="${initial_view}" \
-    JEWEL_STANDALONE_INITIAL_COMPONENT= \
+    JEWEL_STANDALONE_INITIAL_COMPONENT="${initial_component}" \
     JEWEL_STANDALONE_MARKDOWN_CONTENT="${markdown_content}" \
     JEWEL_STANDALONE_MARKDOWN_PREVIEW_ONLY="${markdown_preview_only}" \
     JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL="${markdown_auto_scroll}" \
@@ -128,6 +130,8 @@ should_run_case markdown-preview-readme80-auto &&
   run_case markdown-preview-readme80-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme80 true true false
 should_run_case markdown-preview-readme80-wheel &&
   run_case markdown-preview-readme80-wheel markdownWheel Markdown JEWEL_STANDALONE_SPECTRE readme80 true false true
+should_run_case showcase-icons &&
+  run_case showcase-icons idle Components JEWEL_STANDALONE_FRAME readme80 false false false Icons 0
 should_run_case markdown-preview-readme20-auto &&
   run_case markdown-preview-readme20-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme20 true true false
 should_run_case markdown-preview-readme40-auto &&
