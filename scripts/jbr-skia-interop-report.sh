@@ -3954,6 +3954,15 @@ validate_report() {
         failures+=("Skiko/JBR command frame count mismatch: ${skiko_command_frames}/${jbr_command_frames} tolerance=${command_frame_tolerance}")
       [[ "${skiko_picture_frames}" -eq 0 ]] || failures+=("unexpected Skiko picture frames in strict command mode: ${skiko_picture_frames}")
       [[ "${jbr_picture_frames}" -eq 0 ]] || failures+=("unexpected JBR picture frames in strict command mode: ${jbr_picture_frames}")
+      if grep -q "${FALLBACK_MARKER}" "${new_full_log}" 2>/dev/null; then
+        failures+=("unexpected Skiko fallback markers in strict command mode")
+      fi
+      if grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_full_log}" 2>/dev/null; then
+        failures+=("unexpected rendered=false command frames in strict command mode")
+      fi
+      if grep -q "SKIKO_JBR_INTEROP_COMMAND_RETRY" "${new_full_log}" 2>/dev/null; then
+        failures+=("unexpected command-render retry markers in strict command mode")
+      fi
       if grep -Eq "(${CMP_COMMAND_RECORDER_MARKER}|${CMP_COMMAND_RECORDER_NESTED_MARKER}).*unsupported=[1-9][0-9]*" "${new_log}" 2>/dev/null; then
         failures+=("CMP recorder reported unsupported command operations")
       fi

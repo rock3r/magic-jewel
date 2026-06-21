@@ -69,7 +69,12 @@ command path. It launches directly into the top-level `Hypnotoad` page, an alway
 stress Swing compositing while staying command-clean. Spectre `0.2.1` is wired in-process through
 `ComposeAutomator` and drives tagged Hypnotoad controls during the measured run; set
 `JEWEL_STANDALONE_SPECTRE_STRESS=false` to disable that UI-control loop, or tune
-`JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS`. Results land in
+`JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS`. Set
+`JEWEL_STANDALONE_SPECTRE_STRESS_MODE=fullShowcaseThenHypnotoad` to use the copied Jewel showcase tour as the real
+coverage gate: Welcome, every component page, Markdown, the component pages again in reverse order, and then
+Hypnotoad. Focused iteration can set `JEWEL_STANDALONE_SPECTRE_COMPONENTS` to a comma-separated component-page slice,
+for example `Combo Boxes,Icons,TextFields,Scrollbars`; slices are narrow probes only and are not a 100% coverage claim.
+Results land in
 `out/jewel-standalone-benchmark-suite/<timestamp>/suite.tsv` with machine-load metadata, process samples, old/new
 app-frame rates, JBR command-frame rates, fallback counts, and strict command validation.
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import org.jetbrains.jewel.foundation.modifier.trackActivation
@@ -19,15 +20,21 @@ import org.jetbrains.jewel.samples.standalone.markdown.MarkdownPreview
 import org.jetbrains.jewel.ui.Orientation
 import org.jetbrains.jewel.ui.component.Divider
 
+private val InitialMarkdown = JewelReadme.lineSequence().take(80).joinToString("\n")
+
 @Composable
 internal fun MarkdownDemo() {
     Row(
-        Modifier.trackActivation().fillMaxSize().background(JewelTheme.globalColors.panelBackground).semantics {
-            isTraversalGroup = true
-        }
+        Modifier.trackActivation()
+            .fillMaxSize()
+            .testTag("jewel.page.markdown")
+            .background(JewelTheme.globalColors.panelBackground)
+            .semantics {
+                isTraversalGroup = true
+            }
     ) {
         WithMarkdownMode(MarkdownMode.EditorPreview(scrollingSynchronizer = null)) {
-            val editorState = rememberTextFieldState(JewelReadme)
+            val editorState = rememberTextFieldState(InitialMarkdown)
             MarkdownEditor(state = editorState, modifier = Modifier.fillMaxHeight().weight(1f))
 
             Divider(Orientation.Vertical, Modifier.fillMaxHeight())

@@ -35,6 +35,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import java.awt.datatransfer.StringSelection
 import java.util.Locale
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.jewel.foundation.Stroke
 import org.jetbrains.jewel.foundation.modifier.border
@@ -46,7 +48,6 @@ import org.jetbrains.jewel.ui.component.Text
 import org.jetbrains.jewel.ui.component.TextField
 import org.jetbrains.jewel.ui.component.VerticallyScrollableContainer
 import org.jetbrains.jewel.ui.component.scrollbarContentSafePadding
-import org.jetbrains.jewel.ui.graphics.cssLinearGradient
 import org.jetbrains.jewel.ui.typography
 import org.jetbrains.jewel.ui.util.fromArgbHexStringOrNull
 import org.jetbrains.jewel.ui.util.toArgbHexString
@@ -103,13 +104,24 @@ internal fun BrushesShowcase() {
 
     val brush =
         remember(angleDegrees.text, parsedColors, parsedStops, scaleX, scaleY, offsetX, offsetY, canShowGradient) {
-            Brush.cssLinearGradient(
-                angleDegrees = angleDegrees.text.toString().toDoubleOrNull() ?: 0.0,
-                colors = parsedColors.takeIf { canShowGradient } ?: listOf(Color.Transparent, Color.Transparent),
-                stops = parsedStops.takeIf { canShowGradient } ?: listOf(0f, 1f),
-                scaleX = scaleX,
-                scaleY = scaleY,
-                offset = Offset(offsetX, offsetY),
+            val radians = Math.toRadians(angleDegrees.text.toString().toDoubleOrNull() ?: 0.0)
+            val gradientExtent = 320f
+            val start = Offset(offsetX, offsetY)
+            val end =
+                Offset(
+                    x = offsetX + cos(radians).toFloat() * gradientExtent * scaleX,
+                    y = offsetY + sin(radians).toFloat() * gradientExtent * scaleY,
+                )
+            val colorStops =
+                if (canShowGradient) {
+                    parsedStops.zip(parsedColors).toTypedArray()
+                } else {
+                    arrayOf(0f to Color.Transparent, 1f to Color.Transparent)
+                }
+            Brush.linearGradient(
+                colorStops = colorStops,
+                start = start,
+                end = end,
             )
         }
 

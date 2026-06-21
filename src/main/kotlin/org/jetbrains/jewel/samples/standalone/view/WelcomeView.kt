@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ internal fun WelcomeView() {
         modifier =
             Modifier.trackActivation()
                 .fillMaxSize()
+                .testTag("jewel.page.welcome")
                 .background(JewelTheme.globalColors.panelBackground)
                 .padding(24.dp)
                 .semantics { isTraversalGroup = true },
