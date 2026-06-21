@@ -2,6 +2,7 @@
 kotlin = "2.3.20"
 compose = "1.10.3"
 jewel = "0.35.0-261.23567.138"
+intellijIcons = "261.23567.143"
 coroutines = "1.10.2"
 
 [libraries]
@@ -11,6 +12,7 @@ jewel-markdown-core = { module = "org.jetbrains.jewel:jewel-markdown-core", vers
 jewel-markdown-extensions-autolink = { module = "org.jetbrains.jewel:jewel-markdown-extensions-autolink", version.ref = "jewel" }
 jewel-markdown-extensions-gfm-tables = { module = "org.jetbrains.jewel:jewel-markdown-extensions-gfm-tables", version.ref = "jewel" }
 jewel-markdown-int-ui-standalone-styling = { module = "org.jetbrains.jewel:jewel-markdown-int-ui-standalone-styling", version.ref = "jewel" }
+intellij-icons = { module = "com.jetbrains.intellij.platform:icons", version.ref = "intellijIcons" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 [plugins]

@@ -676,6 +676,7 @@ dependencies {
     implementation(libs.jewel.markdown.extensions.autolink)
     implementation(libs.jewel.markdown.extensions.gfm.tables)
     implementation(libs.jewel.markdown.int.ui.standalone.styling)
+    implementation(libs.intellij.icons)
     implementation(compose.components.resources)
     implementation(libs.kotlinx.coroutines.swing)
     implementation("dev.sebastiano.spectre:spectre-core:0.2.1")
