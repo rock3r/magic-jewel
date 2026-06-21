@@ -19,6 +19,7 @@ COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS:-false}"
 POWERMETRICS="${POWERMETRICS:-/usr/bin/powermetrics}"
 POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-1000}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
+COLLECT_THREAD_CPU="${COLLECT_THREAD_CPU:-false}"
 CAPTURE_WINDOW_QUERY="${CAPTURE_WINDOW_QUERY:-MagicJewelJbrSkiaWindow}"
 APP_PROCESS_QUERY="${APP_PROCESS_QUERY:-com.magicjewel.MainKt}"
 CMP_SCRIPTS_DIR="${CMP_SCRIPTS_DIR:-$(cd -- "${ROOT_DIR}/../cmp/compose/desktop/desktop/samples/scripts" >/dev/null && pwd)}"
@@ -2565,6 +2566,43 @@ sample_process_tree() {
   fi
 }
 
+sample_thread_cpu() {
+  local mode="$1"
+  local pid="$2"
+  local csv="$3"
+  local timestamp
+
+  if [[ "${COLLECT_THREAD_CPU}" != "true" || -z "${pid}" ]]; then
+    return
+  fi
+
+  timestamp="$(date +%s)"
+  ps -M -p "${pid}" 2>/dev/null |
+    awk -v timestamp="${timestamp}" -v mode="${mode}" '
+      NR == 1 { next }
+      {
+        pid = $2
+        cpu = $4
+        command = ""
+        if ($1 ~ /^[0-9]+$/) {
+          pid = $1
+          cpu = $2
+        } else if ($1 == "") {
+          pid = $2
+          cpu = $3
+        }
+        if (cpu !~ /^[0-9.]+$/) {
+          next
+        }
+        for (i = 9; i <= NF; i++) {
+          command = command (command == "" ? "" : " ") $i
+        }
+        gsub(/,/, " ", command)
+        printf "%s,%s,%s,%d,%s,%s\n", timestamp, mode, pid, ++threadIndex, cpu, command
+      }
+    ' >> "${csv}"
+}
+
 launch_mode() {
   local mode="$1"
   cd "${ROOT_DIR}"
@@ -2579,6 +2617,7 @@ run_mode() {
   local mode="$1"
   local log="${OUT_DIR}/${mode}.log"
   local csv="${OUT_DIR}/${mode}-ps.csv"
+  local thread_csv="${OUT_DIR}/${mode}-thread-cpu.csv"
   local screenshot="${OUT_DIR}/${mode}-window.png"
   local screenshot_assertion="${OUT_DIR}/${mode}-screenshot-assertion.log"
   local screenshot_status="${OUT_DIR}/${mode}-screenshot-status.txt"
@@ -2613,6 +2652,7 @@ run_mode() {
   fi
 
   printf 'timestamp,mode,pid,cpu_percent,rss_kb\n' > "${csv}"
+  printf 'timestamp,mode,pid,thread_index,cpu_percent,command\n' > "${thread_csv}"
 
   if [[ "${DRY_RUN:-false}" == "true" ]]; then
     echo "Would run Magic Jewel mode ${mode}" > "${log}"
@@ -2660,6 +2700,7 @@ run_mode() {
         powermetrics_pid="$(start_powermetrics "${mode}")"
       fi
       sample_process_tree "${mode}" "${root_pid}" "${csv}"
+      sample_thread_cpu "${mode}" "${profiler_pid}" "${thread_csv}"
     fi
     if [[ ( "${mode}" == "new" || "${CAPTURE_OLD_SCREENSHOT}" == "true" )
         && "${screenshot_done}" == "false"
