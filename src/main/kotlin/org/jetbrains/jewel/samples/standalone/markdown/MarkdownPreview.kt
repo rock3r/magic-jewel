@@ -97,7 +97,7 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
         val lazyListState = rememberLazyListState()
         val autoScroll = remember {
             java.lang.Boolean.getBoolean("jewel.standalone.markdownAutoScroll") ||
-                System.getProperty("jewel.standalone.spectreStressMode") == "markdownScroll"
+                System.getProperty("jewel.standalone.spectreStressMode") == "markdownAutoScroll"
         }
         LaunchedEffect(autoScroll, markdownBlocks.size) {
             if (autoScroll && markdownBlocks.isNotEmpty()) {

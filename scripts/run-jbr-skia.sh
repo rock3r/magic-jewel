@@ -1317,6 +1317,11 @@ fi
 if [[ -n "${JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST}" ]]; then
   JBR_ARGS+=("-Dsun.java2d.skia.interop.commandCapabilitiesHighMaskForTest=${JBR_SKIA_COMMAND_CAPABILITIES_HIGH_MASK_FOR_TEST}")
 fi
+if [[ -n "${JBR_SKIA_INTEROP_EXTRA_JVM_ARGS:-}" ]]; then
+  # shellcheck disable=SC2206
+  EXTRA_JBR_ARGS=(${JBR_SKIA_INTEROP_EXTRA_JVM_ARGS})
+  JBR_ARGS+=("${EXTRA_JBR_ARGS[@]}")
+fi
 
 printf -v JOINED_ARGS "%s " "${JBR_ARGS[@]}"
 cd "$ROOT"

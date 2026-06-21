@@ -36,7 +36,7 @@ internal object SpectreStressController {
                 val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.synthetic(frame))
                 val startupTag =
                     when (mode) {
-                        SpectreStressMode.MarkdownScroll -> "jewel.page.markdown"
+                        SpectreStressMode.MarkdownWheel -> "jewel.page.markdown"
                         else -> "jewel.page.hypnotoad"
                     }
                 automator.waitForNode(tag = startupTag, timeout = 10.seconds)
@@ -49,7 +49,7 @@ internal object SpectreStressController {
                         selectTopLevelView("Hypnotoad")
                         automator.waitForNode(tag = "jewel.page.hypnotoad", timeout = 5.seconds)
                     }
-                    SpectreStressMode.MarkdownScroll -> {
+                    SpectreStressMode.MarkdownWheel -> {
                         selectTopLevelView("Markdown")
                         automator.waitForNode(tag = "jewel.page.markdown", timeout = TourWaitTimeout)
                         println("JEWEL_STANDALONE_SPECTRE phase=focused-view target=Markdown")
@@ -121,7 +121,7 @@ internal object SpectreStressController {
     private suspend fun ComposeAutomator.stressOnce(mode: SpectreStressMode, cycle: Int) {
         refreshWindows()
         when (mode) {
-            SpectreStressMode.MarkdownScroll -> scrollMarkdownOnce(cycle)
+            SpectreStressMode.MarkdownWheel -> scrollMarkdownOnce(cycle)
             else ->
                 when (cycle % 6) {
                     0, 1, 2, 3 -> clickIfPresent("jewel.hypnotoad.warp", "hypnotoad-warp", cycle)
@@ -154,14 +154,14 @@ internal object SpectreStressController {
 
     private enum class SpectreStressMode {
         Hypnotoad,
-        MarkdownScroll,
+        MarkdownWheel,
         TourThenHypnotoad,
         FullShowcaseThenHypnotoad;
 
         companion object {
             fun from(value: String): SpectreStressMode =
                 when (value) {
-                    "markdownScroll" -> MarkdownScroll
+                    "markdownScroll", "markdownWheel" -> MarkdownWheel
                     "tourThenHypnotoad" -> TourThenHypnotoad
                     "fullShowcaseThenHypnotoad" -> FullShowcaseThenHypnotoad
                     else -> Hypnotoad

@@ -14,6 +14,8 @@ JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS="${JEWEL_STANDALONE_SPECTRE_STRE
 COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS:-false}"
 POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-1000}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
+JBR_SKIA_INTEROP_JVM_ARGS="${JBR_SKIA_INTEROP_JVM_ARGS:--Dcompose.jbr.skia.command.logOpCounts=true}"
+CASES="${CASES:-hypnotoad-animation markdown-editor-preview-readme80-auto markdown-preview-readme80-auto markdown-preview-readme80-wheel}"
 
 mkdir -p "${OUT_ROOT}"
 
@@ -45,10 +47,15 @@ run_case() {
   local mode="$2"
   local initial_view="$3"
   local frame_marker="$4"
+  local markdown_content="${5:-readme80}"
+  local markdown_preview_only="${6:-false}"
+  local markdown_auto_scroll="${7:-false}"
+  local spectre_stress="${8:-${JEWEL_STANDALONE_SPECTRE_STRESS}}"
   local out_dir="${OUT_ROOT}/${name}"
   echo "== ${name} (${mode}) =="
   mkdir -p "${out_dir}"
   env \
+    JBR_SKIA_INTEROP_EXTRA_JVM_ARGS="${JBR_SKIA_INTEROP_JVM_ARGS}" \
     OUT_DIR="${out_dir}" \
     SKIKO_VERSION="${SKIKO_VERSION}" \
     DURATION_SECONDS="${DURATION_SECONDS}" \
@@ -67,11 +74,19 @@ run_case() {
     POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS}" \
     JEWEL_STANDALONE_INITIAL_VIEW="${initial_view}" \
     JEWEL_STANDALONE_INITIAL_COMPONENT= \
-    JEWEL_STANDALONE_SPECTRE_STRESS="${JEWEL_STANDALONE_SPECTRE_STRESS}" \
+    JEWEL_STANDALONE_MARKDOWN_CONTENT="${markdown_content}" \
+    JEWEL_STANDALONE_MARKDOWN_PREVIEW_ONLY="${markdown_preview_only}" \
+    JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL="${markdown_auto_scroll}" \
+    JEWEL_STANDALONE_SPECTRE_STRESS="${spectre_stress}" \
     JEWEL_STANDALONE_SPECTRE_STRESS_MODE="${mode}" \
     JEWEL_STANDALONE_SPECTRE_COMPONENTS= \
     JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS="${JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS}" \
     "${SCRIPT_DIR}/jbr-skia-interop-report.sh" > "${out_dir}/report-path.txt"
+}
+
+should_run_case() {
+  local name="$1"
+  [[ " ${CASES} " == *" ${name} "* ]]
 }
 
 write_suite_summary() {
@@ -105,6 +120,22 @@ write_suite_summary() {
 }
 
 machine_snapshot
-run_case hypnotoad-animation hypnotoad Hypnotoad JEWEL_STANDALONE_FRAME
-run_case markdown-scroll markdownScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL
+should_run_case hypnotoad-animation &&
+  run_case hypnotoad-animation hypnotoad Hypnotoad JEWEL_STANDALONE_FRAME readme80 false false true
+should_run_case markdown-editor-preview-readme80-auto &&
+  run_case markdown-editor-preview-readme80-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme80 false true false
+should_run_case markdown-preview-readme80-auto &&
+  run_case markdown-preview-readme80-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme80 true true false
+should_run_case markdown-preview-readme80-wheel &&
+  run_case markdown-preview-readme80-wheel markdownWheel Markdown JEWEL_STANDALONE_SPECTRE readme80 true false true
+should_run_case markdown-preview-readme20-auto &&
+  run_case markdown-preview-readme20-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme20 true true false
+should_run_case markdown-preview-readme40-auto &&
+  run_case markdown-preview-readme40-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme40 true true false
+should_run_case markdown-preview-readme160-auto &&
+  run_case markdown-preview-readme160-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme160 true true false
+should_run_case markdown-preview-catalog-head-auto &&
+  run_case markdown-preview-catalog-head-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL catalogHead true true false
+should_run_case markdown-preview-catalog-auto &&
+  run_case markdown-preview-catalog-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL catalog true true false
 write_suite_summary

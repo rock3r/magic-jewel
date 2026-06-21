@@ -61,6 +61,18 @@ val jewelStandaloneSpectreComponents =
     providers.gradleProperty("jewelStandaloneSpectreComponents")
         .orElse(providers.environmentVariable("JEWEL_STANDALONE_SPECTRE_COMPONENTS"))
         .orElse("")
+val jewelStandaloneMarkdownContent =
+    providers.gradleProperty("jewelStandaloneMarkdownContent")
+        .orElse(providers.environmentVariable("JEWEL_STANDALONE_MARKDOWN_CONTENT"))
+        .orElse("readme80")
+val jewelStandaloneMarkdownPreviewOnly =
+    providers.gradleProperty("jewelStandaloneMarkdownPreviewOnly")
+        .orElse(providers.environmentVariable("JEWEL_STANDALONE_MARKDOWN_PREVIEW_ONLY"))
+        .orElse("false")
+val jewelStandaloneMarkdownAutoScroll =
+    providers.gradleProperty("jewelStandaloneMarkdownAutoScroll")
+        .orElse(providers.environmentVariable("JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL"))
+        .orElse("false")
 val composeTextEnabled = providers.gradleProperty("magicJewelComposeText")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_TEXT"))
     .orElse("true")
@@ -1042,6 +1054,9 @@ fun JavaExec.configureJewelStandaloneJvm(interoperable: Boolean, swingCompositin
     systemProperty("jewel.standalone.spectreStressIntervalMillis", jewelStandaloneSpectreStressIntervalMillis.get())
     systemProperty("jewel.standalone.spectreStressMode", jewelStandaloneSpectreStressMode.get())
     systemProperty("jewel.standalone.spectreComponents", jewelStandaloneSpectreComponents.get())
+    systemProperty("jewel.standalone.markdownContent", jewelStandaloneMarkdownContent.get())
+    systemProperty("jewel.standalone.markdownPreviewOnly", jewelStandaloneMarkdownPreviewOnly.get())
+    systemProperty("jewel.standalone.markdownAutoScroll", jewelStandaloneMarkdownAutoScroll.get())
     jewelStandaloneInitialComponent.orNull?.takeIf { it.isNotBlank() }?.let {
         systemProperty("jewel.standalone.initialComponent", it)
     }

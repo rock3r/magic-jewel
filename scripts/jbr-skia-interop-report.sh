@@ -1876,6 +1876,7 @@ SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
 SKIKO_COMMAND_CACHES_CLEARED_MARKER="SKIKO_JBR_INTEROP_COMMAND_CACHES_CLEARED"
 SKIKO_TINY_FULL_SCENE_MARKER="SKIKO_JBR_INTEROP_TINY_FULL_SCENE_INJECTED"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
+CMP_COMMAND_RECORDER_OPS_MARKER="CMP_JBR_COMMAND_RECORDER_OPS"
 CMP_COMMAND_RECORDER_NESTED_MARKER="CMP_JBR_COMMAND_RECORDER_NESTED_UNSUPPORTED"
 CMP_COMMAND_FRAME_KIND_MARKER="CMP_JBR_COMMAND_FRAME_KIND"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
@@ -2862,6 +2863,12 @@ command_recorder_summary() {
         } else if (value[1] == "imageDefines") {
           imageDefines += value[2]
           if (value[2] > maxImageDefines) maxImageDefines = value[2]
+        } else if (value[1] == "imageDefineWords") {
+          imageDefineWords += value[2]
+          if (value[2] > maxImageDefineWords) maxImageDefineWords = value[2]
+        } else if (value[1] == "imageDefinePixels") {
+          imageDefinePixels += value[2]
+          if (value[2] > maxImageDefinePixels) maxImageDefinePixels = value[2]
         } else if (value[1] == "imageRefs") {
           imageRefs += value[2]
           if (value[2] > maxImageRefs) maxImageRefs = value[2]
@@ -2884,7 +2891,7 @@ command_recorder_summary() {
     }
     END {
       if (frames == 0) {
-        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_paragraph_text_commands=0 max_paragraph_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_refs=0 max_image_refs=0 avg_image_cache_clears=0 max_image_cache_clears=0 avg_image_cache_evicts=0 max_image_cache_evicts=0 reasons=none"
+        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_paragraph_text_commands=0 max_paragraph_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_define_words=0 max_image_define_words=0 avg_image_define_pixels=0 max_image_define_pixels=0 avg_image_refs=0 max_image_refs=0 avg_image_cache_clears=0 max_image_cache_clears=0 avg_image_cache_evicts=0 max_image_cache_evicts=0 reasons=none"
         exit
       }
       reasonSummary = "none"
@@ -2892,10 +2899,11 @@ command_recorder_summary() {
         item = reason ":" reasons[reason]
         reasonSummary = reasonSummary == "none" ? item : reasonSummary "," item
       }
-      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_paragraph_text_commands=%.1f max_paragraph_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_refs=%.1f max_image_refs=%.0f avg_image_cache_clears=%.1f max_image_cache_clears=%.0f avg_image_cache_evicts=%.1f max_image_cache_evicts=%.0f reasons=%s",
+      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_paragraph_text_commands=%.1f max_paragraph_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_define_words=%.1f max_image_define_words=%.0f avg_image_define_pixels=%.1f max_image_define_pixels=%.0f avg_image_refs=%.1f max_image_refs=%.0f avg_image_cache_clears=%.1f max_image_cache_clears=%.0f avg_image_cache_evicts=%.1f max_image_cache_evicts=%.0f reasons=%s",
         frames, frames / duration, commands / frames, maxCommands, unsupportedFrames, unsupported / frames, maxUnsupported,
         textCommands / frames, maxTextCommands, paragraphTextCommands / frames, maxParagraphTextCommands,
-        imageDefines / frames, maxImageDefines, imageRefs / frames, maxImageRefs,
+        imageDefines / frames, maxImageDefines, imageDefineWords / frames, maxImageDefineWords,
+        imageDefinePixels / frames, maxImageDefinePixels, imageRefs / frames, maxImageRefs,
         imageCacheClears / frames, maxImageCacheClears, imageCacheEvicts / frames, maxImageCacheEvicts,
         reasonSummary
     }
@@ -3051,6 +3059,49 @@ command_frame_kind_summary() {
   ' "${log}"
 }
 
+command_recorder_ops_summary() {
+  local log="$1"
+  awk -v marker="${CMP_COMMAND_RECORDER_OPS_MARKER}" '
+    index($0, marker) {
+      frames++
+      for (i = 2; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] ~ /^[A-Za-z0-9_]+$/ && value[2] ~ /^[0-9]+$/) {
+          totals[value[1]] += value[2]
+          if (value[2] > max[value[1]]) max[value[1]] = value[2]
+        }
+      }
+    }
+    END {
+      if (frames == 0) {
+        printf "frames=0 top=none"
+        exit
+      }
+      for (op in totals) {
+        order[++count] = op
+      }
+      for (i = 1; i <= count; i++) {
+        for (j = i + 1; j <= count; j++) {
+          if (totals[order[j]] > totals[order[i]] ||
+              (totals[order[j]] == totals[order[i]] && order[j] < order[i])) {
+            tmp = order[i]
+            order[i] = order[j]
+            order[j] = tmp
+          }
+        }
+      }
+      summary = "none"
+      limit = count < 12 ? count : 12
+      for (i = 1; i <= limit; i++) {
+        op = order[i]
+        item = sprintf("%s:avg=%.1f,max=%d,total=%d", op, totals[op] / frames, max[op], totals[op])
+        summary = summary == "none" ? item : summary "," item
+      }
+      printf "frames=%d top=%s", frames, summary
+    }
+  ' "${log}"
+}
+
 write_screenshot_count_properties() {
   local assertion_log="$1"
   local key_prefix="$2"
@@ -3136,6 +3187,7 @@ write_machine_summary() {
     echo "cmp_frame_kind_unknown=$(grep -c "${CMP_COMMAND_FRAME_KIND_MARKER}.*kind=Unknown" "${new_log}" 2>/dev/null || true)"
     echo "cmp_unsupported_max=$(max_command_recorder_field "${new_log}" "unsupported")"
     echo "cmp_unsupported_reasons=$(command_recorder_reasons "${new_log}")"
+    echo "cmp_recorder_top_ops=$(command_recorder_ops_summary "${new_log}")"
     echo "skiko_picture_frames=$(grep -c "${SKIKO_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_picture_frames=$(grep -c "${JBR_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_command_frames=$(grep -c "${SKIKO_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
@@ -3197,6 +3249,7 @@ write_report() {
   local skiko_command_summary
   local jbr_command_summary
   local cmp_command_recorder_summary
+  local cmp_command_recorder_ops_summary
   local jbr_command_timing_summary
   local jbr_runtime_effect_compile_failure_summary
   local cmp_command_frame_kind_summary
@@ -3231,6 +3284,7 @@ write_report() {
   skiko_command_summary="$(payload_marker_summary "${SKIKO_COMMAND_MARKER}" "${new_log}" "commands")"
   jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${new_log}" "commands")"
   cmp_command_recorder_summary="$(command_recorder_summary "${new_log}")"
+  cmp_command_recorder_ops_summary="$(command_recorder_ops_summary "${new_log}")"
   cmp_command_frame_kind_summary="$(command_frame_kind_summary "${new_log}")"
   jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
   jbr_runtime_effect_compile_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_full_log}")"
@@ -3802,6 +3856,7 @@ write_report() {
     echo "## Command Replay Markers"
     echo
     echo "- CMP command recorder: ${cmp_command_recorder_summary}"
+    echo "- CMP command recorder op mix: ${cmp_command_recorder_ops_summary}"
     echo "- CMP command frame kinds: ${cmp_command_frame_kind_summary}"
     echo "- Skiko command frames: ${skiko_command_summary}"
     echo "- JBR command frames: ${jbr_command_summary}"
