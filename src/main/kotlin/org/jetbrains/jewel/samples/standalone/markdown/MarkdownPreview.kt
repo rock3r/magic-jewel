@@ -152,13 +152,32 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
 }
 
 private fun String.withStableBadgeLinks(): String =
-    withoutEmbeddedBadgeLogoDataUrls()
+    withoutReadmeBadgeImages()
+        .withoutEmbeddedBadgeLogoDataUrls()
+        .withoutReadmeHtmlLayoutHints()
         .replace(Regex("""\[!\[([^]]+)]\((https://img\.shields\.io/[^)]*)\)]\(([^)]*)\)""")) {
             "[${it.groupValues[1]}](${it.groupValues[3]})"
         }
         .replace(Regex("""!\[([^]]+)]\((https://img\.shields\.io/[^)]*)\)""")) {
             "[${it.groupValues[1]}](${it.groupValues[2]})"
         }
+
+private fun String.withoutReadmeBadgeImages(): String =
+    lineSequence()
+        .map { line ->
+            if (line.contains("https://img.shields.io/")) {
+                "[JetBrains incubator](https://github.com/JetBrains#jetbrains-on-github) " +
+                    "[CI checks](https://github.com/JetBrains/jewel/actions/workflows/build.yml) " +
+                    "[Apache 2.0](https://github.com/JetBrains/jewel/blob/main/LICENSE) " +
+                    "[Latest release](https://github.com/JetBrains/jewel/releases/latest) " +
+                    "Compose for Desktop 1.6.0-dev1369"
+            } else {
+                line
+            }
+        }
+        .joinToString("\n")
+
+private fun String.withoutReadmeHtmlLayoutHints(): String = replace(Regex("""<br\s+clear="left"\s*/>"""), "")
 
 private fun String.withoutEmbeddedBadgeLogoDataUrls(): String =
     replace(Regex("""([?&])logo=data(?::|%3A)[^)\s&]+""")) { match ->
