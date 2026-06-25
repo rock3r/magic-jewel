@@ -27,6 +27,8 @@ strict_command_passes() {
   dir="$(make_report_dir)"
   {
     echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "CMP_JBR_COMMAND_RECORDER_OPS fillRect=2 save=1"
+    echo "CMP_JBR_COMMAND_RECORDER_OP_WORDS fillRect=14 save=3"
     echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
     echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
   } > "${dir}/new.log"
@@ -37,6 +39,8 @@ strict_command_passes() {
   grep -q "^jbr_command_frames=1$" "${dir}/summary.properties"
   grep -q "^skiko_command_fps=0.1$" "${dir}/summary.properties"
   grep -q "^jbr_command_fps=0.1$" "${dir}/summary.properties"
+  grep -q "^cmp_recorder_top_ops=frames=1 top=fillRect:avg=2.0,max=2,total=2,save:avg=1.0,max=1,total=1$" "${dir}/summary.properties"
+  grep -q "^cmp_recorder_top_op_words=frames=1 top=fillRect:avg=14.0,max=14,total=14,save:avg=3.0,max=3,total=3$" "${dir}/summary.properties"
   grep -q "^old_avg_cpu=0$" "${dir}/summary.properties"
   grep -q "^new_avg_cpu=0$" "${dir}/summary.properties"
   grep -q "^host_cpu_count=" "${dir}/summary.properties"

@@ -1878,6 +1878,7 @@ SKIKO_COMMAND_CACHES_CLEARED_MARKER="SKIKO_JBR_INTEROP_COMMAND_CACHES_CLEARED"
 SKIKO_TINY_FULL_SCENE_MARKER="SKIKO_JBR_INTEROP_TINY_FULL_SCENE_INJECTED"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 CMP_COMMAND_RECORDER_OPS_MARKER="CMP_JBR_COMMAND_RECORDER_OPS"
+CMP_COMMAND_RECORDER_OP_WORDS_MARKER="CMP_JBR_COMMAND_RECORDER_OP_WORDS"
 CMP_COMMAND_RECORDER_NESTED_MARKER="CMP_JBR_COMMAND_RECORDER_NESTED_UNSUPPORTED"
 CMP_COMMAND_FRAME_KIND_MARKER="CMP_JBR_COMMAND_FRAME_KIND"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
@@ -3102,7 +3103,8 @@ command_frame_kind_summary() {
 
 command_recorder_ops_summary() {
   local log="$1"
-  awk -v marker="${CMP_COMMAND_RECORDER_OPS_MARKER}" '
+  local marker="${2:-${CMP_COMMAND_RECORDER_OPS_MARKER}}"
+  awk -v marker="${marker}" '
     index($0, marker) {
       frames++
       for (i = 2; i <= NF; i++) {
@@ -3243,6 +3245,7 @@ write_machine_summary() {
     echo "cmp_unsupported_max=$(max_command_recorder_field "${new_log}" "unsupported")"
     echo "cmp_unsupported_reasons=$(command_recorder_reasons "${new_log}")"
     echo "cmp_recorder_top_ops=$(command_recorder_ops_summary "${new_log}")"
+    echo "cmp_recorder_top_op_words=$(command_recorder_ops_summary "${new_log}" "${CMP_COMMAND_RECORDER_OP_WORDS_MARKER}")"
     echo "skiko_picture_frames=$(grep -c "${SKIKO_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "jbr_picture_frames=$(grep -c "${JBR_PICTURE_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "skiko_command_frames=$(grep -c "${SKIKO_COMMAND_MARKER}" "${new_log}" 2>/dev/null || true)"
@@ -3305,6 +3308,7 @@ write_report() {
   local jbr_command_summary
   local cmp_command_recorder_summary
   local cmp_command_recorder_ops_summary
+  local cmp_command_recorder_op_words_summary
   local jbr_command_timing_summary
   local jbr_runtime_effect_compile_failure_summary
   local cmp_command_frame_kind_summary
@@ -3340,6 +3344,7 @@ write_report() {
   jbr_command_summary="$(payload_marker_summary "${JBR_COMMAND_MARKER}" "${new_log}" "commands")"
   cmp_command_recorder_summary="$(command_recorder_summary "${new_log}")"
   cmp_command_recorder_ops_summary="$(command_recorder_ops_summary "${new_log}")"
+  cmp_command_recorder_op_words_summary="$(command_recorder_ops_summary "${new_log}" "${CMP_COMMAND_RECORDER_OP_WORDS_MARKER}")"
   cmp_command_frame_kind_summary="$(command_frame_kind_summary "${new_log}")"
   jbr_command_timing_summary="$(jbr_command_timing_summary "${new_log}")"
   jbr_runtime_effect_compile_failure_summary="$(frame_marker_summary "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${new_full_log}")"
@@ -3912,6 +3917,7 @@ write_report() {
     echo
     echo "- CMP command recorder: ${cmp_command_recorder_summary}"
     echo "- CMP command recorder op mix: ${cmp_command_recorder_ops_summary}"
+    echo "- CMP command recorder op words: ${cmp_command_recorder_op_words_summary}"
     echo "- CMP command frame kinds: ${cmp_command_frame_kind_summary}"
     echo "- Skiko command frames: ${skiko_command_summary}"
     echo "- JBR command frames: ${jbr_command_summary}"
