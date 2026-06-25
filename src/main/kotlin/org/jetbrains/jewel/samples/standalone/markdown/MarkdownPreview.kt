@@ -165,15 +165,7 @@ private fun String.withStableBadgeLinks(): String =
 private fun String.withoutReadmeBadgeImages(): String =
     lineSequence()
         .map { line ->
-            if (line.contains("https://img.shields.io/")) {
-                "[JetBrains incubator](https://github.com/JetBrains#jetbrains-on-github) " +
-                    "[CI checks](https://github.com/JetBrains/jewel/actions/workflows/build.yml) " +
-                    "[Apache 2.0](https://github.com/JetBrains/jewel/blob/main/LICENSE) " +
-                    "[Latest release](https://github.com/JetBrains/jewel/releases/latest) " +
-                    "Compose for Desktop 1.6.0-dev1369"
-            } else {
-                line
-            }
+            if (line.contains("https://img.shields.io/")) "" else line
         }
         .joinToString("\n")
 
