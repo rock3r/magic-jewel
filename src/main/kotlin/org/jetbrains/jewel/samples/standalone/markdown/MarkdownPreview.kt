@@ -151,7 +151,7 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
     }
 }
 
-private fun String.withStableBadgeLinks(): String =
+internal fun String.withStableBadgeLinks(): String =
     withoutReadmeBadgeImages()
         .withoutEmbeddedBadgeLogoDataUrls()
         .withoutReadmeHtmlLayoutHints()
