@@ -130,6 +130,8 @@ should_run_case markdown-preview-readme80-auto &&
   run_case markdown-preview-readme80-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme80 true true false
 should_run_case markdown-preview-readme80-wheel &&
   run_case markdown-preview-readme80-wheel markdownWheel Markdown JEWEL_STANDALONE_SPECTRE readme80 true false true
+should_run_case markdown-preview-readme80-static &&
+  run_case markdown-preview-readme80-static idle Markdown JEWEL_STANDALONE_FRAME readme80 true false false "" 0
 should_run_case showcase-icons &&
   run_case showcase-icons idle Components JEWEL_STANDALONE_FRAME readme80 false false false Icons 0
 should_run_case markdown-preview-readme20-auto &&
