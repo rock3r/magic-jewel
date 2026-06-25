@@ -80,7 +80,10 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
         // not do this
         //  in the UI to begin with.
         @Suppress("InjectDispatcher") // This should never go in the composable IRL
-        markdownBlocks = withContext(Dispatchers.Default) { processor.processMarkdownDocument(rawMarkdown.toString()) }
+        markdownBlocks =
+            withContext(Dispatchers.Default) {
+                processor.processMarkdownDocument(rawMarkdown.toString().withStableBadgeLinks())
+            }
     }
 
     val blockRenderer =
@@ -147,3 +150,19 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
         }
     }
 }
+
+private fun String.withStableBadgeLinks(): String =
+    withoutEmbeddedBadgeLogoDataUrls()
+        .replace(Regex("""\[!\[([^]]+)]\((https://img\.shields\.io/[^)]*)\)]\(([^)]*)\)""")) {
+            "[${it.groupValues[1]}](${it.groupValues[3]})"
+        }
+        .replace(Regex("""!\[([^]]+)]\((https://img\.shields\.io/[^)]*)\)""")) {
+            "[${it.groupValues[1]}](${it.groupValues[2]})"
+        }
+
+private fun String.withoutEmbeddedBadgeLogoDataUrls(): String =
+    replace(Regex("""([?&])logo=data(?::|%3A)[^)\s&]+""")) { match ->
+        if (match.groupValues[1] == "?") "?" else ""
+    }
+        .replace("?&", "?")
+        .replace(Regex("""\?(?=\))"""), "")
