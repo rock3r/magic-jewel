@@ -20,6 +20,9 @@ import androidx.compose.ui.platform.testTag
 @Composable
 internal fun IdleRedraw() {
     val logFrames = remember { !java.lang.Boolean.getBoolean("jewel.standalone.idleRedraw.disableFrameLogs") }
+    val extraShapes = remember {
+        System.getProperty("jewel.standalone.idleRedraw.extraShapes")?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+    }
     var frame by remember { mutableLongStateOf(0L) }
     LaunchedEffect(Unit) {
         while (true) {
@@ -43,6 +46,15 @@ internal fun IdleRedraw() {
             topLeft = Offset(size.width * 0.5f - 96f, size.height * 0.5f + 72f),
             size = Size(192f, 24f),
         )
+        repeat(extraShapes) { index ->
+            val column = index % 24
+            val row = index / 24
+            drawRect(
+                color = Color(0xFF6366F1).copy(alpha = 0.18f + (index % 5) * 0.05f),
+                topLeft = Offset(88f + column * 30f, 112f + row * 18f),
+                size = Size(20f, 10f),
+            )
+        }
         if (logFrames) {
             println("JEWEL_STANDALONE_FRAME page=IdleRedraw frame=$frame")
         }
