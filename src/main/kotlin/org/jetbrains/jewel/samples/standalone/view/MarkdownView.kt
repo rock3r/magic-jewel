@@ -15,21 +15,21 @@ import org.jetbrains.jewel.foundation.modifier.trackActivation
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.markdown.MarkdownMode
 import org.jetbrains.jewel.markdown.WithMarkdownMode
-import org.jetbrains.jewel.samples.standalone.markdown.JewelReadme
 import org.jetbrains.jewel.samples.standalone.markdown.MarkdownCatalog
 import org.jetbrains.jewel.samples.standalone.markdown.MarkdownEditor
 import org.jetbrains.jewel.samples.standalone.markdown.MarkdownPreview
+import org.jetbrains.jewel.samples.standalone.markdown.SanitizedJewelReadme
 import org.jetbrains.jewel.ui.Orientation
 import org.jetbrains.jewel.ui.component.Divider
 
 private val InitialMarkdown: String =
     when (System.getProperty("jewel.standalone.markdownContent", "readme80")) {
-        "readme20" -> JewelReadme.lineSequence().take(20).joinToString("\n")
-        "readme40" -> JewelReadme.lineSequence().take(40).joinToString("\n")
-        "readme160" -> JewelReadme.lineSequence().take(160).joinToString("\n")
+        "readme20" -> SanitizedJewelReadme.lineSequence().take(20).joinToString("\n")
+        "readme40" -> SanitizedJewelReadme.lineSequence().take(40).joinToString("\n")
+        "readme160" -> SanitizedJewelReadme.lineSequence().take(160).joinToString("\n")
         "catalog" -> MarkdownCatalog
         "catalogHead" -> MarkdownCatalog.lineSequence().take(120).joinToString("\n")
-        else -> JewelReadme.lineSequence().take(80).joinToString("\n")
+        else -> SanitizedJewelReadme.lineSequence().take(80).joinToString("\n")
     }
 
 @Composable

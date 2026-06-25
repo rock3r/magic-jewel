@@ -465,3 +465,5 @@ If you don't already have access to the Kotlin Slack, you can request it
 [here](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up).
 """
         .trimIndent()
+
+internal val SanitizedJewelReadme: String = JewelReadme.withoutReadmeBadgeImages()

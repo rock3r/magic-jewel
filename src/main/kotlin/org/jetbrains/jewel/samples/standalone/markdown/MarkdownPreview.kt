@@ -162,7 +162,7 @@ private fun String.withStableBadgeLinks(): String =
             "[${it.groupValues[1]}](${it.groupValues[2]})"
         }
 
-private fun String.withoutReadmeBadgeImages(): String =
+internal fun String.withoutReadmeBadgeImages(): String =
     lineSequence()
         .map { line ->
             if (line.contains("https://img.shields.io/")) "" else line

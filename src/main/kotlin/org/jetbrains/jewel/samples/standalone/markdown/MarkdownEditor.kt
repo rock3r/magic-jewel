@@ -74,7 +74,7 @@ private fun ControlsRow(onLoadMarkdown: (String) -> Unit, modifier: Modifier = M
             selectedIndex = selectedIndex,
             onSelectedItemChange = { index ->
                 selectedIndex = index
-                onLoadMarkdown(if (selectedIndex == 0) JewelReadme else MarkdownCatalog)
+                onLoadMarkdown(if (selectedIndex == 0) SanitizedJewelReadme else MarkdownCatalog)
             },
             modifier = Modifier.width(170.dp).padding(end = 2.dp),
             maxPopupHeight = 150.dp,
