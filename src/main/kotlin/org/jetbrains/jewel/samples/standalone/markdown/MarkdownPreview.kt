@@ -215,8 +215,11 @@ private fun String.withoutShieldsBadgeImages(): String =
 
 private fun String.withPlainShieldsBadgeImages(): String =
     replace(LinkedShieldsBadgeRegex) { match ->
-        "![${match.groupValues[1]}](${match.groupValues[2]})"
+        "![](${match.groupValues[2]})"
     }
+        .replace(StandaloneShieldsBadgeRegex) { match ->
+            "![](${match.groupValues[2]})"
+        }
 
 private val LinkedShieldsBadgeRegex = Regex("""\[!\[([^]]+)]\((https://img\.shields\.io/\S+?)\)]\((\S+?)\)""")
 
