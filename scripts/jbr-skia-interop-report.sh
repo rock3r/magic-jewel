@@ -1875,6 +1875,7 @@ JBR_SHADER_HANDLE_CACHE_HIT_MARKER="JBR_SKIA_INTEROP_SHADER_HANDLE_CACHE_HIT"
 JBR_FONT_DATA_DEFINE_MARKER="JBR_SKIA_INTEROP_FONT_DATA_DEFINE"
 SKIKO_SURFACE_CHANGE_MARKER="SKIKO_JBR_INTEROP_SURFACE_CHANGED"
 SKIKO_COMMAND_CACHES_CLEARED_MARKER="SKIKO_JBR_INTEROP_COMMAND_CACHES_CLEARED"
+SKIKO_COMMAND_BUFFER_CACHE_MARKER="SKIKO_JBR_INTEROP_COMMAND_BUFFER_CACHE"
 SKIKO_TINY_FULL_SCENE_MARKER="SKIKO_JBR_INTEROP_TINY_FULL_SCENE_INJECTED"
 CMP_COMMAND_RECORDER_MARKER="CMP_JBR_COMMAND_RECORDER_FRAME"
 CMP_COMMAND_RECORDER_OPS_MARKER="CMP_JBR_COMMAND_RECORDER_OPS"
@@ -2863,6 +2864,51 @@ frame_marker_summary() {
   '
 }
 
+command_buffer_cache_field() {
+  local log="$1"
+  local field="$2"
+  awk -v marker="${SKIKO_COMMAND_BUFFER_CACHE_MARKER}" -v field="${field}" '
+    index($0, marker) {
+      for (i = 1; i <= NF; i++) {
+        if ($i ~ ("^" field "=")) {
+          split($i, value, "=")
+          latest = value[2]
+        }
+      }
+    }
+    END {
+      if (latest == "") {
+        print 0
+      } else {
+        print latest
+      }
+    }
+  ' "${log}"
+}
+
+command_buffer_cache_summary() {
+  local log="$1"
+  awk -v marker="${SKIKO_COMMAND_BUFFER_CACHE_MARKER}" '
+    index($0, marker) {
+      seen = 1
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] == "hits") hits = value[2]
+        if (value[1] == "misses") misses = value[2]
+        if (value[1] == "skipped") skipped = value[2]
+        if (value[1] == "deferred") deferred = value[2]
+      }
+    }
+    END {
+      if (!seen) {
+        print "hits=0 misses=0 skipped=0 deferred=0"
+      } else {
+        printf "hits=%d misses=%d skipped=%d deferred=%d\n", hits, misses, skipped, deferred
+      }
+    }
+  ' "${log}"
+}
+
 frame_marker_fps() {
   local marker="$1"
   local log="$2"
@@ -3277,6 +3323,10 @@ write_machine_summary() {
     echo "jbr_font_data_define_frames=$(grep -c "${JBR_FONT_DATA_DEFINE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_surface_change_markers=$(grep -c "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_command_cache_clear_markers=$(grep -c "${SKIKO_COMMAND_CACHES_CLEARED_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "skiko_command_buffer_cache_hits=$(command_buffer_cache_field "${new_full_log}" hits)"
+    echo "skiko_command_buffer_cache_misses=$(command_buffer_cache_field "${new_full_log}" misses)"
+    echo "skiko_command_buffer_cache_skipped=$(command_buffer_cache_field "${new_full_log}" skipped)"
+    echo "skiko_command_buffer_cache_deferred=$(command_buffer_cache_field "${new_full_log}" deferred)"
     echo "skiko_tiny_full_scene_injections=$(grep -c "${SKIKO_TINY_FULL_SCENE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_context_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_same_context_surface_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=false.*surfaceChanged=true" "${new_full_log}" 2>/dev/null || true)"
@@ -3371,6 +3421,7 @@ write_report() {
   local jbr_shader_handle_evict_summary
   local jbr_shader_handle_cache_hit_summary
   local skiko_command_cache_clear_summary
+  local skiko_command_buffer_cache_summary
   jbr_effect_handle_define_summary="$(frame_marker_summary "${JBR_EFFECT_HANDLE_DEFINE_MARKER}" "${new_full_log}")"
   jbr_effect_handle_use_summary="$(frame_marker_summary "${JBR_EFFECT_HANDLE_USE_MARKER}" "${new_full_log}")"
   jbr_effect_handle_evict_summary="$(frame_marker_summary "${JBR_EFFECT_HANDLE_EVICT_MARKER}" "${new_full_log}")"
@@ -3381,6 +3432,7 @@ write_report() {
   jbr_shader_handle_cache_hit_summary="$(frame_marker_summary "${JBR_SHADER_HANDLE_CACHE_HIT_MARKER}" "${new_full_log}")"
   skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}")"
   skiko_command_cache_clear_summary="$(frame_marker_summary "${SKIKO_COMMAND_CACHES_CLEARED_MARKER}" "${new_full_log}")"
+  skiko_command_buffer_cache_summary="$(command_buffer_cache_summary "${new_full_log}")"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
   popup_screenshot_counts="$(grep -E "${POPUP_WINDOW_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-popup-window-screenshot-assertion.log" 2>/dev/null || true)"
@@ -3948,6 +4000,7 @@ write_report() {
     echo
     echo "- Skiko surface changes: ${skiko_surface_change_summary}"
     echo "- Skiko command cache clears: ${skiko_command_cache_clear_summary}"
+    echo "- Skiko command buffer cache final: ${skiko_command_buffer_cache_summary}"
     echo
     echo "## Async Profiler"
     echo

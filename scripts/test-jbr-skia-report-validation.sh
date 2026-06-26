@@ -198,6 +198,24 @@ strict_command_requires_min_command_cache_clears() {
   grep -q "^skiko_command_cache_clear_markers=1$" "${dir}/summary.properties"
 }
 
+summary_includes_command_buffer_cache_final_stats() {
+  local dir
+  dir="$(make_report_dir)"
+  {
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
+    echo "SKIKO_JBR_INTEROP_COMMAND_BUFFER_CACHE hits=1 misses=2 skipped=3 deferred=4"
+    echo "SKIKO_JBR_INTEROP_COMMAND_BUFFER_CACHE hits=5 misses=6 skipped=7 deferred=8"
+  } > "${dir}/new.log"
+
+  run_validate_only "${dir}"
+  grep -q "^skiko_command_buffer_cache_hits=5$" "${dir}/summary.properties"
+  grep -q "^skiko_command_buffer_cache_misses=6$" "${dir}/summary.properties"
+  grep -q "^skiko_command_buffer_cache_skipped=7$" "${dir}/summary.properties"
+  grep -q "^skiko_command_buffer_cache_deferred=8$" "${dir}/summary.properties"
+}
+
 strict_command_fails_without_min_command_cache_clears() {
   local dir
   dir="$(make_report_dir)"
@@ -1368,6 +1386,7 @@ summary_includes_screenshot_counts
 surface_change_summary_is_machine_readable
 strict_command_requires_min_surface_changes
 strict_command_requires_min_command_cache_clears
+summary_includes_command_buffer_cache_final_stats
 strict_command_fails_without_min_command_cache_clears
 strict_command_requires_surface_change_shape
 strict_command_fails_without_expected_surface_change_shape
