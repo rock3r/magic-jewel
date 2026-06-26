@@ -15,6 +15,7 @@ COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS:-false}"
 POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-1000}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
 JBR_SKIA_INTEROP_JVM_ARGS="${JBR_SKIA_INTEROP_JVM_ARGS:--Dcompose.jbr.skia.command.logOpCounts=true}"
+EXPECT_SCREENSHOT_ASSERTION="${EXPECT_SCREENSHOT_ASSERTION:-false}"
 CASES="${CASES:-hypnotoad-animation markdown-editor-preview-readme80-auto markdown-preview-readme80-auto markdown-preview-readme80-wheel}"
 
 mkdir -p "${OUT_ROOT}"
@@ -64,7 +65,7 @@ run_case() {
     WARMUP_SECONDS="${WARMUP_SECONDS}" \
     SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS}" \
     JBR_SKIA_RENDER_MODE="${JBR_SKIA_RENDER_MODE}" \
-    EXPECT_SCREENSHOT_ASSERTION=false \
+    EXPECT_SCREENSHOT_ASSERTION="${EXPECT_SCREENSHOT_ASSERTION}" \
     OLD_GRADLE_TASK=runJewelStandalone \
     NEW_GRADLE_TASK=runJewelStandaloneJbrSkiaInterop \
     APP_PROCESS_QUERY=org.jetbrains.jewel.samples.standalone.SwingMainKt \

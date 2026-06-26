@@ -95,6 +95,7 @@ var primaryButtonTextMinX = width
 var primaryButtonTextMinY = height
 var primaryButtonTextMaxX = 0
 var primaryButtonTextMaxY = 0
+var markdownReadmeLogoGray = 0
 
 func isDarkText(r: Int, g: Int, b: Int) -> Bool {
     return r < 55 && g < 55 && b < 55
@@ -185,6 +186,12 @@ let primaryButtonTextRect = (
     top: height * 123 / 1000,
     right: width * 17 / 200,
     bottom: height * 157 / 1000
+)
+let markdownReadmeLogoRect = (
+    left: width / 25,
+    top: height / 5,
+    right: width / 4,
+    bottom: height / 2
 )
 
 for y in 0..<height {
@@ -318,6 +325,11 @@ for y in 0..<height {
                 primaryButtonDarkText += 1
             }
         }
+        if inRect(x: x, y: y, left: markdownReadmeLogoRect.left, top: markdownReadmeLogoRect.top, right: markdownReadmeLogoRect.right, bottom: markdownReadmeLogoRect.bottom) {
+            if abs(r - g) <= 8 && abs(g - b) <= 8 && r >= 120 && r <= 210 {
+                markdownReadmeLogoGray += 1
+            }
+        }
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: paragraphCenteredRect.left, top: paragraphCenteredRect.top, right: paragraphCenteredRect.right, bottom: paragraphCenteredRect.bottom) {
                 paragraphCentered += 1
@@ -352,21 +364,33 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) primaryButtonWhiteText=\(primaryButtonWhiteText) primaryButtonDarkText=\(primaryButtonDarkText) primaryButtonTextBox=\(primaryButtonTextMinX),\(primaryButtonTextMinY),\(primaryButtonTextMaxX),\(primaryButtonTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) probeRightShadow=\(probeRightShadow) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) primaryButtonWhiteText=\(primaryButtonWhiteText) primaryButtonDarkText=\(primaryButtonDarkText) primaryButtonTextBox=\(primaryButtonTextMinX),\(primaryButtonTextMinY),\(primaryButtonTextMaxX),\(primaryButtonTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) probeRightShadow=\(probeRightShadow) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated) markdownReadmeLogoGray=\(markdownReadmeLogoGray)")
 
 let composeTextEnabled = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_TEXT"] != "false"
-var checks: [(String, Int, Int)] = [
-    ("green", green, 10000),
-    ("blue", blue, 10000),
-    ("purple", purple, 1000),
-    ("yellow", yellow, 500),
-    ("orange", orange, 1000),
-    ("white", white, 500),
-]
-if composeTextEnabled {
+let markdownReadmeProbe =
+    ProcessInfo.processInfo.environment["JEWEL_STANDALONE_INITIAL_VIEW"] == "Markdown" &&
+    (ProcessInfo.processInfo.environment["JEWEL_STANDALONE_MARKDOWN_CONTENT"] ?? "").hasPrefix("readme")
+var checks: [(String, Int, Int)] = markdownReadmeProbe
+    ? [
+        ("white", white, 500),
+        ("topText", topText, 900),
+      ]
+    : [
+        ("green", green, 10000),
+        ("blue", blue, 10000),
+        ("purple", purple, 1000),
+        ("yellow", yellow, 500),
+        ("orange", orange, 1000),
+        ("white", white, 500),
+      ]
+if composeTextEnabled && !markdownReadmeProbe {
     checks.append(("topText", topText, 900))
     checks.append(("bottomText", bottomText, 1200))
     checks.append(("primaryButtonWhiteText", primaryButtonWhiteText, 180))
+}
+if markdownReadmeProbe && markdownReadmeLogoGray > 10_000 {
+    fputs("Unexpected local README logo block in Markdown preview: markdownReadmeLogoGray=\(markdownReadmeLogoGray)\n", stderr)
+    exit(1)
 }
 
 let nativeTextProbe = ProcessInfo.processInfo.environment["JBR_SKIA_NATIVE_TEXT"] == "true"
@@ -374,7 +398,7 @@ let paragraphLayoutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_PARA
 let minimumTextWidth = min(width / 5, 360)
 
 var textBoxChecks: [(String, Bool)] = []
-if composeTextEnabled {
+if composeTextEnabled && !markdownReadmeProbe {
     let primaryButtonTextCenterX = (primaryButtonTextMinX + primaryButtonTextMaxX) / 2
     let primaryButtonTextCenterY = (primaryButtonTextMinY + primaryButtonTextMaxY) / 2
     let expectedPrimaryButtonTextCenterX = (primaryButtonTextRect.left + primaryButtonTextRect.right) / 2
