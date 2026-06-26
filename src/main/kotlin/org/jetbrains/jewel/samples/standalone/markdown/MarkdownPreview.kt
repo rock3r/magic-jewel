@@ -121,7 +121,12 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
                     if (java.lang.Boolean.getBoolean("jewel.standalone.markdownStableImages")) {
                         rawMarkdown.toString().withStableBadgeLinks()
                     } else {
-                        rawMarkdown.toString().withoutEmbeddedBadgeLogoDataUrls().withPlainShieldsBadgeImages()
+                        rawMarkdown
+                            .toString()
+                            .withoutEmbeddedBadgeLogoDataUrls()
+                            .withoutReadmeLayoutImages()
+                            .joinToString("\n")
+                            .withPlainShieldsBadgeImages()
                     }
                 processor.processMarkdownDocument(markdown)
             }
@@ -194,13 +199,10 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
 
 internal fun String.withStableBadgeLinks(): String =
     withoutEmbeddedBadgeLogoDataUrls()
-        .withoutReadmeHtmlLayoutHints()
-        .lineSequence()
+        .withoutReadmeLayoutImages()
         .map { line ->
             when {
                 "https://img.shields.io/" in line -> line.withoutShieldsBadgeImages().takeUnless { "https://img.shields.io/" in it }
-                line.isLocalJewelReadmeLogo() -> ""
-                line.isReadmeRemoteImageLayoutHint() -> ""
                 else -> line
             }
         }
@@ -227,6 +229,11 @@ private val StandaloneShieldsBadgeRegex = Regex("""!\[([^]]+)]\((https://img\.sh
 
 private fun String.withoutReadmeHtmlLayoutHints(): String =
     replace(Regex("""<br\s+clear="left"\s*/>"""), "").replace(Regex("""<br\s*/>"""), "")
+
+private fun String.withoutReadmeLayoutImages(): Sequence<String> =
+    withoutReadmeHtmlLayoutHints()
+        .lineSequence()
+        .filterNot { line -> line.isLocalJewelReadmeLogo() || line.isReadmeRemoteImageLayoutHint() }
 
 private fun String.isReadmeRemoteImageLayoutHint(): Boolean =
     "[!TIP]" in this ||
