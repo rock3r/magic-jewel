@@ -154,12 +154,22 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
 internal fun String.withStableBadgeLinks(): String =
     withoutEmbeddedBadgeLogoDataUrls()
         .withoutReadmeHtmlLayoutHints()
-        .replace(Regex("""\[!\[([^]]+)]\((https://img\.shields\.io/[^)]*)\)]\(([^)]*)\)""")) {
-            "[${it.groupValues[1]}](${it.groupValues[3]})"
+        .lineSequence()
+        .joinToString("\n") { line ->
+            if ("https://img.shields.io/" in line) {
+                line.withStableBadgeLineLinks()
+            } else {
+                line
+            }
         }
-        .replace(Regex("""!\[([^]]+)]\((https://img\.shields\.io/[^)]*)\)""")) {
-            "[${it.groupValues[1]}](${it.groupValues[2]})"
-        }
+
+private fun String.withStableBadgeLineLinks(): String =
+    replace(LinkedShieldsBadgeRegex) { "[${it.groupValues[1]}](${it.groupValues[3]})" }
+        .replace(StandaloneShieldsBadgeRegex) { "[${it.groupValues[1]}](${it.groupValues[2]})" }
+
+private val LinkedShieldsBadgeRegex = Regex("""\[!\[([^]]+)]\((https://img\.shields\.io/\S+?)\)]\((\S+?)\)""")
+
+private val StandaloneShieldsBadgeRegex = Regex("""!\[([^]]+)]\((https://img\.shields\.io/\S+?)\)""")
 
 private fun String.withoutReadmeHtmlLayoutHints(): String = replace(Regex("""<br\s+clear="left"\s*/>"""), "")
 
