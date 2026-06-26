@@ -367,9 +367,11 @@ for y in 0..<height {
 print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) primaryButtonWhiteText=\(primaryButtonWhiteText) primaryButtonDarkText=\(primaryButtonDarkText) primaryButtonTextBox=\(primaryButtonTextMinX),\(primaryButtonTextMinY),\(primaryButtonTextMaxX),\(primaryButtonTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) probeRightShadow=\(probeRightShadow) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated) markdownReadmeLogoGray=\(markdownReadmeLogoGray)")
 
 let composeTextEnabled = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_TEXT"] != "false"
+let markdownContent = ProcessInfo.processInfo.environment["JEWEL_STANDALONE_MARKDOWN_CONTENT"] ?? ""
 let markdownReadmeProbe =
     ProcessInfo.processInfo.environment["JEWEL_STANDALONE_INITIAL_VIEW"] == "Markdown" &&
-    (ProcessInfo.processInfo.environment["JEWEL_STANDALONE_MARKDOWN_CONTENT"] ?? "").hasPrefix("readme")
+    (markdownContent.hasPrefix("readme") || markdownContent.hasPrefix("rawReadme"))
+let rawMarkdownReadmeProbe = markdownReadmeProbe && markdownContent.hasPrefix("rawReadme")
 var checks: [(String, Int, Int)] = markdownReadmeProbe
     ? [
         ("white", white, 500),
@@ -388,7 +390,12 @@ if composeTextEnabled && !markdownReadmeProbe {
     checks.append(("bottomText", bottomText, 1200))
     checks.append(("primaryButtonWhiteText", primaryButtonWhiteText, 180))
 }
-if markdownReadmeProbe && markdownReadmeLogoGray > 10_000 {
+if rawMarkdownReadmeProbe {
+    checks.append(("green", green, 1000))
+    checks.append(("yellow", yellow, 1000))
+    checks.append(("orange", orange, 1000))
+    checks.append(("purple", purple, 1000))
+} else if markdownReadmeProbe && markdownReadmeLogoGray > 10_000 {
     fputs("Unexpected local README logo block in Markdown preview: markdownReadmeLogoGray=\(markdownReadmeLogoGray)\n", stderr)
     exit(1)
 }

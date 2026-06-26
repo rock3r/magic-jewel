@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="20" viewBox="0 0 112 20">
+  <rect width="112" height="20" rx="3" fill="#555"/>
+  <rect x="58" width="54" height="20" rx="3" fill="#2cbe4e"/>
+  <path d="M58 0h3v20h-3z" fill="#2cbe4e"/>
+  <text x="8" y="14" fill="#fff" font-family="Arial, sans-serif" font-size="11">CI checks</text>
+  <text x="66" y="14" fill="#fff" font-family="Arial, sans-serif" font-size="11">passing</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="228" height="20" viewBox="0 0 228 20">
+  <rect width="228" height="20" rx="3" fill="#555"/>
+  <rect x="132" width="96" height="20" rx="3" fill="#6f42c1"/>
+  <path d="M132 0h3v20h-3z" fill="#6f42c1"/>
+  <text x="8" y="14" fill="#fff" font-family="Arial, sans-serif" font-size="11">Compose for Desktop</text>
+  <text x="140" y="14" fill="#fff" font-family="Arial, sans-serif" font-size="11">1.6.0-dev1369</text>
+</svg>

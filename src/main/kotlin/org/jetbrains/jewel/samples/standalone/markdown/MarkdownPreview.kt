@@ -44,10 +44,13 @@ import org.jetbrains.jewel.markdown.extensions.github.tables.GitHubTableProcesso
 import org.jetbrains.jewel.markdown.extensions.github.tables.GitHubTableRendererExtension
 import org.jetbrains.jewel.markdown.extensions.images.Coil3ImageRendererExtension
 import org.jetbrains.jewel.markdown.processing.MarkdownProcessor
+import org.jetbrains.jewel.markdown.rendering.ImageSourceResolver
 import org.jetbrains.jewel.markdown.rendering.MarkdownBlockRenderer
 import org.jetbrains.jewel.markdown.rendering.MarkdownStyling
 import org.jetbrains.jewel.ui.component.VerticallyScrollableContainer
 import org.jetbrains.jewel.ui.component.scrollbarContentSafePadding
+
+private object MarkdownPreviewResources
 
 @Composable
 internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Modifier) {
@@ -74,6 +77,38 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
 
     val coilContext = LocalPlatformContext.current
     val coil3ImageRendererExtension = remember(coilContext) { Coil3ImageRendererExtension.withDefaultLoader(coilContext) }
+    val imageSourceResolver: ImageSourceResolver =
+        remember {
+            val defaultResolver = ImageSourceResolver.create(
+                resolveCapabilities =
+                    setOf(
+                        ImageSourceResolver.ResolveCapability.PlainUri,
+                        ImageSourceResolver.ResolveCapability.RelativePathInResources(MarkdownPreviewResources::class.java),
+                        ImageSourceResolver.ResolveCapability.AbsolutePath,
+                    ),
+                logResolveFailure = true,
+            )
+            object : ImageSourceResolver {
+                override fun resolve(rawDestination: String): String? {
+                    if (rawDestination.startsWith("https://img.shields.io/")) {
+                        val badgeResource =
+                            when {
+                                "/badge/JetBrains-incubator-yellow" in rawDestination ->
+                                    "readme/badges/jetbrains-incubator.svg"
+                                "/actions/workflow/status/" in rawDestination -> "readme/badges/ci-checks.svg"
+                                "/license/" in rawDestination -> "readme/badges/license.svg"
+                                "/v/release/" in rawDestination -> "readme/badges/latest-release.svg"
+                                "/badge/Compose%20for%20Desktop-" in rawDestination -> "readme/badges/compose-desktop.svg"
+                                else -> null
+                            }
+                        badgeResource?.let {
+                            return MarkdownPreviewResources::class.java.classLoader.getResource(it)?.toExternalForm()
+                        }
+                    }
+                    return defaultResolver.resolve(rawDestination)
+                }
+            }
+        }
 
     LaunchedEffect(rawMarkdown) {
         // TODO you may want to debounce or drop on backpressure, in real usages. You should also
@@ -86,7 +121,7 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
                     if (java.lang.Boolean.getBoolean("jewel.standalone.markdownStableImages")) {
                         rawMarkdown.toString().withStableBadgeLinks()
                     } else {
-                        rawMarkdown.toString()
+                        rawMarkdown.toString().withoutEmbeddedBadgeLogoDataUrls().withPlainShieldsBadgeImages()
                     }
                 processor.processMarkdownDocument(markdown)
             }
@@ -122,7 +157,7 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
     // Using the values from the GitHub rendering to ensure contrast
     val background = remember(instanceUuid) { if (isDark) Color(0xff0d1117) else Color.White }
 
-    ProvideMarkdownStyling(markdownStyling, blockRenderer, NoOpCodeHighlighter) {
+    ProvideMarkdownStyling(imageSourceResolver, markdownStyling, blockRenderer, NoOpCodeHighlighter) {
         val lazyListState = rememberLazyListState()
         val autoScroll = remember {
             java.lang.Boolean.getBoolean("jewel.standalone.markdownAutoScroll") ||
@@ -177,6 +212,11 @@ private fun String.withoutShieldsBadgeImages(): String =
     replace(LinkedShieldsBadgeRegex, "")
         .replace(StandaloneShieldsBadgeRegex, "")
         .trim()
+
+private fun String.withPlainShieldsBadgeImages(): String =
+    replace(LinkedShieldsBadgeRegex) { match ->
+        "![${match.groupValues[1]}](${match.groupValues[2]})"
+    }
 
 private val LinkedShieldsBadgeRegex = Regex("""\[!\[([^]]+)]\((https://img\.shields\.io/\S+?)\)]\((\S+?)\)""")
 
