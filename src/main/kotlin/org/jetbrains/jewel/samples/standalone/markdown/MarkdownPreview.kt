@@ -217,15 +217,28 @@ private fun String.withoutShieldsBadgeImages(): String =
 
 private fun String.withPlainShieldsBadgeImages(): String =
     replace(LinkedShieldsBadgeRegex) { match ->
-        "![](${match.groupValues[2]})"
+        match.groupValues[2].toPlainBadgeImageMarkdown()
     }
         .replace(StandaloneShieldsBadgeRegex) { match ->
-            "![](${match.groupValues[2]})"
+            match.groupValues[2].toPlainBadgeImageMarkdown()
         }
 
 private val LinkedShieldsBadgeRegex = Regex("""\[!\[([^]]+)]\((https://img\.shields\.io/\S+?)\)]\((\S+?)\)""")
 
 private val StandaloneShieldsBadgeRegex = Regex("""!\[([^]]+)]\((https://img\.shields\.io/\S+?)\)""")
+
+private fun String.toPlainBadgeImageMarkdown(): String {
+    val resource =
+        when {
+            "/badge/JetBrains-incubator-yellow" in this -> "readme/badges/jetbrains-incubator.svg"
+            "/actions/workflow/status/" in this -> "readme/badges/ci-checks.svg"
+            "/license/" in this -> "readme/badges/license.svg"
+            "/v/release/" in this -> "readme/badges/latest-release.svg"
+            "/badge/Compose%20for%20Desktop-" in this -> "readme/badges/compose-desktop.svg"
+            else -> this
+        }
+    return "![]($resource)"
+}
 
 private fun String.withoutReadmeHtmlLayoutHints(): String =
     replace(Regex("""<br\s+clear="left"\s*/>"""), "").replace(Regex("""<br\s*/>"""), "")
