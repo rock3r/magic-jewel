@@ -82,7 +82,13 @@ internal fun MarkdownPreview(rawMarkdown: CharSequence, modifier: Modifier = Mod
         @Suppress("InjectDispatcher") // This should never go in the composable IRL
         markdownBlocks =
             withContext(Dispatchers.Default) {
-                processor.processMarkdownDocument(rawMarkdown.toString().withStableBadgeLinks())
+                val markdown =
+                    if (java.lang.Boolean.getBoolean("jewel.standalone.markdownStableImages")) {
+                        rawMarkdown.toString().withStableBadgeLinks()
+                    } else {
+                        rawMarkdown.toString()
+                    }
+                processor.processMarkdownDocument(markdown)
             }
     }
 

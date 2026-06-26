@@ -54,6 +54,7 @@ run_case() {
   local spectre_stress="${8:-${JEWEL_STANDALONE_SPECTRE_STRESS}}"
   local initial_component="${9:-}"
   local expect_min_app_new_frames="${10:-1}"
+  local markdown_stable_images="${11:-true}"
   local out_dir="${OUT_ROOT}/${name}"
   echo "== ${name} (${mode}) =="
   mkdir -p "${out_dir}"
@@ -80,6 +81,7 @@ run_case() {
     JEWEL_STANDALONE_MARKDOWN_CONTENT="${markdown_content}" \
     JEWEL_STANDALONE_MARKDOWN_PREVIEW_ONLY="${markdown_preview_only}" \
     JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL="${markdown_auto_scroll}" \
+    JEWEL_STANDALONE_MARKDOWN_STABLE_IMAGES="${markdown_stable_images}" \
     JEWEL_STANDALONE_SPECTRE_STRESS="${spectre_stress}" \
     JEWEL_STANDALONE_SPECTRE_STRESS_MODE="${mode}" \
     JEWEL_STANDALONE_SPECTRE_COMPONENTS= \
@@ -145,4 +147,6 @@ should_run_case markdown-preview-catalog-head-auto &&
   run_case markdown-preview-catalog-head-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL catalogHead true true false
 should_run_case markdown-preview-catalog-auto &&
   run_case markdown-preview-catalog-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL catalog true true false
+should_run_case markdown-preview-raw-readme80-static &&
+  run_case markdown-preview-raw-readme80-static idle Markdown JEWEL_STANDALONE_FRAME rawReadme80 true false false "" 0 false
 write_suite_summary

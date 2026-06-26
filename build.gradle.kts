@@ -73,6 +73,10 @@ val jewelStandaloneMarkdownAutoScroll =
     providers.gradleProperty("jewelStandaloneMarkdownAutoScroll")
         .orElse(providers.environmentVariable("JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL"))
         .orElse("false")
+val jewelStandaloneMarkdownStableImages =
+    providers.gradleProperty("jewelStandaloneMarkdownStableImages")
+        .orElse(providers.environmentVariable("JEWEL_STANDALONE_MARKDOWN_STABLE_IMAGES"))
+        .orElse("true")
 val composeTextEnabled = providers.gradleProperty("magicJewelComposeText")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_COMPOSE_TEXT"))
     .orElse("true")
@@ -1061,6 +1065,7 @@ fun JavaExec.configureJewelStandaloneJvm(interoperable: Boolean, swingCompositin
     systemProperty("jewel.standalone.markdownContent", jewelStandaloneMarkdownContent.get())
     systemProperty("jewel.standalone.markdownPreviewOnly", jewelStandaloneMarkdownPreviewOnly.get())
     systemProperty("jewel.standalone.markdownAutoScroll", jewelStandaloneMarkdownAutoScroll.get())
+    systemProperty("jewel.standalone.markdownStableImages", jewelStandaloneMarkdownStableImages.get())
     jewelStandaloneInitialComponent.orNull?.takeIf { it.isNotBlank() }?.let {
         systemProperty("jewel.standalone.initialComponent", it)
     }
