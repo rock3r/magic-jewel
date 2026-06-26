@@ -155,23 +155,33 @@ internal fun String.withStableBadgeLinks(): String =
     withoutEmbeddedBadgeLogoDataUrls()
         .withoutReadmeHtmlLayoutHints()
         .lineSequence()
-        .joinToString("\n") { line ->
-            if ("https://img.shields.io/" in line) {
-                line.withStableBadgeLineLinks()
-            } else {
-                line
+        .map { line ->
+            when {
+                "https://img.shields.io/" in line -> line.withoutShieldsBadgeImages()
+                line.isReadmeRemoteImageLayoutHint() -> ""
+                else -> line
             }
         }
+        .filterNot { it.isBlank() }
+        .joinToString("\n")
 
-private fun String.withStableBadgeLineLinks(): String =
-    replace(LinkedShieldsBadgeRegex) { "[${it.groupValues[1]}](${it.groupValues[3]})" }
-        .replace(StandaloneShieldsBadgeRegex) { "[${it.groupValues[1]}](${it.groupValues[2]})" }
+private fun String.withoutShieldsBadgeImages(): String =
+    replace(LinkedShieldsBadgeRegex, "")
+        .replace(StandaloneShieldsBadgeRegex, "")
+        .trim()
 
 private val LinkedShieldsBadgeRegex = Regex("""\[!\[([^]]+)]\((https://img\.shields\.io/\S+?)\)]\((\S+?)\)""")
 
 private val StandaloneShieldsBadgeRegex = Regex("""!\[([^]]+)]\((https://img\.shields\.io/\S+?)\)""")
 
-private fun String.withoutReadmeHtmlLayoutHints(): String = replace(Regex("""<br\s+clear="left"\s*/>"""), "")
+private fun String.withoutReadmeHtmlLayoutHints(): String =
+    replace(Regex("""<br\s+clear="left"\s*/>"""), "").replace(Regex("""<br\s*/>"""), "")
+
+private fun String.isReadmeRemoteImageLayoutHint(): Boolean =
+    "[!TIP]" in this ||
+        "https://www.droidcon.com/2023/11/15/meet-jewelcreate-ide-plugins-in-compose/" in this ||
+        "https://i.vimeocdn.com/video/" in this ||
+        "</a>" in this
 
 private fun String.withoutEmbeddedBadgeLogoDataUrls(): String =
     replace(Regex("""([?&])logo=data(?::|%3A)[^)\s&]+""")) { match ->

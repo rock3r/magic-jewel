@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.component.DefaultButton
@@ -49,7 +50,9 @@ private fun BasicMenus() {
         var selectedItem by remember { mutableStateOf("Item 1") }
 
         Box {
-            DefaultButton(onClick = { showMenu = true }) { Text("Show Menu") }
+            DefaultButton(onClick = { showMenu = true }, modifier = Modifier.testTag("jewel.menu.basic")) {
+                Text("Show Menu")
+            }
 
             if (showMenu) {
                 PopupMenu(
@@ -86,7 +89,9 @@ private fun MenusWithIcons() {
         var selectedAction by remember { mutableStateOf("Copy") }
 
         Box {
-            DefaultButton(onClick = { showMenu = true }) { Text("Show Menu with Icons") }
+            DefaultButton(onClick = { showMenu = true }, modifier = Modifier.testTag("jewel.menu.icons")) {
+                Text("Show Menu with Icons")
+            }
 
             if (showMenu) {
                 PopupMenu(
@@ -138,7 +143,9 @@ private fun MenusWithSubmenus() {
         var selectedItem by remember { mutableStateOf("None") }
 
         Box {
-            DefaultButton(onClick = { showMenu = true }) { Text("Show Menu with Submenus") }
+            DefaultButton(onClick = { showMenu = true }, modifier = Modifier.testTag("jewel.menu.submenus")) {
+                Text("Show Menu with Submenus")
+            }
 
             if (showMenu) {
                 PopupMenu(
@@ -208,7 +215,9 @@ private fun MenusWithAdContent() {
         var selectedMode by remember { mutableStateOf("Standard") }
 
         Box {
-            DefaultButton(onClick = { showMenu = true }) { Text("Show Menu with Ad") }
+            DefaultButton(onClick = { showMenu = true }, modifier = Modifier.testTag("jewel.menu.ad")) {
+                Text("Show Menu with Ad")
+            }
 
             if (showMenu) {
                 PopupMenu(

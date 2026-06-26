@@ -693,6 +693,7 @@ dependencies {
     implementation(libs.jewel.markdown.int.ui.standalone.styling)
     implementation(libs.intellij.icons)
     implementation(compose.components.resources)
+    implementation("androidx.navigationevent:navigationevent-compose-desktop:1.1.0-alpha01")
     implementation(libs.kotlinx.coroutines.swing)
     implementation("dev.sebastiano.spectre:spectre-core:0.2.1")
 }

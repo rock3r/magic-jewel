@@ -40,6 +40,7 @@ internal object SpectreStressController {
                         SpectreStressMode.IdleRedraw -> "jewel.page.idle-redraw"
                         SpectreStressMode.MarkdownWheel -> "jewel.page.markdown"
                         SpectreStressMode.TooltipHover -> "jewel.tooltip.hoverTarget"
+                        SpectreStressMode.MenuPopup -> "jewel.menu.basic"
                         else -> "jewel.page.hypnotoad"
                     }
                 automator.waitForNode(tag = startupTag, timeout = 10.seconds)
@@ -63,6 +64,12 @@ internal object SpectreStressController {
                         selectComponentView("Tooltips")
                         automator.waitForNode(tag = "jewel.tooltip.hoverTarget", timeout = TourWaitTimeout)
                         println("JEWEL_STANDALONE_SPECTRE phase=focused-component target=Tooltips")
+                    }
+                    SpectreStressMode.MenuPopup -> {
+                        selectTopLevelView("Components")
+                        selectComponentView("Menus")
+                        automator.waitForNode(tag = "jewel.menu.basic", timeout = TourWaitTimeout)
+                        println("JEWEL_STANDALONE_SPECTRE phase=focused-component target=Menus")
                     }
                     SpectreStressMode.Hypnotoad -> Unit
                 }
@@ -134,6 +141,7 @@ internal object SpectreStressController {
             SpectreStressMode.IdleRedraw -> Unit
             SpectreStressMode.MarkdownWheel -> scrollMarkdownOnce(cycle)
             SpectreStressMode.TooltipHover -> hoverTooltipOnce(cycle)
+            SpectreStressMode.MenuPopup -> openMenuOnce(cycle)
             else ->
                 when (cycle % 6) {
                     0, 1, 2, 3 -> clickIfPresent("jewel.hypnotoad.warp", "hypnotoad-warp", cycle)
@@ -158,6 +166,16 @@ internal object SpectreStressController {
         println("JEWEL_STANDALONE_SPECTRE phase=tooltip-hover cycle=$cycle")
     }
 
+    private suspend fun ComposeAutomator.openMenuOnce(cycle: Int) {
+        if (cycle > 0) return
+        val node: AutomatorNode = findOneByTestTag("jewel.menu.basic") ?: return
+        val center = node.centerOnScreen
+        Robot().mouseMove(center.x, center.y)
+        click(node)
+        delay(250.milliseconds)
+        println("JEWEL_STANDALONE_SPECTRE phase=menu-popup cycle=$cycle target=basic")
+    }
+
     private suspend fun ComposeAutomator.clickIfPresent(tag: String, phase: String, cycle: Int) {
         val node: AutomatorNode = findOneByTestTag(tag) ?: return
         performSemanticsClick(node)
@@ -177,6 +195,7 @@ internal object SpectreStressController {
         Hypnotoad,
         MarkdownWheel,
         TooltipHover,
+        MenuPopup,
         TourThenHypnotoad,
         FullShowcaseThenHypnotoad;
 
@@ -186,6 +205,7 @@ internal object SpectreStressController {
                     "idleRedraw" -> IdleRedraw
                     "markdownScroll", "markdownWheel" -> MarkdownWheel
                     "tooltipHover" -> TooltipHover
+                    "menuPopup" -> MenuPopup
                     "tourThenHypnotoad" -> TourThenHypnotoad
                     "fullShowcaseThenHypnotoad" -> FullShowcaseThenHypnotoad
                     else -> Hypnotoad
