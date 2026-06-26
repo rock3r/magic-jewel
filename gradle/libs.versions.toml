@@ -4,6 +4,7 @@ compose = "1.10.3"
 jewel = "0.35.0-261.23567.138"
 intellijIcons = "261.23567.143"
 coroutines = "1.10.2"
+coil = "3.2.0"
 
 [libraries]
 jewel-int-ui-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone", version.ref = "jewel" }
@@ -17,6 +18,7 @@ jewel-markdown-extensions-images = { module = "org.jetbrains.jewel:jewel-markdow
 jewel-markdown-int-ui-standalone-styling = { module = "org.jetbrains.jewel:jewel-markdown-int-ui-standalone-styling", version.ref = "jewel" }
 intellij-icons = { module = "com.jetbrains.intellij.platform:icons", version.ref = "intellijIcons" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
+coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

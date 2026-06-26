@@ -696,6 +696,7 @@ dependencies {
     implementation(libs.jewel.markdown.extensions.images)
     implementation(libs.jewel.markdown.int.ui.standalone.styling)
     implementation(libs.intellij.icons)
+    implementation(libs.coil.svg)
     implementation(compose.components.resources)
     implementation("androidx.navigationevent:navigationevent-compose-desktop:1.1.0-alpha01")
     implementation(libs.kotlinx.coroutines.swing)
