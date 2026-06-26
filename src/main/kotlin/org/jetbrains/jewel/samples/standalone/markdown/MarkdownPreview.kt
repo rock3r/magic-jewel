@@ -157,12 +157,13 @@ internal fun String.withStableBadgeLinks(): String =
         .lineSequence()
         .map { line ->
             when {
-                "https://img.shields.io/" in line -> line.withoutShieldsBadgeImages()
+                "https://img.shields.io/" in line -> line.withoutShieldsBadgeImages().takeUnless { "https://img.shields.io/" in it }
                 line.isLocalJewelReadmeLogo() -> ""
                 line.isReadmeRemoteImageLayoutHint() -> ""
                 else -> line
             }
         }
+        .filterNotNull()
         .filterNot { it.isBlank() }
         .joinToString("\n")
 
