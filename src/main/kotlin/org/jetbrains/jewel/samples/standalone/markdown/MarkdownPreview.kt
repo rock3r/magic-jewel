@@ -158,6 +158,7 @@ internal fun String.withStableBadgeLinks(): String =
         .map { line ->
             when {
                 "https://img.shields.io/" in line -> line.withoutShieldsBadgeImages()
+                line.isLocalJewelReadmeLogo() -> ""
                 line.isReadmeRemoteImageLayoutHint() -> ""
                 else -> line
             }
@@ -182,6 +183,9 @@ private fun String.isReadmeRemoteImageLayoutHint(): Boolean =
         "https://www.droidcon.com/2023/11/15/meet-jewelcreate-ide-plugins-in-compose/" in this ||
         "https://i.vimeocdn.com/video/" in this ||
         "</a>" in this
+
+private fun String.isLocalJewelReadmeLogo(): Boolean =
+    trim() == "![Jewel logo](readme/jewel-logo.svg)"
 
 private fun String.withoutEmbeddedBadgeLogoDataUrls(): String =
     replace(Regex("""([?&])logo=data(?::|%3A)[^)\s&]+""")) { match ->
