@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import kotlin.time.Duration.Companion.seconds
@@ -88,7 +89,7 @@ public fun Tooltips(modifier: Modifier = Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Tooltip(tooltip = { Text(text) }, enabled = enabled, style = tooltipStyle, tooltipPlacement = placement) {
             // Any content works — this is a button just because it's focusable
-            DefaultButton({}) { Text("Hover me!") }
+            DefaultButton({}, modifier = Modifier.testTag("jewel.tooltip.hoverTarget")) { Text("Hover me!") }
         }
 
         Divider(Orientation.Horizontal, Modifier.fillMaxWidth())

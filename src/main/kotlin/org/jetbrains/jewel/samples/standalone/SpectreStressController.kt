@@ -3,6 +3,7 @@ package org.jetbrains.jewel.samples.standalone
 import dev.sebastiano.spectre.core.AutomatorNode
 import dev.sebastiano.spectre.core.ComposeAutomator
 import dev.sebastiano.spectre.core.RobotDriver
+import java.awt.Robot
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
@@ -38,6 +39,7 @@ internal object SpectreStressController {
                     when (mode) {
                         SpectreStressMode.IdleRedraw -> "jewel.page.idle-redraw"
                         SpectreStressMode.MarkdownWheel -> "jewel.page.markdown"
+                        SpectreStressMode.TooltipHover -> "jewel.tooltip.hoverTarget"
                         else -> "jewel.page.hypnotoad"
                     }
                 automator.waitForNode(tag = startupTag, timeout = 10.seconds)
@@ -55,6 +57,12 @@ internal object SpectreStressController {
                         selectTopLevelView("Markdown")
                         automator.waitForNode(tag = "jewel.page.markdown", timeout = TourWaitTimeout)
                         println("JEWEL_STANDALONE_SPECTRE phase=focused-view target=Markdown")
+                    }
+                    SpectreStressMode.TooltipHover -> {
+                        selectTopLevelView("Components")
+                        selectComponentView("Tooltips")
+                        automator.waitForNode(tag = "jewel.tooltip.hoverTarget", timeout = TourWaitTimeout)
+                        println("JEWEL_STANDALONE_SPECTRE phase=focused-component target=Tooltips")
                     }
                     SpectreStressMode.Hypnotoad -> Unit
                 }
@@ -125,6 +133,7 @@ internal object SpectreStressController {
         when (mode) {
             SpectreStressMode.IdleRedraw -> Unit
             SpectreStressMode.MarkdownWheel -> scrollMarkdownOnce(cycle)
+            SpectreStressMode.TooltipHover -> hoverTooltipOnce(cycle)
             else ->
                 when (cycle % 6) {
                     0, 1, 2, 3 -> clickIfPresent("jewel.hypnotoad.warp", "hypnotoad-warp", cycle)
@@ -139,6 +148,14 @@ internal object SpectreStressController {
         val ticks = if ((cycle / 10) % 2 == 0) 7 else -7
         scrollWheel(node, ticks)
         println("JEWEL_STANDALONE_SPECTRE phase=markdown-scroll cycle=$cycle ticks=$ticks")
+    }
+
+    private suspend fun ComposeAutomator.hoverTooltipOnce(cycle: Int) {
+        val node = findOneByTestTag("jewel.tooltip.hoverTarget") ?: return
+        val center = node.centerOnScreen
+        Robot().mouseMove(center.x, center.y)
+        delay(250.milliseconds)
+        println("JEWEL_STANDALONE_SPECTRE phase=tooltip-hover cycle=$cycle")
     }
 
     private suspend fun ComposeAutomator.clickIfPresent(tag: String, phase: String, cycle: Int) {
@@ -159,6 +176,7 @@ internal object SpectreStressController {
         IdleRedraw,
         Hypnotoad,
         MarkdownWheel,
+        TooltipHover,
         TourThenHypnotoad,
         FullShowcaseThenHypnotoad;
 
@@ -167,6 +185,7 @@ internal object SpectreStressController {
                 when (value) {
                     "idleRedraw" -> IdleRedraw
                     "markdownScroll", "markdownWheel" -> MarkdownWheel
+                    "tooltipHover" -> TooltipHover
                     "tourThenHypnotoad" -> TourThenHypnotoad
                     "fullShowcaseThenHypnotoad" -> FullShowcaseThenHypnotoad
                     else -> Hypnotoad
