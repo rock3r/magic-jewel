@@ -3327,6 +3327,7 @@ write_machine_summary() {
     echo "skiko_command_buffer_cache_misses=$(command_buffer_cache_field "${new_full_log}" misses)"
     echo "skiko_command_buffer_cache_skipped=$(command_buffer_cache_field "${new_full_log}" skipped)"
     echo "skiko_command_buffer_cache_deferred=$(command_buffer_cache_field "${new_full_log}" deferred)"
+    echo "skiko_command_buffer_cache_bypassed=$(command_buffer_cache_field "${new_full_log}" bypassed)"
     echo "skiko_tiny_full_scene_injections=$(grep -c "${SKIKO_TINY_FULL_SCENE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_context_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=true" "${new_full_log}" 2>/dev/null || true)"
     echo "skiko_same_context_surface_change_markers=$(grep -Ec "${SKIKO_SURFACE_CHANGE_MARKER}.*contextChanged=false.*surfaceChanged=true" "${new_full_log}" 2>/dev/null || true)"
