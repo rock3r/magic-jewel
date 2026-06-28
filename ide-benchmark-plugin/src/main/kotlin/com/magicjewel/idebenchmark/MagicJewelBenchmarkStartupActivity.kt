@@ -14,16 +14,15 @@ import kotlinx.coroutines.runBlocking
 class MagicJewelBenchmarkStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
         if (System.getProperty("magic.jewel.benchmark.autorun") != "true") return
+        val mode = BenchmarkMode.from(System.getProperty("magic.jewel.benchmark.mode"))
+        println("MAGIC_JEWEL_IDE_BENCHMARK status=project-opened project=${project.name} mode=$mode")
         delay(2_000)
-        ApplicationManager.getApplication().invokeLater {
-            ToolWindowManager.getInstance(project).getToolWindow("JBR Skia Benchmark")?.activate(null)
-        }
+        activateBenchmarkToolWindow(project)
         thread(name = "magic-jewel-ide-benchmark-spectre", isDaemon = true) {
             runBlocking {
                 delay(2_000)
                 val frame = com.intellij.openapi.wm.WindowManager.getInstance().getFrame(project) ?: return@runBlocking
                 val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.synthetic(frame))
-                val mode = BenchmarkMode.from(System.getProperty("magic.jewel.benchmark.mode"))
                 val tag = if (mode == BenchmarkMode.Chat) "magic.benchmark.page.chat" else "magic.benchmark.page.hypnotoad"
                 automator.waitForNode(tag = tag, timeout = 30.seconds)
                 println("MAGIC_JEWEL_IDE_BENCHMARK status=started mode=$mode")
@@ -45,5 +44,21 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                 }
             }
         }
+    }
+
+    private suspend fun activateBenchmarkToolWindow(project: Project) {
+        val manager = ToolWindowManager.getInstance(project)
+        repeat(30) {
+            val toolWindow = manager.getToolWindow("JBR Skia Benchmark")
+            if (toolWindow != null) {
+                ApplicationManager.getApplication().invokeLater {
+                    toolWindow.activate(null)
+                    println("MAGIC_JEWEL_IDE_BENCHMARK status=tool-window-activated")
+                }
+                return
+            }
+            delay(500)
+        }
+        println("MAGIC_JEWEL_IDE_BENCHMARK status=tool-window-missing")
     }
 }

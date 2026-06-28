@@ -6,6 +6,7 @@ OUT_ROOT="${OUT_ROOT:-${ROOT_DIR}/out/jewel-ide-plugin-benchmark-suite/$(date +%
 CASES="${CASES:-hypnotoad chat}"
 SAMPLE_SECONDS="${SAMPLE_SECONDS:-90}"
 COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS:-true}"
+BENCHMARK_PROJECT_PATH="${BENCHMARK_PROJECT_PATH:-/Users/rock3r/src/uel}"
 POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-500}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
 POWERMETRICS="${POWERMETRICS:-/usr/bin/powermetrics}"
@@ -16,6 +17,11 @@ JBR_SKIA_RENDER_MODE="${JBR_SKIA_RENDER_MODE:-commands}"
 JBR_SKIA_INTEROP_EXTRA_JVM_ARGS="${JBR_SKIA_INTEROP_EXTRA_JVM_ARGS:--Dcompose.jbr.skia.command.logOpCounts=true -Dcompose.jbr.skia.command.strict=true}"
 
 mkdir -p "${OUT_ROOT}"
+
+if [[ ! -d "${BENCHMARK_PROJECT_PATH}" ]]; then
+  echo "error: BENCHMARK_PROJECT_PATH does not exist: ${BENCHMARK_PROJECT_PATH}" >&2
+  exit 2
+fi
 
 if [[ "${COLLECT_POWERMETRICS}" == "true" ]] && ! sudo -n true 2>/dev/null; then
   echo "error: COLLECT_POWERMETRICS=true requires a cached sudo credential; run 'sudo -v' first" >&2
@@ -91,6 +97,7 @@ run_variant() {
     -PmagicJewelBenchmarkAutorun=true
     "-PmagicJewelBenchmarkMode=${case_name}"
     "-PmagicJewelBenchmarkOut=${case_dir}"
+    "-PmagicJewelBenchmarkProjectPath=${BENCHMARK_PROJECT_PATH}"
     --console=plain
   )
   if [[ "${variant}" == "new" ]]; then
@@ -148,6 +155,7 @@ for case_name in ${CASES}; do
   echo "case=${case_name}" > "${case_dir}/summary.properties"
   echo "sample_seconds=${SAMPLE_SECONDS}" >> "${case_dir}/summary.properties"
   echo "collect_powermetrics=${COLLECT_POWERMETRICS}" >> "${case_dir}/summary.properties"
+  echo "benchmark_project_path=${BENCHMARK_PROJECT_PATH}" >> "${case_dir}/summary.properties"
   status="passed"
   run_variant "${case_name}" old "${case_dir}" || status="failed"
   run_variant "${case_name}" new "${case_dir}" || status="failed"

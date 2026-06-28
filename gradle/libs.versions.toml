@@ -4,6 +4,8 @@ compose = "1.10.3"
 jewel = "0.35.0-261.23567.138"
 intellijIcons = "261.23567.143"
 intellijJewelBridge = "261.23567.138"
+ideStarter = "261.23567.138"
+junit5 = "5.11.4"
 coroutines = "1.10.2"
 coil = "3.2.0"
 intellijIdea = "2026.1.1"
@@ -28,6 +30,14 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
 jewel-ide-laf-bridge = { module = "com.jetbrains.intellij.platform:jewel-ide-laf-bridge", version.ref = "intellijJewelBridge" }
 jewel-ui = { module = "org.jetbrains.jewel:jewel-ui", version.ref = "jewel" }
 spectre-core = { module = "dev.sebastiano.spectre:spectre-core", version = "0.2.1" }
+junit5-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
+junit5-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
+ide-starter-squashed = { module = "com.jetbrains.intellij.tools:ide-starter-squashed", version.ref = "ideStarter" }
+ide-starter-junit5 = { module = "com.jetbrains.intellij.tools:ide-starter-junit5", version.ref = "ideStarter" }
+ide-starter-driver = { module = "com.jetbrains.intellij.tools:ide-starter-driver", version.ref = "ideStarter" }
+ide-starter-driver-client = { module = "com.jetbrains.intellij.driver:driver-client", version.ref = "ideStarter" }
+ide-starter-driver-sdk = { module = "com.jetbrains.intellij.driver:driver-sdk", version.ref = "ideStarter" }
+ide-starter-driver-model = { module = "com.jetbrains.intellij.driver:driver-model", version.ref = "ideStarter" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

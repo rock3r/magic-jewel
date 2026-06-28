@@ -16,6 +16,9 @@ val jbrSkiaRenderMode =
     providers.gradleProperty("jbrSkiaRenderMode")
         .orElse(providers.environmentVariable("JBR_SKIA_RENDER_MODE"))
         .orElse("commands")
+val magicJewelBenchmarkProjectPath =
+    providers.gradleProperty("magicJewelBenchmarkProjectPath")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_BENCHMARK_PROJECT_PATH"))
 
 kotlin {
     jvmToolchain {
@@ -93,6 +96,9 @@ tasks.named<JavaExec>("runIde") {
     providers.gradleProperty("magicJewelBenchmarkOut").orNull?.let {
         systemProperty("magic.jewel.benchmark.out", it)
     }
+    magicJewelBenchmarkProjectPath.orNull?.let {
+        args(it)
+    }
     if (jbrSkiaInteropEnabled.get().toBoolean()) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")
@@ -110,3 +116,55 @@ tasks.named<JavaExec>("runIde") {
 }
 
 tasks.named("buildSearchableOptions") { enabled = false }
+
+val ideBenchmarkSmokeSourceSet =
+    sourceSets.create("ideBenchmarkSmoke") {
+        java.srcDir("src/ideBenchmarkSmoke/kotlin")
+        resources.srcDir("src/ideBenchmarkSmoke/resources")
+        compileClasspath += sourceSets["main"].output
+        runtimeClasspath += sourceSets["main"].output
+    }
+
+val ideBenchmarkSmokeImplementation by
+    configurations.getting {
+        extendsFrom(configurations["implementation"])
+    }
+
+val ideBenchmarkSmokeRuntimeOnly by
+    configurations.getting {
+        extendsFrom(configurations["runtimeOnly"])
+    }
+
+dependencies {
+    "ideBenchmarkSmokeImplementation"(libs.junit5.api)
+    "ideBenchmarkSmokeImplementation"(libs.ide.starter.squashed)
+    "ideBenchmarkSmokeImplementation"(libs.ide.starter.junit5)
+    "ideBenchmarkSmokeImplementation"(libs.ide.starter.driver)
+    "ideBenchmarkSmokeImplementation"(libs.ide.starter.driver.client)
+    "ideBenchmarkSmokeImplementation"(libs.ide.starter.driver.sdk)
+    "ideBenchmarkSmokeImplementation"(libs.ide.starter.driver.model)
+    "ideBenchmarkSmokeImplementation"(libs.kotlinx.coroutines.core)
+    "ideBenchmarkSmokeRuntimeOnly"(libs.junit5.engine)
+    "ideBenchmarkSmokeRuntimeOnly"("org.junit.platform:junit-platform-launcher")
+}
+
+val buildPluginTask = tasks.named<Zip>("buildPlugin")
+val pluginZipProvider = buildPluginTask.flatMap { it.archiveFile }
+
+val ideBenchmarkSmokeProjectPath =
+    providers.gradleProperty("magicJewelBenchmarkProjectPath")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_BENCHMARK_PROJECT_PATH"))
+        .orElse("/Users/rock3r/src/uel")
+
+tasks.register<Test>("ideBenchmarkSmoke") {
+    group = "verification"
+    description =
+        "Starter-backed smoke for the IDE benchmark plugin. Boots IU, opens a project, " +
+            "installs the plugin, shows the benchmark tool window, and lets Spectre drive it."
+    useJUnitPlatform()
+    testClassesDirs = ideBenchmarkSmokeSourceSet.output.classesDirs
+    classpath = ideBenchmarkSmokeSourceSet.runtimeClasspath
+    dependsOn(buildPluginTask)
+    systemProperty("path.to.build.plugin", pluginZipProvider.get().asFile.absolutePath)
+    systemProperty("magic.jewel.benchmark.project.path", ideBenchmarkSmokeProjectPath.get())
+}
