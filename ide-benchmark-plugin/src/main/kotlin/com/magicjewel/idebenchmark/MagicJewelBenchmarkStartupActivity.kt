@@ -15,6 +15,19 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         if (System.getProperty("magic.jewel.benchmark.autorun") != "true") return
         val mode = BenchmarkMode.from(System.getProperty("magic.jewel.benchmark.mode"))
         println("MAGIC_JEWEL_IDE_BENCHMARK status=project-opened project=${project.name} mode=$mode")
+        println(
+            "MAGIC_JEWEL_IDE_BENCHMARK_INTEROP_PROBE " +
+                "composeSwing=${System.getProperty("compose.swing.render.on.graphics")} " +
+                "composeJbrSkia=${System.getProperty("compose.swing.render.on.jbr.skia")} " +
+                "renderCommands=${System.getProperty("skiko.jbr.interop.renderCommands")} " +
+                "renderPicture=${System.getProperty("skiko.jbr.interop.renderPicture")} " +
+                "sunInterop=${System.getProperty("sun.java2d.skia.interop")} " +
+                "sunInteropLibrary=${System.getProperty("sun.java2d.skia.interop.library")} " +
+                "commandLogOpCounts=${System.getProperty("compose.jbr.skia.command.logOpCounts")} " +
+                "commandStrict=${System.getProperty("compose.jbr.skia.command.strict")} " +
+                "skikoLayerSource=${classSource("org.jetbrains.skiko.SkiaLayer")} " +
+                "composeSceneSource=${classSource("androidx.compose.ui.scene.ComposeScene")}",
+        )
         delay(2_000)
         activateBenchmarkToolWindow(project, mode)
     }
@@ -101,6 +114,16 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         @Suppress("UNCHECKED_CAST")
         return result as T
     }
+
+    private fun classSource(className: String): String =
+        runCatching {
+                val klass = Class.forName(className)
+                val resourceName = className.replace('.', '/') + ".class"
+                klass.classLoader?.getResource(resourceName)?.toString()
+                    ?: klass.protectionDomain.codeSource?.location?.toString()
+                    ?: "unknown"
+            }
+            .getOrElse { "missing:${it::class.simpleName}" }
 
     private companion object {
         const val POLL_BUDGET_MS: Long = 30_000

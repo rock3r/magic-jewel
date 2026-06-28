@@ -19,6 +19,20 @@ val jbrSkiaRenderMode =
 val magicJewelBenchmarkProjectPath =
     providers.gradleProperty("magicJewelBenchmarkProjectPath")
         .orElse(providers.environmentVariable("MAGIC_JEWEL_BENCHMARK_PROJECT_PATH"))
+val patchedIdeProductPath =
+    providers.gradleProperty("magicJewelPatchedIdeProductPath")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_PATCHED_IDE_PRODUCT_PATH"))
+val generatedLocalCmpOut = layout.projectDirectory.dir("../../cmp/out/compose-multiplatform-core").asFile
+val defaultLocalCmpOut =
+    if (generatedLocalCmpOut.isDirectory) {
+        generatedLocalCmpOut.absolutePath
+    } else {
+        layout.projectDirectory.dir("../../cmp").asFile.absolutePath
+    }
+val localCmpOut =
+    providers.gradleProperty("localCmpOut")
+        .orElse(providers.environmentVariable("LOCAL_CMP_OUT"))
+        .orElse(defaultLocalCmpOut)
 
 kotlin {
     jvmToolchain {
@@ -53,7 +67,11 @@ dependencies {
     compileOnly(libs.kotlinx.coroutines.swing)
 
     intellijPlatform {
-        intellijIdea(libs.versions.intellijIdea.get())
+        if (patchedIdeProductPath.isPresent) {
+            local(patchedIdeProductPath)
+        } else {
+            intellijIdea(libs.versions.intellijIdea.get())
+        }
         @Suppress("UnstableApiUsage") composeUI()
         bundledModule("intellij.platform.jewel.foundation")
         bundledModule("intellij.platform.jewel.ui")
@@ -87,6 +105,8 @@ intellijPlatform {
 
 tasks.named<JavaExec>("runIde") {
     group = "verification"
+    val patchedCompose = patchedComposeRuntimeJars()
+    classpath = patchedCompose + classpath
     systemProperty("idea.is.internal", "true")
     systemProperty("compose.swing.render.on.graphics", "true")
     if (providers.gradleProperty("magicJewelBenchmarkAutorun").isPresent) {
@@ -115,9 +135,25 @@ tasks.named<JavaExec>("runIde") {
             .filter { it.isNotBlank() }
             .let(::jvmArgs)
     }
+    doFirst {
+        logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
+    }
 }
 
 tasks.named("buildSearchableOptions") { enabled = false }
+
+fun Project.patchedComposeRuntimeJars(): FileCollection {
+    val root = file(localCmpOut.get())
+    if (!root.isDirectory) return files()
+    return files(
+        fileTree(root) {
+            include("annotation/annotation/build/libs/annotation-jvm-9999.0.0-SNAPSHOT.jar")
+            include("collection/collection/build/libs/collection-jvm-9999.0.0-SNAPSHOT.jar")
+            include("compose/**/build/libs/*-desktop-9999.0.0-SNAPSHOT.jar")
+            include("compose/desktop/desktop/build/libs/desktop-jvm-9999.0.0-SNAPSHOT.jar")
+        },
+    )
+}
 
 val ideBenchmarkSmokeSourceSet =
     sourceSets.create("ideBenchmarkSmoke") {
