@@ -28,8 +28,10 @@ kotlin {
 }
 
 dependencies {
-    implementation(libs.spectre.core)
-    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.spectre.core) {
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    }
+    compileOnly(libs.kotlinx.coroutines.core)
 
     compileOnly(libs.compose.runtime)
     compileOnly(libs.compose.foundation)
@@ -42,13 +44,11 @@ dependencies {
         exclude(group = "org.jetbrains.compose")
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     }
-    implementation(libs.jewel.markdown.core) {
+    compileOnly(libs.jewel.markdown.core) {
         exclude(group = "org.jetbrains.compose")
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
-    }
-    implementation(libs.jewel.markdown.int.ui.standalone.styling) {
-        exclude(group = "org.jetbrains.compose")
-        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+        exclude(group = "org.jetbrains.jewel", module = "jewel-foundation")
+        exclude(group = "org.jetbrains.jewel", module = "jewel-ui")
     }
     compileOnly(libs.kotlinx.coroutines.swing)
 
@@ -71,6 +71,8 @@ configurations
         exclude(group = "org.jetbrains.compose.foundation")
         exclude(group = "org.jetbrains.compose.ui")
         exclude(group = "org.jetbrains.skiko")
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-swing")
     }
 
 intellijPlatform {

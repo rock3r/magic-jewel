@@ -6,6 +6,11 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.compose</depends>
 
+    <dependencies>
+        <module name="intellij.platform.jewel.markdown.core"/>
+        <module name="intellij.platform.jewel.markdown.ideLafBridgeStyling"/>
+    </dependencies>
+
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="JBR Skia Benchmark"
                     anchor="right"

@@ -42,11 +42,9 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
-import org.jetbrains.jewel.foundation.theme.JewelTheme
-import org.jetbrains.jewel.intui.markdown.standalone.dark
-import org.jetbrains.jewel.intui.markdown.standalone.light
-import org.jetbrains.jewel.intui.markdown.standalone.styling.dark
-import org.jetbrains.jewel.intui.markdown.standalone.styling.light
+import org.jetbrains.jewel.foundation.ExperimentalJewelApi
+import org.jetbrains.jewel.intui.markdown.bridge.create
+import org.jetbrains.jewel.intui.markdown.bridge.styling.create
 import org.jetbrains.jewel.markdown.LazyMarkdown
 import org.jetbrains.jewel.markdown.rendering.MarkdownBlockRenderer
 import org.jetbrains.jewel.markdown.rendering.MarkdownStyling
@@ -160,18 +158,11 @@ private fun IdeHypnotoad(
 }
 
 @Composable
+@OptIn(ExperimentalJewelApi::class)
 private fun StreamingMarkdownChat(state: MagicJewelBenchmarkUiState) {
     val listState = rememberLazyListState()
-    val isDark = JewelTheme.isDark
-    val markdownStyling = remember(isDark) { if (isDark) MarkdownStyling.dark() else MarkdownStyling.light() }
-    val markdownRenderer =
-        remember(isDark, markdownStyling) {
-            if (isDark) {
-                MarkdownBlockRenderer.dark(styling = markdownStyling)
-            } else {
-                MarkdownBlockRenderer.light(styling = markdownStyling)
-            }
-        }
+    val markdownStyling = remember { MarkdownStyling.create() }
+    val markdownRenderer = remember(markdownStyling) { MarkdownBlockRenderer.create(styling = markdownStyling) }
     LaunchedEffect(state.streamingMarkdownBlocks.size, state.streamingToken) {
         if (state.streamingMarkdownBlocks.isNotEmpty()) {
             listState.animateScrollToItem((state.streamingMarkdownBlocks.size - 1).coerceAtLeast(0))
