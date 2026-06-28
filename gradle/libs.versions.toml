@@ -3,8 +3,10 @@ kotlin = "2.3.20"
 compose = "1.10.3"
 jewel = "0.35.0-261.23567.138"
 intellijIcons = "261.23567.143"
+intellijJewelBridge = "261.23567.138"
 coroutines = "1.10.2"
 coil = "3.2.0"
+intellijIdea = "2026.1.1"
 
 [libraries]
 jewel-int-ui-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone", version.ref = "jewel" }
@@ -18,7 +20,14 @@ jewel-markdown-extensions-images = { module = "org.jetbrains.jewel:jewel-markdow
 jewel-markdown-int-ui-standalone-styling = { module = "org.jetbrains.jewel:jewel-markdown-int-ui-standalone-styling", version.ref = "jewel" }
 intellij-icons = { module = "com.jetbrains.intellij.platform:icons", version.ref = "intellijIcons" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
+jewel-ide-laf-bridge = { module = "com.jetbrains.intellij.platform:jewel-ide-laf-bridge", version.ref = "intellijJewelBridge" }
+jewel-ui = { module = "org.jetbrains.jewel:jewel-ui", version.ref = "jewel" }
+spectre-core = { module = "dev.sebastiano.spectre:spectre-core", version = "0.2.1" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

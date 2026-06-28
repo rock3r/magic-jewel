@@ -1,0 +1,17 @@
+<idea-plugin>
+    <id>com.magicjewel.jbrskia.benchmark</id>
+    <name>Magic Jewel JBR Skia Benchmark</name>
+    <vendor>Magic Jewel</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.compose</depends>
+    <depends>intellij.platform.jewel.markdown.core</depends>
+    <depends>intellij.platform.jewel.markdown.ideLafBridgeStyling</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="JBR Skia Benchmark"
+                    anchor="right"
+                    factoryClass="com.magicjewel.idebenchmark.MagicJewelBenchmarkToolWindowFactory"/>
+        <postStartupActivity implementation="com.magicjewel.idebenchmark.MagicJewelBenchmarkStartupActivity"/>
+    </extensions>
+</idea-plugin>
