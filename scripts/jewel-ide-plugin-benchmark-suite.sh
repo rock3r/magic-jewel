@@ -7,6 +7,7 @@ CASES="${CASES:-hypnotoad chat}"
 VARIANTS="${VARIANTS:-old new}"
 SAMPLE_SECONDS="${SAMPLE_SECONDS:-90}"
 COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS:-true}"
+COLLECT_THREAD_CPU="${COLLECT_THREAD_CPU:-true}"
 PAINT_PROBE="${PAINT_PROBE:-true}"
 BENCHMARK_PROJECT_PATH="${BENCHMARK_PROJECT_PATH:-/Users/rock3r/src/uel}"
 POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-500}"
@@ -145,6 +146,44 @@ sample_process() {
   done >> "${csv}"
 }
 
+sample_thread_cpu() {
+  local mode="$1"
+  local variant="$2"
+  local pid="$3"
+  local csv="$4"
+  echo "timestamp,mode,variant,pid,thread_index,cpu_percent,command" > "${csv}"
+  [[ "${COLLECT_THREAD_CPU}" == "true" ]] || return
+  while kill -0 "${pid}" 2>/dev/null; do
+    local timestamp
+    timestamp="$(date +%s)"
+    ps -M -p "${pid}" 2>/dev/null |
+      awk -v timestamp="${timestamp}" -v mode="${mode}" -v variant="${variant}" '
+        NR == 1 { next }
+        {
+          pid = $2
+          cpu = $4
+          command = ""
+          if ($1 ~ /^[0-9]+$/) {
+            pid = $1
+            cpu = $2
+          } else if ($1 == "") {
+            pid = $2
+            cpu = $3
+          }
+          if (cpu !~ /^[0-9.]+$/) {
+            next
+          }
+          for (i = 9; i <= NF; i++) {
+            command = command (command == "" ? "" : " ") $i
+          }
+          gsub(/,/, " ", command)
+          printf "%s,%s,%s,%s,%d,%s,%s\n", timestamp, mode, variant, pid, ++threadIndex, cpu, command
+        }
+      ' >> "${csv}"
+    sleep 2
+  done
+}
+
 start_powermetrics() {
   local out="$1"
   if [[ "${COLLECT_POWERMETRICS}" != "true" ]]; then
@@ -172,6 +211,12 @@ summarize_ps() {
     END {if(n) printf "samples=%d avg_cpu=%.2f max_cpu=%.2f avg_rss_kb=%.0f max_rss_kb=%.0f", n, sum/n, max, rss/n, maxrss; else printf "samples=0"}' "${csv}"
 }
 
+summarize_thread_cpu() {
+  local csv="$1"
+  awk -F, 'NR>1 {if($6>max) {max=$6; command=$7}; n++}
+    END {if(n) printf "samples=%d max_thread_cpu=%.2f command=%s", n, max, command; else printf "samples=0"}' "${csv}"
+}
+
 summary_value() {
   local file="$1"
   local key="$2"
@@ -184,6 +229,7 @@ run_variant() {
   local case_dir="$3"
   local log="${case_dir}/${variant}.log"
   local ps_csv="${case_dir}/${variant}-ps.csv"
+  local thread_csv="${case_dir}/${variant}-thread-cpu.csv"
   local pm="${case_dir}/${variant}-powermetrics.txt"
 
   if [[ "${variant}" == "new" ]]; then
@@ -234,19 +280,24 @@ run_variant() {
 
   sample_process "${case_name}" "${variant}" "${pid}" "${ps_csv}" &
   local sampler_pid=$!
+  sample_thread_cpu "${case_name}" "${variant}" "${pid}" "${thread_csv}" &
+  local thread_sampler_pid=$!
   start_powermetrics "${pm}"
 
   sleep "${SAMPLE_SECONDS}"
 
   stop_pid_file "${pm}.pid"
   kill "${sampler_pid}" 2>/dev/null || true
+  kill "${thread_sampler_pid}" 2>/dev/null || true
   kill "${pid}" 2>/dev/null || true
   kill "${gradle_pid}" 2>/dev/null || true
   wait "${sampler_pid}" 2>/dev/null || true
+  wait "${thread_sampler_pid}" 2>/dev/null || true
   wait "${gradle_pid}" 2>/dev/null || true
 
   echo "${variant}_pid=${pid}" >> "${case_dir}/summary.properties"
   echo "${variant}_ps=$(summarize_ps "${ps_csv}")" >> "${case_dir}/summary.properties"
+  echo "${variant}_thread_cpu=$(summarize_thread_cpu "${thread_csv}")" >> "${case_dir}/summary.properties"
   local benchmark_ticks benchmark_frames command_frames picture_frames fallbacks
   benchmark_ticks="$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK phase=tick' "${log}" || true)"
   benchmark_frames="$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK_FRAME' "${log}" || true)"
@@ -277,6 +328,15 @@ run_variant() {
       echo "${variant}_paint_probe_missing=true" >> "${case_dir}/summary.properties"
       return 1
     fi
+    local probe_image="${case_dir}/toolwindow-paint-probe.png"
+    local variant_probe_image="${case_dir}/${variant}-toolwindow-paint-probe.png"
+    if [[ -f "${probe_image}" ]]; then
+      cp "${probe_image}" "${variant_probe_image}"
+      echo "${variant}_paint_probe_image=${variant_probe_image}" >> "${case_dir}/summary.properties"
+    else
+      echo "${variant}_paint_probe_image_missing=true" >> "${case_dir}/summary.properties"
+      return 1
+    fi
     local non_dominant_ratio distinct_colors content_non_dominant_ratio content_distinct_colors
     non_dominant_ratio="$(awk '{for (i=1; i<=NF; i++) if ($i ~ /^nonDominantRatio=/) {split($i, a, "="); print a[2]}}' <<< "${paint_probe}")"
     distinct_colors="$(awk '{for (i=1; i<=NF; i++) if ($i ~ /^distinct=/) {split($i, a, "="); print a[2]}}' <<< "${paint_probe}")"
@@ -299,7 +359,7 @@ run_variant() {
 }
 
 suite_tsv="${OUT_ROOT}/suite.tsv"
-printf "case\tstatus\told_ps\tnew_ps\told_benchmark_ticks\tnew_benchmark_ticks\told_benchmark_frames\tnew_benchmark_frames\told_command_frames\tnew_command_frames\told_picture_frames\tnew_picture_frames\told_fallbacks\tnew_fallbacks\treport\n" > "${suite_tsv}"
+printf "case\tstatus\told_ps\tnew_ps\told_thread_cpu\tnew_thread_cpu\told_benchmark_ticks\tnew_benchmark_ticks\told_benchmark_frames\tnew_benchmark_frames\told_command_frames\tnew_command_frames\told_picture_frames\tnew_picture_frames\told_fallbacks\tnew_fallbacks\treport\n" > "${suite_tsv}"
 
 for case_name in ${CASES}; do
   case_dir="${OUT_ROOT}/${case_name}"
@@ -308,6 +368,7 @@ for case_name in ${CASES}; do
   echo "sample_seconds=${SAMPLE_SECONDS}" >> "${case_dir}/summary.properties"
   echo "variants=${VARIANTS}" >> "${case_dir}/summary.properties"
   echo "collect_powermetrics=${COLLECT_POWERMETRICS}" >> "${case_dir}/summary.properties"
+  echo "collect_thread_cpu=${COLLECT_THREAD_CPU}" >> "${case_dir}/summary.properties"
   echo "paint_probe=${PAINT_PROBE}" >> "${case_dir}/summary.properties"
   echo "benchmark_project_path=${BENCHMARK_PROJECT_PATH}" >> "${case_dir}/summary.properties"
   status="passed"
@@ -316,6 +377,8 @@ for case_name in ${CASES}; do
   done
   old_ps="$(summary_value "${case_dir}/summary.properties" old_ps)"
   new_ps="$(summary_value "${case_dir}/summary.properties" new_ps)"
+  old_thread_cpu="$(summary_value "${case_dir}/summary.properties" old_thread_cpu)"
+  new_thread_cpu="$(summary_value "${case_dir}/summary.properties" new_thread_cpu)"
   old_ticks="$(summary_value "${case_dir}/summary.properties" old_benchmark_ticks)"
   new_ticks="$(summary_value "${case_dir}/summary.properties" new_benchmark_ticks)"
   old_frames="$(summary_value "${case_dir}/summary.properties" old_benchmark_frames)"
@@ -326,8 +389,8 @@ for case_name in ${CASES}; do
   new_picture="$(summary_value "${case_dir}/summary.properties" new_picture_frames)"
   old_fallbacks="$(summary_value "${case_dir}/summary.properties" old_fallbacks)"
   new_fallbacks="$(summary_value "${case_dir}/summary.properties" new_fallbacks)"
-  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
-    "${case_name}" "${status}" "${old_ps}" "${new_ps}" "${old_ticks}" "${new_ticks}" "${old_frames}" "${new_frames}" "${old_command}" "${new_command}" \
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+    "${case_name}" "${status}" "${old_ps}" "${new_ps}" "${old_thread_cpu}" "${new_thread_cpu}" "${old_ticks}" "${new_ticks}" "${old_frames}" "${new_frames}" "${old_command}" "${new_command}" \
     "${old_picture}" "${new_picture}" "${old_fallbacks}" "${new_fallbacks}" "${case_dir}" >> "${suite_tsv}"
 done
 
