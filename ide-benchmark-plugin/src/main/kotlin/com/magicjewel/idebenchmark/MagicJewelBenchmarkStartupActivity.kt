@@ -149,24 +149,20 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                         println("MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE status=missing-component")
                         return@runCatching
                     }
-                    val capture =
-                        PaintProbeCaptures(
-                            toolWindow = captureComponentWithRetries(target.component, target.frame),
-                            window = target.frame?.let { targetWindow ->
-                                runCatching { captureWindowWithRetries(targetWindow) }
-                                    .onFailure { error ->
-                                        println(
-                                            "MAGIC_JEWEL_IDE_BENCHMARK_WINDOW_PAINT_PROBE " +
-                                                "status=failed error=${error::class.simpleName}:${error.message}",
-                                        )
-                                    }
-                                    .getOrNull()
-                            },
-                        )
+                    val toolWindowCapture = captureComponentWithRetries(target.component, target.frame)
                     val path = Path.of(outDir, "toolwindow-paint-probe.png")
-                    ImageIO.write(capture.toolWindow.image, "png", path.toFile())
-                    logPaintCapture("MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE", capture.toolWindow, path)
-                    capture.window?.let { windowCapture ->
+                    ImageIO.write(toolWindowCapture.image, "png", path.toFile())
+                    logPaintCapture("MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE", toolWindowCapture, path)
+                    target.frame?.let { targetWindow ->
+                        runCatching { captureWindowWithRetries(targetWindow) }
+                            .onFailure { error ->
+                                println(
+                                    "MAGIC_JEWEL_IDE_BENCHMARK_WINDOW_PAINT_PROBE " +
+                                        "status=failed error=${error::class.simpleName}:${error.message}",
+                                )
+                            }
+                            .getOrNull()
+                    }?.let { windowCapture ->
                         val windowPath = Path.of(outDir, "window-paint-probe.png")
                         ImageIO.write(windowCapture.image, "png", windowPath.toFile())
                         logPaintCapture("MAGIC_JEWEL_IDE_BENCHMARK_WINDOW_PAINT_PROBE", windowCapture, windowPath)
@@ -179,7 +175,17 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
     }
 
     private fun captureComponentWithRetries(component: Component, frame: Frame?): PaintCapture {
-        return captureWithRetries("toolWindow") { captureComponent(component, frame) }
+        return runCatching { captureWithRetries("toolWindow") { captureComponent(component, frame) } }
+            .getOrElse { error ->
+                println(
+                    "MAGIC_JEWEL_IDE_BENCHMARK_CAPTURE_FALLBACK " +
+                        "label=toolWindow source=spectre-robot-region " +
+                        "reason=${error::class.simpleName}:${error.message}",
+                )
+                val capture = captureWithRetries("toolWindow.spectreRobotRegion") { captureComponentRegion(component) }
+                println("MAGIC_JEWEL_IDE_BENCHMARK_CAPTURE_SOURCE label=toolWindow source=spectre-robot-region")
+                capture
+            }
     }
 
     private fun captureWindowWithRetries(frame: Frame): PaintCapture =
@@ -283,6 +289,28 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
             contentStats = sampleImage(
                 image = image,
                 region = Rectangle(width / 3, 0, width - width / 3, height),
+            ),
+        )
+    }
+
+    private fun captureComponentRegion(component: Component): PaintCapture {
+        val region =
+            runOnEdt {
+                val location = component.locationOnScreen
+                Rectangle(
+                    location.x,
+                    location.y,
+                    component.width.coerceAtLeast(1),
+                    component.height.coerceAtLeast(1),
+                )
+            }
+        val image = RobotDriver().screenshot(region)
+        return PaintCapture(
+            image = image,
+            stats = sampleImage(image),
+            contentStats = sampleImage(
+                image = image,
+                region = Rectangle(image.width / 3, 0, image.width - image.width / 3, image.height),
             ),
         )
     }
@@ -427,11 +455,6 @@ private data class PaintCapture(
     val contentNonDominantPixels: Int = contentStats.nonDominantPixels
     val contentNonDominantRatio: Double = contentStats.nonDominantRatio
 }
-
-private data class PaintProbeCaptures(
-    val toolWindow: PaintCapture,
-    val window: PaintCapture?,
-)
 
 private data class PaintStats(
     val sampledPixels: Int,
