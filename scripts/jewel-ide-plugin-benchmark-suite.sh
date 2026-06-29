@@ -213,8 +213,60 @@ summarize_ps() {
 
 summarize_thread_cpu() {
   local csv="$1"
-  awk -F, 'NR>1 {if($6>max) {max=$6; command=$7}; n++}
-    END {if(n) printf "samples=%d max_thread_cpu=%.2f command=%s", n, max, command; else printf "samples=0"}' "${csv}"
+  awk -F, '
+    NR > 1 {
+      cpu = $6 + 0
+      thread = $5
+      n++
+      if (cpu > max) {
+        max = cpu
+        maxThread = thread
+      }
+      totalByThread[thread] += cpu
+      countByThread[thread]++
+    }
+    END {
+      if (!n) {
+        printf "samples=0"
+        exit
+      }
+      bestAvg = -1
+      bestAvgThread = ""
+      for (thread in totalByThread) {
+        avg = totalByThread[thread] / countByThread[thread]
+        if (avg > bestAvg) {
+          bestAvg = avg
+          bestAvgThread = thread
+        }
+      }
+      printf "samples=%d max_thread_index=%s max_thread_cpu=%.2f hottest_avg_thread_index=%s hottest_avg_thread_cpu=%.2f",
+        n, maxThread, max, bestAvgThread, bestAvg
+    }' "${csv}"
+}
+
+summarize_command_frames() {
+  local log="$1"
+  awk '
+    /JBR_SKIA_INTEROP_COMMAND_FRAME/ {
+      for (i = 1; i <= NF; i++) {
+        if ($i ~ /^commands=/) {
+          split($i, a, "=")
+          commands = a[2] + 0
+          frames++
+          total += commands
+          if (commands > max) {
+            max = commands
+          }
+        }
+      }
+    }
+    END {
+      if (frames) {
+        printf "frames=%d avg_commands=%.1f max_commands=%d", frames, total / frames, max
+      } else {
+        printf "frames=0"
+      }
+    }' "${log}"
 }
 
 summary_value() {
@@ -298,6 +350,7 @@ run_variant() {
   echo "${variant}_pid=${pid}" >> "${case_dir}/summary.properties"
   echo "${variant}_ps=$(summarize_ps "${ps_csv}")" >> "${case_dir}/summary.properties"
   echo "${variant}_thread_cpu=$(summarize_thread_cpu "${thread_csv}")" >> "${case_dir}/summary.properties"
+  echo "${variant}_powermetrics_status=$(cat "${pm}.status" 2>/dev/null || echo not-run)" >> "${case_dir}/summary.properties"
   local benchmark_ticks benchmark_frames command_frames picture_frames fallbacks
   benchmark_ticks="$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK phase=tick' "${log}" || true)"
   benchmark_frames="$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK_FRAME' "${log}" || true)"
@@ -307,6 +360,7 @@ run_variant() {
   echo "${variant}_benchmark_ticks=${benchmark_ticks}" >> "${case_dir}/summary.properties"
   echo "${variant}_benchmark_frames=${benchmark_frames}" >> "${case_dir}/summary.properties"
   echo "${variant}_command_frames=${command_frames}" >> "${case_dir}/summary.properties"
+  echo "${variant}_command_frame_summary=$(summarize_command_frames "${log}")" >> "${case_dir}/summary.properties"
   echo "${variant}_picture_frames=${picture_frames}" >> "${case_dir}/summary.properties"
   echo "${variant}_fallbacks=${fallbacks}" >> "${case_dir}/summary.properties"
   if [[ "${benchmark_frames}" == "0" ]]; then
@@ -359,7 +413,7 @@ run_variant() {
 }
 
 suite_tsv="${OUT_ROOT}/suite.tsv"
-printf "case\tstatus\told_ps\tnew_ps\told_thread_cpu\tnew_thread_cpu\told_benchmark_ticks\tnew_benchmark_ticks\told_benchmark_frames\tnew_benchmark_frames\told_command_frames\tnew_command_frames\told_picture_frames\tnew_picture_frames\told_fallbacks\tnew_fallbacks\treport\n" > "${suite_tsv}"
+printf "case\tstatus\told_ps\tnew_ps\told_thread_cpu\tnew_thread_cpu\told_command_summary\tnew_command_summary\told_powermetrics\tnew_powermetrics\told_benchmark_ticks\tnew_benchmark_ticks\told_benchmark_frames\tnew_benchmark_frames\told_command_frames\tnew_command_frames\told_picture_frames\tnew_picture_frames\told_fallbacks\tnew_fallbacks\treport\n" > "${suite_tsv}"
 
 for case_name in ${CASES}; do
   case_dir="${OUT_ROOT}/${case_name}"
@@ -379,6 +433,10 @@ for case_name in ${CASES}; do
   new_ps="$(summary_value "${case_dir}/summary.properties" new_ps)"
   old_thread_cpu="$(summary_value "${case_dir}/summary.properties" old_thread_cpu)"
   new_thread_cpu="$(summary_value "${case_dir}/summary.properties" new_thread_cpu)"
+  old_command_summary="$(summary_value "${case_dir}/summary.properties" old_command_frame_summary)"
+  new_command_summary="$(summary_value "${case_dir}/summary.properties" new_command_frame_summary)"
+  old_powermetrics_status="$(summary_value "${case_dir}/summary.properties" old_powermetrics_status)"
+  new_powermetrics_status="$(summary_value "${case_dir}/summary.properties" new_powermetrics_status)"
   old_ticks="$(summary_value "${case_dir}/summary.properties" old_benchmark_ticks)"
   new_ticks="$(summary_value "${case_dir}/summary.properties" new_benchmark_ticks)"
   old_frames="$(summary_value "${case_dir}/summary.properties" old_benchmark_frames)"
@@ -389,8 +447,9 @@ for case_name in ${CASES}; do
   new_picture="$(summary_value "${case_dir}/summary.properties" new_picture_frames)"
   old_fallbacks="$(summary_value "${case_dir}/summary.properties" old_fallbacks)"
   new_fallbacks="$(summary_value "${case_dir}/summary.properties" new_fallbacks)"
-  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
-    "${case_name}" "${status}" "${old_ps}" "${new_ps}" "${old_thread_cpu}" "${new_thread_cpu}" "${old_ticks}" "${new_ticks}" "${old_frames}" "${new_frames}" "${old_command}" "${new_command}" \
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+    "${case_name}" "${status}" "${old_ps}" "${new_ps}" "${old_thread_cpu}" "${new_thread_cpu}" "${old_command_summary}" "${new_command_summary}" \
+    "${old_powermetrics_status}" "${new_powermetrics_status}" "${old_ticks}" "${new_ticks}" "${old_frames}" "${new_frames}" "${old_command}" "${new_command}" \
     "${old_picture}" "${new_picture}" "${old_fallbacks}" "${new_fallbacks}" "${case_dir}" >> "${suite_tsv}"
 done
 
