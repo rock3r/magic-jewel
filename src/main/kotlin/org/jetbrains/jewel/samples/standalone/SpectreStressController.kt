@@ -41,6 +41,8 @@ internal object SpectreStressController {
                         SpectreStressMode.MarkdownWheel -> "jewel.page.markdown"
                         SpectreStressMode.TooltipHover -> "jewel.tooltip.hoverTarget"
                         SpectreStressMode.MenuPopup -> "jewel.menu.basic"
+                        SpectreStressMode.TourThenHypnotoad,
+                        SpectreStressMode.FullShowcaseThenHypnotoad -> "jewel.components.Buttons"
                         else -> "jewel.page.hypnotoad"
                     }
                 automator.waitForNode(tag = startupTag, timeout = 10.seconds)

@@ -63,6 +63,8 @@ EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE="${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE
 EXPECT_MIN_POPUP_FRAMES="${EXPECT_MIN_POPUP_FRAMES:-0}"
 EXPECT_MIN_APP_NEW_FRAMES="${EXPECT_MIN_APP_NEW_FRAMES:-0}"
 EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS="${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS:-0}"
+EXPECT_SPECTRE_TOUR_COMPLETE="${EXPECT_SPECTRE_TOUR_COMPLETE:-false}"
+EXPECT_SPECTRE_COMPONENTS="${EXPECT_SPECTRE_COMPONENTS:-}"
 EXPECT_MIN_COMMAND_CACHE_CLEARS="${EXPECT_MIN_COMMAND_CACHE_CLEARS:-0}"
 EXPECT_MAX_IMAGE_DEFINES="${EXPECT_MAX_IMAGE_DEFINES:--1}"
 EXPECT_MAX_IMAGE_CACHE_CLEARS="${EXPECT_MAX_IMAGE_CACHE_CLEARS:--1}"
@@ -1852,6 +1854,7 @@ POPUP_FRAME_MARKER="MAGIC_JEWEL_POPUP_FRAME"
 POPUP_SHOWN_MARKER="MAGIC_JEWEL_POPUP_SHOWN"
 POPUP_WINDOW_SHOWN_MARKER="MAGIC_JEWEL_POPUP_WINDOW_SHOWN"
 MENU_SHOWN_MARKER="MAGIC_JEWEL_MENU_SHOWN"
+SPECTRE_MARKER="JEWEL_STANDALONE_SPECTRE"
 SKIKO_PICTURE_MARKER="SKIKO_JBR_INTEROP_PICTURE_FRAME"
 JBR_PICTURE_MARKER="JBR_SKIA_INTEROP_PICTURE_FRAME"
 SKIKO_COMMAND_MARKER="SKIKO_JBR_INTEROP_COMMAND_FRAME"
@@ -3284,6 +3287,10 @@ write_machine_summary() {
     echo "popup_new_shown=$(grep -c "${POPUP_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "popup_window_new_shown=$(grep -c "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "menu_new_shown=$(grep -c "${MENU_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null || true)"
+    echo "spectre_started=$(grep -c "${SPECTRE_MARKER} status=started" "${new_full_log}" 2>/dev/null || true)"
+    echo "spectre_tour_complete=$(grep -c "${SPECTRE_MARKER} status=tour-complete" "${new_full_log}" 2>/dev/null || true)"
+    echo "spectre_errors=$(grep -Ec "${SPECTRE_MARKER} status=(tour-error|error)" "${new_full_log}" 2>/dev/null || true)"
+    echo "spectre_tour_components=$(grep "${SPECTRE_MARKER} phase=tour-component" "${new_full_log}" 2>/dev/null | sed -E 's/^.*target=//' | paste -sd ',' - || true)"
     echo "cmp_recorder_frames=$(grep -c "${CMP_COMMAND_RECORDER_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "cmp_frame_kind_frames=$(grep -c "${CMP_COMMAND_FRAME_KIND_MARKER}" "${new_log}" 2>/dev/null || true)"
     echo "cmp_frame_kind_full_scene=$(grep -c "${CMP_COMMAND_FRAME_KIND_MARKER}.*kind=FullScene" "${new_log}" 2>/dev/null || true)"
@@ -4388,6 +4395,26 @@ validate_report() {
         tiny_full_scene_injections="$(grep -c "${SKIKO_TINY_FULL_SCENE_MARKER}" "${new_full_log}" 2>/dev/null || true)"
         [[ "${tiny_full_scene_injections}" -ge "${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS}" ]] ||
           failures+=("Skiko tiny FullScene injection markers ${tiny_full_scene_injections} below expected ${EXPECT_MIN_TINY_FULL_SCENE_INJECTIONS}")
+      fi
+      if [[ "${EXPECT_SPECTRE_TOUR_COMPLETE}" == "true" ]]; then
+        if ! grep -q "${SPECTRE_MARKER} status=tour-complete" "${new_full_log}" 2>/dev/null; then
+          failures+=("missing Spectre showcase tour-complete marker")
+        fi
+        if grep -Eq "${SPECTRE_MARKER} status=(tour-error|error)" "${new_full_log}" 2>/dev/null; then
+          failures+=("Spectre showcase tour reported an error")
+        fi
+      fi
+      if [[ -n "${EXPECT_SPECTRE_COMPONENTS}" ]]; then
+        local expected_spectre_component
+        IFS=',' read -ra expected_spectre_components <<< "${EXPECT_SPECTRE_COMPONENTS}"
+        for expected_spectre_component in "${expected_spectre_components[@]}"; do
+          expected_spectre_component="${expected_spectre_component#"${expected_spectre_component%%[![:space:]]*}"}"
+          expected_spectre_component="${expected_spectre_component%"${expected_spectre_component##*[![:space:]]}"}"
+          [[ -n "${expected_spectre_component}" ]] || continue
+          if ! grep -Fq "${SPECTRE_MARKER} phase=tour-component target=${expected_spectre_component}" "${new_full_log}" 2>/dev/null; then
+            failures+=("missing Spectre component tour marker for ${expected_spectre_component}")
+          fi
+        done
       fi
       if [[ "${MAGIC_JEWEL_POPUP_WINDOW_STRESS}" == "true" ]]; then
         if ! grep -q "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null; then

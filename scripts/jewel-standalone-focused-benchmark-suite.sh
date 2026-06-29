@@ -55,6 +55,8 @@ run_case() {
   local initial_component="${9:-}"
   local expect_min_app_new_frames="${10:-1}"
   local markdown_stable_images="${11:-true}"
+  local expect_spectre_tour_complete="${12:-false}"
+  local expect_spectre_components="${13:-}"
   local out_dir="${OUT_ROOT}/${name}"
   echo "== ${name} (${mode}) =="
   mkdir -p "${out_dir}"
@@ -73,6 +75,8 @@ run_case() {
     CAPTURE_WINDOW_QUERY=JewelStandaloneJbrSkiaWindow \
     APP_FRAME_MARKER="${frame_marker}" \
     EXPECT_MIN_APP_NEW_FRAMES="${expect_min_app_new_frames}" \
+    EXPECT_SPECTRE_TOUR_COMPLETE="${expect_spectre_tour_complete}" \
+    EXPECT_SPECTRE_COMPONENTS="${expect_spectre_components}" \
     COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS}" \
     POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS}" \
     POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS}" \
@@ -84,7 +88,7 @@ run_case() {
     JEWEL_STANDALONE_MARKDOWN_STABLE_IMAGES="${markdown_stable_images}" \
     JEWEL_STANDALONE_SPECTRE_STRESS="${spectre_stress}" \
     JEWEL_STANDALONE_SPECTRE_STRESS_MODE="${mode}" \
-    JEWEL_STANDALONE_SPECTRE_COMPONENTS= \
+    JEWEL_STANDALONE_SPECTRE_COMPONENTS="${expect_spectre_components}" \
     JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS="${JEWEL_STANDALONE_SPECTRE_STRESS_INTERVAL_MILLIS}" \
     "${SCRIPT_DIR}/jbr-skia-interop-report.sh" > "${out_dir}/report-path.txt"
 }
@@ -96,13 +100,13 @@ should_run_case() {
 
 write_suite_summary() {
   local suite_tsv="${OUT_ROOT}/suite.tsv"
-  printf "case\tstatus\told_avg_cpu\tnew_avg_cpu\told_max_cpu\tnew_max_cpu\told_avg_rss_kb\tnew_avg_rss_kb\told_fps\tnew_fps\tjbr_command_fps\tjbr_command_frames\tfallbacks\tunsupported_max\told_powermetrics\tnew_powermetrics\treport\n" > "${suite_tsv}"
+  printf "case\tstatus\told_avg_cpu\tnew_avg_cpu\told_max_cpu\tnew_max_cpu\told_avg_rss_kb\tnew_avg_rss_kb\told_fps\tnew_fps\tjbr_command_fps\tjbr_command_frames\tfallbacks\tunsupported_max\tspectre_tour_complete\tspectre_errors\tspectre_tour_components\told_powermetrics\tnew_powermetrics\treport\n" > "${suite_tsv}"
   local case_dir
   for case_dir in "${OUT_ROOT}"/*; do
     [[ -d "${case_dir}" && -f "${case_dir}/summary.properties" ]] || continue
     local name
     name="$(basename "${case_dir}")"
-    printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+    printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
       "${name}" \
       "$(summary_value "${case_dir}/summary.properties" validation_status)" \
       "$(summary_value "${case_dir}/summary.properties" old_avg_cpu)" \
@@ -117,6 +121,9 @@ write_suite_summary() {
       "$(summary_value "${case_dir}/summary.properties" jbr_command_frames)" \
       "$(summary_value "${case_dir}/summary.properties" fallback_new_count)" \
       "$(summary_value "${case_dir}/summary.properties" cmp_unsupported_max)" \
+      "$(summary_value "${case_dir}/summary.properties" spectre_tour_complete)" \
+      "$(summary_value "${case_dir}/summary.properties" spectre_errors)" \
+      "$(summary_value "${case_dir}/summary.properties" spectre_tour_components)" \
       "$(summary_value "${case_dir}/summary.properties" powermetrics_old_status)" \
       "$(summary_value "${case_dir}/summary.properties" powermetrics_new_status)" \
       "$(cat "${case_dir}/report-path.txt" 2>/dev/null || true)" >> "${suite_tsv}"
@@ -137,6 +144,8 @@ should_run_case markdown-preview-readme80-static &&
   run_case markdown-preview-readme80-static idle Markdown JEWEL_STANDALONE_FRAME readme80 true false false "" 0
 should_run_case showcase-icons &&
   run_case showcase-icons idle Components JEWEL_STANDALONE_FRAME readme80 false false false Icons 0
+should_run_case showcase-critical-tour &&
+  run_case showcase-critical-tour fullShowcaseThenHypnotoad Components JEWEL_STANDALONE_SPECTRE readme80 false false true "" 1 true true "Combo Boxes,TextFields,Scrollbars"
 should_run_case markdown-preview-readme20-auto &&
   run_case markdown-preview-readme20-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme20 true true false
 should_run_case markdown-preview-readme40-auto &&
