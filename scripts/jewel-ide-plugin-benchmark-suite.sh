@@ -256,14 +256,28 @@ run_variant() {
     local paint_probe
     paint_probe="$(grep 'MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE' "${log}" | tail -1 || true)"
     echo "${variant}_paint_probe=${paint_probe}" >> "${case_dir}/summary.properties"
+    local expected_node_probe
+    expected_node_probe="$(grep 'MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE_EXPECTED_NODE' "${log}" | tail -1 || true)"
+    echo "${variant}_paint_probe_expected_node=${expected_node_probe}" >> "${case_dir}/summary.properties"
+    if [[ -z "${expected_node_probe}" || "${expected_node_probe}" != *"present=true"* ]]; then
+      echo "${variant}_paint_probe_expected_node_missing=true" >> "${case_dir}/summary.properties"
+      return 1
+    fi
     if [[ -z "${paint_probe}" || "${paint_probe}" != *"status=captured"* ]]; then
       echo "${variant}_paint_probe_missing=true" >> "${case_dir}/summary.properties"
       return 1
     fi
-    local non_dominant_ratio distinct_colors
+    local non_dominant_ratio distinct_colors content_non_dominant_ratio content_distinct_colors
     non_dominant_ratio="$(awk '{for (i=1; i<=NF; i++) if ($i ~ /^nonDominantRatio=/) {split($i, a, "="); print a[2]}}' <<< "${paint_probe}")"
     distinct_colors="$(awk '{for (i=1; i<=NF; i++) if ($i ~ /^distinct=/) {split($i, a, "="); print a[2]}}' <<< "${paint_probe}")"
-    if ! awk -v ratio="${non_dominant_ratio:-0}" -v distinct="${distinct_colors:-0}" 'BEGIN { exit (ratio >= 0.005 && distinct >= 8) ? 0 : 1 }'; then
+    content_non_dominant_ratio="$(awk '{for (i=1; i<=NF; i++) if ($i ~ /^contentNonDominantRatio=/) {split($i, a, "="); print a[2]}}' <<< "${paint_probe}")"
+    content_distinct_colors="$(awk '{for (i=1; i<=NF; i++) if ($i ~ /^contentDistinct=/) {split($i, a, "="); print a[2]}}' <<< "${paint_probe}")"
+    if ! awk \
+      -v ratio="${non_dominant_ratio:-0}" \
+      -v distinct="${distinct_colors:-0}" \
+      -v content_ratio="${content_non_dominant_ratio:-0}" \
+      -v content_distinct="${content_distinct_colors:-0}" \
+      'BEGIN { exit (ratio >= 0.005 && distinct >= 8 && content_ratio >= 0.02 && content_distinct >= 16) ? 0 : 1 }'; then
       echo "${variant}_paint_probe_blank=true" >> "${case_dir}/summary.properties"
       return 1
     fi

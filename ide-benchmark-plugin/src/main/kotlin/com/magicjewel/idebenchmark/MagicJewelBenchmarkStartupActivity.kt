@@ -7,10 +7,12 @@ import com.intellij.openapi.wm.ToolWindowManager
 import dev.sebastiano.spectre.core.AutomatorNode
 import dev.sebastiano.spectre.core.ComposeAutomator
 import dev.sebastiano.spectre.core.RobotDriver
+import dev.sebastiano.spectre.recording.AutoScreenshotter
+import dev.sebastiano.spectre.recording.screencapturekit.asTitledWindow
+import java.awt.Frame
 import java.awt.Component
 import java.awt.Container
 import java.awt.Rectangle
-import java.awt.Robot
 import java.awt.image.BufferedImage
 import java.nio.file.Path
 import java.util.Locale
@@ -50,7 +52,7 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                     toolWindow.activate(
                         {
                             println("MAGIC_JEWEL_IDE_BENCHMARK status=tool-window-activated")
-                            maybeStartPaintProbe(project)
+                            maybeStartPaintProbe(project, mode)
                             ApplicationManager.getApplication().executeOnPooledThread { driveBenchmarkUi(mode) }
                         },
                         true,
@@ -103,12 +105,17 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         }
     }
 
-    private fun maybeStartPaintProbe(project: Project) {
+    private fun maybeStartPaintProbe(project: Project, mode: BenchmarkMode) {
         if (System.getProperty("magic.jewel.benchmark.paintProbe") != "true") return
         val outDir = System.getProperty("magic.jewel.benchmark.out") ?: return
         ApplicationManager.getApplication().executeOnPooledThread {
             Thread.sleep(PAINT_PROBE_DELAY_MS)
             runCatching {
+                    val expectedTag = if (mode == BenchmarkMode.Chat) {
+                        "magic.benchmark.page.chat"
+                    } else {
+                        "magic.benchmark.page.hypnotoad"
+                    }
                     val capture =
                         runOnEdt {
                             val component =
@@ -116,12 +123,29 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                                     .getToolWindow("JBR Skia Benchmark")
                                     ?.component
                             component?.takeIf { it.isShowing }?.let {
+                                val window = SwingUtilities.getWindowAncestor(it)?.takeIf { window -> window.isShowing }
+                                val frame = window as? Frame
+                                window?.toFront()
+                                window?.requestFocus()
+                                it.requestFocusInWindow()
+                                Thread.sleep(PAINT_PROBE_FRONT_DELAY_MS)
                                 logComponentBounds("toolWindow", it, depth = 0, maxDepth = 4)
+                                val expectedNodePresent =
+                                    runCatching {
+                                            val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.headless())
+                                            automator.refreshWindows()
+                                            automator.findOneByTestTag(expectedTag) != null
+                                        }
+                                        .getOrDefault(false)
+                                println(
+                                    "MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE_EXPECTED_NODE " +
+                                        "tag=$expectedTag present=$expectedNodePresent",
+                                )
                                 PaintProbeCaptures(
-                                    toolWindow = captureComponent(it),
-                                    window = SwingUtilities.getWindowAncestor(it)?.takeIf { window -> window.isShowing }?.let { window ->
-                                        logComponentBounds("window", window, depth = 0, maxDepth = 2)
-                                        captureComponent(window)
+                                    toolWindow = captureComponent(it, frame),
+                                    window = frame?.let { targetWindow ->
+                                        logComponentBounds("window", targetWindow, depth = 0, maxDepth = 2)
+                                        captureWindow(targetWindow)
                                     },
                                 )
                             }
@@ -157,17 +181,61 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                 "distinct=${capture.distinctColors} " +
                 "nonDominant=${capture.nonDominantPixels} " +
                 "nonDominantRatio=${String.format(Locale.US, "%.4f", capture.nonDominantRatio)} " +
+                "contentSampled=${capture.contentSampledPixels} " +
+                "contentDominantRgb=0x${capture.contentDominantRgb.toString(16).padStart(6, '0')} " +
+                "contentDominantRatio=${String.format(Locale.US, "%.4f", capture.contentDominantRatio)} " +
+                "contentDistinct=${capture.contentDistinctColors} " +
+                "contentNonDominant=${capture.contentNonDominantPixels} " +
+                "contentNonDominantRatio=${String.format(Locale.US, "%.4f", capture.contentNonDominantRatio)} " +
                 "path=$path",
         )
     }
 
-    private fun captureComponent(component: Component): PaintCapture {
+    private fun captureComponent(component: Component, frame: Frame?): PaintCapture {
         val width = component.width.coerceAtLeast(1)
         val height = component.height.coerceAtLeast(1)
-        val location = component.locationOnScreen
-        val image = Robot().createScreenCapture(Rectangle(location.x, location.y, width, height))
-        return PaintCapture(image = image, stats = sampleImage(image))
+        val frameImage = frame?.let(::captureWindowImage)
+        val image =
+            if (frameImage != null) {
+                val componentLocation = component.locationOnScreen
+                val frameLocation = frame.locationOnScreen
+                val scaleX = frameImage.width.toDouble() / frame.width.coerceAtLeast(1)
+                val scaleY = frameImage.height.toDouble() / frame.height.coerceAtLeast(1)
+                val crop =
+                    Rectangle(
+                        ((componentLocation.x - frameLocation.x) * scaleX).toInt(),
+                        ((componentLocation.y - frameLocation.y) * scaleY).toInt(),
+                        (width * scaleX).toInt().coerceAtLeast(1),
+                        (height * scaleY).toInt().coerceAtLeast(1),
+                    ).intersection(Rectangle(0, 0, frameImage.width, frameImage.height))
+                frameImage.getSubimage(crop.x, crop.y, crop.width.coerceAtLeast(1), crop.height.coerceAtLeast(1))
+            } else {
+                throw IllegalStateException("Spectre window screenshot requires the toolwindow to have an AWT Frame ancestor")
+            }
+        return PaintCapture(
+            image = image,
+            stats = sampleImage(image),
+            contentStats = sampleImage(
+                image = image,
+                region = Rectangle(width / 3, 0, width - width / 3, height),
+            ),
+        )
     }
+
+    private fun captureWindow(frame: Frame): PaintCapture {
+        val image = captureWindowImage(frame)
+        return PaintCapture(
+            image = image,
+            stats = sampleImage(image),
+            contentStats = sampleImage(
+                image = image,
+                region = Rectangle(image.width / 3, 0, image.width - image.width / 3, image.height),
+            ),
+        )
+    }
+
+    private fun captureWindowImage(frame: Frame): BufferedImage =
+        AutoScreenshotter().captureWindow(frame.asTitledWindow())
 
     private fun logComponentBounds(label: String, component: Component, depth: Int, maxDepth: Int) {
         val location =
@@ -190,15 +258,21 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         }
     }
 
-    private fun sampleImage(image: BufferedImage): PaintStats {
+    private fun sampleImage(
+        image: BufferedImage,
+        region: Rectangle = Rectangle(0, 0, image.width, image.height),
+    ): PaintStats {
+        val sampleRegion = region.intersection(Rectangle(0, 0, image.width, image.height))
         val strideX = (image.width / PAINT_PROBE_TARGET_SAMPLES_PER_AXIS).coerceAtLeast(1)
         val strideY = (image.height / PAINT_PROBE_TARGET_SAMPLES_PER_AXIS).coerceAtLeast(1)
         val histogram = HashMap<Int, Int>()
         var samples = 0
-        var y = 0
-        while (y < image.height) {
-            var x = 0
-            while (x < image.width) {
+        var y = sampleRegion.y
+        val maxY = sampleRegion.y + sampleRegion.height
+        val maxX = sampleRegion.x + sampleRegion.width
+        while (y < maxY) {
+            var x = sampleRegion.x
+            while (x < maxX) {
                 val rgb = image.getRGB(x, y) and 0x00ffffff
                 histogram[rgb] = (histogram[rgb] ?: 0) + 1
                 samples += 1
@@ -257,6 +331,7 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         const val POLL_INTERVAL_MS: Long = 50
         const val NANOS_PER_MILLI: Long = 1_000_000
         const val PAINT_PROBE_DELAY_MS: Long = 8_000
+        const val PAINT_PROBE_FRONT_DELAY_MS: Long = 750
         const val PAINT_PROBE_TARGET_SAMPLES_PER_AXIS: Int = 160
     }
 }
@@ -264,6 +339,7 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
 private data class PaintCapture(
     val image: BufferedImage,
     private val stats: PaintStats,
+    private val contentStats: PaintStats,
 ) {
     val sampledPixels: Int = stats.sampledPixels
     val dominantRgb: Int = stats.dominantRgb
@@ -271,6 +347,12 @@ private data class PaintCapture(
     val distinctColors: Int = stats.distinctColors
     val nonDominantPixels: Int = stats.nonDominantPixels
     val nonDominantRatio: Double = stats.nonDominantRatio
+    val contentSampledPixels: Int = contentStats.sampledPixels
+    val contentDominantRgb: Int = contentStats.dominantRgb
+    val contentDominantRatio: Double = contentStats.dominantRatio
+    val contentDistinctColors: Int = contentStats.distinctColors
+    val contentNonDominantPixels: Int = contentStats.nonDominantPixels
+    val contentNonDominantRatio: Double = contentStats.nonDominantRatio
 }
 
 private data class PaintProbeCaptures(

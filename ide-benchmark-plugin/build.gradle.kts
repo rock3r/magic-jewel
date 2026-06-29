@@ -45,6 +45,10 @@ dependencies {
     implementation(libs.spectre.core) {
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
     }
+    implementation(libs.spectre.recording) {
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
+    }
+    runtimeOnly(libs.spectre.recording.macos)
     compileOnly(libs.kotlinx.coroutines.core)
 
     compileOnly(libs.compose.runtime)
