@@ -18,6 +18,7 @@ import org.jetbrains.jewel.markdown.processing.MarkdownProcessor
 internal data class MagicJewelBenchmarkUiState(
     val mode: BenchmarkMode = BenchmarkMode.Hypnotoad,
     val hypnotoadIntensity: Int = 0,
+    val hypnotoadFrame: Int = 0,
     val streamingToken: Int = 0,
     val streamingMarkdownBlocks: List<MarkdownBlock> = emptyList(),
 )
@@ -30,20 +31,28 @@ internal class MagicJewelBenchmarkPresenter(
     private val processor = MarkdownProcessor(emptyList())
     private val chunks = ArrayDeque<String>()
     private var streamingJob: Job? = null
+    private var hypnotoadJob: Job? = null
     private val _state = MutableStateFlow(MagicJewelBenchmarkUiState(mode = initialMode))
     val state: StateFlow<MagicJewelBenchmarkUiState> = _state.asStateFlow()
 
     init {
-        if (initialMode == BenchmarkMode.Chat) startStreaming()
+        if (initialMode == BenchmarkMode.Chat) {
+            startStreaming()
+        } else {
+            startHypnotoadFrames()
+        }
     }
 
     fun setMode(mode: BenchmarkMode) {
         _state.update { it.copy(mode = mode) }
         if (mode == BenchmarkMode.Chat) {
+            hypnotoadJob?.cancel()
+            hypnotoadJob = null
             startStreaming()
         } else {
             streamingJob?.cancel()
             streamingJob = null
+            startHypnotoadFrames()
         }
     }
 
@@ -75,6 +84,28 @@ internal class MagicJewelBenchmarkPresenter(
                     }
                     println("MAGIC_JEWEL_IDE_BENCHMARK_FRAME mode=chat token=$token chunks=${chunks.size}")
                     token += 1
+                    delay(80)
+                }
+            }
+    }
+
+    private fun startHypnotoadFrames() {
+        if (hypnotoadJob?.isActive == true) return
+        hypnotoadJob =
+            scope.launch {
+                var frame = _state.value.hypnotoadFrame
+                while (true) {
+                    _state.update {
+                        it.copy(
+                            mode = BenchmarkMode.Hypnotoad,
+                            hypnotoadFrame = frame,
+                        )
+                    }
+                    println(
+                        "MAGIC_JEWEL_IDE_BENCHMARK_FRAME " +
+                            "mode=hypnotoad frame=$frame intensity=${_state.value.hypnotoadIntensity}",
+                    )
+                    frame += 1
                     delay(80)
                 }
             }

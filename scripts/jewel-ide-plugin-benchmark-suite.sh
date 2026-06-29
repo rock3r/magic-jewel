@@ -247,14 +247,24 @@ run_variant() {
 
   echo "${variant}_pid=${pid}" >> "${case_dir}/summary.properties"
   echo "${variant}_ps=$(summarize_ps "${ps_csv}")" >> "${case_dir}/summary.properties"
-  echo "${variant}_benchmark_ticks=$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK phase=tick' "${log}" || true)" >> "${case_dir}/summary.properties"
-  echo "${variant}_benchmark_frames=$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK_FRAME' "${log}" || true)" >> "${case_dir}/summary.properties"
-  echo "${variant}_command_frames=$(grep -c 'JBR_SKIA_INTEROP_COMMAND_FRAME' "${log}" || true)" >> "${case_dir}/summary.properties"
-  echo "${variant}_picture_frames=$(grep -c 'JBR_SKIA_INTEROP_PICTURE_FRAME' "${log}" || true)" >> "${case_dir}/summary.properties"
-  echo "${variant}_fallbacks=$(grep -c 'JBR_SKIA_INTEROP_FALLBACK' "${log}" || true)" >> "${case_dir}/summary.properties"
+  local benchmark_ticks benchmark_frames command_frames picture_frames fallbacks
+  benchmark_ticks="$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK phase=tick' "${log}" || true)"
+  benchmark_frames="$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK_FRAME' "${log}" || true)"
+  command_frames="$(grep -c 'JBR_SKIA_INTEROP_COMMAND_FRAME' "${log}" || true)"
+  picture_frames="$(grep -c 'JBR_SKIA_INTEROP_PICTURE_FRAME' "${log}" || true)"
+  fallbacks="$(grep -c 'JBR_SKIA_INTEROP_FALLBACK' "${log}" || true)"
+  echo "${variant}_benchmark_ticks=${benchmark_ticks}" >> "${case_dir}/summary.properties"
+  echo "${variant}_benchmark_frames=${benchmark_frames}" >> "${case_dir}/summary.properties"
+  echo "${variant}_command_frames=${command_frames}" >> "${case_dir}/summary.properties"
+  echo "${variant}_picture_frames=${picture_frames}" >> "${case_dir}/summary.properties"
+  echo "${variant}_fallbacks=${fallbacks}" >> "${case_dir}/summary.properties"
+  if [[ "${benchmark_frames}" == "0" ]]; then
+    echo "${variant}_benchmark_frames_missing=true" >> "${case_dir}/summary.properties"
+    return 1
+  fi
   if [[ "${PAINT_PROBE}" == "true" ]]; then
     local paint_probe
-    paint_probe="$(grep 'MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE' "${log}" | tail -1 || true)"
+    paint_probe="$(grep 'MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE status=' "${log}" | tail -1 || true)"
     echo "${variant}_paint_probe=${paint_probe}" >> "${case_dir}/summary.properties"
     local expected_node_probe
     expected_node_probe="$(grep 'MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE_EXPECTED_NODE' "${log}" | tail -1 || true)"
