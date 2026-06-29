@@ -150,6 +150,8 @@ should_run_case showcase-controls-tour &&
   run_case showcase-controls-tour fullShowcaseThenHypnotoad Components JEWEL_STANDALONE_SPECTRE readme80 false false true "" 1 true true "Buttons,Radio Buttons,Checkboxes,Menus,Tabs,Tooltips"
 should_run_case showcase-layout-text-tour &&
   run_case showcase-layout-text-tour fullShowcaseThenHypnotoad Components JEWEL_STANDALONE_SPECTRE readme80 false false true "" 1 true true "TextAreas,SplitLayout,Banners,Typography,Brushes"
+should_run_case showcase-misc-tour &&
+  run_case showcase-misc-tour fullShowcaseThenHypnotoad Components JEWEL_STANDALONE_SPECTRE readme80 false false true "" 1 true true "Chips and trees,Progressbar,Icons,Links,Borders,Segmented Controls,Sliders"
 should_run_case markdown-preview-readme20-auto &&
   run_case markdown-preview-readme20-auto markdownAutoScroll Markdown JEWEL_STANDALONE_MARKDOWN_AUTO_SCROLL readme20 true true false
 should_run_case markdown-preview-readme40-auto &&
