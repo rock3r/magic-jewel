@@ -16,6 +16,10 @@ import java.awt.Rectangle
 import java.awt.image.BufferedImage
 import java.nio.file.Path
 import java.util.Locale
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import javax.imageio.ImageIO
 import javax.swing.SwingUtilities
 import kotlinx.coroutines.delay
@@ -112,7 +116,7 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
             Thread.sleep(PAINT_PROBE_DELAY_MS)
             runCatching {
                     val expectedTag = expectedPageTag(mode)
-                    val capture =
+                    val target =
                         runOnEdt {
                             val component =
                                 ToolWindowManager.getInstance(project)
@@ -137,26 +141,28 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                                     "MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE_EXPECTED_NODE " +
                                         "tag=$expectedTag present=$expectedNodePresent",
                                 )
-                                PaintProbeCaptures(
-                                    toolWindow = captureComponent(it, frame),
-                                    window = frame?.let { targetWindow ->
-                                        logComponentBounds("window", targetWindow, depth = 0, maxDepth = 2)
-                                        runCatching { captureWindow(targetWindow) }
-                                            .onFailure { error ->
-                                                println(
-                                                    "MAGIC_JEWEL_IDE_BENCHMARK_WINDOW_PAINT_PROBE " +
-                                                        "status=failed error=${error::class.simpleName}:${error.message}",
-                                                )
-                                            }
-                                            .getOrNull()
-                                    },
-                                )
+                                frame?.let { targetWindow -> logComponentBounds("window", targetWindow, depth = 0, maxDepth = 2) }
+                                PaintProbeTarget(it, frame)
                             }
                         }
-                    if (capture == null) {
+                    if (target == null) {
                         println("MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE status=missing-component")
                         return@runCatching
                     }
+                    val capture =
+                        PaintProbeCaptures(
+                            toolWindow = captureComponentWithRetries(target.component, target.frame),
+                            window = target.frame?.let { targetWindow ->
+                                runCatching { captureWindowWithRetries(targetWindow) }
+                                    .onFailure { error ->
+                                        println(
+                                            "MAGIC_JEWEL_IDE_BENCHMARK_WINDOW_PAINT_PROBE " +
+                                                "status=failed error=${error::class.simpleName}:${error.message}",
+                                        )
+                                    }
+                                    .getOrNull()
+                            },
+                        )
                     val path = Path.of(outDir, "toolwindow-paint-probe.png")
                     ImageIO.write(capture.toolWindow.image, "png", path.toFile())
                     logPaintCapture("MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE", capture.toolWindow, path)
@@ -169,6 +175,55 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                 .onFailure {
                     println("MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE status=failed error=${it::class.simpleName}:${it.message}")
                 }
+        }
+    }
+
+    private fun captureComponentWithRetries(component: Component, frame: Frame?): PaintCapture {
+        return captureWithRetries("toolWindow") { captureComponent(component, frame) }
+    }
+
+    private fun captureWindowWithRetries(frame: Frame): PaintCapture =
+        captureWithRetries("window") { captureWindow(frame) }
+
+    private fun captureWithRetries(label: String, capture: () -> PaintCapture): PaintCapture {
+        var lastError: Throwable? = null
+        repeat(PAINT_PROBE_CAPTURE_ATTEMPTS) { index ->
+            val attempt = index + 1
+            runCatching { captureWithTimeout(capture) }
+                .onSuccess {
+                    if (attempt > 1) {
+                        println(
+                            "MAGIC_JEWEL_IDE_BENCHMARK_CAPTURE_ATTEMPT " +
+                                "label=$label attempt=$attempt status=success",
+                        )
+                    }
+                    return it
+                }
+                .onFailure { error ->
+                    lastError = error
+                    println(
+                        "MAGIC_JEWEL_IDE_BENCHMARK_CAPTURE_ATTEMPT " +
+                            "label=$label attempt=$attempt status=failed error=${error::class.simpleName}:${error.message}",
+                    )
+                    if (attempt < PAINT_PROBE_CAPTURE_ATTEMPTS) {
+                        Thread.sleep(PAINT_PROBE_CAPTURE_RETRY_DELAY_MS)
+                    }
+                }
+        }
+        throw lastError ?: IllegalStateException("paint probe capture failed without an exception")
+    }
+
+    private fun captureWithTimeout(capture: () -> PaintCapture): PaintCapture {
+        val executor = Executors.newSingleThreadExecutor()
+        try {
+            val future = executor.submit<PaintCapture> { capture() }
+            return future.get(PAINT_PROBE_CAPTURE_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+        } catch (error: ExecutionException) {
+            throw error.cause ?: error
+        } catch (error: TimeoutException) {
+            throw IllegalStateException("timed out after ${PAINT_PROBE_CAPTURE_TIMEOUT_MS}ms", error)
+        } finally {
+            executor.shutdownNow()
         }
     }
 
@@ -342,9 +397,17 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         const val NANOS_PER_MILLI: Long = 1_000_000
         const val PAINT_PROBE_DELAY_MS: Long = 8_000
         const val PAINT_PROBE_FRONT_DELAY_MS: Long = 750
+        const val PAINT_PROBE_CAPTURE_ATTEMPTS: Int = 4
+        const val PAINT_PROBE_CAPTURE_RETRY_DELAY_MS: Long = 1_000
+        const val PAINT_PROBE_CAPTURE_TIMEOUT_MS: Long = 5_000
         const val PAINT_PROBE_TARGET_SAMPLES_PER_AXIS: Int = 160
     }
 }
+
+private data class PaintProbeTarget(
+    val component: Component,
+    val frame: Frame?,
+)
 
 private data class PaintCapture(
     val image: BufferedImage,
