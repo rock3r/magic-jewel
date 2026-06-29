@@ -13,6 +13,7 @@ BENCHMARK_PROJECT_PATH="${BENCHMARK_PROJECT_PATH:-/Users/rock3r/src/uel}"
 POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-500}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
 POWERMETRICS="${POWERMETRICS:-/usr/bin/powermetrics}"
+PAINT_PROBE_SHUTDOWN_WAIT_SECONDS="${PAINT_PROBE_SHUTDOWN_WAIT_SECONDS:-15}"
 DESKTOP_PATCH="${DESKTOP_PATCH:-/tmp/jbr-skia-run/desktop}"
 JBR_API_SHIM="${JBR_API_SHIM:-/tmp/jbr-api-shim.jar}"
 JBR_SKIA_LIB="${JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}"
@@ -275,6 +276,19 @@ summary_value() {
   awk -F= -v key="${key}" '$1 == key { sub(/^[^=]*=/, ""); print; found=1; exit } END { if (!found) exit 0 }' "${file}"
 }
 
+wait_for_paint_probe() {
+  local log="$1"
+  [[ "${PAINT_PROBE}" == "true" ]] || return
+  local waited=0
+  while (( waited < PAINT_PROBE_SHUTDOWN_WAIT_SECONDS )); do
+    if grep -q 'MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE status=' "${log}" 2>/dev/null; then
+      return
+    fi
+    sleep 1
+    waited=$((waited + 1))
+  done
+}
+
 run_variant() {
   local case_name="$1"
   local variant="$2"
@@ -337,6 +351,7 @@ run_variant() {
   start_powermetrics "${pm}"
 
   sleep "${SAMPLE_SECONDS}"
+  wait_for_paint_probe "${log}"
 
   stop_pid_file "${pm}.pid"
   kill "${sampler_pid}" 2>/dev/null || true

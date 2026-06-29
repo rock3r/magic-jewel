@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -76,6 +77,12 @@ internal fun MagicJewelBenchmarkContent() {
             ) {
                 Text("Streaming chat")
             }
+            DefaultButton(
+                onClick = { presenter.setMode(BenchmarkMode.Redraw) },
+                modifier = Modifier.testTag("magic.benchmark.redraw"),
+            ) {
+                Text("Simple redraw")
+            }
         }
         when (state.mode) {
             BenchmarkMode.Hypnotoad -> IdeHypnotoad(
@@ -85,6 +92,7 @@ internal fun MagicJewelBenchmarkContent() {
                 onCalm = presenter::decreaseHypnotoadIntensity,
             )
             BenchmarkMode.Chat -> StreamingMarkdownChat(state)
+            BenchmarkMode.Redraw -> SimpleRedraw(state)
         }
     }
 }
@@ -184,12 +192,55 @@ private fun StreamingMarkdownChat(state: MagicJewelBenchmarkUiState) {
     }
 }
 
+@Composable
+private fun SimpleRedraw(state: MagicJewelBenchmarkUiState) {
+    Column(
+        Modifier.fillMaxSize()
+            .background(Color(0xFF111318))
+            .padding(16.dp)
+            .testTag("magic.benchmark.page.redraw"),
+    ) {
+        Text("Simple redraw ${state.redrawFrame}")
+        Spacer(Modifier.height(12.dp))
+        Canvas(Modifier.fillMaxWidth().height(360.dp)) {
+            val phase = (state.redrawFrame % 120) / 120f
+            val center = Offset(size.width / 2f, size.height / 2f)
+            drawRect(Color(0xFF171A21), size = size)
+            drawRoundRect(
+                color = Color(0xFF2F6FED),
+                topLeft = Offset(24f + phase * 96f, 40f),
+                size = Size(size.width * 0.42f, 88f),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(18f, 18f),
+                alpha = 0.86f,
+            )
+            drawCircle(
+                color = Color(0xFFFFC857),
+                radius = 34f,
+                center = Offset(center.x + sin(phase * PI.toFloat() * 2f) * 72f, center.y),
+            )
+            drawLine(
+                color = Color(0xFF7CE2D1),
+                start = Offset(28f, size.height - 56f),
+                end = Offset(size.width - 28f, size.height - 56f),
+                strokeWidth = 6f,
+                cap = StrokeCap.Round,
+            )
+        }
+    }
+}
+
 internal enum class BenchmarkMode {
     Hypnotoad,
-    Chat;
+    Chat,
+    Redraw;
 
     companion object {
-        fun from(value: String?): BenchmarkMode = if (value == "chat" || value == "markdownStreaming") Chat else Hypnotoad
+        fun from(value: String?): BenchmarkMode =
+            when (value) {
+                "chat", "markdownStreaming" -> Chat
+                "redraw", "simpleRedraw" -> Redraw
+                else -> Hypnotoad
+            }
     }
 }
 

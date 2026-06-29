@@ -19,6 +19,7 @@ internal data class MagicJewelBenchmarkUiState(
     val mode: BenchmarkMode = BenchmarkMode.Hypnotoad,
     val hypnotoadIntensity: Int = 0,
     val hypnotoadFrame: Int = 0,
+    val redrawFrame: Int = 0,
     val streamingToken: Int = 0,
     val streamingMarkdownBlocks: List<MarkdownBlock> = emptyList(),
 )
@@ -32,27 +33,42 @@ internal class MagicJewelBenchmarkPresenter(
     private val chunks = ArrayDeque<String>()
     private var streamingJob: Job? = null
     private var hypnotoadJob: Job? = null
+    private var redrawJob: Job? = null
     private val _state = MutableStateFlow(MagicJewelBenchmarkUiState(mode = initialMode))
     val state: StateFlow<MagicJewelBenchmarkUiState> = _state.asStateFlow()
 
     init {
-        if (initialMode == BenchmarkMode.Chat) {
-            startStreaming()
-        } else {
-            startHypnotoadFrames()
+        when (initialMode) {
+            BenchmarkMode.Chat -> startStreaming()
+            BenchmarkMode.Redraw -> startRedrawFrames()
+            BenchmarkMode.Hypnotoad -> startHypnotoadFrames()
         }
     }
 
     fun setMode(mode: BenchmarkMode) {
         _state.update { it.copy(mode = mode) }
-        if (mode == BenchmarkMode.Chat) {
-            hypnotoadJob?.cancel()
-            hypnotoadJob = null
-            startStreaming()
-        } else {
-            streamingJob?.cancel()
-            streamingJob = null
-            startHypnotoadFrames()
+        when (mode) {
+            BenchmarkMode.Chat -> {
+                hypnotoadJob?.cancel()
+                hypnotoadJob = null
+                redrawJob?.cancel()
+                redrawJob = null
+                startStreaming()
+            }
+            BenchmarkMode.Redraw -> {
+                hypnotoadJob?.cancel()
+                hypnotoadJob = null
+                streamingJob?.cancel()
+                streamingJob = null
+                startRedrawFrames()
+            }
+            BenchmarkMode.Hypnotoad -> {
+                streamingJob?.cancel()
+                streamingJob = null
+                redrawJob?.cancel()
+                redrawJob = null
+                startHypnotoadFrames()
+            }
         }
     }
 
@@ -105,6 +121,25 @@ internal class MagicJewelBenchmarkPresenter(
                         "MAGIC_JEWEL_IDE_BENCHMARK_FRAME " +
                             "mode=hypnotoad frame=$frame intensity=${_state.value.hypnotoadIntensity}",
                     )
+                    frame += 1
+                    delay(80)
+                }
+            }
+    }
+
+    private fun startRedrawFrames() {
+        if (redrawJob?.isActive == true) return
+        redrawJob =
+            scope.launch {
+                var frame = _state.value.redrawFrame
+                while (true) {
+                    _state.update {
+                        it.copy(
+                            mode = BenchmarkMode.Redraw,
+                            redrawFrame = frame,
+                        )
+                    }
+                    println("MAGIC_JEWEL_IDE_BENCHMARK_FRAME mode=redraw frame=$frame")
                     frame += 1
                     delay(80)
                 }

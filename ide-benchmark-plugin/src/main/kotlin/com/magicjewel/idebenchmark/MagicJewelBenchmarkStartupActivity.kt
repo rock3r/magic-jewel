@@ -69,7 +69,7 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
     private fun driveBenchmarkUi(mode: BenchmarkMode) {
         runBlocking {
             val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.headless())
-            val tag = if (mode == BenchmarkMode.Chat) "magic.benchmark.page.chat" else "magic.benchmark.page.hypnotoad"
+            val tag = expectedPageTag(mode)
             val ready = pollOnEdt {
                 automator.refreshWindows()
                 automator.findOneByTestTag(tag) != null
@@ -111,11 +111,7 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         ApplicationManager.getApplication().executeOnPooledThread {
             Thread.sleep(PAINT_PROBE_DELAY_MS)
             runCatching {
-                    val expectedTag = if (mode == BenchmarkMode.Chat) {
-                        "magic.benchmark.page.chat"
-                    } else {
-                        "magic.benchmark.page.hypnotoad"
-                    }
+                    val expectedTag = expectedPageTag(mode)
                     val capture =
                         runOnEdt {
                             val component =
@@ -145,7 +141,14 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                                     toolWindow = captureComponent(it, frame),
                                     window = frame?.let { targetWindow ->
                                         logComponentBounds("window", targetWindow, depth = 0, maxDepth = 2)
-                                        captureWindow(targetWindow)
+                                        runCatching { captureWindow(targetWindow) }
+                                            .onFailure { error ->
+                                                println(
+                                                    "MAGIC_JEWEL_IDE_BENCHMARK_WINDOW_PAINT_PROBE " +
+                                                        "status=failed error=${error::class.simpleName}:${error.message}",
+                                                )
+                                            }
+                                            .getOrNull()
                                     },
                                 )
                             }
@@ -168,6 +171,13 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                 }
         }
     }
+
+    private fun expectedPageTag(mode: BenchmarkMode): String =
+        when (mode) {
+            BenchmarkMode.Chat -> "magic.benchmark.page.chat"
+            BenchmarkMode.Redraw -> "magic.benchmark.page.redraw"
+            BenchmarkMode.Hypnotoad -> "magic.benchmark.page.hypnotoad"
+        }
 
     private fun logPaintCapture(marker: String, capture: PaintCapture, path: Path) {
         println(
