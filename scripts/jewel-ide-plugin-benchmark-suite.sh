@@ -7,6 +7,7 @@ CASES="${CASES:-hypnotoad chat}"
 VARIANTS="${VARIANTS:-old new}"
 SAMPLE_SECONDS="${SAMPLE_SECONDS:-90}"
 COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS:-true}"
+PAINT_PROBE="${PAINT_PROBE:-true}"
 BENCHMARK_PROJECT_PATH="${BENCHMARK_PROJECT_PATH:-/Users/rock3r/src/uel}"
 POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-500}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
@@ -195,6 +196,7 @@ run_variant() {
     -PmagicJewelBenchmarkAutorun=true
     "-PmagicJewelBenchmarkMode=${case_name}"
     "-PmagicJewelBenchmarkOut=${case_dir}"
+    "-PmagicJewelBenchmarkPaintProbe=${PAINT_PROBE}"
     "-PmagicJewelBenchmarkProjectPath=${BENCHMARK_PROJECT_PATH}"
     --console=plain
   )
@@ -250,6 +252,22 @@ run_variant() {
   echo "${variant}_command_frames=$(grep -c 'JBR_SKIA_INTEROP_COMMAND_FRAME' "${log}" || true)" >> "${case_dir}/summary.properties"
   echo "${variant}_picture_frames=$(grep -c 'JBR_SKIA_INTEROP_PICTURE_FRAME' "${log}" || true)" >> "${case_dir}/summary.properties"
   echo "${variant}_fallbacks=$(grep -c 'JBR_SKIA_INTEROP_FALLBACK' "${log}" || true)" >> "${case_dir}/summary.properties"
+  if [[ "${PAINT_PROBE}" == "true" ]]; then
+    local paint_probe
+    paint_probe="$(grep 'MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE' "${log}" | tail -1 || true)"
+    echo "${variant}_paint_probe=${paint_probe}" >> "${case_dir}/summary.properties"
+    if [[ -z "${paint_probe}" || "${paint_probe}" != *"status=captured"* ]]; then
+      echo "${variant}_paint_probe_missing=true" >> "${case_dir}/summary.properties"
+      return 1
+    fi
+    local non_dominant_ratio distinct_colors
+    non_dominant_ratio="$(awk '{for (i=1; i<=NF; i++) if ($i ~ /^nonDominantRatio=/) {split($i, a, "="); print a[2]}}' <<< "${paint_probe}")"
+    distinct_colors="$(awk '{for (i=1; i<=NF; i++) if ($i ~ /^distinct=/) {split($i, a, "="); print a[2]}}' <<< "${paint_probe}")"
+    if ! awk -v ratio="${non_dominant_ratio:-0}" -v distinct="${distinct_colors:-0}" 'BEGIN { exit (ratio >= 0.005 && distinct >= 8) ? 0 : 1 }'; then
+      echo "${variant}_paint_probe_blank=true" >> "${case_dir}/summary.properties"
+      return 1
+    fi
+  fi
   if [[ "${variant}" == "new" ]] && ! grep -q 'JBR_SKIA_INTEROP_.*FRAME' "${log}"; then
     echo "new_missing_jbr_markers=true" >> "${case_dir}/summary.properties"
     return 1
@@ -266,6 +284,7 @@ for case_name in ${CASES}; do
   echo "sample_seconds=${SAMPLE_SECONDS}" >> "${case_dir}/summary.properties"
   echo "variants=${VARIANTS}" >> "${case_dir}/summary.properties"
   echo "collect_powermetrics=${COLLECT_POWERMETRICS}" >> "${case_dir}/summary.properties"
+  echo "paint_probe=${PAINT_PROBE}" >> "${case_dir}/summary.properties"
   echo "benchmark_project_path=${BENCHMARK_PROJECT_PATH}" >> "${case_dir}/summary.properties"
   status="passed"
   for variant in ${VARIANTS}; do

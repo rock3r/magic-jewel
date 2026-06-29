@@ -118,6 +118,9 @@ tasks.named<JavaExec>("runIde") {
     providers.gradleProperty("magicJewelBenchmarkOut").orNull?.let {
         systemProperty("magic.jewel.benchmark.out", it)
     }
+    providers.gradleProperty("magicJewelBenchmarkPaintProbe").orNull?.let {
+        systemProperty("magic.jewel.benchmark.paintProbe", it)
+    }
     magicJewelBenchmarkProjectPath.orNull?.let {
         args(it)
     }
