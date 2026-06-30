@@ -269,6 +269,7 @@ The suite writes one report directory per scenario under `out/jbr-skia-benchmark
 IDE plugin benchmark confirmation suite:
 
 ```bash
+./scripts/jewel-ide-plugin-perf-readiness.sh
 PREFLIGHT_ONLY=true COLLECT_POWERMETRICS=false ./scripts/jewel-ide-plugin-perf-confirmation-suite.sh
 sudo -v
 ./scripts/jewel-ide-plugin-perf-confirmation-suite.sh
@@ -280,6 +281,8 @@ per-thread CPU sampling, native command timing summaries, and powermetrics enabl
 machine-load snapshot, writes it to `machine-preflight.txt` under the suite output root, then launches the underlying
 `jewel-ide-plugin-benchmark-suite.sh`; use it for clean-machine confirmation passes after focused fixes. The preflight
 file is still written when `COLLECT_POWERMETRICS=true` fails because no cached sudo credential is available.
+Use `jewel-ide-plugin-perf-readiness.sh` to run only the preflight, print the parsed readiness verdict, and exit
+nonzero when the machine is not ready.
 Non-`PREFLIGHT_ONLY` confirmation runs require a clean preflight by default: `REQUIRE_CLEAN_PREFLIGHT=true` rejects
 launch when the one-minute load is above `MAX_PREFLIGHT_LOAD_1` (default `6.0`) or the hottest process is above
 `MAX_PREFLIGHT_TOP_CPU` (default `75.0`). The snapshot records `preflight_ready` and `preflight_reason`; override
