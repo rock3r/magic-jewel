@@ -7,6 +7,7 @@ REQUIRE_COMMAND_CLEAN="${REQUIRE_COMMAND_CLEAN:-false}"
 REQUIRE_TOUR_COMPLETE="${REQUIRE_TOUR_COMPLETE:-false}"
 REQUIRE_COMPONENTS="${REQUIRE_COMPONENTS:-}"
 REQUIRE_CASES="${REQUIRE_CASES:-}"
+REQUIRE_POWERMETRICS="${REQUIRE_POWERMETRICS:-false}"
 
 if [[ -z "${suite_tsv}" || ! -f "${suite_tsv}" ]]; then
   echo "usage: $0 /path/to/jewel-standalone-focused-benchmark-suite/<timestamp>/suite.tsv [analysis.md]" >&2
@@ -175,12 +176,13 @@ echo "analysis=${out_md}"
 
 strict_failures=0
 
-if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_TOUR_COMPLETE}" == "true" || -n "${REQUIRE_COMPONENTS}" || -n "${REQUIRE_CASES}" ]]; then
+if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_TOUR_COMPLETE}" == "true" || -n "${REQUIRE_COMPONENTS}" || -n "${REQUIRE_CASES}" || "${REQUIRE_POWERMETRICS}" == "true" ]]; then
   if ! awk -F '\t' \
     -v require_command_clean="${REQUIRE_COMMAND_CLEAN}" \
     -v require_tour_complete="${REQUIRE_TOUR_COMPLETE}" \
     -v require_components="${REQUIRE_COMPONENTS}" \
-    -v require_cases="${REQUIRE_CASES}" '
+    -v require_cases="${REQUIRE_CASES}" \
+    -v require_powermetrics="${REQUIRE_POWERMETRICS}" '
       function number_or_zero(value) {
         return value == "" ? 0 : value + 0
       }
@@ -209,6 +211,8 @@ if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_TOUR_COMPLETE}" == "tru
         unsupported = $col["unsupported_max"]
         tour_complete = $col["spectre_tour_complete"]
         tour_errors = $col["spectre_errors"]
+        old_powermetrics = $col["old_powermetrics"]
+        new_powermetrics = $col["new_powermetrics"]
         remember_components($col["spectre_tour_components"])
         if (require_command_clean == "true" &&
             !(status == "passed" && number_or_zero(command_frames) > 0 &&
@@ -219,6 +223,13 @@ if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_TOUR_COMPLETE}" == "tru
         if (require_tour_complete == "true" &&
             !(number_or_zero(tour_complete) == 1 && number_or_zero(tour_errors) == 0)) {
           printf("strict failure: %s Spectre tour is not complete\n", case_name) > "/dev/stderr"
+          failures = 1
+        }
+        if (require_powermetrics == "true" &&
+            (old_powermetrics == "" || new_powermetrics == "" ||
+             old_powermetrics == "disabled" || new_powermetrics == "disabled")) {
+          printf("strict failure: %s powermetrics missing old=%s new=%s\n",
+              case_name, old_powermetrics, new_powermetrics) > "/dev/stderr"
           failures = 1
         }
       }

@@ -82,7 +82,8 @@ For focused showcase suites, run
 to write `analysis.md` and summarize command cleanliness, Spectre tour completion, component coverage, CPU/RSS/FPS
 deltas, and powermetrics coverage. Set `REQUIRE_COMMAND_CLEAN=true`, `REQUIRE_TOUR_COMPLETE=true`,
 `REQUIRE_CASES="showcase-controls-tour,..."`, and `REQUIRE_COMPONENTS="Buttons,Radio Buttons,..."` to make retained
-standalone showcase evidence a strict case/command/tour/component gate.
+standalone showcase evidence a strict case/command/tour/component gate. Add `REQUIRE_POWERMETRICS=true` only when the
+suite is meant to prove GPU/Metal perf evidence.
 
 Old/new process and marker report:
 
