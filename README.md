@@ -283,6 +283,8 @@ IDE plugin benchmark confirmation suite:
 PREFLIGHT_ONLY=true COLLECT_POWERMETRICS=false ./scripts/jewel-ide-plugin-perf-confirmation-suite.sh
 sudo -v
 ./scripts/jewel-ide-plugin-perf-confirmation-suite.sh
+sudo -v
+./scripts/jewel-ide-plugin-perf-ready-and-run.sh
 ./scripts/analyze-jewel-ide-plugin-benchmark-suite.sh out/jewel-ide-plugin-benchmark-suite/<timestamp>/suite.tsv
 ```
 
@@ -293,6 +295,11 @@ machine-load snapshot, writes it to `machine-preflight.txt` under the suite outp
 file is still written when `COLLECT_POWERMETRICS=true` fails because no cached sudo credential is available.
 Use `jewel-ide-plugin-perf-readiness.sh` to run only the preflight, print the parsed readiness verdict, and exit
 nonzero when the machine is not ready.
+Use `jewel-ide-plugin-perf-ready-and-run.sh` for unattended clean-machine collection: it optionally clears stale
+Spectre screenshot helpers, polls the same readiness gate until it passes, then launches
+`jewel-ide-plugin-perf-confirmation-suite.sh` unchanged. Tune it with `WAIT_TIMEOUT_SECONDS`,
+`WAIT_INTERVAL_SECONDS`, `OUT_ROOT`, `READY_ROOT`, and `CLEAN_STALE_SPECTRE=false`. Run `sudo -v` before starting it
+when the run is meant to count as powermetrics-backed GPU/Metal evidence.
 Non-`PREFLIGHT_ONLY` confirmation runs require a clean preflight by default: `REQUIRE_CLEAN_PREFLIGHT=true` rejects
 launch when the one-minute load is above `MAX_PREFLIGHT_LOAD_1` (default `6.0`) or the hottest process is above
 `MAX_PREFLIGHT_TOP_CPU` (default `75.0`). The snapshot records `preflight_ready` and `preflight_reason`; override
