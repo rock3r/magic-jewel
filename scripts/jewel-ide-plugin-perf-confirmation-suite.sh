@@ -15,12 +15,13 @@ POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-500}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
 PREFLIGHT_ONLY="${PREFLIGHT_ONLY:-false}"
 
-if [[ "${COLLECT_POWERMETRICS}" == "true" ]] && ! sudo -n true 2>/dev/null; then
-  cat >&2 <<'EOF'
-error: COLLECT_POWERMETRICS=true requires a cached sudo credential for powermetrics.
-Run `sudo -v` first, or rerun with COLLECT_POWERMETRICS=false for CPU/thread/command timing only.
-EOF
-  exit 2
+powermetrics_sudo_cached="not-required"
+if [[ "${COLLECT_POWERMETRICS}" == "true" ]]; then
+  if sudo -n true 2>/dev/null; then
+    powermetrics_sudo_cached="true"
+  else
+    powermetrics_sudo_cached="false"
+  fi
 fi
 
 mkdir -p "${OUT_ROOT}"
@@ -31,7 +32,7 @@ preflight_file="${OUT_ROOT}/machine-preflight.txt"
   uptime || true
   echo
   if command -v ps >/dev/null 2>&1 && command -v sort >/dev/null 2>&1; then
-    ps -Ao pid,pcpu,pmem,comm | sort -k2 -nr | head -15 || true
+    ps -Ao pid,pcpu,pmem,comm 2>/dev/null | sort -k2 -nr | head -15 || true
   fi
   echo
   echo "out_root=${OUT_ROOT}"
@@ -43,8 +44,18 @@ preflight_file="${OUT_ROOT}/machine-preflight.txt"
   echo "paint_probe=${PAINT_PROBE}"
   echo "powermetrics_interval_ms=${POWERMETRICS_INTERVAL_MS}"
   echo "powermetrics_samplers=${POWERMETRICS_SAMPLERS}"
+  echo "powermetrics_sudo_cached=${powermetrics_sudo_cached}"
   echo "preflight_only=${PREFLIGHT_ONLY}"
 } | tee "${preflight_file}"
+
+if [[ "${COLLECT_POWERMETRICS}" == "true" && "${powermetrics_sudo_cached}" != "true" ]]; then
+  cat >&2 <<EOF
+error: COLLECT_POWERMETRICS=true requires a cached sudo credential for powermetrics.
+Run \`sudo -v\` first, or rerun with COLLECT_POWERMETRICS=false for CPU/thread/command timing only.
+Wrote preflight snapshot: ${preflight_file}
+EOF
+  exit 2
+fi
 
 if [[ "${PREFLIGHT_ONLY}" == "true" ]]; then
   echo "PREFLIGHT_ONLY=true; wrote ${preflight_file}"
