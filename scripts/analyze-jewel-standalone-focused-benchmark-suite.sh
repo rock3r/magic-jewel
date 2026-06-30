@@ -6,6 +6,7 @@ out_md="${2:-}"
 REQUIRE_COMMAND_CLEAN="${REQUIRE_COMMAND_CLEAN:-false}"
 REQUIRE_TOUR_COMPLETE="${REQUIRE_TOUR_COMPLETE:-false}"
 REQUIRE_COMPONENTS="${REQUIRE_COMPONENTS:-}"
+REQUIRE_CASES="${REQUIRE_CASES:-}"
 
 if [[ -z "${suite_tsv}" || ! -f "${suite_tsv}" ]]; then
   echo "usage: $0 /path/to/jewel-standalone-focused-benchmark-suite/<timestamp>/suite.tsv [analysis.md]" >&2
@@ -17,7 +18,7 @@ if [[ -z "${out_md}" ]]; then
   out_md="${suite_dir}/analysis.md"
 fi
 
-awk -F '\t' -v suite="${suite_tsv}" -v require_components="${REQUIRE_COMPONENTS}" '
+awk -F '\t' -v suite="${suite_tsv}" -v require_components="${REQUIRE_COMPONENTS}" -v require_cases="${REQUIRE_CASES}" '
 function number_or_zero(value) {
   return value == "" ? 0 : value + 0
 }
@@ -76,6 +77,7 @@ NR == 1 {
   new_powermetrics = $col["new_powermetrics"]
 
   rows++
+  caseSeen[case_name] = 1
   if (command_ok(status, command_frames, fallbacks, unsupported)) {
     command_clean++
   }
@@ -144,6 +146,22 @@ END {
       print "- component coverage verdict: missing `" missing "`"
     }
   }
+  if (require_cases != "") {
+    requiredCaseCount = split(require_cases, requiredCases, ",")
+    missingCases = ""
+    for (i = 1; i <= requiredCaseCount; i++) {
+      requiredCase = requiredCases[i]
+      gsub(/^ +| +$/, "", requiredCase)
+      if (requiredCase != "" && !(requiredCase in caseSeen)) {
+        missingCases = missingCases (missingCases == "" ? "" : ",") requiredCase
+      }
+    }
+    if (missingCases == "") {
+      print "- case coverage verdict: all required cases observed"
+    } else {
+      print "- case coverage verdict: missing `" missingCases "`"
+    }
+  }
   print ""
   print "| Case | Status | Command Path | Spectre Tour | Old CPU | New CPU | CPU Delta | Old RSS KB | New RSS KB | RSS Delta | Old FPS | New FPS | JBR Command Frames | Components |"
   print "| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |"
@@ -157,11 +175,12 @@ echo "analysis=${out_md}"
 
 strict_failures=0
 
-if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_TOUR_COMPLETE}" == "true" || -n "${REQUIRE_COMPONENTS}" ]]; then
+if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_TOUR_COMPLETE}" == "true" || -n "${REQUIRE_COMPONENTS}" || -n "${REQUIRE_CASES}" ]]; then
   if ! awk -F '\t' \
     -v require_command_clean="${REQUIRE_COMMAND_CLEAN}" \
     -v require_tour_complete="${REQUIRE_TOUR_COMPLETE}" \
-    -v require_components="${REQUIRE_COMPONENTS}" '
+    -v require_components="${REQUIRE_COMPONENTS}" \
+    -v require_cases="${REQUIRE_CASES}" '
       function number_or_zero(value) {
         return value == "" ? 0 : value + 0
       }
@@ -183,6 +202,7 @@ if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_TOUR_COMPLETE}" == "tru
       }
       {
         case_name = $col["case"]
+        caseSeen[case_name] = 1
         status = $col["status"]
         command_frames = $col["jbr_command_frames"]
         fallbacks = $col["fallbacks"]
@@ -210,6 +230,17 @@ if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_TOUR_COMPLETE}" == "tru
             gsub(/^ +| +$/, "", component)
             if (component != "" && !(component in componentSeen)) {
               printf("strict failure: missing component %s\n", component) > "/dev/stderr"
+              failures = 1
+            }
+          }
+        }
+        if (require_cases != "") {
+          requiredCaseCount = split(require_cases, requiredCases, ",")
+          for (i = 1; i <= requiredCaseCount; i++) {
+            requiredCase = requiredCases[i]
+            gsub(/^ +| +$/, "", requiredCase)
+            if (requiredCase != "" && !(requiredCase in caseSeen)) {
+              printf("strict failure: missing case %s\n", requiredCase) > "/dev/stderr"
               failures = 1
             }
           }
