@@ -266,6 +266,19 @@ SKIKO_VERSION=0.0.0-SNAPSHOT ./scripts/jbr-skia-benchmark-suite.sh
 
 The suite writes one report directory per scenario under `out/jbr-skia-benchmark-suite/...`: SKP picture replay, command replay, stable image-cache workload, dynamic image-cache workload, and resize plus dynamic image-cache workload. It also writes `suite.tsv` with per-case status, old/new sample counts, CPU averages, FPS keys, and report paths. If a side has zero `ps` samples, the suite table records `na` for that CPU average. Use `CASES="commands-stable-images commands-resize-dynamic-images"` to rerun an exact subset, or `CASE_GROUPS=baseline` / `CASE_GROUPS=image-cache` for curated subsets. Use `LIST_CASE_GROUPS=true`, `LIST_CASE_GROUP_COUNTS=true`, `LIST_UNGROUPED_CASES=true`, `LIST_CASES=true`, and `LIST_CASE_COUNT=true` for no-run discovery; unknown `CASES` or `CASE_GROUPS` entries fail fast. Set `ENABLE_ASPROF=true` to collect async-profiler output for each case. Treat short-duration smoke runs as wiring checks only.
 
+IDE plugin benchmark confirmation suite:
+
+```bash
+sudo -v
+./scripts/jewel-ide-plugin-perf-confirmation-suite.sh
+```
+
+The wrapper runs the IDE plugin old/new benchmark cases `redraw hypnotoad chat` with Spectre toolwindow visual probes,
+per-thread CPU sampling, native command timing summaries, and powermetrics enabled by default. It prints a preflight
+machine-load snapshot before launching the underlying `jewel-ide-plugin-benchmark-suite.sh`; use it for clean-machine
+confirmation passes after focused fixes. If sudo cannot be cached for powermetrics, rerun with
+`COLLECT_POWERMETRICS=false` for CPU/thread/command timing only, and avoid treating that run as GPU/Metal evidence.
+
 The image-cache churn report records both generic JBR clear markers and scoped clear markers. New scoped markers have the form
 `JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR backend=native contextId=0x... cleared=N`, which verifies that JBR clears the current destination context namespace instead of dropping one process-global image cache.
 Use `MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN=true` with `EXPECT_MAX_IMAGE_DEFINES=0 EXPECT_MAX_IMAGE_CACHE_CLEARS=0` to validate that stable cached images are defined during warmup and then reused without steady-state cache churn.
