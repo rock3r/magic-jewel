@@ -323,40 +323,42 @@ summary_value() {
 
 wait_for_paint_probe() {
   local log="$1"
-  [[ "${PAINT_PROBE}" == "true" ]] || return
+  [[ "${PAINT_PROBE}" == "true" ]] || return 0
   local waited=0
   while (( waited < PAINT_PROBE_SHUTDOWN_WAIT_SECONDS )); do
     if grep -q 'MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE status=' "${log}" 2>/dev/null; then
-      return
+      return 0
     fi
     sleep 1
     waited=$((waited + 1))
   done
+  return 1
 }
 
 request_benchmark_exit() {
   local case_dir="$1"
-  local log="$2"
-  local pid="$3"
-  local gradle_pid="$4"
+  local variant="$2"
+  local log="$3"
+  local pid="$4"
+  local gradle_pid="$5"
 
   touch "${case_dir}/stop-requested"
   local waited=0
   while (( waited < BENCHMARK_EXIT_WAIT_SECONDS )); do
     if ! kill -0 "${pid}" 2>/dev/null && ! kill -0 "${gradle_pid}" 2>/dev/null; then
-      echo "benchmark_exit=graceful waited=${waited}" >> "${case_dir}/summary.properties"
+      echo "${variant}_benchmark_exit=graceful waited=${waited}" >> "${case_dir}/summary.properties"
       return 0
     fi
     if grep -q 'MAGIC_JEWEL_IDE_BENCHMARK status=application-exit-requested' "${log}" 2>/dev/null &&
       ! kill -0 "${pid}" 2>/dev/null; then
-      echo "benchmark_exit=graceful waited=${waited}" >> "${case_dir}/summary.properties"
+      echo "${variant}_benchmark_exit=graceful waited=${waited}" >> "${case_dir}/summary.properties"
       kill "${gradle_pid}" 2>/dev/null || true
       return 0
     fi
     sleep 1
     waited=$((waited + 1))
   done
-  echo "benchmark_exit=forced waited=${BENCHMARK_EXIT_WAIT_SECONDS}" >> "${case_dir}/summary.properties"
+  echo "${variant}_benchmark_exit=forced waited=${BENCHMARK_EXIT_WAIT_SECONDS}" >> "${case_dir}/summary.properties"
   return 1
 }
 
@@ -368,6 +370,8 @@ run_variant() {
   local ps_csv="${case_dir}/${variant}-ps.csv"
   local thread_csv="${case_dir}/${variant}-thread-cpu.csv"
   local pm="${case_dir}/${variant}-powermetrics.txt"
+
+  rm -f "${case_dir}/stop-requested"
 
   if [[ "${variant}" == "new" ]]; then
     prepare_patched_ide_product
@@ -422,14 +426,18 @@ run_variant() {
   start_powermetrics "${pm}"
 
   sleep "${SAMPLE_SECONDS}"
-  wait_for_paint_probe "${log}"
+  local paint_probe_ready=true
+  wait_for_paint_probe "${log}" || {
+    paint_probe_ready=false
+    echo "${variant}_paint_probe_wait_timeout=true" >> "${case_dir}/summary.properties"
+  }
 
   stop_pid_file "${pm}.pid"
   kill "${sampler_pid}" 2>/dev/null || true
   kill "${thread_sampler_pid}" 2>/dev/null || true
   wait "${sampler_pid}" 2>/dev/null || true
   wait "${thread_sampler_pid}" 2>/dev/null || true
-  request_benchmark_exit "${case_dir}" "${log}" "${pid}" "${gradle_pid}" || {
+  request_benchmark_exit "${case_dir}" "${variant}" "${log}" "${pid}" "${gradle_pid}" || {
     kill "${pid}" 2>/dev/null || true
     kill "${gradle_pid}" 2>/dev/null || true
   }
@@ -454,6 +462,9 @@ run_variant() {
   echo "${variant}_fallbacks=${fallbacks}" >> "${case_dir}/summary.properties"
   if [[ "${benchmark_frames}" == "0" ]]; then
     echo "${variant}_benchmark_frames_missing=true" >> "${case_dir}/summary.properties"
+    return 1
+  fi
+  if [[ "${paint_probe_ready}" != "true" ]]; then
     return 1
   fi
   if [[ "${PAINT_PROBE}" == "true" ]]; then
