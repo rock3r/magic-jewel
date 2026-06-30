@@ -77,6 +77,12 @@ for example `Combo Boxes,Icons,TextFields,Scrollbars`; slices are narrow probes 
 Results land in
 `out/jewel-standalone-benchmark-suite/<timestamp>/suite.tsv` with machine-load metadata, process samples, old/new
 app-frame rates, JBR command-frame rates, fallback counts, and strict command validation.
+For focused showcase suites, run
+`scripts/analyze-jewel-standalone-focused-benchmark-suite.sh out/jewel-standalone-focused-benchmark-suite/<timestamp>/suite.tsv`
+to write `analysis.md` and summarize command cleanliness, Spectre tour completion, component coverage, CPU/RSS/FPS
+deltas, and powermetrics coverage. Set `REQUIRE_COMMAND_CLEAN=true`, `REQUIRE_TOUR_COMPLETE=true`, and
+`REQUIRE_COMPONENTS="Buttons,Radio Buttons,..."` to make retained standalone showcase evidence a strict
+command/tour/component gate.
 
 Old/new process and marker report:
 
