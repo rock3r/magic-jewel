@@ -78,6 +78,7 @@ public fun main() {
                 },
                 content = {
                     LaunchedEffect(window) {
+                        println("JEWEL_STANDALONE_READY view=${currentView.title}")
                         SpectreStressController.startIfRequested(window)
                     }
                     TitleBarView()

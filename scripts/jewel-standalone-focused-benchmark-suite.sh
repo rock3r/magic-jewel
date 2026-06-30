@@ -71,6 +71,7 @@ run_case() {
     JBR_SKIA_RENDER_MODE="${JBR_SKIA_RENDER_MODE}" \
     EXPECT_SCREENSHOT_ASSERTION="${EXPECT_SCREENSHOT_ASSERTION}" \
     CAPTURE_OLD_SCREENSHOT="${CAPTURE_OLD_SCREENSHOT}" \
+    APP_CAPTURE_MARKER=JEWEL_STANDALONE_READY \
     OLD_GRADLE_TASK=runJewelStandalone \
     NEW_GRADLE_TASK=runJewelStandaloneJbrSkiaInterop \
     APP_PROCESS_QUERY=org.jetbrains.jewel.samples.standalone.SwingMainKt \

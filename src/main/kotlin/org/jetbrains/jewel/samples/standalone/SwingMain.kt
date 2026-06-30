@@ -2,6 +2,7 @@ package org.jetbrains.jewel.samples.standalone
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.awt.ComposePanel
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -53,6 +54,9 @@ public fun main() {
                                 styling = ComponentStyling.default(),
                                 swingCompatMode = MainViewModel.swingCompat,
                             ) {
+                                LaunchedEffect(MainViewModel.currentView.title) {
+                                    println("JEWEL_STANDALONE_READY view=${MainViewModel.currentView.title}")
+                                }
                                 ProvideMarkdownStyling {
                                     MainViewModel.currentView.content()
                                 }

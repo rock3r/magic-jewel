@@ -1849,6 +1849,7 @@ export JBR_SKIA_RUNTIME_EFFECT_CACHE_LIMIT_FOR_TEST
 export SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST
 FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="${APP_FRAME_MARKER:-MAGIC_JEWEL_COMPOSE_FRAME}"
+APP_CAPTURE_MARKER="${APP_CAPTURE_MARKER:-${APP_FRAME_MARKER}}"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
 POPUP_FRAME_MARKER="MAGIC_JEWEL_POPUP_FRAME"
 POPUP_SHOWN_MARKER="MAGIC_JEWEL_POPUP_SHOWN"
@@ -1927,6 +1928,7 @@ Environment:
   CAPTURE_POPUP_WINDOW_QUERY Popup window title/owner to capture. Default: MagicJewelPopupWindow.
   CAPTURE_OLD_SCREENSHOT   Capture and assert the old renderer window too, useful for parity runs. Default: false.
   APP_PROCESS_QUERY        Process command substring for the launched app. Default: com.magicjewel.MainKt.
+  APP_CAPTURE_MARKER       Old-renderer startup/capture marker. Default: APP_FRAME_MARKER.
   EXPECT_STRICT_COMMANDS   In command mode, fail if recorder/JBR command replay is not strict. Default: true.
   EXPECT_COMMAND_FALLBACK  In command mode, require unsupported-command fallback to picture replay. Default: false.
   EXPECT_COMMAND_FALLBACK_REASON Required unsupported reason when EXPECT_COMMAND_FALLBACK=true. Default: text.
@@ -2563,9 +2565,9 @@ sample_process_tree() {
   local pids
 
   timestamp="$(date +%s)"
-  pids="$(process_tree "${root_pid}" | tr '\n' ',' | sed 's/,$//')"
+  pids="$(process_tree "${root_pid}" | tr '\n' ' ')"
   if [[ -n "${pids}" ]]; then
-    ps -o pid= -o pcpu= -o rss= -p "${pids}" 2>/dev/null | while read -r pid cpu rss; do
+    ps -o pid= -o pcpu= -o rss= -p ${pids} 2>/dev/null | while read -r pid cpu rss; do
       [[ -n "${pid:-}" ]] || continue
       printf '%s,%s,%s,%s,%s\n' "${timestamp}" "${mode}" "${pid}" "${cpu}" "${rss}" >> "${csv}"
     done
@@ -2632,8 +2634,8 @@ run_mode() {
   local popup_screenshot_status="${OUT_DIR}/${mode}-popup-window-screenshot-status.txt"
   local ready_marker="${SKIKO_PICTURE_MARKER}"
   local assert_script="${ASSERT_SCRIPT}"
-  local startup_marker="${APP_FRAME_MARKER}"
-  local capture_marker="${APP_FRAME_MARKER}"
+  local startup_marker="${APP_CAPTURE_MARKER}"
+  local capture_marker="${APP_CAPTURE_MARKER}"
 
   if [[ "${JBR_SKIA_RENDER_MODE:-picture}" == "commands" ]]; then
     if [[ "${EXPECT_COMMAND_FALLBACK:-false}" == "true" ]]; then
