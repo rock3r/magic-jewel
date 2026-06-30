@@ -85,7 +85,8 @@ deltas, and powermetrics coverage. Set `REQUIRE_COMMAND_CLEAN=true`, `REQUIRE_TO
 standalone showcase evidence a strict case/command/tour/component gate. Add `REQUIRE_POWERMETRICS=true` only when the
 suite is meant to prove GPU/Metal perf evidence.
 Use `scripts/jbr-skia-current-validation-status.sh` to rerun the retained standalone and IDE coverage analyzers, their
-strict powermetrics gates, and the no-launch IDE perf readiness check into one timestamped status directory.
+strict powermetrics gates, and the no-launch IDE perf readiness check into one timestamped status directory. The status
+file reports `coverage_ready`, `perf_evidence_ready`, and `completion_ready` verdicts for the current retained evidence.
 
 Old/new process and marker report:
 

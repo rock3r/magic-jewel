@@ -89,7 +89,25 @@ load_1="$(awk -F= '$1 == "load_1" { print $2; exit }' "${readiness_log}" 2>/dev/
 top_cpu="$(awk -F= '$1 == "top_cpu" { print $2; exit }' "${readiness_log}" 2>/dev/null || true)"
 sudo_cached="$(awk -F= '$1 == "powermetrics_sudo_cached" { print $2; exit }' "${readiness_log}" 2>/dev/null || true)"
 
+coverage_ready="false"
+if [[ "${standalone_status}" -eq 0 && "${ide_status}" -eq 0 ]]; then
+  coverage_ready="true"
+fi
+
+perf_evidence_ready="false"
+if [[ "${standalone_perf_status}" -eq 0 && "${ide_perf_status}" -eq 0 && "${readiness_status}" -eq 0 ]]; then
+  perf_evidence_ready="true"
+fi
+
+completion_ready="false"
+if [[ "${coverage_ready}" == "true" && "${perf_evidence_ready}" == "true" ]]; then
+  completion_ready="true"
+fi
+
 {
+  echo "- coverage_ready: ${coverage_ready}"
+  echo "- perf_evidence_ready: ${perf_evidence_ready}"
+  echo "- completion_ready: ${completion_ready}"
   echo "- readiness: ${readiness:-unknown}"
   echo "- readiness reason: ${reason:-unknown}"
   echo "- load_1: ${load_1:-unknown}"
