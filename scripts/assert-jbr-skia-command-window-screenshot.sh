@@ -96,6 +96,9 @@ var primaryButtonTextMinY = height
 var primaryButtonTextMaxX = 0
 var primaryButtonTextMaxY = 0
 var markdownReadmeLogoGray = 0
+var buttonsBodyIconTileVeryLight = 0
+var buttonsBodyIconGlyphPixels = 0
+var buttonsSelectedNavBackground = 0
 
 func isDarkText(r: Int, g: Int, b: Int) -> Bool {
     return r < 55 && g < 55 && b < 55
@@ -192,6 +195,23 @@ let markdownReadmeLogoRect = (
     top: height / 5,
     right: width / 4,
     bottom: height / 2
+)
+let buttonsBodyIconRects = [
+    (left: width * 109 / 1000, top: height * 452 / 1000, right: width * 129 / 1000, bottom: height * 491 / 1000),
+    (left: width * 209 / 1000, top: height * 452 / 1000, right: width * 229 / 1000, bottom: height * 491 / 1000),
+    (left: width * 513 / 1000, top: height * 452 / 1000, right: width * 533 / 1000, bottom: height * 491 / 1000),
+    (left: width * 582 / 1000, top: height * 452 / 1000, right: width * 602 / 1000, bottom: height * 491 / 1000),
+    (left: width * 111 / 1000, top: height * 542 / 1000, right: width * 131 / 1000, bottom: height * 577 / 1000),
+    (left: width * 219 / 1000, top: height * 542 / 1000, right: width * 239 / 1000, bottom: height * 577 / 1000),
+    (left: width * 312 / 1000, top: height * 542 / 1000, right: width * 332 / 1000, bottom: height * 577 / 1000),
+    (left: width * 400 / 1000, top: height * 542 / 1000, right: width * 420 / 1000, bottom: height * 577 / 1000),
+    (left: width * 480 / 1000, top: height * 542 / 1000, right: width * 500 / 1000, bottom: height * 577 / 1000),
+]
+let buttonsSelectedNavRect = (
+    left: 0,
+    top: height * 39 / 1000,
+    right: width * 30 / 1000,
+    bottom: height * 78 / 1000
 )
 
 for y in 0..<height {
@@ -330,6 +350,19 @@ for y in 0..<height {
                 markdownReadmeLogoGray += 1
             }
         }
+        if inRect(x: x, y: y, left: buttonsSelectedNavRect.left, top: buttonsSelectedNavRect.top, right: buttonsSelectedNavRect.right, bottom: buttonsSelectedNavRect.bottom) {
+            if abs(r - g) <= 8 && abs(g - b) <= 8 && r >= 165 && r <= 245 {
+                buttonsSelectedNavBackground += 1
+            }
+        }
+        for rect in buttonsBodyIconRects where inRect(x: x, y: y, left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom) {
+            if r > 248 && g > 248 && b > 248 {
+                buttonsBodyIconTileVeryLight += 1
+            }
+            if (r < 120 && g < 130 && b < 160) || (b > 135 && r < 160 && g < 180 && b > r + 15) {
+                buttonsBodyIconGlyphPixels += 1
+            }
+        }
         if isDarkText(r: r, g: g, b: b) {
             if inRect(x: x, y: y, left: paragraphCenteredRect.left, top: paragraphCenteredRect.top, right: paragraphCenteredRect.right, bottom: paragraphCenteredRect.bottom) {
                 paragraphCentered += 1
@@ -364,7 +397,7 @@ for y in 0..<height {
     }
 }
 
-print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) primaryButtonWhiteText=\(primaryButtonWhiteText) primaryButtonDarkText=\(primaryButtonDarkText) primaryButtonTextBox=\(primaryButtonTextMinX),\(primaryButtonTextMinY),\(primaryButtonTextMaxX),\(primaryButtonTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) probeRightShadow=\(probeRightShadow) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated) markdownReadmeLogoGray=\(markdownReadmeLogoGray)")
+print("JBR_SKIA_COMMAND_SCREENSHOT_COUNTS green=\(green) blue=\(blue) purple=\(purple) yellow=\(yellow) orange=\(orange) white=\(white) topText=\(topText) bottomText=\(bottomText) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) primaryButtonWhiteText=\(primaryButtonWhiteText) primaryButtonDarkText=\(primaryButtonDarkText) primaryButtonTextBox=\(primaryButtonTextMinX),\(primaryButtonTextMinY),\(primaryButtonTextMaxX),\(primaryButtonTextMaxY) popupPink=\(popupPink) popupCyan=\(popupCyan) menuWhite=\(menuWhite) menuYellow=\(menuYellow) probeTopLeftCyan=\(probeTopLeftCyan) probeBottomLeftCyan=\(probeBottomLeftCyan) probeRightPurple=\(probeRightPurple) probeRightOrange=\(probeRightOrange) probeRightCyan=\(probeRightCyan) probeRightYellow=\(probeRightYellow) probeRightDark=\(probeRightDark) probeRightShadow=\(probeRightShadow) blendModeYellow=\(blendModeYellow) blendModeMultiply=\(blendModeMultiply) blendModeScreen=\(blendModeScreen) blendModeOverlay=\(blendModeOverlay) blendModeDarken=\(blendModeDarken) blendModeLighten=\(blendModeLighten) blendModeDifference=\(blendModeDifference) blendModeExclusion=\(blendModeExclusion) blendModeColorDodge=\(blendModeColorDodge) blendModeColorBurn=\(blendModeColorBurn) blendModeHardlight=\(blendModeHardlight) blendModeSoftlight=\(blendModeSoftlight) blendModeHue=\(blendModeHue) blendModeSaturation=\(blendModeSaturation) blendModeColor=\(blendModeColor) blendModeLuminosity=\(blendModeLuminosity) paragraphCentered=\(paragraphCentered) paragraphItalicRight=\(paragraphItalicRight) paragraphRtl=\(paragraphRtl) paragraphOverflow=\(paragraphOverflow) paragraphDecorated=\(paragraphDecorated) markdownReadmeLogoGray=\(markdownReadmeLogoGray) buttonsBodyIconTileVeryLight=\(buttonsBodyIconTileVeryLight) buttonsBodyIconGlyphPixels=\(buttonsBodyIconGlyphPixels) buttonsSelectedNavBackground=\(buttonsSelectedNavBackground)")
 
 let composeTextEnabled = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_TEXT"] != "false"
 let markdownContent = ProcessInfo.processInfo.environment["JEWEL_STANDALONE_MARKDOWN_CONTENT"] ?? ""
@@ -372,20 +405,31 @@ let markdownReadmeProbe =
     ProcessInfo.processInfo.environment["JEWEL_STANDALONE_INITIAL_VIEW"] == "Markdown" &&
     (markdownContent.hasPrefix("readme") || markdownContent.hasPrefix("rawReadme"))
 let rawMarkdownReadmeProbe = markdownReadmeProbe && markdownContent.hasPrefix("rawReadme")
-var checks: [(String, Int, Int)] = markdownReadmeProbe
-    ? [
+let buttonsComponentProbe = ProcessInfo.processInfo.environment["JEWEL_STANDALONE_INITIAL_COMPONENT"] == "Buttons"
+var checks: [(String, Int, Int)]
+if markdownReadmeProbe {
+    checks = [
         ("white", white, 500),
         ("topText", topText, 900),
-      ]
-    : [
+    ]
+} else if buttonsComponentProbe {
+    checks = [
+        ("white", white, 500),
+        ("topText", topText, 900),
+        ("primaryButtonWhiteText", primaryButtonWhiteText, 180),
+        ("buttonsBodyIconGlyphPixels", buttonsBodyIconGlyphPixels, 200),
+    ]
+} else {
+    checks = [
         ("green", green, 10000),
         ("blue", blue, 10000),
         ("purple", purple, 1000),
         ("yellow", yellow, 500),
         ("orange", orange, 1000),
         ("white", white, 500),
-      ]
-if composeTextEnabled && !markdownReadmeProbe {
+    ]
+}
+if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe {
     checks.append(("topText", topText, 900))
     checks.append(("bottomText", bottomText, 1200))
     checks.append(("primaryButtonWhiteText", primaryButtonWhiteText, 180))
@@ -405,7 +449,7 @@ let paragraphLayoutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_PARA
 let minimumTextWidth = min(width / 5, 360)
 
 var textBoxChecks: [(String, Bool)] = []
-if composeTextEnabled && !markdownReadmeProbe {
+if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe {
     let primaryButtonTextCenterX = (primaryButtonTextMinX + primaryButtonTextMaxX) / 2
     let primaryButtonTextCenterY = (primaryButtonTextMinY + primaryButtonTextMaxY) / 2
     let expectedPrimaryButtonTextCenterX = (primaryButtonTextRect.left + primaryButtonTextRect.right) / 2
@@ -574,6 +618,14 @@ if blendModeProbe {
 for (name, count, minimum) in checks where count < minimum {
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
     exit(1)
+}
+if buttonsComponentProbe {
+    let maxButtonsBodyIconTileVeryLight =
+        Int(ProcessInfo.processInfo.environment["MAX_BUTTONS_BODY_ICON_TILE_VERY_LIGHT"] ?? "") ?? 100
+    if buttonsBodyIconTileVeryLight > maxButtonsBodyIconTileVeryLight {
+        fputs("Unexpected very-light body icon tile pixels: buttonsBodyIconTileVeryLight=\(buttonsBodyIconTileVeryLight) max=\(maxButtonsBodyIconTileVeryLight) selectedNavBackground=\(buttonsSelectedNavBackground)\n", stderr)
+        exit(1)
+    }
 }
 for (name, passed) in textBoxChecks where !passed {
     fputs("Text placement check failed: \(name) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) primaryButtonTextBox=\(primaryButtonTextMinX),\(primaryButtonTextMinY),\(primaryButtonTextMaxX),\(primaryButtonTextMaxY) primaryButtonWhiteText=\(primaryButtonWhiteText) primaryButtonDarkText=\(primaryButtonDarkText)\n", stderr)
