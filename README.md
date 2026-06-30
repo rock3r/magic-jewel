@@ -272,6 +272,7 @@ IDE plugin benchmark confirmation suite:
 PREFLIGHT_ONLY=true COLLECT_POWERMETRICS=false ./scripts/jewel-ide-plugin-perf-confirmation-suite.sh
 sudo -v
 ./scripts/jewel-ide-plugin-perf-confirmation-suite.sh
+./scripts/analyze-jewel-ide-plugin-benchmark-suite.sh out/jewel-ide-plugin-benchmark-suite/<timestamp>/suite.tsv
 ```
 
 The wrapper runs the IDE plugin old/new benchmark cases `redraw hypnotoad chat` with Spectre toolwindow visual probes,
@@ -281,6 +282,8 @@ machine-load snapshot, writes it to `machine-preflight.txt` under the suite outp
 `PREFLIGHT_ONLY=true` writes the snapshot and exits without launching the IDE. If sudo cannot be cached for
 powermetrics, rerun with
 `COLLECT_POWERMETRICS=false` for CPU/thread/command timing only, and avoid treating that run as GPU/Metal evidence.
+The analyzer writes `analysis.md` next to `suite.tsv`, summarizes old/new CPU, RSS, hot-thread, command-frame, and
+native timing deltas, and labels runs without powermetrics as incomplete for GPU/Metal claims.
 
 The image-cache churn report records both generic JBR clear markers and scoped clear markers. New scoped markers have the form
 `JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR backend=native contextId=0x... cleared=N`, which verifies that JBR clears the current destination context namespace instead of dropping one process-global image cache.
