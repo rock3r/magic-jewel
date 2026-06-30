@@ -17,7 +17,45 @@ if [[ -z "${out_md}" ]]; then
   out_md="${suite_dir}/analysis.md"
 fi
 
-awk -F '\t' -v suite="${suite_tsv}" '
+visual_summary_tsv="$(mktemp "${TMPDIR:-/tmp}/jewel-ide-visual-summary.XXXXXX")"
+trap 'rm -f "${visual_summary_tsv}"' EXIT
+awk -F '\t' '
+  NR == 1 {
+    for (i = 1; i <= NF; i++) {
+      col[$i] = i
+    }
+    next
+  }
+  {
+    print $col["case"] "\t" $col["report"]
+  }
+' "${suite_tsv}" | while IFS=$'\t' read -r case_name report_dir; do
+  [[ -n "${case_name}" && -n "${report_dir}" ]] || continue
+  summary="${report_dir}/summary.properties"
+  status="missing"
+  if [[ -f "${summary}" ]]; then
+    status="complete"
+    for variant in old new; do
+      if ! grep -q "^${variant}_paint_probe=.*status=captured" "${summary}" ||
+          ! grep -q "^${variant}_paint_probe_expected_node=.*present=true" "${summary}"; then
+        status="incomplete"
+      fi
+      for marker in \
+        paint_probe_wait_timeout \
+        paint_probe_expected_node_missing \
+        paint_probe_missing \
+        paint_probe_image_missing \
+        paint_probe_blank; do
+        if grep -q "^${variant}_${marker}=true" "${summary}"; then
+          status="incomplete"
+        fi
+      done
+    done
+  fi
+  printf "%s\t%s\n" "${case_name}" "${status}"
+done > "${visual_summary_tsv}"
+
+awk -F '\t' -v suite="${suite_tsv}" -v visual_summary="${visual_summary_tsv}" '
 function metric(text, key, parts, count, i, prefix) {
   count = split(text, parts, " ")
   prefix = key "="
@@ -53,6 +91,11 @@ function command_ok(status, new_command, new_picture, new_fallbacks) {
 }
 
 NR == 1 {
+  while ((getline visualLine < visual_summary) > 0) {
+    split(visualLine, visualParts, "\t")
+    visualStatus[visualParts[1]] = visualParts[2]
+  }
+  close(visual_summary)
   for (i = 1; i <= NF; i++) {
     col[$i] = i
   }
@@ -98,11 +141,19 @@ NR == 1 {
       old_powermetrics != "" && new_powermetrics != "") {
     powermetrics_rows++
   }
+  if (visualStatus[case_name] == "complete") {
+    visual_complete++
+  } else if (visualStatus[case_name] == "missing") {
+    visual_missing++
+  } else {
+    visual_incomplete++
+  }
 
-  case_line[rows] = sprintf("| `%s` | `%s` | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |",
+  case_line[rows] = sprintf("| `%s` | `%s` | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |",
       case_name,
       status,
       command_ok(status, new_command, new_picture, new_fallbacks) ? "clean" : "check",
+      visualStatus[case_name] == "" ? "missing" : visualStatus[case_name],
       old_cpu == "" ? "n/a" : old_cpu,
       new_cpu == "" ? "n/a" : new_cpu,
       pct_delta(number_or_zero(old_cpu), number_or_zero(new_cpu)),
@@ -127,11 +178,17 @@ END {
   print "- suite: `" suite "`"
   print "- rows: " rows
   print "- command-clean rows: " command_clean "/" rows
+  print "- visual-proof rows: " (visual_complete + 0) "/" rows
   print "- powermetrics rows: " (powermetrics_rows + 0) "/" rows
   if (command_clean == rows && rows > 0) {
     print "- command coverage verdict: clean for this suite"
   } else {
     print "- command coverage verdict: inspect failures before making coverage claims"
+  }
+  if (visual_complete == rows && rows > 0) {
+    print "- visual proof verdict: Spectre toolwindow proof complete for this suite"
+  } else {
+    print "- visual proof verdict: incomplete; missing or failed Spectre paint probes remain"
   }
   if (powermetrics_rows == rows && rows > 0) {
     print "- perf evidence verdict: includes powermetrics-backed CPU/GPU evidence"
@@ -139,8 +196,8 @@ END {
     print "- perf evidence verdict: incomplete for GPU/Metal claims; powermetrics is missing for at least one row"
   }
   print ""
-  print "| Case | Status | Command Path | Old CPU | New CPU | CPU Delta | Old RSS KB | New RSS KB | RSS Delta | Old Hot Thread | New Hot Thread | Hot Thread Delta | New Avg Commands | New Avg Total ms |"
-  print "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+  print "| Case | Status | Command Path | Visual Proof | Old CPU | New CPU | CPU Delta | Old RSS KB | New RSS KB | RSS Delta | Old Hot Thread | New Hot Thread | Hot Thread Delta | New Avg Commands | New Avg Total ms |"
+  print "| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
   for (i = 1; i <= rows; i++) {
     print case_line[i]
   }
