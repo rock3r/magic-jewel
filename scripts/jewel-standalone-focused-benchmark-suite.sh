@@ -16,6 +16,7 @@ POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-1000}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
 JBR_SKIA_INTEROP_JVM_ARGS="${JBR_SKIA_INTEROP_JVM_ARGS:--Dcompose.jbr.skia.command.logOpCounts=true}"
 EXPECT_SCREENSHOT_ASSERTION="${EXPECT_SCREENSHOT_ASSERTION:-false}"
+CAPTURE_OLD_SCREENSHOT="${CAPTURE_OLD_SCREENSHOT:-false}"
 CASES="${CASES:-hypnotoad-animation markdown-editor-preview-readme80-auto markdown-preview-readme80-auto markdown-preview-readme80-wheel}"
 
 mkdir -p "${OUT_ROOT}"
@@ -69,6 +70,7 @@ run_case() {
     SAMPLE_INTERVAL_SECONDS="${SAMPLE_INTERVAL_SECONDS}" \
     JBR_SKIA_RENDER_MODE="${JBR_SKIA_RENDER_MODE}" \
     EXPECT_SCREENSHOT_ASSERTION="${EXPECT_SCREENSHOT_ASSERTION}" \
+    CAPTURE_OLD_SCREENSHOT="${CAPTURE_OLD_SCREENSHOT}" \
     OLD_GRADLE_TASK=runJewelStandalone \
     NEW_GRADLE_TASK=runJewelStandaloneJbrSkiaInterop \
     APP_PROCESS_QUERY=org.jetbrains.jewel.samples.standalone.SwingMainKt \
@@ -144,6 +146,8 @@ should_run_case markdown-preview-readme80-static &&
   run_case markdown-preview-readme80-static idle Markdown JEWEL_STANDALONE_FRAME readme80 true false false "" 0
 should_run_case showcase-icons &&
   run_case showcase-icons idle Components JEWEL_STANDALONE_FRAME readme80 false false false Icons 0
+should_run_case showcase-buttons &&
+  run_case showcase-buttons idle Components JEWEL_STANDALONE_FRAME readme80 false false false Buttons 0
 should_run_case showcase-critical-tour &&
   run_case showcase-critical-tour fullShowcaseThenHypnotoad Components JEWEL_STANDALONE_SPECTRE readme80 false false true "" 1 true true "Combo Boxes,TextFields,Scrollbars"
 should_run_case showcase-controls-tour &&
