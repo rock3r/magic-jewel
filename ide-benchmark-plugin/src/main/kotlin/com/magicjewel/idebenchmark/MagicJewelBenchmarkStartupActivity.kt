@@ -14,6 +14,7 @@ import java.awt.Component
 import java.awt.Container
 import java.awt.Rectangle
 import java.awt.image.BufferedImage
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Locale
 import java.util.concurrent.ExecutionException
@@ -74,6 +75,9 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         runBlocking {
             val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.headless())
             val tag = expectedPageTag(mode)
+            val stopRequestPath =
+                System.getProperty("magic.jewel.benchmark.out")
+                    ?.let { Path.of(it, BENCHMARK_STOP_REQUEST_FILE) }
             val ready = pollOnEdt {
                 automator.refreshWindows()
                 automator.findOneByTestTag(tag) != null
@@ -90,6 +94,14 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
             println("MAGIC_JEWEL_IDE_BENCHMARK status=started mode=$mode")
             var cycle = 0
             while (true) {
+                if (stopRequestPath?.let(Files::exists) == true) {
+                    println("MAGIC_JEWEL_IDE_BENCHMARK status=stop-requested mode=$mode cycle=$cycle")
+                    ApplicationManager.getApplication().invokeLater {
+                        println("MAGIC_JEWEL_IDE_BENCHMARK status=application-exit-requested mode=$mode")
+                        ApplicationManager.getApplication().exit()
+                    }
+                    return@runBlocking
+                }
                 runOnEdt {
                     automator.refreshWindows()
                     if (mode == BenchmarkMode.Hypnotoad) {
@@ -116,35 +128,7 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
             Thread.sleep(PAINT_PROBE_DELAY_MS)
             runCatching {
                     val expectedTag = expectedPageTag(mode)
-                    val target =
-                        runOnEdt {
-                            val component =
-                                ToolWindowManager.getInstance(project)
-                                    .getToolWindow("JBR Skia Benchmark")
-                                    ?.component
-                            component?.takeIf { it.isShowing }?.let {
-                                val window = SwingUtilities.getWindowAncestor(it)?.takeIf { window -> window.isShowing }
-                                val frame = window as? Frame
-                                window?.toFront()
-                                window?.requestFocus()
-                                it.requestFocusInWindow()
-                                Thread.sleep(PAINT_PROBE_FRONT_DELAY_MS)
-                                logComponentBounds("toolWindow", it, depth = 0, maxDepth = 4)
-                                val expectedNodePresent =
-                                    runCatching {
-                                            val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.headless())
-                                            automator.refreshWindows()
-                                            automator.findOneByTestTag(expectedTag) != null
-                                        }
-                                        .getOrDefault(false)
-                                println(
-                                    "MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE_EXPECTED_NODE " +
-                                        "tag=$expectedTag present=$expectedNodePresent",
-                                )
-                                frame?.let { targetWindow -> logComponentBounds("window", targetWindow, depth = 0, maxDepth = 2) }
-                                PaintProbeTarget(it, frame)
-                            }
-                        }
+                    val target = awaitPaintProbeTarget(project, expectedTag)
                     if (target == null) {
                         println("MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE status=missing-component")
                         return@runCatching
@@ -172,6 +156,47 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                     println("MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE status=failed error=${it::class.simpleName}:${it.message}")
                 }
         }
+    }
+
+    private fun awaitPaintProbeTarget(project: Project, expectedTag: String): PaintProbeTarget? {
+        repeat(PAINT_PROBE_TARGET_ATTEMPTS) { index ->
+            val target =
+                runOnEdt {
+                    val component =
+                        ToolWindowManager.getInstance(project)
+                            .getToolWindow("JBR Skia Benchmark")
+                            ?.component
+                    component?.takeIf { it.isShowing }?.let {
+                        val window = SwingUtilities.getWindowAncestor(it)?.takeIf { window -> window.isShowing }
+                        val frame = window as? Frame
+                        window?.toFront()
+                        window?.requestFocus()
+                        it.requestFocusInWindow()
+                        Thread.sleep(PAINT_PROBE_FRONT_DELAY_MS)
+                        logComponentBounds("toolWindow", it, depth = 0, maxDepth = 4)
+                        val expectedNodePresent =
+                            runCatching {
+                                    val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.headless())
+                                    automator.refreshWindows()
+                                    automator.findOneByTestTag(expectedTag) != null
+                                }
+                                .getOrDefault(false)
+                        println(
+                            "MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE_EXPECTED_NODE " +
+                                "tag=$expectedTag present=$expectedNodePresent",
+                        )
+                        frame?.let { targetWindow -> logComponentBounds("window", targetWindow, depth = 0, maxDepth = 2) }
+                        PaintProbeTarget(it, frame)
+                    }
+                }
+            if (target != null) return target
+            println(
+                "MAGIC_JEWEL_IDE_BENCHMARK_PAINT_PROBE_TARGET_ATTEMPT " +
+                    "attempt=${index + 1} status=missing-component",
+            )
+            Thread.sleep(PAINT_PROBE_TARGET_RETRY_DELAY_MS)
+        }
+        return null
     }
 
     private fun captureComponentWithRetries(component: Component, frame: Frame?): PaintCapture {
@@ -425,10 +450,13 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         const val NANOS_PER_MILLI: Long = 1_000_000
         const val PAINT_PROBE_DELAY_MS: Long = 8_000
         const val PAINT_PROBE_FRONT_DELAY_MS: Long = 750
+        const val PAINT_PROBE_TARGET_ATTEMPTS: Int = 10
+        const val PAINT_PROBE_TARGET_RETRY_DELAY_MS: Long = 1_000
         const val PAINT_PROBE_CAPTURE_ATTEMPTS: Int = 4
         const val PAINT_PROBE_CAPTURE_RETRY_DELAY_MS: Long = 1_000
         const val PAINT_PROBE_CAPTURE_TIMEOUT_MS: Long = 5_000
         const val PAINT_PROBE_TARGET_SAMPLES_PER_AXIS: Int = 160
+        const val BENCHMARK_STOP_REQUEST_FILE: String = "stop-requested"
     }
 }
 

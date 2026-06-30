@@ -14,6 +14,7 @@ POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-500}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
 POWERMETRICS="${POWERMETRICS:-/usr/bin/powermetrics}"
 PAINT_PROBE_SHUTDOWN_WAIT_SECONDS="${PAINT_PROBE_SHUTDOWN_WAIT_SECONDS:-15}"
+BENCHMARK_EXIT_WAIT_SECONDS="${BENCHMARK_EXIT_WAIT_SECONDS:-20}"
 DESKTOP_PATCH="${DESKTOP_PATCH:-/tmp/jbr-skia-run/desktop}"
 JBR_API_SHIM="${JBR_API_SHIM:-/tmp/jbr-api-shim.jar}"
 JBR_SKIA_LIB="${JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}"
@@ -333,6 +334,32 @@ wait_for_paint_probe() {
   done
 }
 
+request_benchmark_exit() {
+  local case_dir="$1"
+  local log="$2"
+  local pid="$3"
+  local gradle_pid="$4"
+
+  touch "${case_dir}/stop-requested"
+  local waited=0
+  while (( waited < BENCHMARK_EXIT_WAIT_SECONDS )); do
+    if ! kill -0 "${pid}" 2>/dev/null && ! kill -0 "${gradle_pid}" 2>/dev/null; then
+      echo "benchmark_exit=graceful waited=${waited}" >> "${case_dir}/summary.properties"
+      return 0
+    fi
+    if grep -q 'MAGIC_JEWEL_IDE_BENCHMARK status=application-exit-requested' "${log}" 2>/dev/null &&
+      ! kill -0 "${pid}" 2>/dev/null; then
+      echo "benchmark_exit=graceful waited=${waited}" >> "${case_dir}/summary.properties"
+      kill "${gradle_pid}" 2>/dev/null || true
+      return 0
+    fi
+    sleep 1
+    waited=$((waited + 1))
+  done
+  echo "benchmark_exit=forced waited=${BENCHMARK_EXIT_WAIT_SECONDS}" >> "${case_dir}/summary.properties"
+  return 1
+}
+
 run_variant() {
   local case_name="$1"
   local variant="$2"
@@ -400,10 +427,12 @@ run_variant() {
   stop_pid_file "${pm}.pid"
   kill "${sampler_pid}" 2>/dev/null || true
   kill "${thread_sampler_pid}" 2>/dev/null || true
-  kill "${pid}" 2>/dev/null || true
-  kill "${gradle_pid}" 2>/dev/null || true
   wait "${sampler_pid}" 2>/dev/null || true
   wait "${thread_sampler_pid}" 2>/dev/null || true
+  request_benchmark_exit "${case_dir}" "${log}" "${pid}" "${gradle_pid}" || {
+    kill "${pid}" 2>/dev/null || true
+    kill "${gradle_pid}" 2>/dev/null || true
+  }
   wait "${gradle_pid}" 2>/dev/null || true
 
   echo "${variant}_pid=${pid}" >> "${case_dir}/summary.properties"
