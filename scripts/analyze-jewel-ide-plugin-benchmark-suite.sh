@@ -3,6 +3,9 @@ set -euo pipefail
 
 suite_tsv="${1:-}"
 out_md="${2:-}"
+REQUIRE_COMMAND_CLEAN="${REQUIRE_COMMAND_CLEAN:-false}"
+REQUIRE_POWERMETRICS="${REQUIRE_POWERMETRICS:-false}"
+REQUIRE_VISUAL_PROBES="${REQUIRE_VISUAL_PROBES:-false}"
 
 if [[ -z "${suite_tsv}" || ! -f "${suite_tsv}" ]]; then
   echo "usage: $0 /path/to/jewel-ide-plugin-benchmark-suite/<timestamp>/suite.tsv [analysis.md]" >&2
@@ -151,3 +154,97 @@ END {
 ' "${suite_tsv}" | tee "${out_md}"
 
 echo "analysis=${out_md}"
+
+strict_failures=0
+
+if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_POWERMETRICS}" == "true" ]]; then
+  if ! awk -F '\t' \
+    -v require_command_clean="${REQUIRE_COMMAND_CLEAN}" \
+    -v require_powermetrics="${REQUIRE_POWERMETRICS}" '
+      function number_or_zero(value) {
+        return value == "" ? 0 : value + 0
+      }
+      NR == 1 {
+        for (i = 1; i <= NF; i++) {
+          col[$i] = i
+        }
+        next
+      }
+      {
+        case_name = $col["case"]
+        status = $col["status"]
+        new_command = $col["new_command_frames"]
+        new_picture = $col["new_picture_frames"]
+        new_fallbacks = $col["new_fallbacks"]
+        old_powermetrics = $col["old_powermetrics"]
+        new_powermetrics = $col["new_powermetrics"]
+        if (require_command_clean == "true" &&
+            !(status == "passed" && number_or_zero(new_command) > 0 &&
+              number_or_zero(new_picture) == 0 && number_or_zero(new_fallbacks) == 0)) {
+          printf("strict failure: %s command path is not clean\n", case_name) > "/dev/stderr"
+          failures = 1
+        }
+        if (require_powermetrics == "true" &&
+            (old_powermetrics == "" || new_powermetrics == "" ||
+             old_powermetrics == "disabled" || new_powermetrics == "disabled")) {
+          printf("strict failure: %s powermetrics missing old=%s new=%s\n",
+              case_name, old_powermetrics, new_powermetrics) > "/dev/stderr"
+          failures = 1
+        }
+      }
+      END {
+        exit failures
+      }
+    ' "${suite_tsv}"; then
+    strict_failures=1
+  fi
+fi
+
+if [[ "${REQUIRE_VISUAL_PROBES}" == "true" ]]; then
+  while IFS=$'\t' read -r case_name report_dir; do
+    [[ -n "${case_name}" && -n "${report_dir}" ]] || continue
+    summary="${report_dir}/summary.properties"
+    if [[ ! -f "${summary}" ]]; then
+      echo "strict failure: ${case_name} missing summary.properties at ${summary}" >&2
+      strict_failures=1
+      continue
+    fi
+    for variant in old new; do
+      if ! grep -q "^${variant}_paint_probe=.*status=captured" "${summary}"; then
+        echo "strict failure: ${case_name} ${variant} paint probe was not captured" >&2
+        strict_failures=1
+      fi
+      if ! grep -q "^${variant}_paint_probe_expected_node=.*present=true" "${summary}"; then
+        echo "strict failure: ${case_name} ${variant} expected Spectre node was not present" >&2
+        strict_failures=1
+      fi
+      for marker in \
+        paint_probe_wait_timeout \
+        paint_probe_expected_node_missing \
+        paint_probe_missing \
+        paint_probe_image_missing \
+        paint_probe_blank; do
+        if grep -q "^${variant}_${marker}=true" "${summary}"; then
+          echo "strict failure: ${case_name} ${variant} ${marker}=true" >&2
+          strict_failures=1
+        fi
+      done
+    done
+  done < <(
+    awk -F '\t' '
+      NR == 1 {
+        for (i = 1; i <= NF; i++) {
+          col[$i] = i
+        }
+        next
+      }
+      {
+        print $col["case"] "\t" $col["report"]
+      }
+    ' "${suite_tsv}"
+  )
+fi
+
+if [[ "${strict_failures}" -ne 0 ]]; then
+  exit 1
+fi

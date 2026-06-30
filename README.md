@@ -284,6 +284,8 @@ powermetrics, rerun with
 `COLLECT_POWERMETRICS=false` for CPU/thread/command timing only, and avoid treating that run as GPU/Metal evidence.
 The analyzer writes `analysis.md` next to `suite.tsv`, summarizes old/new CPU, RSS, hot-thread, command-frame, and
 native timing deltas, and labels runs without powermetrics as incomplete for GPU/Metal claims.
+Set `REQUIRE_COMMAND_CLEAN=true`, `REQUIRE_VISUAL_PROBES=true`, or `REQUIRE_POWERMETRICS=true` to make the analyzer
+exit nonzero when command replay, Spectre toolwindow proof, or powermetrics evidence is missing.
 
 The image-cache churn report records both generic JBR clear markers and scoped clear markers. New scoped markers have the form
 `JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR backend=native contextId=0x... cleared=N`, which verifies that JBR clears the current destination context namespace instead of dropping one process-global image cache.
