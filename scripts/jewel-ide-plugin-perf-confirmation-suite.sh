@@ -2,7 +2,9 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+ROOT_DIR="$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)"
 
+OUT_ROOT="${OUT_ROOT:-${ROOT_DIR}/out/jewel-ide-plugin-benchmark-suite/$(date +%Y%m%d-%H%M%S)}"
 CASES="${CASES:-redraw hypnotoad chat}"
 VARIANTS="${VARIANTS:-old new}"
 SAMPLE_SECONDS="${SAMPLE_SECONDS:-60}"
@@ -11,6 +13,7 @@ COLLECT_THREAD_CPU="${COLLECT_THREAD_CPU:-true}"
 PAINT_PROBE="${PAINT_PROBE:-true}"
 POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-500}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
+PREFLIGHT_ONLY="${PREFLIGHT_ONLY:-false}"
 
 if [[ "${COLLECT_POWERMETRICS}" == "true" ]] && ! sudo -n true 2>/dev/null; then
   cat >&2 <<'EOF'
@@ -20,21 +23,36 @@ EOF
   exit 2
 fi
 
-echo "== IDE perf confirmation preflight =="
-uptime || true
-if command -v ps >/dev/null 2>&1 && command -v sort >/dev/null 2>&1; then
-  ps -Ao pid,pcpu,pmem,comm | sort -k2 -nr | head -15 || true
+mkdir -p "${OUT_ROOT}"
+preflight_file="${OUT_ROOT}/machine-preflight.txt"
+
+{
+  echo "== IDE perf confirmation preflight =="
+  uptime || true
+  echo
+  if command -v ps >/dev/null 2>&1 && command -v sort >/dev/null 2>&1; then
+    ps -Ao pid,pcpu,pmem,comm | sort -k2 -nr | head -15 || true
+  fi
+  echo
+  echo "out_root=${OUT_ROOT}"
+  echo "cases=${CASES}"
+  echo "variants=${VARIANTS}"
+  echo "sample_seconds=${SAMPLE_SECONDS}"
+  echo "collect_powermetrics=${COLLECT_POWERMETRICS}"
+  echo "collect_thread_cpu=${COLLECT_THREAD_CPU}"
+  echo "paint_probe=${PAINT_PROBE}"
+  echo "powermetrics_interval_ms=${POWERMETRICS_INTERVAL_MS}"
+  echo "powermetrics_samplers=${POWERMETRICS_SAMPLERS}"
+  echo "preflight_only=${PREFLIGHT_ONLY}"
+} | tee "${preflight_file}"
+
+if [[ "${PREFLIGHT_ONLY}" == "true" ]]; then
+  echo "PREFLIGHT_ONLY=true; wrote ${preflight_file}"
+  exit 0
 fi
-echo "cases=${CASES}"
-echo "variants=${VARIANTS}"
-echo "sample_seconds=${SAMPLE_SECONDS}"
-echo "collect_powermetrics=${COLLECT_POWERMETRICS}"
-echo "collect_thread_cpu=${COLLECT_THREAD_CPU}"
-echo "paint_probe=${PAINT_PROBE}"
-echo "powermetrics_interval_ms=${POWERMETRICS_INTERVAL_MS}"
-echo "powermetrics_samplers=${POWERMETRICS_SAMPLERS}"
 
 exec env \
+  OUT_ROOT="${OUT_ROOT}" \
   CASES="${CASES}" \
   VARIANTS="${VARIANTS}" \
   SAMPLE_SECONDS="${SAMPLE_SECONDS}" \

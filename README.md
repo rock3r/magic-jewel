@@ -269,14 +269,17 @@ The suite writes one report directory per scenario under `out/jbr-skia-benchmark
 IDE plugin benchmark confirmation suite:
 
 ```bash
+PREFLIGHT_ONLY=true COLLECT_POWERMETRICS=false ./scripts/jewel-ide-plugin-perf-confirmation-suite.sh
 sudo -v
 ./scripts/jewel-ide-plugin-perf-confirmation-suite.sh
 ```
 
 The wrapper runs the IDE plugin old/new benchmark cases `redraw hypnotoad chat` with Spectre toolwindow visual probes,
 per-thread CPU sampling, native command timing summaries, and powermetrics enabled by default. It prints a preflight
-machine-load snapshot before launching the underlying `jewel-ide-plugin-benchmark-suite.sh`; use it for clean-machine
-confirmation passes after focused fixes. If sudo cannot be cached for powermetrics, rerun with
+machine-load snapshot, writes it to `machine-preflight.txt` under the suite output root, then launches the underlying
+`jewel-ide-plugin-benchmark-suite.sh`; use it for clean-machine confirmation passes after focused fixes.
+`PREFLIGHT_ONLY=true` writes the snapshot and exits without launching the IDE. If sudo cannot be cached for
+powermetrics, rerun with
 `COLLECT_POWERMETRICS=false` for CPU/thread/command timing only, and avoid treating that run as GPU/Metal evidence.
 
 The image-cache churn report records both generic JBR clear markers and scoped clear markers. New scoped markers have the form
