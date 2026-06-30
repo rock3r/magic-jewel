@@ -90,6 +90,18 @@ function command_ok(status, new_command, new_picture, new_fallbacks) {
       number_or_zero(new_picture) == 0 && number_or_zero(new_fallbacks) == 0
 }
 
+function column_value(name) {
+  return (name in col) ? $col[name] : ""
+}
+
+function powermetrics_ok(status, summary) {
+  return status != "" && status != "disabled" &&
+      metric(summary, "samples") != "" && number_or_zero(metric(summary, "samples")) > 0 &&
+      metric(summary, "gpu_power_avg_mw") != "" &&
+      metric(summary, "gpu_active_avg") != "" &&
+      metric(summary, "hottest_cpu_active_avg") != ""
+}
+
 NR == 1 {
   while ((getline visualLine < visual_summary) > 0) {
     split(visualLine, visualParts, "\t")
@@ -113,6 +125,8 @@ NR == 1 {
   new_timing_summary = $col["new_timing_summary"]
   old_powermetrics = $col["old_powermetrics"]
   new_powermetrics = $col["new_powermetrics"]
+  old_powermetrics_summary = column_value("old_powermetrics_summary")
+  new_powermetrics_summary = column_value("new_powermetrics_summary")
   old_frames = $col["old_benchmark_frames"]
   new_frames = $col["new_benchmark_frames"]
   old_command = $col["old_command_frames"]
@@ -132,13 +146,19 @@ NR == 1 {
   avg_total_ms = metric(new_timing_summary, "avg_total_ms")
   avg_draw_ms = metric(new_timing_summary, "avg_draw_ms")
   avg_flush_ms = metric(new_timing_summary, "avg_flush_ms")
+  old_gpu_power = metric(old_powermetrics_summary, "gpu_power_avg_mw")
+  new_gpu_power = metric(new_powermetrics_summary, "gpu_power_avg_mw")
+  old_gpu_active = metric(old_powermetrics_summary, "gpu_active_avg")
+  new_gpu_active = metric(new_powermetrics_summary, "gpu_active_avg")
+  old_hot_core = metric(old_powermetrics_summary, "hottest_cpu_active_avg")
+  new_hot_core = metric(new_powermetrics_summary, "hottest_cpu_active_avg")
 
   rows++
   if (command_ok(status, new_command, new_picture, new_fallbacks)) {
     command_clean++
   }
-  if (old_powermetrics != "disabled" && new_powermetrics != "disabled" &&
-      old_powermetrics != "" && new_powermetrics != "") {
+  if (powermetrics_ok(old_powermetrics, old_powermetrics_summary) &&
+      powermetrics_ok(new_powermetrics, new_powermetrics_summary)) {
     powermetrics_rows++
   }
   if (visualStatus[case_name] == "complete") {
@@ -149,7 +169,7 @@ NR == 1 {
     visual_incomplete++
   }
 
-  case_line[rows] = sprintf("| `%s` | `%s` | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |",
+  case_line[rows] = sprintf("| `%s` | `%s` | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |",
       case_name,
       status,
       command_ok(status, new_command, new_picture, new_fallbacks) ? "clean" : "check",
@@ -163,13 +183,21 @@ NR == 1 {
       old_hot_thread == "" ? "n/a" : old_hot_thread,
       new_hot_thread == "" ? "n/a" : new_hot_thread,
       pct_delta(number_or_zero(old_hot_thread), number_or_zero(new_hot_thread)),
+      old_hot_core == "" ? "n/a" : old_hot_core,
+      new_hot_core == "" ? "n/a" : new_hot_core,
+      old_gpu_power == "" ? "n/a" : old_gpu_power,
+      new_gpu_power == "" ? "n/a" : new_gpu_power,
+      old_gpu_active == "" ? "n/a" : old_gpu_active,
+      new_gpu_active == "" ? "n/a" : new_gpu_active,
       avg_commands == "" ? "n/a" : avg_commands,
       avg_total_ms == "" ? "n/a" : avg_total_ms)
 
-  detail_line[rows] = sprintf("- `%s`: old/new frames `%s`/`%s`; old/new command frames `%s`/`%s`; old/new picture frames `%s`/`%s`; old/new fallbacks `%s`/`%s`; new timing avg draw/flush `%s`/`%s` ms; powermetrics `%s`/`%s`.",
+  detail_line[rows] = sprintf("- `%s`: old/new frames `%s`/`%s`; old/new command frames `%s`/`%s`; old/new picture frames `%s`/`%s`; old/new fallbacks `%s`/`%s`; new timing avg draw/flush `%s`/`%s` ms; powermetrics `%s`/`%s`; old/new powermetrics summary `%s` / `%s`.",
       case_name, old_frames, new_frames, old_command, new_command, old_picture, new_picture,
       old_fallbacks, new_fallbacks, avg_draw_ms == "" ? "n/a" : avg_draw_ms,
-      avg_flush_ms == "" ? "n/a" : avg_flush_ms, old_powermetrics, new_powermetrics)
+      avg_flush_ms == "" ? "n/a" : avg_flush_ms, old_powermetrics, new_powermetrics,
+      old_powermetrics_summary == "" ? "n/a" : old_powermetrics_summary,
+      new_powermetrics_summary == "" ? "n/a" : new_powermetrics_summary)
 }
 
 END {
@@ -196,8 +224,8 @@ END {
     print "- perf evidence verdict: incomplete for GPU/Metal claims; powermetrics is missing for at least one row"
   }
   print ""
-  print "| Case | Status | Command Path | Visual Proof | Old CPU | New CPU | CPU Delta | Old RSS KB | New RSS KB | RSS Delta | Old Hot Thread | New Hot Thread | Hot Thread Delta | New Avg Commands | New Avg Total ms |"
-  print "| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+  print "| Case | Status | Command Path | Visual Proof | Old CPU | New CPU | CPU Delta | Old RSS KB | New RSS KB | RSS Delta | Old Hot Thread | New Hot Thread | Hot Thread Delta | Old Hot Core | New Hot Core | Old GPU mW | New GPU mW | Old GPU Active | New GPU Active | New Avg Commands | New Avg Total ms |"
+  print "| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
   for (i = 1; i <= rows; i++) {
     print case_line[i]
   }
@@ -227,6 +255,26 @@ if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_POWERMETRICS}" == "true
         }
         next
       }
+      function column_value(name) {
+        return (name in col) ? $col[name] : ""
+      }
+      function metric(text, key, parts, count, i, prefix) {
+        count = split(text, parts, " ")
+        prefix = key "="
+        for (i = 1; i <= count; i++) {
+          if (index(parts[i], prefix) == 1) {
+            return substr(parts[i], length(prefix) + 1)
+          }
+        }
+        return ""
+      }
+      function powermetrics_ok(status, summary) {
+        return status != "" && status != "disabled" &&
+            metric(summary, "samples") != "" && number_or_zero(metric(summary, "samples")) > 0 &&
+            metric(summary, "gpu_power_avg_mw") != "" &&
+            metric(summary, "gpu_active_avg") != "" &&
+            metric(summary, "hottest_cpu_active_avg") != ""
+      }
       {
         case_name = $col["case"]
         status = $col["status"]
@@ -235,6 +283,8 @@ if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_POWERMETRICS}" == "true
         new_fallbacks = $col["new_fallbacks"]
         old_powermetrics = $col["old_powermetrics"]
         new_powermetrics = $col["new_powermetrics"]
+        old_powermetrics_summary = column_value("old_powermetrics_summary")
+        new_powermetrics_summary = column_value("new_powermetrics_summary")
         if (require_command_clean == "true" &&
             !(status == "passed" && number_or_zero(new_command) > 0 &&
               number_or_zero(new_picture) == 0 && number_or_zero(new_fallbacks) == 0)) {
@@ -242,10 +292,11 @@ if [[ "${REQUIRE_COMMAND_CLEAN}" == "true" || "${REQUIRE_POWERMETRICS}" == "true
           failures = 1
         }
         if (require_powermetrics == "true" &&
-            (old_powermetrics == "" || new_powermetrics == "" ||
-             old_powermetrics == "disabled" || new_powermetrics == "disabled")) {
-          printf("strict failure: %s powermetrics missing old=%s new=%s\n",
-              case_name, old_powermetrics, new_powermetrics) > "/dev/stderr"
+            (!powermetrics_ok(old_powermetrics, old_powermetrics_summary) ||
+             !powermetrics_ok(new_powermetrics, new_powermetrics_summary))) {
+          printf("strict failure: %s powermetrics missing old=%s (%s) new=%s (%s)\n",
+              case_name, old_powermetrics, old_powermetrics_summary,
+              new_powermetrics, new_powermetrics_summary) > "/dev/stderr"
           failures = 1
         }
       }

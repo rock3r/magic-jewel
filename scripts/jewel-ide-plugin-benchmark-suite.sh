@@ -315,6 +315,123 @@ summarize_command_timing() {
     }' "${log}"
 }
 
+summarize_powermetrics() {
+  local file="$1"
+  if [[ ! -s "${file}" ]]; then
+    printf "samples=0"
+    return
+  fi
+  awk '
+    function pct_value(line, value) {
+      if (match(line, /[0-9]+([.][0-9]+)?%/)) {
+        value = substr(line, RSTART, RLENGTH - 1)
+        return value + 0
+      }
+      return ""
+    }
+
+    /^CPU Power:/ {
+      cpuPowerSamples++
+      cpuPowerSum += $3 + 0
+      if ($3 + 0 > cpuPowerMax) cpuPowerMax = $3 + 0
+    }
+
+    /^GPU Power:/ {
+      gpuPowerSamples++
+      gpuPowerSum += $3 + 0
+      if ($3 + 0 > gpuPowerMax) gpuPowerMax = $3 + 0
+    }
+
+    /^GPU HW active residency:/ {
+      value = pct_value($0)
+      if (value != "") {
+        gpuActiveSamples++
+        gpuActiveSum += value
+        if (value > gpuActiveMax) gpuActiveMax = value
+      }
+    }
+
+    /^GPU idle residency:/ {
+      value = pct_value($0)
+      if (value != "") {
+        gpuIdleSamples++
+        gpuIdleSum += value
+      }
+    }
+
+    /^CPU [0-9]+ active residency:/ {
+      cpu = "CPU" $2
+      value = pct_value($0)
+      if (value != "") {
+        cpuActiveSamples++
+        cpuActiveSum[cpu] += value
+        cpuActiveCount[cpu]++
+        if (value > maxCpuActive) {
+          maxCpuActive = value
+          maxCpu = cpu
+        }
+      }
+    }
+
+    END {
+      if (!cpuPowerSamples && !gpuPowerSamples && !gpuActiveSamples && !cpuActiveSamples) {
+        printf "samples=0"
+        exit
+      }
+      samples = gpuActiveSamples
+      if (cpuPowerSamples > 0) {
+        samples = cpuPowerSamples
+      }
+      cpuPowerAvg = 0
+      if (cpuPowerSamples > 0) {
+        cpuPowerAvg = cpuPowerSum / cpuPowerSamples
+      }
+      gpuPowerAvg = 0
+      if (gpuPowerSamples > 0) {
+        gpuPowerAvg = gpuPowerSum / gpuPowerSamples
+      }
+      gpuActiveAvg = 0
+      if (gpuActiveSamples > 0) {
+        gpuActiveAvg = gpuActiveSum / gpuActiveSamples
+      }
+      gpuIdleAvg = 0
+      if (gpuIdleSamples > 0) {
+        gpuIdleAvg = gpuIdleSum / gpuIdleSamples
+      }
+      hottestAvg = -1
+      hottestCpu = ""
+      for (cpu in cpuActiveSum) {
+        avg = cpuActiveSum[cpu] / cpuActiveCount[cpu]
+        if (avg > hottestAvg) {
+          hottestAvg = avg
+          hottestCpu = cpu
+        }
+      }
+      if (hottestCpu == "") {
+        hottestCpu = "n/a"
+      }
+      if (hottestAvg < 0) {
+        hottestAvg = 0
+      }
+      if (maxCpu == "") {
+        maxCpu = "n/a"
+      }
+      printf "samples=%d cpu_power_avg_mw=%.0f cpu_power_max_mw=%.0f gpu_power_avg_mw=%.0f gpu_power_max_mw=%.0f gpu_active_avg=%.2f gpu_active_max=%.2f gpu_idle_avg=%.2f hottest_cpu=%s hottest_cpu_active_avg=%.2f max_cpu=%s max_cpu_active=%.2f",
+        samples,
+        cpuPowerAvg,
+        cpuPowerMax,
+        gpuPowerAvg,
+        gpuPowerMax,
+        gpuActiveAvg,
+        gpuActiveMax,
+        gpuIdleAvg,
+        hottestCpu,
+        hottestAvg,
+        maxCpu,
+        maxCpuActive
+    }' "${file}"
+}
+
 summary_value() {
   local file="$1"
   local key="$2"
@@ -447,6 +564,7 @@ run_variant() {
   echo "${variant}_ps=$(summarize_ps "${ps_csv}")" >> "${case_dir}/summary.properties"
   echo "${variant}_thread_cpu=$(summarize_thread_cpu "${thread_csv}")" >> "${case_dir}/summary.properties"
   echo "${variant}_powermetrics_status=$(cat "${pm}.status" 2>/dev/null || echo not-run)" >> "${case_dir}/summary.properties"
+  echo "${variant}_powermetrics_summary=$(summarize_powermetrics "${pm}")" >> "${case_dir}/summary.properties"
   local benchmark_ticks benchmark_frames command_frames picture_frames fallbacks
   benchmark_ticks="$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK phase=tick' "${log}" || true)"
   benchmark_frames="$(grep -c 'MAGIC_JEWEL_IDE_BENCHMARK_FRAME' "${log}" || true)"
@@ -513,7 +631,7 @@ run_variant() {
 }
 
 suite_tsv="${OUT_ROOT}/suite.tsv"
-printf "case\tstatus\told_ps\tnew_ps\told_thread_cpu\tnew_thread_cpu\told_command_summary\tnew_command_summary\told_timing_summary\tnew_timing_summary\told_powermetrics\tnew_powermetrics\told_benchmark_ticks\tnew_benchmark_ticks\told_benchmark_frames\tnew_benchmark_frames\told_command_frames\tnew_command_frames\told_picture_frames\tnew_picture_frames\told_fallbacks\tnew_fallbacks\treport\n" > "${suite_tsv}"
+printf "case\tstatus\told_ps\tnew_ps\told_thread_cpu\tnew_thread_cpu\told_command_summary\tnew_command_summary\told_timing_summary\tnew_timing_summary\told_powermetrics\tnew_powermetrics\told_powermetrics_summary\tnew_powermetrics_summary\told_benchmark_ticks\tnew_benchmark_ticks\told_benchmark_frames\tnew_benchmark_frames\told_command_frames\tnew_command_frames\told_picture_frames\tnew_picture_frames\told_fallbacks\tnew_fallbacks\treport\n" > "${suite_tsv}"
 
 for case_name in ${CASES}; do
   case_dir="${OUT_ROOT}/${case_name}"
@@ -539,6 +657,8 @@ for case_name in ${CASES}; do
   new_timing_summary="$(summary_value "${case_dir}/summary.properties" new_command_timing_summary)"
   old_powermetrics_status="$(summary_value "${case_dir}/summary.properties" old_powermetrics_status)"
   new_powermetrics_status="$(summary_value "${case_dir}/summary.properties" new_powermetrics_status)"
+  old_powermetrics_summary="$(summary_value "${case_dir}/summary.properties" old_powermetrics_summary)"
+  new_powermetrics_summary="$(summary_value "${case_dir}/summary.properties" new_powermetrics_summary)"
   old_ticks="$(summary_value "${case_dir}/summary.properties" old_benchmark_ticks)"
   new_ticks="$(summary_value "${case_dir}/summary.properties" new_benchmark_ticks)"
   old_frames="$(summary_value "${case_dir}/summary.properties" old_benchmark_frames)"
@@ -549,9 +669,9 @@ for case_name in ${CASES}; do
   new_picture="$(summary_value "${case_dir}/summary.properties" new_picture_frames)"
   old_fallbacks="$(summary_value "${case_dir}/summary.properties" old_fallbacks)"
   new_fallbacks="$(summary_value "${case_dir}/summary.properties" new_fallbacks)"
-  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
     "${case_name}" "${status}" "${old_ps}" "${new_ps}" "${old_thread_cpu}" "${new_thread_cpu}" "${old_command_summary}" "${new_command_summary}" \
-    "${old_timing_summary}" "${new_timing_summary}" "${old_powermetrics_status}" "${new_powermetrics_status}" "${old_ticks}" "${new_ticks}" "${old_frames}" "${new_frames}" "${old_command}" "${new_command}" \
+    "${old_timing_summary}" "${new_timing_summary}" "${old_powermetrics_status}" "${new_powermetrics_status}" "${old_powermetrics_summary}" "${new_powermetrics_summary}" "${old_ticks}" "${new_ticks}" "${old_frames}" "${new_frames}" "${old_command}" "${new_command}" \
     "${old_picture}" "${new_picture}" "${old_fallbacks}" "${new_fallbacks}" "${case_dir}" >> "${suite_tsv}"
 done
 

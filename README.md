@@ -282,10 +282,11 @@ machine-load snapshot, writes it to `machine-preflight.txt` under the suite outp
 `PREFLIGHT_ONLY=true` writes the snapshot and exits without launching the IDE. If sudo cannot be cached for
 powermetrics, rerun with
 `COLLECT_POWERMETRICS=false` for CPU/thread/command timing only, and avoid treating that run as GPU/Metal evidence.
-The analyzer writes `analysis.md` next to `suite.tsv`, summarizes old/new CPU, RSS, hot-thread, command-frame, Spectre
-visual-proof, and native timing deltas, and labels runs without powermetrics as incomplete for GPU/Metal claims.
+The analyzer writes `analysis.md` next to `suite.tsv`, summarizes old/new process CPU, RSS, hot-thread CPU,
+powermetrics hottest-core residency, GPU power, GPU active residency, command-frame, Spectre visual-proof, and native
+timing deltas, and labels runs without sampled powermetrics as incomplete for GPU/Metal claims.
 Set `REQUIRE_COMMAND_CLEAN=true`, `REQUIRE_VISUAL_PROBES=true`, or `REQUIRE_POWERMETRICS=true` to make the analyzer
-exit nonzero when command replay, Spectre toolwindow proof, or powermetrics evidence is missing.
+exit nonzero when command replay, Spectre toolwindow proof, or sampled powermetrics evidence is missing.
 
 The image-cache churn report records both generic JBR clear markers and scoped clear markers. New scoped markers have the form
 `JBR_SKIA_INTEROP_IMAGE_CACHE_CLEAR backend=native contextId=0x... cleared=N`, which verifies that JBR clears the current destination context namespace instead of dropping one process-global image cache.
