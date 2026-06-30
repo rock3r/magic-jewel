@@ -280,6 +280,10 @@ per-thread CPU sampling, native command timing summaries, and powermetrics enabl
 machine-load snapshot, writes it to `machine-preflight.txt` under the suite output root, then launches the underlying
 `jewel-ide-plugin-benchmark-suite.sh`; use it for clean-machine confirmation passes after focused fixes. The preflight
 file is still written when `COLLECT_POWERMETRICS=true` fails because no cached sudo credential is available.
+Non-`PREFLIGHT_ONLY` confirmation runs require a clean preflight by default: `REQUIRE_CLEAN_PREFLIGHT=true` rejects
+launch when the one-minute load is above `MAX_PREFLIGHT_LOAD_1` (default `6.0`) or the hottest process is above
+`MAX_PREFLIGHT_TOP_CPU` (default `75.0`). The snapshot records `preflight_ready` and `preflight_reason`; override
+`REQUIRE_CLEAN_PREFLIGHT=false` only for deliberate noisy-machine experiments.
 `PREFLIGHT_ONLY=true` writes the snapshot and exits without launching the IDE. If sudo cannot be cached for
 powermetrics, rerun with
 `COLLECT_POWERMETRICS=false` for CPU/thread/command timing only, and avoid treating that run as GPU/Metal evidence.
