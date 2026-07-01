@@ -122,14 +122,16 @@ overlay_jar() {
 
 find_ide_pid() {
   local mode="$1"
-  local pid
-  while read -r pid; do
-    [[ -n "${pid}" ]] || continue
-    ps -p "${pid}" -o command= 2>/dev/null | grep -q '/jbr/Contents/Home/bin/java' || continue
-    ps -p "${pid}" -o command= 2>/dev/null | grep -q "magic.jewel.benchmark.mode=${mode}" || continue
+  local pid command
+  while IFS= read -r line; do
+    pid="${line%% *}"
+    command="${line#* }"
+    [[ -n "${pid}" && "${pid}" != "${command}" ]] || continue
+    [[ "${command}" == *'/jbr/Contents/Home/bin/java'* ]] || continue
+    [[ "${command}" == *"magic.jewel.benchmark.mode=${mode}"* ]] || continue
     echo "${pid}"
     return 0
-  done < <(pgrep -f "magic.jewel.benchmark.mode=${mode}" || true)
+  done < <(ps -axo pid=,command= 2>/dev/null || true)
   return 0
 }
 
