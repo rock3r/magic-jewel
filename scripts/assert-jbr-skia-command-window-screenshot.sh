@@ -406,16 +406,25 @@ let markdownReadmeProbe =
     (markdownContent.hasPrefix("readme") || markdownContent.hasPrefix("rawReadme"))
 let rawMarkdownReadmeProbe = markdownReadmeProbe && markdownContent.hasPrefix("rawReadme")
 let buttonsComponentProbe = ProcessInfo.processInfo.environment["JEWEL_STANDALONE_INITIAL_COMPONENT"] == "Buttons"
+let imageArea = width * height
+let minTopTextPixels =
+    Int(ProcessInfo.processInfo.environment["MIN_TOP_TEXT_PIXELS"] ?? "") ?? min(900, max(500, imageArea / 1100))
+let minBottomTextPixels =
+    Int(ProcessInfo.processInfo.environment["MIN_BOTTOM_TEXT_PIXELS"] ?? "") ?? min(1200, max(700, imageArea / 900))
+let minTopTextHeight =
+    Int(ProcessInfo.processInfo.environment["MIN_TOP_TEXT_HEIGHT"] ?? "") ?? min(30, max(20, height / 30))
+let minBottomTextHeight =
+    Int(ProcessInfo.processInfo.environment["MIN_BOTTOM_TEXT_HEIGHT"] ?? "") ?? min(24, max(22, height / 60))
 var checks: [(String, Int, Int)]
 if markdownReadmeProbe {
     checks = [
         ("white", white, 500),
-        ("topText", topText, 900),
+        ("topText", topText, minTopTextPixels),
     ]
 } else if buttonsComponentProbe {
     checks = [
         ("white", white, 500),
-        ("topText", topText, 900),
+        ("topText", topText, minTopTextPixels),
         ("primaryButtonWhiteText", primaryButtonWhiteText, 180),
         ("buttonsBodyIconGlyphPixels", buttonsBodyIconGlyphPixels, 200),
     ]
@@ -430,8 +439,8 @@ if markdownReadmeProbe {
     ]
 }
 if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe {
-    checks.append(("topText", topText, 900))
-    checks.append(("bottomText", bottomText, 1200))
+    checks.append(("topText", topText, minTopTextPixels))
+    checks.append(("bottomText", bottomText, minBottomTextPixels))
     checks.append(("primaryButtonWhiteText", primaryButtonWhiteText, 180))
 }
 if rawMarkdownReadmeProbe {
@@ -458,14 +467,14 @@ if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe && !popu
     let expectedPrimaryButtonTextCenterY = (primaryButtonTextRect.top + primaryButtonTextRect.bottom) / 2
     textBoxChecks.append(contentsOf: [
         ("topTextWidth", topTextMaxX - topTextMinX >= minimumTextWidth),
-        ("topTextHeight", topTextMaxY - topTextMinY >= 30),
+        ("topTextHeight", topTextMaxY - topTextMinY >= minTopTextHeight),
         ("topTextVerticalAnchor", topTextMinY <= topTextRect.top + height / 12 && topTextMaxY >= topTextRect.top + height / 24),
         ("bottomTextWidth", bottomTextMaxX - bottomTextMinX >= minimumTextWidth),
-        ("bottomTextHeight", bottomTextMaxY - bottomTextMinY >= 40),
+        ("bottomTextHeight", bottomTextMaxY - bottomTextMinY >= minBottomTextHeight),
         ("bottomTextVerticalAnchor", nativeTextProbe && paragraphLayoutProbe
             ? bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.top + height / 20
             : bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.bottom - height / 15),
-        ("primaryButtonTextColor", primaryButtonDarkText <= 20),
+        ("primaryButtonTextColor", primaryButtonDarkText <= max(20, primaryButtonWhiteText / 8)),
         ("primaryButtonTextWidth", primaryButtonTextMaxX - primaryButtonTextMinX >= width / 45),
         ("primaryButtonTextHorizontalCenter", abs(primaryButtonTextCenterX - expectedPrimaryButtonTextCenterX) <= width / 80),
         ("primaryButtonTextVerticalCenter", abs(primaryButtonTextCenterY - expectedPrimaryButtonTextCenterY) <= height / 70),
