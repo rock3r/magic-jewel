@@ -3,14 +3,31 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ROOT_DIR="$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)"
+EVIDENCE_FILE="${EVIDENCE_FILE:-${ROOT_DIR}/scripts/jbr-skia-current-validation-evidence.env}"
 
 latest_suite() {
   local suite_root="$1"
   find "${suite_root}" -mindepth 2 -maxdepth 2 -name suite.tsv -print 2>/dev/null | sort | tail -n 1
 }
 
-STANDALONE_SUITE="${STANDALONE_SUITE:-$(latest_suite "${ROOT_DIR}/out/jewel-standalone-focused-benchmark-suite")}"
-IDE_SUITE="${IDE_SUITE:-$(latest_suite "${ROOT_DIR}/out/jewel-ide-plugin-benchmark-suite")}"
+resolve_suite_path() {
+  local path="$1"
+  if [[ -z "${path}" || "${path}" == /* ]]; then
+    printf "%s\n" "${path}"
+  else
+    printf "%s/%s\n" "${ROOT_DIR}" "${path}"
+  fi
+}
+
+if [[ -f "${EVIDENCE_FILE}" ]]; then
+  # shellcheck source=/dev/null
+  source "${EVIDENCE_FILE}"
+fi
+
+STANDALONE_SUITE="${STANDALONE_SUITE:-${DEFAULT_STANDALONE_SUITE:-$(latest_suite "${ROOT_DIR}/out/jewel-standalone-focused-benchmark-suite")}}"
+IDE_SUITE="${IDE_SUITE:-${DEFAULT_IDE_SUITE:-$(latest_suite "${ROOT_DIR}/out/jewel-ide-plugin-benchmark-suite")}}"
+STANDALONE_SUITE="$(resolve_suite_path "${STANDALONE_SUITE}")"
+IDE_SUITE="$(resolve_suite_path "${IDE_SUITE}")"
 OUT_ROOT="${OUT_ROOT:-${ROOT_DIR}/out/current-validation-status/$(date +%Y%m%d-%H%M%S)}"
 REQUIRED_STANDALONE_CASES="${REQUIRED_STANDALONE_CASES:-showcase-controls-tour,showcase-critical-tour,showcase-layout-text-tour,showcase-misc-tour}"
 REQUIRED_STANDALONE_COMPONENTS="${REQUIRED_STANDALONE_COMPONENTS:-Buttons,Radio Buttons,Checkboxes,Menus,Tabs,Tooltips,Combo Boxes,TextFields,Scrollbars,TextAreas,SplitLayout,Banners,Typography,Brushes,Chips and trees,Progressbar,Icons,Links,Borders,Segmented Controls,Sliders}"

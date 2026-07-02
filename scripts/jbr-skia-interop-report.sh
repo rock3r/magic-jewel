@@ -4425,9 +4425,7 @@ validate_report() {
         if ! grep -q "${POPUP_WINDOW_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null; then
           failures+=("missing Swing popup window shown marker")
         fi
-        if [[ "${EXPECT_SCREENSHOT_ASSERTION}" == "true" ]]; then
-          [[ "${popup_screenshot_status}" == "passed" ]] || failures+=("popup window screenshot assertion did not pass")
-        fi
+        [[ "${popup_screenshot_status}" == "passed" ]] || failures+=("popup window screenshot assertion did not pass")
       fi
       if [[ "${MAGIC_JEWEL_MENU_STRESS}" == "true" ]]; then
         if ! grep -q "${MENU_SHOWN_MARKER}" "${new_full_log}" 2>/dev/null; then

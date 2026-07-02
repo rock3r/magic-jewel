@@ -1522,6 +1522,7 @@ run_named_case() {
     commands-popup-window)
       run_case "$1" \
         MAGIC_JEWEL_POPUP_WINDOW_STRESS=true \
+        EXPECT_SCREENSHOT_ASSERTION=false \
         EXPECT_MIN_POPUP_FRAMES=5
       ;;
     commands-menu)

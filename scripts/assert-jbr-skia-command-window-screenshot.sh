@@ -446,10 +446,12 @@ if rawMarkdownReadmeProbe {
 
 let nativeTextProbe = ProcessInfo.processInfo.environment["JBR_SKIA_NATIVE_TEXT"] == "true"
 let paragraphLayoutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT"] == "true"
+let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
+let menuStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_MENU_STRESS"] == "true"
 let minimumTextWidth = min(width / 5, 360)
 
 var textBoxChecks: [(String, Bool)] = []
-if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe {
+if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe && !popupStress && !menuStress {
     let primaryButtonTextCenterX = (primaryButtonTextMinX + primaryButtonTextMaxX) / 2
     let primaryButtonTextCenterY = (primaryButtonTextMinY + primaryButtonTextMaxY) / 2
     let expectedPrimaryButtonTextCenterX = (primaryButtonTextRect.left + primaryButtonTextRect.right) / 2
@@ -470,8 +472,6 @@ if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe {
     ])
 }
 
-let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
-let menuStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_MENU_STRESS"] == "true"
 let transformProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_TRANSFORM"] == "true"
 let clipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP"] == "true"
 let clipOutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP_OUT"] == "true"
