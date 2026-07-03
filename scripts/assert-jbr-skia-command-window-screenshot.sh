@@ -516,7 +516,11 @@ let linearGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_C
 let minLinearGradientPathProbePixels =
     Int(ProcessInfo.processInfo.environment["MIN_LINEAR_GRADIENT_PATH_PROBE_PIXELS"] ?? "") ?? 500
 let radialGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_PATH"] == "true"
+let minRadialGradientPathProbePixels =
+    Int(ProcessInfo.processInfo.environment["MIN_RADIAL_GRADIENT_PATH_PROBE_PIXELS"] ?? "") ?? 350
 let sweepGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH"] == "true"
+let minSweepGradientPathProbePixels =
+    Int(ProcessInfo.processInfo.environment["MIN_SWEEP_GRADIENT_PATH_PROBE_PIXELS"] ?? "") ?? 800
 let blendModeProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_BLEND_MODE"] == "true"
 let popupChecks: [(String, Int, Int)] = popupStress
     ? [
@@ -610,10 +614,18 @@ if linearGradientPathProbe {
     ))
 }
 if radialGradientPathProbe {
-    probeChecks.append(("probeRightOrange", probeRightOrange, 1500))
+    probeChecks.append((
+        "radialGradientPathProbePixels",
+        probeRightPurple + probeRightOrange + probeRightYellow + probeRightCyan,
+        minRadialGradientPathProbePixels
+    ))
 }
 if sweepGradientPathProbe {
-    probeChecks.append(("probeRightCyan", probeRightCyan, 500))
+    probeChecks.append((
+        "sweepGradientPathProbePixels",
+        probeRightPurple + probeRightOrange + probeRightYellow + probeRightCyan,
+        minSweepGradientPathProbePixels
+    ))
 }
 if blendModeProbe {
     probeChecks.append(("blendModeYellow", blendModeYellow, 500))
