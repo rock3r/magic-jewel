@@ -985,6 +985,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_LINE_DASH_PATH_EFFECT_INTERVAL_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_LINE_DASH_PATH_EFFECT_INTERVAL_COUNT_CORRUPTED"
       ;;
     commands-invalid-stroke-rect-dash-path-effect-interval-count-fallback)
@@ -993,6 +994,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_RECT_DASH_PATH_EFFECT_INTERVAL_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_RECT_DASH_PATH_EFFECT_INTERVAL_COUNT_CORRUPTED"
       ;;
     commands-invalid-stroke-rect-dash-path-effect-width-fallback)
@@ -1001,6 +1003,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_RECT_DASH_PATH_EFFECT_WIDTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_RECT_DASH_PATH_EFFECT_WIDTH_CORRUPTED"
       ;;
     commands-invalid-stroke-rect-dash-path-effect-height-fallback)
@@ -1009,6 +1012,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_RECT_DASH_PATH_EFFECT_HEIGHT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_RECT_DASH_PATH_EFFECT_HEIGHT_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-interval-count-fallback)
@@ -1017,6 +1021,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_INTERVAL_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_INTERVAL_COUNT_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-right-fallback)
@@ -1025,6 +1030,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_RIGHT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_RIGHT_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-bottom-fallback)
@@ -1033,6 +1039,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_BOTTOM=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_BOTTOM_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-radius-x-fallback)
@@ -1041,6 +1048,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_RADIUS_X=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_RADIUS_X_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-radius-y-fallback)
@@ -1049,6 +1057,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_RADIUS_Y=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_RADIUS_Y_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-stroke-width-fallback)
@@ -1057,6 +1066,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_STROKE_WIDTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_STROKE_WIDTH_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-stroke-cap-fallback)
@@ -1065,6 +1075,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_STROKE_CAP=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_STROKE_CAP_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-stroke-join-fallback)
@@ -1073,6 +1084,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_STROKE_JOIN=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_STROKE_JOIN_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-stroke-miter-fallback)
@@ -1081,6 +1093,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_STROKE_MITER=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_STROKE_MITER_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-phase-fallback)
@@ -1089,6 +1102,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_PHASE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_PHASE_CORRUPTED"
       ;;
     commands-invalid-stroke-round-rect-dash-path-effect-interval-fallback)
@@ -1097,6 +1111,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_ROUND_RECT_DASH_PATH_EFFECT_INTERVAL=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_ROUND_RECT_DASH_PATH_EFFECT_INTERVAL_CORRUPTED"
       ;;
     commands-invalid-stroke-path-dash-path-effect-verb-fallback)
@@ -1105,6 +1120,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_PATH_DASH_PATH_EFFECT_VERB=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_PATH_DASH_PATH_EFFECT_VERB_CORRUPTED"
       ;;
     commands-invalid-stroke-path-dash-path-effect-interval-count-fallback)
@@ -1113,6 +1129,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_PATH_DASH_PATH_EFFECT_INTERVAL_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_PATH_DASH_PATH_EFFECT_INTERVAL_COUNT_CORRUPTED"
       ;;
     commands-invalid-stroke-path-dash-path-effect-interval-fallback)
@@ -1121,6 +1138,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_STROKE_PATH_DASH_PATH_EFFECT_INTERVAL=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_STROKE_PATH_DASH_PATH_EFFECT_INTERVAL_CORRUPTED"
       ;;
     commands-invalid-draw-shadow-path-verb-fallback)
@@ -1131,6 +1149,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_DRAW_SHADOW_PATH_VERB=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_DRAW_SHADOW_PATH_VERB_CORRUPTED"
       ;;
     commands-concat-transform)
