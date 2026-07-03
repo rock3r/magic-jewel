@@ -4121,7 +4121,8 @@ validate_report() {
           command_fallback_log="${new_full_log}"
         fi
         if ! grep -q "${FALLBACK_MARKER} reason=command-stream-invalid" "${command_fallback_log}" 2>/dev/null &&
-            ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${command_fallback_log}" 2>/dev/null; then
+            ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${command_fallback_log}" 2>/dev/null &&
+            ! grep -q "SKIKO_JBR_INTEROP_COMMAND_RETRY reason=render-false" "${command_fallback_log}" 2>/dev/null; then
           failures+=("missing command-stream-invalid fallback marker or rendered=false command frame")
         fi
       elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "abi-mismatch" ]]; then
