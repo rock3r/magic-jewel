@@ -497,10 +497,13 @@ let drawPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRA
 let drawArcProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ARC"] == "true"
 let drawRoundRectProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_DRAW_ROUND_RECT"] == "true"
 let imageShaderProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_IMAGE_SHADER"] == "true"
+let invalidImageShaderProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_INVALID_IMAGE_SHADER_IMAGE"] == "true"
 let minImageShaderProbeRightDark =
     Int(ProcessInfo.processInfo.environment["MIN_IMAGE_SHADER_PROBE_RIGHT_DARK"] ?? "") ?? 2000
 let minImageShaderProbeRightCyan =
     Int(ProcessInfo.processInfo.environment["MIN_IMAGE_SHADER_PROBE_RIGHT_CYAN"] ?? "") ?? 800
+let minInvalidImageShaderProbeRightPurple =
+    Int(ProcessInfo.processInfo.environment["MIN_INVALID_IMAGE_SHADER_PROBE_RIGHT_PURPLE"] ?? "") ?? 8000
 let minTransformProbeBottomLeftCyan =
     Int(ProcessInfo.processInfo.environment["MIN_TRANSFORM_PROBE_BOTTOM_LEFT_CYAN"] ?? "") ?? 200
 let linearGradientStrokeProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_STROKE"] == "true"
@@ -586,7 +589,9 @@ if drawArcProbe {
 if drawRoundRectProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 3000))
 }
-if imageShaderProbe {
+if imageShaderProbe && invalidImageShaderProbe {
+    probeChecks.append(("probeRightPurple", probeRightPurple, minInvalidImageShaderProbeRightPurple))
+} else if imageShaderProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, minImageShaderProbeRightCyan))
     probeChecks.append(("probeRightDark", probeRightDark, minImageShaderProbeRightDark))
 }
