@@ -505,6 +505,8 @@ let linearGradientStrokeProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL
 let minLinearGradientStrokeProbeRightOrange =
     Int(ProcessInfo.processInfo.environment["MIN_LINEAR_GRADIENT_STROKE_PROBE_RIGHT_ORANGE"] ?? "") ?? 500
 let linearGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT"] == "true"
+let minLinearGradientSurfaceProbeRightPurple =
+    Int(ProcessInfo.processInfo.environment["MIN_LINEAR_GRADIENT_SURFACE_PROBE_RIGHT_PURPLE"] ?? "") ?? 4000
 let linearGradientRoundRectSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_ROUND_RECT"] == "true"
 let radialGradientSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT"] == "true"
 let radialGradientRoundRectSurfaceProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_RADIAL_GRADIENT_ROUND_RECT"] == "true"
@@ -575,7 +577,7 @@ if linearGradientStrokeProbe {
     probeChecks.append(("probeRightOrange", probeRightOrange, minLinearGradientStrokeProbeRightOrange))
 }
 if linearGradientSurfaceProbe {
-    probeChecks.append(("probeRightPurple", probeRightPurple, 5000))
+    probeChecks.append(("probeRightPurple", probeRightPurple, minLinearGradientSurfaceProbeRightPurple))
 }
 if linearGradientRoundRectSurfaceProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 3000))
