@@ -698,7 +698,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_USE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_CORRUPTED op=16"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_CORRUPTED"
       ;;
     commands-invalid-image-define-pixel-count-fallback)
       run_case "$1" \
@@ -784,7 +785,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_USE_AFTER_EVICT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_AFTER_EVICT_CORRUPTED op=16"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_AFTER_EVICT_CORRUPTED"
       ;;
     commands-invalid-image-ref-width-fallback)
       run_case "$1" \
@@ -792,7 +794,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_REF_WIDTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_WIDTH_CORRUPTED op=16"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_WIDTH_CORRUPTED"
       ;;
     commands-invalid-image-ref-height-fallback)
       run_case "$1" \
@@ -800,7 +803,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_REF_HEIGHT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_HEIGHT_CORRUPTED op=16"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_HEIGHT_CORRUPTED"
       ;;
     commands-invalid-image-ref-alpha-fallback)
       run_case "$1" \
@@ -808,7 +812,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_REF_ALPHA=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_ALPHA_CORRUPTED op=16"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_ALPHA_CORRUPTED"
       ;;
     commands-invalid-image-ref-filter-quality-fallback)
       run_case "$1" \
@@ -816,7 +821,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_REF_FILTER_QUALITY=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_FILTER_QUALITY_CORRUPTED op=16"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_FILTER_QUALITY_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-use-fallback)
       run_case "$1" \
@@ -824,7 +830,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_USE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_CORRUPTED op=45"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-use-after-evict-fallback)
       run_case "$1" \
@@ -832,7 +839,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_USE_AFTER_EVICT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_AFTER_EVICT_CORRUPTED op=45"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_AFTER_EVICT_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-ref-width-fallback)
       run_case "$1" \
@@ -840,7 +848,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_REF_WIDTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_WIDTH_CORRUPTED op=45"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_WIDTH_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-ref-height-fallback)
       run_case "$1" \
@@ -848,7 +857,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_REF_HEIGHT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_HEIGHT_CORRUPTED op=45"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_HEIGHT_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-ref-alpha-fallback)
       run_case "$1" \
@@ -856,7 +866,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_REF_ALPHA=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_ALPHA_CORRUPTED op=45"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_ALPHA_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-ref-filter-quality-fallback)
       run_case "$1" \
@@ -864,7 +875,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_REF_FILTER_QUALITY=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_FILTER_QUALITY_CORRUPTED op=45"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_FILTER_QUALITY_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-blend-mode-fallback)
       run_case "$1" \
@@ -880,7 +892,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_REF_USE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_CORRUPTED op=53"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-ref-use-after-evict-fallback)
       run_case "$1" \
@@ -888,7 +901,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_REF_USE_AFTER_EVICT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_AFTER_EVICT_CORRUPTED op=53"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_USE_AFTER_EVICT_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-descriptor-ref-width-fallback)
       run_case "$1" \
@@ -896,7 +910,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_DESCRIPTOR_REF_WIDTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_WIDTH_CORRUPTED op=53"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_WIDTH_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-descriptor-ref-height-fallback)
       run_case "$1" \
@@ -904,7 +919,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_DESCRIPTOR_REF_HEIGHT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_HEIGHT_CORRUPTED op=53"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_HEIGHT_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-descriptor-ref-alpha-fallback)
       run_case "$1" \
@@ -912,7 +928,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_DESCRIPTOR_REF_ALPHA=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_ALPHA_CORRUPTED op=53"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_ALPHA_CORRUPTED"
       ;;
     commands-invalid-image-color-filter-descriptor-ref-filter-quality-fallback)
       run_case "$1" \
@@ -920,7 +937,8 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_IMAGE_COLOR_FILTER_DESCRIPTOR_REF_FILTER_QUALITY=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_FILTER_QUALITY_CORRUPTED op=53"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_REF_FILTER_QUALITY_CORRUPTED"
       ;;
     commands-invalid-clip-path-verb-fallback)
       run_case "$1" \
@@ -928,6 +946,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_CLIP_PATH_VERB=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_CLIP_PATH_VERB_CORRUPTED"
       ;;
     commands-clip-path-invalid-fallback)
@@ -948,6 +967,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_DRAW_PATH_VERB=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_DRAW_PATH_VERB_CORRUPTED"
       ;;
     commands-invalid-draw-path-path-effect-verb-fallback)
@@ -956,6 +976,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_DRAW_PATH_PATH_EFFECT_VERB=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_DRAW_PATH_PATH_EFFECT_VERB_CORRUPTED"
       ;;
     commands-invalid-stroke-line-dash-path-effect-interval-count-fallback)
