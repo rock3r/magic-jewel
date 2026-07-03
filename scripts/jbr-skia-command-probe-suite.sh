@@ -703,14 +703,17 @@ run_named_case() {
     commands-invalid-image-define-pixel-count-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE=true \
+        MAGIC_JEWEL_IMAGE_CACHE_CHURN=true \
         MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_PIXEL_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_PIXEL_COUNT_CORRUPTED op=15"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_PIXEL_COUNT_CORRUPTED"
       ;;
     commands-invalid-image-define-record-flags-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE=true \
+        MAGIC_JEWEL_IMAGE_CACHE_CHURN=true \
         MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_RECORD_FLAGS=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
@@ -719,34 +722,42 @@ run_named_case() {
     commands-invalid-image-define-width-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE=true \
+        MAGIC_JEWEL_IMAGE_CACHE_CHURN=true \
         MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_WIDTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_WIDTH_CORRUPTED op=15"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_WIDTH_CORRUPTED"
       ;;
     commands-invalid-image-define-max-width-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE=true \
+        MAGIC_JEWEL_IMAGE_CACHE_CHURN=true \
         MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_MAX_WIDTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_MAX_WIDTH_CORRUPTED op=15"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_MAX_WIDTH_CORRUPTED"
       ;;
     commands-invalid-image-define-height-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE=true \
+        MAGIC_JEWEL_IMAGE_CACHE_CHURN=true \
         MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_HEIGHT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_HEIGHT_CORRUPTED op=15"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_HEIGHT_CORRUPTED"
       ;;
     commands-invalid-image-define-max-height-fallback)
       run_case "$1" \
         MAGIC_JEWEL_COMPOSE_IMAGE=true \
+        MAGIC_JEWEL_IMAGE_CACHE_CHURN=true \
         MAGIC_JEWEL_CORRUPT_IMAGE_DEFINE_MAX_HEIGHT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_MAX_HEIGHT_CORRUPTED op=15"
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
+        EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_IMAGE_DEFINE_MAX_HEIGHT_CORRUPTED"
       ;;
     commands-invalid-image-cache-clear-record-flags-fallback)
       run_case "$1" \
