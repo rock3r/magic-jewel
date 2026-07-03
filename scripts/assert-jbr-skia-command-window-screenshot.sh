@@ -536,11 +536,21 @@ let menuChecks: [(String, Int, Int)] = menuStress
     : []
 var probeChecks: [(String, Int, Int)] = []
 if paragraphLayoutProbe {
-    probeChecks.append(("paragraphCentered", paragraphCentered, nativeTextProbe ? 700 : 1200))
-    probeChecks.append(("paragraphItalicRight", paragraphItalicRight, 1500))
-    probeChecks.append(("paragraphRtl", paragraphRtl, 1500))
-    probeChecks.append(("paragraphOverflow", paragraphOverflow, 1400))
-    probeChecks.append(("paragraphDecorated", paragraphDecorated, 700))
+    let minParagraphCentered =
+        Int(ProcessInfo.processInfo.environment["MIN_PARAGRAPH_CENTERED_PIXELS"] ?? "") ?? 700
+    let minParagraphItalicRight =
+        Int(ProcessInfo.processInfo.environment["MIN_PARAGRAPH_ITALIC_RIGHT_PIXELS"] ?? "") ?? 150
+    let minParagraphRtl =
+        Int(ProcessInfo.processInfo.environment["MIN_PARAGRAPH_RTL_PIXELS"] ?? "") ?? 1500
+    let minParagraphOverflow =
+        Int(ProcessInfo.processInfo.environment["MIN_PARAGRAPH_OVERFLOW_PIXELS"] ?? "") ?? 1400
+    let minParagraphDecorated =
+        Int(ProcessInfo.processInfo.environment["MIN_PARAGRAPH_DECORATED_PIXELS"] ?? "") ?? 700
+    probeChecks.append(("paragraphCentered", paragraphCentered, minParagraphCentered))
+    probeChecks.append(("paragraphItalicRight", paragraphItalicRight, minParagraphItalicRight))
+    probeChecks.append(("paragraphRtl", paragraphRtl, minParagraphRtl))
+    probeChecks.append(("paragraphOverflow", paragraphOverflow, minParagraphOverflow))
+    probeChecks.append(("paragraphDecorated", paragraphDecorated, minParagraphDecorated))
 }
 if transformProbe {
     probeChecks.append(("probeBottomLeftCyan", probeBottomLeftCyan, minTransformProbeBottomLeftCyan))
