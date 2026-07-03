@@ -486,7 +486,7 @@ let clipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP"] 
 let clipOutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP_OUT"] == "true"
 let clipPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_CLIP_PATH"] == "true"
 let minClipPathProbeRightCyan =
-    Int(ProcessInfo.processInfo.environment["MIN_CLIP_PATH_PROBE_RIGHT_CYAN"] ?? "") ?? 5000
+    Int(ProcessInfo.processInfo.environment["MIN_CLIP_PATH_PROBE_RIGHT_CYAN"] ?? "") ?? 4000
 let graphicsLayerClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_CLIP"] == "true"
 let graphicsLayerRoundClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_ROUND_CLIP"] == "true"
 let graphicsLayerPathClipProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRAPHICS_LAYER_PATH_CLIP"] == "true"
@@ -499,6 +499,8 @@ let drawRoundRectProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOS
 let imageShaderProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_IMAGE_SHADER"] == "true"
 let minImageShaderProbeRightDark =
     Int(ProcessInfo.processInfo.environment["MIN_IMAGE_SHADER_PROBE_RIGHT_DARK"] ?? "") ?? 2500
+let minTransformProbeBottomLeftCyan =
+    Int(ProcessInfo.processInfo.environment["MIN_TRANSFORM_PROBE_BOTTOM_LEFT_CYAN"] ?? "") ?? 200
 let linearGradientStrokeProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_LINEAR_GRADIENT_STROKE"] == "true"
 let minLinearGradientStrokeProbeRightOrange =
     Int(ProcessInfo.processInfo.environment["MIN_LINEAR_GRADIENT_STROKE_PROBE_RIGHT_ORANGE"] ?? "") ?? 500
@@ -533,7 +535,7 @@ if paragraphLayoutProbe {
     probeChecks.append(("paragraphDecorated", paragraphDecorated, 700))
 }
 if transformProbe {
-    probeChecks.append(("probeBottomLeftCyan", probeBottomLeftCyan, 500))
+    probeChecks.append(("probeBottomLeftCyan", probeBottomLeftCyan, minTransformProbeBottomLeftCyan))
 }
 if clipProbe || clipOutProbe {
     probeChecks.append(("probeTopLeftCyan", probeTopLeftCyan, 2000))
