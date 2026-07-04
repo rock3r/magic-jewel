@@ -2651,6 +2651,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_SOURCE_HASH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_SOURCE_HASH_CORRUPTED"
       ;;
     commands-runtime-effect-shader-source-code-fallback)
@@ -2659,6 +2660,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_SOURCE_CODE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_SOURCE_CODE_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-source-hash-fallback)
@@ -2667,6 +2669,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_SOURCE_HASH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_SOURCE_HASH_CORRUPTED"
       ;;
     commands-runtime-effect-shader-uniform-name-fallback)
@@ -2675,6 +2678,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_UNIFORM_NAME=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_UNIFORM_NAME_CORRUPTED"
       ;;
     commands-runtime-effect-shader-uniform-schema-float-count-fallback)
@@ -2683,6 +2687,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_FLOAT_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_FLOAT_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-shader-uniform-schema-float-offset-fallback)
@@ -2691,6 +2696,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_FLOAT_OFFSET=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_FLOAT_OFFSET_CORRUPTED"
       ;;
     commands-runtime-effect-shader-uniform-schema-float-range-fallback)
@@ -2699,6 +2705,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_FLOAT_RANGE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_FLOAT_RANGE_CORRUPTED"
       ;;
     commands-runtime-effect-shader-uniform-schema-name-length-fallback)
@@ -2707,6 +2714,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_NAME_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_NAME_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-shader-uniform-schema-max-name-length-fallback)
@@ -2715,6 +2723,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_MAX_NAME_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_MAX_NAME_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-shader-uniform-schema-name-range-fallback)
@@ -2723,6 +2732,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_NAME_RANGE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_UNIFORM_SCHEMA_NAME_RANGE_CORRUPTED"
       ;;
     commands-runtime-effect-shader-child-name-fallback)
@@ -2731,6 +2741,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_CHILD_NAME=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_CHILD_NAME_CORRUPTED"
       ;;
     commands-runtime-effect-shader-child-schema-name-length-fallback)
@@ -2739,6 +2750,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_CHILD_SCHEMA_NAME_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_CHILD_SCHEMA_NAME_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-shader-child-schema-max-name-length-fallback)
@@ -2747,6 +2759,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_CHILD_SCHEMA_MAX_NAME_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_CHILD_SCHEMA_MAX_NAME_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-shader-child-schema-name-range-fallback)
@@ -2755,6 +2768,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_CHILD_SCHEMA_NAME_RANGE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_CHILD_SCHEMA_NAME_RANGE_CORRUPTED"
       ;;
     commands-runtime-effect-shader-child-index-fallback)
@@ -2763,6 +2777,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_CHILD_INDEX=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_CHILD_INDEX_CORRUPTED"
       ;;
     commands-runtime-effect-shader-negative-child-index-fallback)
@@ -2771,6 +2786,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_NEGATIVE_CHILD_INDEX=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_NEGATIVE_CHILD_INDEX_CORRUPTED"
       ;;
     commands-runtime-effect-shader-duplicate-child-index-fallback)
@@ -2779,6 +2795,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_DUPLICATE_CHILD_INDEX=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_DUPLICATE_CHILD_INDEX_CORRUPTED"
       ;;
     commands-runtime-effect-shader-sksl-length-fallback)
@@ -2787,6 +2804,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_SKSL_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_SKSL_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-shader-uniform-float-count-fallback)
@@ -2795,6 +2813,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_UNIFORM_FLOAT_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_UNIFORM_FLOAT_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-shader-negative-uniform-float-count-fallback)
@@ -2803,6 +2822,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_NEGATIVE_UNIFORM_FLOAT_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_NEGATIVE_UNIFORM_FLOAT_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-shader-child-count-fallback)
@@ -2811,6 +2831,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_CHILD_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_CHILD_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-shader-negative-child-count-fallback)
@@ -2819,6 +2840,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_NEGATIVE_CHILD_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_NEGATIVE_CHILD_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-shader-named-uniform-count-fallback)
@@ -2827,6 +2849,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_NAMED_UNIFORM_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_NAMED_UNIFORM_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-shader-negative-named-uniform-count-fallback)
@@ -2835,6 +2858,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_NEGATIVE_NAMED_UNIFORM_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_NEGATIVE_NAMED_UNIFORM_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-shader-named-child-count-fallback)
@@ -2843,6 +2867,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_NAMED_CHILD_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_NAMED_CHILD_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-shader-negative-named-child-count-fallback)
@@ -2851,6 +2876,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SHADER_NEGATIVE_NAMED_CHILD_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_SHADER_NEGATIVE_NAMED_CHILD_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-sksl-length-fallback)
@@ -2859,6 +2885,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_SKSL_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_SKSL_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-source-code-fallback)
@@ -2867,6 +2894,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_SOURCE_CODE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_SOURCE_CODE_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-uniform-float-count-fallback)
@@ -2875,6 +2903,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_FLOAT_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_FLOAT_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-negative-uniform-float-count-fallback)
@@ -2883,6 +2912,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_UNIFORM_FLOAT_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_UNIFORM_FLOAT_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-child-count-fallback)
@@ -2891,6 +2921,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_CHILD_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_CHILD_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-negative-child-count-fallback)
@@ -2899,6 +2930,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_CHILD_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_CHILD_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-named-uniform-count-fallback)
@@ -2907,6 +2939,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_NAMED_UNIFORM_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_NAMED_UNIFORM_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-negative-named-uniform-count-fallback)
@@ -2915,6 +2948,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_NAMED_UNIFORM_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_NAMED_UNIFORM_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-named-child-count-fallback)
@@ -2923,6 +2957,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_NAMED_CHILD_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_NAMED_CHILD_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-negative-named-child-count-fallback)
@@ -2931,6 +2966,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_NAMED_CHILD_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_NAMED_CHILD_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-uniform-name-fallback)
@@ -2939,6 +2975,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_NAME=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_NAME_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-uniform-schema-float-count-fallback)
@@ -2947,6 +2984,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_FLOAT_COUNT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_FLOAT_COUNT_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-uniform-schema-float-offset-fallback)
@@ -2955,6 +2993,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_FLOAT_OFFSET=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_FLOAT_OFFSET_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-uniform-schema-float-range-fallback)
@@ -2963,6 +3002,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_FLOAT_RANGE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_FLOAT_RANGE_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-uniform-schema-name-length-fallback)
@@ -2971,6 +3011,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_NAME_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_NAME_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-uniform-schema-max-name-length-fallback)
@@ -2979,6 +3020,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_MAX_NAME_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_MAX_NAME_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-uniform-schema-name-range-fallback)
@@ -2987,6 +3029,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_NAME_RANGE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_UNIFORM_SCHEMA_NAME_RANGE_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-child-name-fallback)
@@ -2995,6 +3038,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_CHILD_NAME=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_CHILD_NAME_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-child-schema-name-length-fallback)
@@ -3003,6 +3047,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_CHILD_SCHEMA_NAME_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_CHILD_SCHEMA_NAME_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-child-schema-max-name-length-fallback)
@@ -3011,6 +3056,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_CHILD_SCHEMA_MAX_NAME_LENGTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_CHILD_SCHEMA_MAX_NAME_LENGTH_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-child-schema-name-range-fallback)
@@ -3019,6 +3065,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_CHILD_SCHEMA_NAME_RANGE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_CHILD_SCHEMA_NAME_RANGE_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-child-index-fallback)
@@ -3027,6 +3074,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_CHILD_INDEX=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_CHILD_INDEX_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-negative-child-index-fallback)
@@ -3035,6 +3083,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_CHILD_INDEX=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_NEGATIVE_CHILD_INDEX_CORRUPTED"
       ;;
     commands-runtime-effect-color-filter-duplicate-child-index-fallback)
@@ -3043,6 +3092,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_COLOR_FILTER_DUPLICATE_CHILD_INDEX=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_COMMAND_FALLBACK_MARKER="SKIKO_JBR_INTEROP_RUNTIME_EFFECT_COLOR_FILTER_DUPLICATE_CHILD_INDEX_CORRUPTED"
       ;;
         commands-runtime-effect-invalid-uniform-schema-fallback)
