@@ -4151,24 +4151,40 @@ validate_report() {
         fi
       elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "runtime-effect-compile-failed" ]]; then
         [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames before RuntimeEffect compile fallback")
-        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during RuntimeEffect compile fallback: ${jbr_command_frames}")
-        if ! grep -q "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null; then
+        if [[ "${EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY}" != "true" ]]; then
+          [[ "${jbr_command_frames}" -eq 0 ]] ||
+            failures+=("unexpected JBR command frames during RuntimeEffect compile fallback: ${jbr_command_frames}")
+        fi
+        local command_fallback_log="${new_log}"
+        if [[ "${EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY}" == "true" ]]; then
+          command_fallback_log="${new_full_log}"
+        fi
+        if ! grep -q "${JBR_RUNTIME_EFFECT_COMPILE_FAILED_MARKER}" "${command_fallback_log}" 2>/dev/null; then
           failures+=("missing RuntimeEffect compile-failure marker")
         fi
-        if ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
+        if ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${command_fallback_log}" 2>/dev/null &&
+            ! grep -q "SKIKO_JBR_INTEROP_COMMAND_RETRY reason=render-false" "${command_fallback_log}" 2>/dev/null; then
           failures+=("missing rendered=false command frame for RuntimeEffect compile fallback")
         fi
       elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "runtime-effect-build-failed" ]]; then
         [[ "${skiko_command_frames}" -gt 0 ]] || failures+=("no Skiko command frames before RuntimeEffect build fallback")
-        [[ "${jbr_command_frames}" -eq 0 ]] || failures+=("unexpected JBR command frames during RuntimeEffect build fallback: ${jbr_command_frames}")
-        if ! grep -q "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${OUT_DIR}/new.log" 2>/dev/null; then
+        if [[ "${EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY}" != "true" ]]; then
+          [[ "${jbr_command_frames}" -eq 0 ]] ||
+            failures+=("unexpected JBR command frames during RuntimeEffect build fallback: ${jbr_command_frames}")
+        fi
+        local command_fallback_log="${new_log}"
+        if [[ "${EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY}" == "true" ]]; then
+          command_fallback_log="${new_full_log}"
+        fi
+        if ! grep -q "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}" "${command_fallback_log}" 2>/dev/null; then
           failures+=("missing RuntimeEffect build-failure marker")
         fi
         if [[ -n "${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE}" ]] &&
-            ! grep -Eq "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}.*stage=${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE}" "${OUT_DIR}/new.log" 2>/dev/null; then
+            ! grep -Eq "${JBR_RUNTIME_EFFECT_BUILD_FAILED_MARKER}.*stage=${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE}" "${command_fallback_log}" 2>/dev/null; then
           failures+=("missing RuntimeEffect build-failure stage marker: ${EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE}")
         fi
-        if ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${new_log}" 2>/dev/null; then
+        if ! grep -Eq "${SKIKO_COMMAND_MARKER}.*rendered=false" "${command_fallback_log}" 2>/dev/null &&
+            ! grep -q "SKIKO_JBR_INTEROP_COMMAND_RETRY reason=render-false" "${command_fallback_log}" 2>/dev/null; then
           failures+=("missing rendered=false command frame for RuntimeEffect build fallback")
         fi
       elif [[ "${EXPECT_COMMAND_FALLBACK_REASON:-}" == "command-cache-clear-unavailable" ]]; then

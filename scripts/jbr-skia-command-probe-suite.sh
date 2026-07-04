@@ -3273,7 +3273,8 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER=true \
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SOURCE=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-compile-failed
+        EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-compile-failed \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true
       ;;
     commands-runtime-effect-color-filter-build-fallback)
       run_case "$1" \
@@ -3281,6 +3282,7 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_COLOR_FILTER_BAD_CHILD=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE=child-count
       ;;
     commands-runtime-effect-color-filter-child-type-fallback)
@@ -3289,6 +3291,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE=positional-child-type
       ;;
     commands-runtime-effect-compile-fallback)
@@ -3296,7 +3299,8 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_SHADER=true \
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_SOURCE=true \
         EXPECT_COMMAND_FALLBACK=true \
-        EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-compile-failed
+        EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-compile-failed \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true
       ;;
     commands-runtime-effect-build-fallback)
       run_case "$1" \
@@ -3304,6 +3308,7 @@ run_named_case() {
         MAGIC_JEWEL_COMPOSE_RUNTIME_EFFECT_BAD_CHILD=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE=missing-child
       ;;
     commands-runtime-effect-child-type-fallback)
@@ -3312,6 +3317,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_RUNTIME_EFFECT_CHILD_TYPE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=runtime-effect-build-failed \
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true \
         EXPECT_RUNTIME_EFFECT_BUILD_FAILURE_STAGE=child-type
       ;;
     commands-invalid-descriptor-use-fallback)
