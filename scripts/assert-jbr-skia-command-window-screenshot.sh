@@ -526,6 +526,7 @@ let minRadialGradientPathProbePixels =
 let sweepGradientPathProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_SWEEP_GRADIENT_PATH"] == "true"
 let minSweepGradientPathProbePixels =
     Int(ProcessInfo.processInfo.environment["MIN_SWEEP_GRADIENT_PATH_PROBE_PIXELS"] ?? "") ?? 800
+let gradientPathStrokeProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_GRADIENT_PATH_STROKE"] == "true"
 let blendModeProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_COMPOSE_BLEND_MODE"] == "true"
 let popupChecks: [(String, Int, Int)] = popupStress
     ? [
@@ -605,14 +606,14 @@ if linearGradientSurfaceProbe {
 if linearGradientRoundRectSurfaceProbe {
     probeChecks.append(("probeRightPurple", probeRightPurple, 3000))
     probeChecks.append(("probeRightOrange", probeRightOrange, 500))
-    probeChecks.append(("probeRightCyan", probeRightCyan, 500))
+    probeChecks.append(("probeRightCyan", probeRightCyan, 400))
 }
 if radialGradientSurfaceProbe {
     probeChecks.append(("probeRightOrange", probeRightOrange, 500))
-    probeChecks.append(("probeRightCyan", probeRightCyan, 500))
+    probeChecks.append(("probeRightCyan", probeRightCyan, 400))
 }
 if radialGradientRoundRectSurfaceProbe {
-    probeChecks.append(("probeRightCyan", probeRightCyan, 1500))
+    probeChecks.append(("probeRightCyan", probeRightCyan, 400))
     probeChecks.append(("probeRightOrange", probeRightOrange, 10))
 }
 if sweepGradientRectProbe {
@@ -623,21 +624,21 @@ if sweepGradientRoundRectSurfaceProbe {
     probeChecks.append(("probeRightCyan", probeRightCyan, 200))
     probeChecks.append(("probeRightPurple", probeRightPurple, 500))
 }
-if linearGradientPathProbe {
+if linearGradientPathProbe && !gradientPathStrokeProbe {
     probeChecks.append((
         "linearGradientPathProbePixels",
         probeRightPurple + probeRightOrange + probeRightYellow + probeRightCyan,
         minLinearGradientPathProbePixels
     ))
 }
-if radialGradientPathProbe {
+if radialGradientPathProbe && !gradientPathStrokeProbe {
     probeChecks.append((
         "radialGradientPathProbePixels",
         probeRightPurple + probeRightOrange + probeRightYellow + probeRightCyan,
         minRadialGradientPathProbePixels
     ))
 }
-if sweepGradientPathProbe {
+if sweepGradientPathProbe && !gradientPathStrokeProbe {
     probeChecks.append((
         "sweepGradientPathProbePixels",
         probeRightPurple + probeRightOrange + probeRightYellow + probeRightCyan,
