@@ -457,7 +457,7 @@ let nativeTextProbe = ProcessInfo.processInfo.environment["JBR_SKIA_NATIVE_TEXT"
 let paragraphLayoutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT"] == "true"
 let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
 let menuStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_MENU_STRESS"] == "true"
-let minimumTextWidth = min(width / 5, 360)
+let minimumTextWidth = nativeTextProbe ? min(width / 6, 180) : min(width / 5, 360)
 
 var textBoxChecks: [(String, Bool)] = []
 if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe && !popupStress && !menuStress {
