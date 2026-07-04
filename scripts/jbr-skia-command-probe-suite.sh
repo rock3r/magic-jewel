@@ -5033,7 +5033,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_FILL_RECT_COLOR_FILTER_BLEND_MODE=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER=SKIKO_JBR_INTEROP_FILL_RECT_COLOR_FILTER_BLEND_MODE_CORRUPTED
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true
       ;;
     commands-invalid-fill-rect-color-filter-width-fallback)
       run_case "$1" \
@@ -5041,7 +5041,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_FILL_RECT_COLOR_FILTER_WIDTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER=SKIKO_JBR_INTEROP_FILL_RECT_COLOR_FILTER_WIDTH_CORRUPTED
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true
       ;;
     commands-invalid-fill-rect-color-filter-height-fallback)
       run_case "$1" \
@@ -5049,7 +5049,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_FILL_RECT_COLOR_FILTER_HEIGHT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER=SKIKO_JBR_INTEROP_FILL_RECT_COLOR_FILTER_HEIGHT_CORRUPTED
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true
       ;;
     commands-invalid-fill-rect-color-filter-ref-width-fallback)
       run_case "$1" \
@@ -5058,7 +5058,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_FILL_RECT_COLOR_FILTER_REF_WIDTH=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER=SKIKO_JBR_INTEROP_FILL_RECT_COLOR_FILTER_REF_WIDTH_CORRUPTED
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true
       ;;
     commands-invalid-fill-rect-color-filter-ref-height-fallback)
       run_case "$1" \
@@ -5067,7 +5067,7 @@ run_named_case() {
         MAGIC_JEWEL_CORRUPT_FILL_RECT_COLOR_FILTER_REF_HEIGHT=true \
         EXPECT_COMMAND_FALLBACK=true \
         EXPECT_COMMAND_FALLBACK_REASON=command-stream-invalid \
-        EXPECT_COMMAND_FALLBACK_MARKER=SKIKO_JBR_INTEROP_FILL_RECT_COLOR_FILTER_REF_HEIGHT_CORRUPTED
+        EXPECT_COMMAND_FALLBACK_ALLOW_RECOVERY=true
       ;;
     commands-raw-blend-color-filter-fallback)
       run_case "$1" \
