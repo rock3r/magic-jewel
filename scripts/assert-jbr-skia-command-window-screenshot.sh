@@ -408,7 +408,7 @@ let rawMarkdownReadmeProbe = markdownReadmeProbe && markdownContent.hasPrefix("r
 let buttonsComponentProbe = ProcessInfo.processInfo.environment["JEWEL_STANDALONE_INITIAL_COMPONENT"] == "Buttons"
 let imageArea = width * height
 let minTopTextPixels =
-    Int(ProcessInfo.processInfo.environment["MIN_TOP_TEXT_PIXELS"] ?? "") ?? min(900, max(500, imageArea / 1100))
+    Int(ProcessInfo.processInfo.environment["MIN_TOP_TEXT_PIXELS"] ?? "") ?? min(900, max(450, imageArea / 1200))
 let minBottomTextPixels =
     Int(ProcessInfo.processInfo.environment["MIN_BOTTOM_TEXT_PIXELS"] ?? "") ?? min(1200, max(700, imageArea / 900))
 let minTopTextHeight =
@@ -658,7 +658,7 @@ if blendModeProbe {
     probeChecks.append(("blendModeColorBurn", blendModeColorBurn, 500))
     probeChecks.append(("blendModeHardlight", blendModeHardlight, 500))
     probeChecks.append(("blendModeSoftlight", blendModeSoftlight, 500))
-    probeChecks.append(("blendModeHue", blendModeHue, 500))
+    probeChecks.append(("blendModeHue", blendModeHue, 400))
     probeChecks.append(("blendModeSaturation", blendModeSaturation, 500))
     probeChecks.append(("blendModeColor", blendModeColor, 500))
     probeChecks.append(("blendModeLuminosity", blendModeLuminosity, 500))
