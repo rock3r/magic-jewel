@@ -34,6 +34,14 @@ val localCmpOut = providers.gradleProperty("localCmpOut")
     .orElse(providers.environmentVariable("LOCAL_CMP_OUT"))
     .orElse(defaultLocalCmpOut)
 val localSkikoAwtJar = layout.projectDirectory.file("../skiko/skiko/build/libs/skiko-awt-0.0.0-SNAPSHOT.jar")
+val jbrSkiaJavaExecutable = providers.gradleProperty("jbrSkiaJavaExecutable")
+    .orElse(providers.environmentVariable("JBR_SKIA_JAVA_EXECUTABLE"))
+    .orElse("")
+// Locally built jbr-api jar (with the JBRSkia service accessor) prepended to
+// the interop tasks' classpath so it shadows the released transitive jbr-api.
+val jbrSkiaApiJar = providers.gradleProperty("jbrSkiaApiJar")
+    .orElse(providers.environmentVariable("JBR_SKIA_API_JAR"))
+    .orElse("")
 val jbrSkiaJvmArgs = providers.gradleProperty("jbrSkiaInteropJvmArgs")
 val jbrSkiaRenderMode = providers.gradleProperty("jbrSkiaRenderMode")
     .orElse(providers.environmentVariable("JBR_SKIA_RENDER_MODE"))
@@ -1132,6 +1140,12 @@ fun JavaExec.configureJewelStandaloneJvm(interoperable: Boolean, swingCompositin
         ?.split(Regex("\\s+"))
         ?.filter { it.isNotBlank() }
         ?.let(::jvmArgs)
+    // Run on an explicit runtime image (e.g. the locally built JBR) instead of
+    // the resolved toolchain; required for JBR interop experiments.
+    jbrSkiaJavaExecutable.orNull?.takeIf { it.isNotBlank() }?.let {
+        executable(it)
+        doFirst { logger.lifecycle("Using explicit java executable: $it") }
+    }
 }
 
 tasks.register<JavaExec>("runJewelStandalone") {
@@ -1176,7 +1190,8 @@ tasks.register<JavaExec>("runJewelStandaloneJbrSkiaInterop") {
     group = ApplicationPlugin.APPLICATION_GROUP
     description = "Run the copied Jewel standalone sample through SwingGraphics with the JBR Skia fast path enabled."
     val patchedCompose = patchedComposeRuntimeJars()
-    classpath = files(localSkikoAwtJar) + patchedCompose + sourceSets.main.get().runtimeClasspath
+    val localJbrApi = jbrSkiaApiJar.orNull?.takeIf { it.isNotBlank() }?.let { files(it) } ?: files()
+    classpath = localJbrApi + files(localSkikoAwtJar) + patchedCompose + sourceSets.main.get().runtimeClasspath
     mainClass.set("org.jetbrains.jewel.samples.standalone.SwingMainKt")
     configureJewelStandaloneJvm(interoperable = true)
     doFirst {

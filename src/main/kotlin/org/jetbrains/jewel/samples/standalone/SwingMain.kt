@@ -7,9 +7,9 @@ import androidx.compose.ui.awt.ComposePanel
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment
-import javax.swing.Timer
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
+import javax.swing.Timer
 import kotlin.system.exitProcess
 import org.jetbrains.jewel.foundation.LocalComponent
 import org.jetbrains.jewel.foundation.enableNewSwingCompositing
@@ -28,10 +28,31 @@ import org.jetbrains.jewel.ui.ComponentStyling
 public fun main() {
     enableNewSwingCompositing()
     SwingUtilities.invokeLater {
-        JFrame("JewelStandaloneJbrSkiaWindow").apply {
+        val requestedWindowWidth = System.getProperty("jewel.standalone.windowWidth")?.toIntOrNull() ?: 1280
+        val requestedWindowHeight = System.getProperty("jewel.standalone.windowHeight")?.toIntOrNull() ?: 840
+        val targetDisplayWidth = System.getProperty("jewel.standalone.targetDisplayWidth")?.toIntOrNull()
+        val targetDisplayHeight = System.getProperty("jewel.standalone.targetDisplayHeight")?.toIntOrNull()
+        val targetDisplay =
+            GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices.firstOrNull { device ->
+                device.displayMode.width == targetDisplayWidth && device.displayMode.height == targetDisplayHeight
+            }
+        val maximizeWindow = java.lang.Boolean.getBoolean("jewel.standalone.maximizeWindow") ||
+            java.lang.Boolean.getBoolean("jewel.standalone.maximized")
+        val targetInternalDisplay = System.getProperty("jewel.standalone.displayTarget") == "internal"
+        val internalDisplay =
+            GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices.firstOrNull { device ->
+                device.getIDstring().contains("built-in", ignoreCase = true) ||
+                    device.getIDstring().contains("internal", ignoreCase = true)
+            }
+        val selectedDisplay = targetDisplay ?: if (targetInternalDisplay) internalDisplay else null
+        val window =
+            selectedDisplay?.defaultConfiguration?.let { graphicsConfiguration ->
+                JFrame("JewelStandaloneJbrSkiaWindow", graphicsConfiguration)
+            } ?: JFrame("JewelStandaloneJbrSkiaWindow")
+        window.apply {
             defaultCloseOperation = JFrame.EXIT_ON_CLOSE
             minimumSize = Dimension(1100, 760)
-            preferredSize = Dimension(1280, 840)
+            preferredSize = Dimension(requestedWindowWidth, requestedWindowHeight)
             contentPane.layout = BorderLayout()
             val composePanel =
                 ComposePanel().apply {
@@ -72,17 +93,11 @@ public fun main() {
                 BorderLayout.CENTER,
             )
             pack()
-            val targetInternalDisplay = System.getProperty("jewel.standalone.displayTarget") == "internal"
-            if (targetInternalDisplay) {
-                GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices
-                    .firstOrNull { it.getIDstring().contains("built-in", ignoreCase = true) || it.getIDstring().contains("internal", ignoreCase = true) }
-                    ?.defaultConfiguration
-                    ?.bounds
-                    ?.let { bounds -> setLocation(bounds.x + 40, bounds.y + 40) }
-            }
-            if (!targetInternalDisplay) setLocationRelativeTo(null)
+            selectedDisplay?.defaultConfiguration?.bounds?.let { bounds ->
+                if (targetInternalDisplay) setLocation(bounds.x + 40, bounds.y + 40) else setLocation(bounds.x, bounds.y)
+            } ?: setLocationRelativeTo(null)
+            if (maximizeWindow) extendedState = JFrame.MAXIMIZED_BOTH
             isVisible = true
-            if (java.lang.Boolean.getBoolean("jewel.standalone.maximized")) extendedState = JFrame.MAXIMIZED_BOTH
             Timer(250) {
                 val transform = graphicsConfiguration.defaultTransform
                 val pixelWidth = (width * transform.scaleX).toInt()
@@ -94,6 +109,28 @@ public fun main() {
                         "pixelWidth=$pixelWidth pixelHeight=$pixelHeight pixelArea=${pixelWidth * pixelHeight} " +
                         "display=${graphicsConfiguration.device.getIDstring()}",
                 )
+                Thread {
+                    repeat(100) {
+                        val painterIdentity = System.getProperty("skiko.swing.painterIdentity")
+                        val renderMode = System.getProperty("skiko.swing.renderMode")
+                        if (painterIdentity != null && renderMode != null) {
+                            println(
+                                "MAGIC_JEWEL_PHASE0 status=started logicalWidth=${composePanel.width} logicalHeight=${composePanel.height} " +
+                                    "backingScale=${transform.scaleX} pixelWidth=$pixelWidth pixelHeight=$pixelHeight " +
+                                    "pixelArea=${pixelWidth.toLong() * pixelHeight} painterIdentity=$painterIdentity " +
+                                    "renderMode=$renderMode requestedWindowWidth=$requestedWindowWidth " +
+                                    "requestedWindowHeight=$requestedWindowHeight maximizeWindow=$maximizeWindow localSkikoSha256=" +
+                                    System.getProperty("magic.jewel.localSkikoSha256", "unknown"),
+                            )
+                            return@Thread
+                        }
+                        Thread.sleep(50)
+                    }
+                }.apply {
+                    isDaemon = true
+                    name = "magic-jewel-phase0-identity-probe"
+                    start()
+                }
                 SpectreStressController.startIfRequested(this)
                 System.getProperty("jewel.standalone.autoExitSeconds")
                     ?.toIntOrNull()
