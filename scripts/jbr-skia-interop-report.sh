@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Locale-proof numeric formatting: driver shells with comma-decimal locales corrupt
+# printf "%.2f" CSV columns and awk float output.
+export LC_ALL=C
+
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 ROOT_DIR="${ROOT_DIR:-$(cd -- "${SCRIPT_DIR}/.." >/dev/null && pwd)}"
 OUT_DIR="${OUT_DIR:-${ROOT_DIR}/out/jbr-skia-interop-report/$(date +%Y%m%d-%H%M%S)}"
@@ -16,7 +20,11 @@ ENABLE_ASPROF="${ENABLE_ASPROF:-false}"
 ASPROF="${ASPROF:-}"
 ASPROF_EVENT="${ASPROF_EVENT:-cpu}"
 COLLECT_POWERMETRICS="${COLLECT_POWERMETRICS:-false}"
-POWERMETRICS="${POWERMETRICS:-/usr/bin/powermetrics}"
+DEFAULT_POWERMETRICS="/usr/bin/powermetrics"
+if [[ -x "/usr/local/sbin/jbr-powermetrics-cpu-gpu" ]]; then
+  DEFAULT_POWERMETRICS="/usr/local/sbin/jbr-powermetrics-cpu-gpu"
+fi
+POWERMETRICS="${POWERMETRICS:-${DEFAULT_POWERMETRICS}}"
 POWERMETRICS_INTERVAL_MS="${POWERMETRICS_INTERVAL_MS:-1000}"
 POWERMETRICS_SAMPLERS="${POWERMETRICS_SAMPLERS:-cpu_power,gpu_power}"
 COLLECT_THREAD_CPU="${COLLECT_THREAD_CPU:-false}"
@@ -1387,6 +1395,18 @@ fi
 if [[ -z "${MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS+x}" ]]; then
   MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS=
 fi
+if [[ -z "${MAGIC_JEWEL_AUTO_RESIZE_STORM+x}" ]]; then
+  MAGIC_JEWEL_AUTO_RESIZE_STORM=false
+fi
+if [[ -z "${MAGIC_JEWEL_AUTO_RESIZE_STORM_INTERVAL_MILLIS+x}" ]]; then
+  MAGIC_JEWEL_AUTO_RESIZE_STORM_INTERVAL_MILLIS=
+fi
+if [[ -z "${MAGIC_JEWEL_AUTO_RESIZE_STORM_COUNT+x}" ]]; then
+  MAGIC_JEWEL_AUTO_RESIZE_STORM_COUNT=
+fi
+if [[ -z "${MAGIC_JEWEL_AUTO_EXIT_SECONDS+x}" ]]; then
+  MAGIC_JEWEL_AUTO_EXIT_SECONDS=
+fi
 if [[ -z "${MAGIC_JEWEL_POPUP_STRESS+x}" ]]; then
   MAGIC_JEWEL_POPUP_STRESS=false
 fi
@@ -1831,6 +1851,10 @@ export MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN
 export MAGIC_JEWEL_INVALID_SWEEP_GRADIENT
 export MAGIC_JEWEL_AUTO_RESIZE
 export MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS
+export MAGIC_JEWEL_AUTO_RESIZE_STORM
+export MAGIC_JEWEL_AUTO_RESIZE_STORM_INTERVAL_MILLIS
+export MAGIC_JEWEL_AUTO_RESIZE_STORM_COUNT
+export MAGIC_JEWEL_AUTO_EXIT_SECONDS
 export MAGIC_JEWEL_POPUP_STRESS
 export MAGIC_JEWEL_POPUP_WINDOW_STRESS
 export MAGIC_JEWEL_MENU_STRESS
@@ -1851,6 +1875,7 @@ FALLBACK_MARKER="SKIKO_JBR_INTEROP_FALLBACK"
 APP_FRAME_MARKER="${APP_FRAME_MARKER:-MAGIC_JEWEL_COMPOSE_FRAME}"
 APP_CAPTURE_MARKER="${APP_CAPTURE_MARKER:-${APP_FRAME_MARKER}}"
 SWING_FRAME_MARKER="MAGIC_JEWEL_SWING_FRAME"
+WINDOW_GEOMETRY_MARKER="MAGIC_JEWEL_WINDOW_GEOMETRY"
 POPUP_FRAME_MARKER="MAGIC_JEWEL_POPUP_FRAME"
 POPUP_SHOWN_MARKER="MAGIC_JEWEL_POPUP_SHOWN"
 POPUP_WINDOW_SHOWN_MARKER="MAGIC_JEWEL_POPUP_WINDOW_SHOWN"
@@ -1890,6 +1915,7 @@ CMP_COMMAND_FRAME_KIND_MARKER="CMP_JBR_COMMAND_FRAME_KIND"
 SCREENSHOT_COUNTS_MARKER="JBR_SKIA_SCREENSHOT_COUNTS"
 MIXED_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_MIXED_SCREENSHOT_COUNTS"
 COMMAND_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_COMMAND_SCREENSHOT_COUNTS"
+COMMAND_SCREENSHOT_GEOMETRY_MARKER="JBR_SKIA_COMMAND_SCREENSHOT_GEOMETRY"
 POPUP_WINDOW_SCREENSHOT_COUNTS_MARKER="JBR_SKIA_POPUP_WINDOW_SCREENSHOT_COUNTS"
 SAMPLE_BEGIN_MARKER="MAGIC_JEWEL_REPORT_SAMPLE_BEGIN"
 
@@ -2399,8 +2425,12 @@ Environment:
   MAGIC_JEWEL_IMAGE_CACHE_CHURN Enables many unique tiny images to exercise image cache reset. Default: false.
   MAGIC_JEWEL_STABLE_IMAGE_CACHE_CHURN Makes image cache churn images independent of frame ticks. Default: false.
   MAGIC_JEWEL_INVALID_SWEEP_GRADIENT Enables an invalid sweep-gradient stop probe. Default: false.
-  MAGIC_JEWEL_AUTO_RESIZE Resizes the JFrame once after startup to exercise surface invalidation. Default: false.
+  MAGIC_JEWEL_AUTO_RESIZE Resizes the JFrame after startup to exercise surface invalidation. Default: false.
   MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS Delay before the automatic resize. Default: app default.
+  MAGIC_JEWEL_AUTO_RESIZE_STORM Grows the content surface repeatedly instead of doing one resize. Default: false.
+  MAGIC_JEWEL_AUTO_RESIZE_STORM_INTERVAL_MILLIS Delay between resize-storm steps. Default: app default.
+  MAGIC_JEWEL_AUTO_RESIZE_STORM_COUNT Number of resize-storm steps; <=0 repeats until exit. Default: app default.
+  MAGIC_JEWEL_AUTO_EXIT_SECONDS Exits the app after this many seconds. Default: unset.
   MAGIC_JEWEL_POPUP_STRESS Shows an animated Swing popup over the ComposePanel. Default: false.
   MAGIC_JEWEL_POPUP_WINDOW_STRESS Shows an animated undecorated Swing popup window over the ComposePanel. Default: false.
   MAGIC_JEWEL_MENU_STRESS Shows an animated Swing JPopupMenu over the ComposePanel. Default: false.
@@ -2520,8 +2550,10 @@ start_powermetrics() {
     echo "missing path=${POWERMETRICS}" > "${status}"
     return
   fi
-  if ! sudo -n true >/dev/null 2>&1; then
-    echo "sudo-unavailable run 'sudo -v' before benchmark to collect powermetrics" > "${status}"
+  if ! sudo -n true >/dev/null 2>&1 &&
+     ! { [[ "$(basename "${POWERMETRICS}")" == "jbr-powermetrics-cpu-gpu" ]] &&
+         sudo -n "${POWERMETRICS}" --check >/dev/null 2>&1; }; then
+    echo "sudo-unavailable run 'sudo -v' or install passwordless ${POWERMETRICS}" > "${status}"
     return
   fi
 
@@ -2619,6 +2651,115 @@ launch_mode() {
   else
     GRADLE_TASK="${NEW_GRADLE_TASK}" SKIKO_VERSION="${SKIKO_VERSION}" "${SCRIPT_DIR}/run-jbr-skia.sh"
   fi
+}
+
+capture_window_size() {
+  local capture_log="$1"
+  awk '
+    /^window=/ {
+      width = ""
+      height = ""
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] == "width") width = value[2]
+        if (value[1] == "height") height = value[2]
+      }
+      if (width ~ /^[0-9]+$/ && height ~ /^[0-9]+$/) {
+        result = width " " height
+      }
+    }
+    END {
+      if (result == "") exit 1
+      print result
+    }
+  ' "${capture_log}"
+}
+
+jbr_command_content_geometry() {
+  local log="$1"
+  awk -v marker="${JBR_COMMAND_MARKER}" '
+    index($0, marker) > 0 && /rendered=true/ {
+      x = y = width = height = ""
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] == "destinationX") x = value[2]
+        if (value[1] == "destinationY") y = value[2]
+        if (value[1] == "destinationWidth") width = value[2]
+        if (value[1] == "destinationHeight") height = value[2]
+      }
+      if (x ~ /^-?[0-9]+$/ && y ~ /^-?[0-9]+$/ &&
+          width ~ /^[1-9][0-9]*$/ && height ~ /^[1-9][0-9]*$/) {
+        result = x " " y " " width " " height
+      }
+    }
+    END {
+      if (result == "") exit 1
+      print result
+    }
+  ' "${log}"
+}
+
+app_window_content_geometry() {
+  local log="$1"
+  awk -v marker="${WINDOW_GEOMETRY_MARKER}" '
+    index($0, marker) > 0 {
+      x = y = width = height = ""
+      for (i = 1; i <= NF; i++) {
+        split($i, value, "=")
+        if (value[1] == "contentX") x = value[2]
+        if (value[1] == "contentY") y = value[2]
+        if (value[1] == "contentWidth") width = value[2]
+        if (value[1] == "contentHeight") height = value[2]
+      }
+      if (x ~ /^-?[0-9]+$/ && y ~ /^-?[0-9]+$/ &&
+          width ~ /^[1-9][0-9]*$/ && height ~ /^[1-9][0-9]*$/) {
+        result = x " " y " " width " " height
+      }
+    }
+    END {
+      if (result == "") exit 1
+      print result
+    }
+  ' "${log}"
+}
+
+run_main_window_screenshot_assertion() {
+  local mode="$1"
+  local assert_script="$2"
+  local screenshot="$3"
+  local capture_log="$4"
+  local render_log="$5"
+  local assertion_log="$6"
+
+  if [[ "${assert_script}" != "${COMMAND_ASSERT_SCRIPT}" ]]; then
+    "${assert_script}" "${screenshot}" > "${assertion_log}" 2>&1
+    return
+  fi
+
+  local window_size content_geometry
+  local window_width window_height content_x content_y content_width content_height
+  if ! window_size="$(capture_window_size "${capture_log}")"; then
+    echo "JBR_SKIA_COMMAND_SCREENSHOT_GEOMETRY reason=geometry-unavailable missing-window-bounds" > "${assertion_log}"
+    return 1
+  fi
+  if [[ "${mode}" == "new" ]]; then
+    if ! content_geometry="$(jbr_command_content_geometry "${render_log}")"; then
+      echo "JBR_SKIA_COMMAND_SCREENSHOT_GEOMETRY reason=geometry-unavailable missing-jbr-frame" > "${assertion_log}"
+      return 1
+    fi
+  elif ! content_geometry="$(app_window_content_geometry "${render_log}")"; then
+    echo "JBR_SKIA_COMMAND_SCREENSHOT_GEOMETRY reason=geometry-unavailable missing-app-window-marker" > "${assertion_log}"
+    return 1
+  fi
+  read -r window_width window_height <<< "${window_size}"
+  read -r content_x content_y content_width content_height <<< "${content_geometry}"
+
+  # Main popup/menu probes are overlays in this captured main window and use its
+  # destination geometry. The separate Swing popup window has its own assertion.
+  "${assert_script}" "${screenshot}" \
+    "${window_width}" "${window_height}" \
+    "${content_x}" "${content_y}" "${content_width}" "${content_height}" \
+    > "${assertion_log}" 2>&1
 }
 
 run_mode() {
@@ -2726,7 +2867,8 @@ run_mode() {
         continue
       fi
       if "${CAPTURE_SCRIPT}" "${CAPTURE_WINDOW_QUERY}" "${screenshot}" > "${OUT_DIR}/${mode}-capture.log" 2>&1; then
-        if "${assert_script}" "${screenshot}" > "${screenshot_assertion}" 2>&1; then
+        if run_main_window_screenshot_assertion "${mode}" "${assert_script}" "${screenshot}" \
+            "${OUT_DIR}/${mode}-capture.log" "${log}" "${screenshot_assertion}"; then
           echo "passed" > "${screenshot_status}"
           screenshot_done=true
         fi
@@ -2754,7 +2896,8 @@ run_mode() {
       && -x "${assert_script}"
       && $(grep -c "${capture_marker}" "${log}" 2>/dev/null) -gt 0 ]]; then
     if "${CAPTURE_SCRIPT}" "${CAPTURE_WINDOW_QUERY}" "${screenshot}" > "${OUT_DIR}/${mode}-capture.log" 2>&1; then
-      if "${assert_script}" "${screenshot}" > "${screenshot_assertion}" 2>&1; then
+      if run_main_window_screenshot_assertion "${mode}" "${assert_script}" "${screenshot}" \
+          "${OUT_DIR}/${mode}-capture.log" "${log}" "${screenshot_assertion}"; then
         echo "passed" > "${screenshot_status}"
       fi
     fi
@@ -2972,6 +3115,21 @@ command_recorder_summary() {
         } else if (value[1] == "imageCacheEvicts") {
           imageCacheEvicts += value[2]
           if (value[2] > maxImageCacheEvicts) maxImageCacheEvicts = value[2]
+        } else if (value[1] == "layerRecords") {
+          layerRecords += value[2]
+          if (value[2] > maxLayerRecords) maxLayerRecords = value[2]
+        } else if (value[1] == "layerReplays") {
+          layerReplays += value[2]
+          if (value[2] > maxLayerReplays) maxLayerReplays = value[2]
+        } else if (value[1] == "compactionScans") {
+          compactionScans += value[2]
+          if (value[2] > maxCompactionScans) maxCompactionScans = value[2]
+        } else if (value[1] == "compactionNanos") {
+          compactionNanos += value[2]
+          if (value[2] > maxCompactionNanos) maxCompactionNanos = value[2]
+        } else if (value[1] == "compactionAborted") {
+          compactionAborted += value[2]
+          if (value[2] > maxCompactionAborted) maxCompactionAborted = value[2]
         } else if (value[2] ~ /^[0-9]+$/) {
           frameReasons[value[1]] += value[2]
         }
@@ -2985,7 +3143,7 @@ command_recorder_summary() {
     }
     END {
       if (frames == 0) {
-        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_paragraph_text_commands=0 max_paragraph_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_define_words=0 max_image_define_words=0 avg_image_define_pixels=0 max_image_define_pixels=0 avg_image_refs=0 max_image_refs=0 avg_image_cache_clears=0 max_image_cache_clears=0 avg_image_cache_evicts=0 max_image_cache_evicts=0 reasons=none"
+        printf "frames=0 fps=0 avg_commands=0 max_commands=0 unsupported_frames=0 avg_unsupported=0 max_unsupported=0 avg_text_commands=0 max_text_commands=0 avg_paragraph_text_commands=0 max_paragraph_text_commands=0 avg_image_defines=0 max_image_defines=0 avg_image_define_words=0 max_image_define_words=0 avg_image_define_pixels=0 max_image_define_pixels=0 avg_image_refs=0 max_image_refs=0 avg_image_cache_clears=0 max_image_cache_clears=0 avg_image_cache_evicts=0 max_image_cache_evicts=0 avg_layer_records=0 max_layer_records=0 avg_layer_replays=0 max_layer_replays=0 avg_compaction_scans=0 max_compaction_scans=0 avg_compaction_nanos=0 max_compaction_nanos=0 avg_compaction_aborted=0 max_compaction_aborted=0 reasons=none"
         exit
       }
       reasonSummary = "none"
@@ -2993,12 +3151,15 @@ command_recorder_summary() {
         item = reason ":" reasons[reason]
         reasonSummary = reasonSummary == "none" ? item : reasonSummary "," item
       }
-      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_paragraph_text_commands=%.1f max_paragraph_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_define_words=%.1f max_image_define_words=%.0f avg_image_define_pixels=%.1f max_image_define_pixels=%.0f avg_image_refs=%.1f max_image_refs=%.0f avg_image_cache_clears=%.1f max_image_cache_clears=%.0f avg_image_cache_evicts=%.1f max_image_cache_evicts=%.0f reasons=%s",
+      printf "frames=%d fps=%.1f avg_commands=%.0f max_commands=%.0f unsupported_frames=%d avg_unsupported=%.1f max_unsupported=%.0f avg_text_commands=%.1f max_text_commands=%.0f avg_paragraph_text_commands=%.1f max_paragraph_text_commands=%.0f avg_image_defines=%.1f max_image_defines=%.0f avg_image_define_words=%.1f max_image_define_words=%.0f avg_image_define_pixels=%.1f max_image_define_pixels=%.0f avg_image_refs=%.1f max_image_refs=%.0f avg_image_cache_clears=%.1f max_image_cache_clears=%.0f avg_image_cache_evicts=%.1f max_image_cache_evicts=%.0f avg_layer_records=%.1f max_layer_records=%.0f avg_layer_replays=%.1f max_layer_replays=%.0f avg_compaction_scans=%.1f max_compaction_scans=%.0f avg_compaction_nanos=%.0f max_compaction_nanos=%.0f avg_compaction_aborted=%.1f max_compaction_aborted=%.0f reasons=%s",
         frames, frames / duration, commands / frames, maxCommands, unsupportedFrames, unsupported / frames, maxUnsupported,
         textCommands / frames, maxTextCommands, paragraphTextCommands / frames, maxParagraphTextCommands,
         imageDefines / frames, maxImageDefines, imageDefineWords / frames, maxImageDefineWords,
         imageDefinePixels / frames, maxImageDefinePixels, imageRefs / frames, maxImageRefs,
         imageCacheClears / frames, maxImageCacheClears, imageCacheEvicts / frames, maxImageCacheEvicts,
+        layerRecords / frames, maxLayerRecords, layerReplays / frames, maxLayerReplays,
+        compactionScans / frames, maxCompactionScans, compactionNanos / frames, maxCompactionNanos,
+        compactionAborted / frames, maxCompactionAborted,
         reasonSummary
     }
   ' "${log}"
@@ -3014,12 +3175,24 @@ jbr_command_timing_summary() {
         if (value[1] == "totalNanos") {
           total += value[2]
           if (value[2] > maxTotal) maxTotal = value[2]
+        } else if (value[1] == "mallocNanos") {
+          malloc += value[2]
+          if (value[2] > maxMalloc) maxMalloc = value[2]
+        } else if (value[1] == "contextNanos") {
+          context += value[2]
+          if (value[2] > maxContext) maxContext = value[2]
+        } else if (value[1] == "surfaceNanos") {
+          surface += value[2]
+          if (value[2] > maxSurface) maxSurface = value[2]
         } else if (value[1] == "drawNanos") {
           draw += value[2]
           if (value[2] > maxDraw) maxDraw = value[2]
         } else if (value[1] == "flushNanos") {
           flush += value[2]
           if (value[2] > maxFlush) maxFlush = value[2]
+        } else if (value[1] == "purgeNanos") {
+          purge += value[2]
+          if (value[2] > maxPurge) maxPurge = value[2]
         } else if (value[1] == "paragraphCommands") {
           paragraphCommands += value[2]
           if (value[2] > maxParagraphCommands) maxParagraphCommands = value[2]
@@ -3034,14 +3207,18 @@ jbr_command_timing_summary() {
     }
     END {
       if (frames == 0) {
-        printf "frames=0 avg_total_ms=0 max_total_ms=0 avg_draw_ms=0 max_draw_ms=0 avg_flush_ms=0 max_flush_ms=0 avg_paragraph_ms=0 max_paragraph_ms=0 avg_paragraph_commands=0 max_paragraph_commands=0 avg_shadow_commands=0 max_shadow_commands=0"
+        printf "frames=0 avg_total_ms=0 max_total_ms=0 avg_malloc_ms=0 max_malloc_ms=0 avg_context_ms=0 max_context_ms=0 avg_surface_ms=0 max_surface_ms=0 avg_draw_ms=0 max_draw_ms=0 avg_flush_ms=0 max_flush_ms=0 avg_purge_ms=0 max_purge_ms=0 avg_paragraph_ms=0 max_paragraph_ms=0 avg_paragraph_commands=0 max_paragraph_commands=0 avg_shadow_commands=0 max_shadow_commands=0"
         exit
       }
-      printf "frames=%d avg_total_ms=%.3f max_total_ms=%.3f avg_draw_ms=%.3f max_draw_ms=%.3f avg_flush_ms=%.3f max_flush_ms=%.3f avg_paragraph_ms=%.3f max_paragraph_ms=%.3f avg_paragraph_commands=%.1f max_paragraph_commands=%.0f avg_shadow_commands=%.1f max_shadow_commands=%.0f",
+      printf "frames=%d avg_total_ms=%.3f max_total_ms=%.3f avg_malloc_ms=%.3f max_malloc_ms=%.3f avg_context_ms=%.3f max_context_ms=%.3f avg_surface_ms=%.3f max_surface_ms=%.3f avg_draw_ms=%.3f max_draw_ms=%.3f avg_flush_ms=%.3f max_flush_ms=%.3f avg_purge_ms=%.3f max_purge_ms=%.3f avg_paragraph_ms=%.3f max_paragraph_ms=%.3f avg_paragraph_commands=%.1f max_paragraph_commands=%.0f avg_shadow_commands=%.1f max_shadow_commands=%.0f",
         frames,
         total / frames / 1000000.0, maxTotal / 1000000.0,
+        malloc / frames / 1000000.0, maxMalloc / 1000000.0,
+        context / frames / 1000000.0, maxContext / 1000000.0,
+        surface / frames / 1000000.0, maxSurface / 1000000.0,
         draw / frames / 1000000.0, maxDraw / 1000000.0,
         flush / frames / 1000000.0, maxFlush / 1000000.0,
+        purge / frames / 1000000.0, maxPurge / 1000000.0,
         paragraph / frames / 1000000.0, maxParagraph / 1000000.0,
         paragraphCommands / frames, maxParagraphCommands,
         shadowCommands / frames, maxShadowCommands
@@ -3105,7 +3282,12 @@ command_recorder_reasons() {
             value[1] != "imageDefines" &&
             value[1] != "imageRefs" &&
             value[1] != "imageCacheClears" &&
-            value[1] != "imageCacheEvicts") {
+            value[1] != "imageCacheEvicts" &&
+            value[1] != "layerRecords" &&
+            value[1] != "layerReplays" &&
+            value[1] != "compactionScans" &&
+            value[1] != "compactionNanos" &&
+            value[1] != "compactionAborted") {
           frameReasons[value[1]] += value[2]
         }
       }
@@ -3300,6 +3482,7 @@ write_machine_summary() {
     echo "cmp_frame_kind_unknown=$(grep -c "${CMP_COMMAND_FRAME_KIND_MARKER}.*kind=Unknown" "${new_log}" 2>/dev/null || true)"
     echo "cmp_unsupported_max=$(max_command_recorder_field "${new_log}" "unsupported")"
     echo "cmp_unsupported_reasons=$(command_recorder_reasons "${new_log}")"
+    echo "cmp_command_recorder_summary=$(command_recorder_summary "${new_log}")"
     echo "cmp_recorder_top_ops=$(command_recorder_ops_summary "${new_log}")"
     echo "cmp_recorder_top_op_words=$(command_recorder_ops_summary "${new_log}" "${CMP_COMMAND_RECORDER_OP_WORDS_MARKER}")"
     echo "cmp_recorder_top_op_pairs=$(command_recorder_ops_summary "${new_log}" "${CMP_COMMAND_RECORDER_OP_PAIRS_MARKER}")"
@@ -3317,6 +3500,7 @@ write_machine_summary() {
     echo "skiko_command_fps=$(frame_marker_fps "${SKIKO_COMMAND_MARKER}" "${new_log}")"
     echo "jbr_command_fps=$(frame_marker_fps "${JBR_COMMAND_MARKER}" "${new_log}")"
     echo "jbr_timing_frames=$(grep -c "${JBR_COMMAND_TIMING_MARKER}" "${new_log}" 2>/dev/null || true)"
+    echo "jbr_command_timing_summary=$(jbr_command_timing_summary "${new_log}")"
     echo "jbr_shadow_commands_max=$(max_jbr_command_timing_field "${new_log}" "shadowCommands")"
     echo "jbr_image_cache_clear_frames=$(grep -c "${JBR_IMAGE_CACHE_CLEAR_MARKER}" "${new_full_log}" 2>/dev/null || true)"
     echo "jbr_scoped_image_cache_clear_frames=$(grep -Ec "${JBR_IMAGE_CACHE_CLEAR_MARKER}.*contextId=0x" "${new_full_log}" 2>/dev/null || true)"
@@ -3443,6 +3627,8 @@ write_report() {
   skiko_surface_change_summary="$(frame_marker_summary "${SKIKO_SURFACE_CHANGE_MARKER}" "${new_full_log}")"
   skiko_command_cache_clear_summary="$(frame_marker_summary "${SKIKO_COMMAND_CACHES_CLEARED_MARKER}" "${new_full_log}")"
   skiko_command_buffer_cache_summary="$(command_buffer_cache_summary "${new_full_log}")"
+  local screenshot_geometry
+  screenshot_geometry="$(grep -E "${COMMAND_SCREENSHOT_GEOMETRY_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null | tail -1 || true)"
   screenshot_counts="$(grep -E "${SCREENSHOT_COUNTS_MARKER}|${MIXED_SCREENSHOT_COUNTS_MARKER}|${COMMAND_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-screenshot-assertion.log" 2>/dev/null || true)"
   screenshot_status="$(cat "${OUT_DIR}/new-screenshot-status.txt" 2>/dev/null || true)"
   popup_screenshot_counts="$(grep -E "${POPUP_WINDOW_SCREENSHOT_COUNTS_MARKER}" "${OUT_DIR}/new-popup-window-screenshot-assertion.log" 2>/dev/null || true)"
@@ -3897,6 +4083,10 @@ write_report() {
     echo "- MAGIC_JEWEL_INVALID_SWEEP_GRADIENT: ${MAGIC_JEWEL_INVALID_SWEEP_GRADIENT}"
     echo "- MAGIC_JEWEL_AUTO_RESIZE: ${MAGIC_JEWEL_AUTO_RESIZE}"
     echo "- MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS: ${MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS:-<unset>}"
+    echo "- MAGIC_JEWEL_AUTO_RESIZE_STORM: ${MAGIC_JEWEL_AUTO_RESIZE_STORM}"
+    echo "- MAGIC_JEWEL_AUTO_RESIZE_STORM_INTERVAL_MILLIS: ${MAGIC_JEWEL_AUTO_RESIZE_STORM_INTERVAL_MILLIS:-<unset>}"
+    echo "- MAGIC_JEWEL_AUTO_RESIZE_STORM_COUNT: ${MAGIC_JEWEL_AUTO_RESIZE_STORM_COUNT:-<unset>}"
+    echo "- MAGIC_JEWEL_AUTO_EXIT_SECONDS: ${MAGIC_JEWEL_AUTO_EXIT_SECONDS:-<unset>}"
     echo "- MAGIC_JEWEL_POPUP_STRESS: ${MAGIC_JEWEL_POPUP_STRESS}"
     echo "- MAGIC_JEWEL_POPUP_WINDOW_STRESS: ${MAGIC_JEWEL_POPUP_WINDOW_STRESS}"
     echo "- MAGIC_JEWEL_MENU_STRESS: ${MAGIC_JEWEL_MENU_STRESS}"
@@ -4028,6 +4218,7 @@ write_report() {
     echo
     if [[ -n "${screenshot_counts}" ]]; then
       echo "- status: ${screenshot_status:-unknown}"
+      [[ -z "${screenshot_geometry}" ]] || echo "- ${screenshot_geometry}"
       echo "- ${screenshot_counts}"
       echo "- screenshot: new-window.png"
       echo "- assertion log: new-screenshot-assertion.log"
@@ -4074,6 +4265,7 @@ write_report() {
     echo "App draw FPS and Skiko/JBR marker FPS count draw/replay calls during the measurement window, not display-presented frames; they can exceed monitor refresh when rendering is not vsync-throttled."
     echo "Picture/command marker counts come from structured Skiko/JBR logs and are the primary signal that the JBR-owned replay path was used."
     echo "Surface identity markers show when Skiko observed a different JBR destination surface and discarded cached surface-bound state."
+    echo "MTL_DEBUG_LAYER=1 is intended for new-path-only soaks: the old/control Java2D Metal leg is known to abort under validation because its destination texture lacks MTLTextureUsageRenderTarget."
     echo "Powermetrics capture is optional and requires a cached sudo credential; run 'sudo -v' before the suite to enable per-core CPU residency and GPU/Metal power counters where macOS exposes them."
     echo "The new mode depends on patched local JBR, Skiko, and CMP artifacts; see README.md for the required paths and overrides."
   } > "${report}"

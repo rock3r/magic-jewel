@@ -12,6 +12,10 @@ val jbrSkiaJvmArgs =
     providers.gradleProperty("jbrSkiaInteropJvmArgs")
         .orElse(providers.environmentVariable("JBR_SKIA_INTEROP_JVM_ARGS"))
         .orElse("")
+val magicJewelBenchmarkJvmArgs =
+    providers.gradleProperty("magicJewelBenchmarkJvmArgs")
+        .orElse(providers.environmentVariable("MAGIC_JEWEL_BENCHMARK_JVM_ARGS"))
+        .orElse("")
 val jbrSkiaRenderMode =
     providers.gradleProperty("jbrSkiaRenderMode")
         .orElse(providers.environmentVariable("JBR_SKIA_RENDER_MODE"))
@@ -50,6 +54,7 @@ dependencies {
     }
     runtimeOnly(libs.spectre.recording.macos)
     compileOnly(libs.kotlinx.coroutines.core)
+    compileOnly("androidx.tracing:tracing-wire-desktop:2.0.0-alpha09")
 
     compileOnly(libs.compose.runtime)
     compileOnly(libs.compose.foundation)
@@ -97,6 +102,12 @@ configurations
         exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-swing")
     }
 
+configurations.named("runtimeClasspath") {
+    exclude(group = "androidx.tracing")
+    exclude(group = "com.squareup.okio")
+    exclude(group = "com.squareup.wire")
+}
+
 intellijPlatform {
     pluginConfiguration {
         id = "com.magicjewel.jbrskia.benchmark"
@@ -115,6 +126,12 @@ tasks.named<JavaExec>("runIde") {
     systemProperty("compose.swing.render.on.graphics", "true")
     if (providers.gradleProperty("magicJewelBenchmarkAutorun").isPresent) {
         systemProperty("magic.jewel.benchmark.autorun", "true")
+        systemProperty("compose.swing.render.paint.marker.enabled", "true")
+        systemProperty("intellij.startup.wizard", "false")
+        systemProperty("idea.initially.ask.config", "never")
+        systemProperty("ide.newUsersOnboarding", "false")
+        systemProperty("ide.experimental.ui.onboarding", "false")
+        systemProperty("idea.trust.all.projects", "true")
     }
     providers.gradleProperty("magicJewelBenchmarkMode").orNull?.let {
         systemProperty("magic.jewel.benchmark.mode", it)
@@ -125,9 +142,16 @@ tasks.named<JavaExec>("runIde") {
     providers.gradleProperty("magicJewelBenchmarkPaintProbe").orNull?.let {
         systemProperty("magic.jewel.benchmark.paintProbe", it)
     }
+    providers.gradleProperty("magicJewelBenchmarkEdtDispatchProbe").orNull?.let {
+        systemProperty("magic.jewel.benchmark.edtDispatchProbe", it)
+    }
     magicJewelBenchmarkProjectPath.orNull?.let {
         args(it)
     }
+    magicJewelBenchmarkJvmArgs.get()
+        .split(Regex("\\s+"))
+        .filter { it.isNotBlank() }
+        .let(::jvmArgs)
     if (jbrSkiaInteropEnabled.get().toBoolean()) {
         systemProperty("compose.swing.render.on.jbr.skia", "true")
         systemProperty("skiko.jbr.interop.debugOverlay", "true")

@@ -33,12 +33,25 @@ val defaultLocalCmpOut = if (generatedLocalCmpOut.isDirectory) {
 val localCmpOut = providers.gradleProperty("localCmpOut")
     .orElse(providers.environmentVariable("LOCAL_CMP_OUT"))
     .orElse(defaultLocalCmpOut)
+val localSkikoAwtJar = layout.projectDirectory.file("../skiko/skiko/build/libs/skiko-awt-0.0.0-SNAPSHOT.jar")
 val jbrSkiaJvmArgs = providers.gradleProperty("jbrSkiaInteropJvmArgs")
 val jbrSkiaRenderMode = providers.gradleProperty("jbrSkiaRenderMode")
     .orElse(providers.environmentVariable("JBR_SKIA_RENDER_MODE"))
     .orElse("picture")
+val jbrSkiaTraceEnabled = providers.gradleProperty("jbrSkiaTraceEnabled")
+    .orElse(providers.environmentVariable("JBR_SKIA_TRACE_ENABLED"))
+    .orElse("false")
+val jbrSkiaTraceOutputDir = providers.gradleProperty("jbrSkiaTraceOutputDir")
+    .orElse(providers.environmentVariable("JBR_SKIA_TRACE_DIR"))
+    .orElse(layout.buildDirectory.dir("jbr-skia-traces").map { it.asFile.absolutePath })
+val jbrSkiaTraceCategory = providers.gradleProperty("jbrSkiaTraceCategory")
+    .orElse(providers.environmentVariable("JBR_SKIA_TRACE_CATEGORY"))
+    .orElse("jbr-skia")
 val forceTinyFullSceneOnceForTesting = providers.gradleProperty("skikoForceTinyFullSceneOnceForTesting")
     .orElse(providers.environmentVariable("SKIKO_FORCE_TINY_FULL_SCENE_ONCE_FOR_TEST"))
+    .orElse("false")
+val skikoSwingPainterProbeEnabled = providers.gradleProperty("skikoSwingPainterProbeEnabled")
+    .orElse(providers.environmentVariable("SKIKO_SWING_PAINTER_PROBE_ENABLED"))
     .orElse("false")
 val jewelStandaloneInitialView = providers.gradleProperty("jewelStandaloneInitialView")
     .orElse(providers.environmentVariable("JEWEL_STANDALONE_INITIAL_VIEW"))
@@ -61,6 +74,17 @@ val jewelStandaloneSpectreComponents =
     providers.gradleProperty("jewelStandaloneSpectreComponents")
         .orElse(providers.environmentVariable("JEWEL_STANDALONE_SPECTRE_COMPONENTS"))
         .orElse("")
+val jewelStandaloneAutoExitSeconds =
+    providers.gradleProperty("jewelStandaloneAutoExitSeconds")
+        .orElse(providers.environmentVariable("JEWEL_STANDALONE_AUTO_EXIT_SECONDS"))
+val jewelStandaloneMaximized =
+    providers.gradleProperty("jewelStandaloneMaximized")
+        .orElse(providers.environmentVariable("JEWEL_STANDALONE_MAXIMIZED"))
+        .orElse("false")
+val jewelStandaloneDisplayTarget =
+    providers.gradleProperty("jewelStandaloneDisplayTarget")
+        .orElse(providers.environmentVariable("JEWEL_STANDALONE_DISPLAY_TARGET"))
+        .orElse("default")
 val jewelStandaloneMarkdownContent =
     providers.gradleProperty("jewelStandaloneMarkdownContent")
         .orElse(providers.environmentVariable("JEWEL_STANDALONE_MARKDOWN_CONTENT"))
@@ -643,6 +667,15 @@ val autoResizeEnabled = providers.gradleProperty("magicJewelAutoResize")
     .orElse("false")
 val autoResizeDelayMillis = providers.gradleProperty("magicJewelAutoResizeDelayMillis")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_AUTO_RESIZE_DELAY_MILLIS"))
+val autoResizeStormEnabled = providers.gradleProperty("magicJewelAutoResizeStorm")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_AUTO_RESIZE_STORM"))
+    .orElse("false")
+val autoResizeStormIntervalMillis = providers.gradleProperty("magicJewelAutoResizeStormIntervalMillis")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_AUTO_RESIZE_STORM_INTERVAL_MILLIS"))
+val autoResizeStormCount = providers.gradleProperty("magicJewelAutoResizeStormCount")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_AUTO_RESIZE_STORM_COUNT"))
+val autoExitSeconds = providers.gradleProperty("magicJewelAutoExitSeconds")
+    .orElse(providers.environmentVariable("MAGIC_JEWEL_AUTO_EXIT_SECONDS"))
 val popupStressEnabled = providers.gradleProperty("magicJewelPopupStress")
     .orElse(providers.environmentVariable("MAGIC_JEWEL_POPUP_STRESS"))
     .orElse("false")
@@ -699,6 +732,7 @@ dependencies {
     implementation(libs.coil.svg)
     implementation(compose.components.resources)
     implementation("androidx.navigationevent:navigationevent-compose-desktop:1.1.0-alpha01")
+    implementation("androidx.tracing:tracing-wire:2.0.0-alpha09")
     implementation(libs.kotlinx.coroutines.swing)
     implementation("dev.sebastiano.spectre:spectre-core:0.2.1")
 }
@@ -1004,6 +1038,10 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.invalidSweepGradient", invalidSweepGradientEnabled.get())
     systemProperty("magic.jewel.autoResize", autoResizeEnabled.get())
     autoResizeDelayMillis.orNull?.let { systemProperty("magic.jewel.autoResizeDelayMillis", it) }
+    systemProperty("magic.jewel.autoResizeStorm", autoResizeStormEnabled.get())
+    autoResizeStormIntervalMillis.orNull?.let { systemProperty("magic.jewel.autoResizeStormIntervalMillis", it) }
+    autoResizeStormCount.orNull?.let { systemProperty("magic.jewel.autoResizeStormCount", it) }
+    autoExitSeconds.orNull?.let { systemProperty("magic.jewel.autoExitSeconds", it) }
     systemProperty("magic.jewel.popupStress", popupStressEnabled.get())
     systemProperty("magic.jewel.popupWindowStress", popupWindowStressEnabled.get())
     systemProperty("magic.jewel.menuStress", menuStressEnabled.get())
@@ -1012,6 +1050,9 @@ fun JavaExec.configureMagicJewelJvm(interoperable: Boolean) {
     systemProperty("magic.jewel.pauseSwingAnimation", pauseSwingAnimation.get())
     systemProperty("magic.jewel.swingIsland", swingIslandEnabled.get())
     systemProperty("magic.jewel.backgroundWindow", backgroundWindowEnabled.get())
+    systemProperty("jbr.skia.trace.enabled", jbrSkiaTraceEnabled.get())
+    systemProperty("jbr.skia.trace.outputDir", jbrSkiaTraceOutputDir.get())
+    systemProperty("jbr.skia.trace.category", jbrSkiaTraceCategory.get())
     if (backgroundWindowEnabled.get().toBoolean()) {
         systemProperty("apple.awt.UIElement", "true")
     }
@@ -1045,7 +1086,7 @@ tasks.register<JavaExec>("runJbrSkiaInterop") {
     group = ApplicationPlugin.APPLICATION_GROUP
     description = "Run Magic Jewel through SwingGraphics with the JBR Skia interop fast path enabled."
     val patchedCompose = patchedComposeRuntimeJars()
-    classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
+    classpath = files(localSkikoAwtJar) + patchedCompose + sourceSets.main.get().runtimeClasspath
     mainClass.set("com.magicjewel.MainKt")
     configureMagicJewelJvm(interoperable = true)
     doFirst {
@@ -1058,11 +1099,17 @@ fun JavaExec.configureJewelStandaloneJvm(interoperable: Boolean, swingCompositin
         systemProperty("compose.swing.render.on.graphics", "true")
     }
     systemProperty("apple.awt.application.name", "Jewel Standalone Sample")
+    systemProperty("skiko.swing.painter.probe.enabled", skikoSwingPainterProbeEnabled.get())
     systemProperty("jewel.standalone.initialView", jewelStandaloneInitialView.get())
     systemProperty("jewel.standalone.spectreStress", jewelStandaloneSpectreStress.get())
     systemProperty("jewel.standalone.spectreStressIntervalMillis", jewelStandaloneSpectreStressIntervalMillis.get())
     systemProperty("jewel.standalone.spectreStressMode", jewelStandaloneSpectreStressMode.get())
     systemProperty("jewel.standalone.spectreComponents", jewelStandaloneSpectreComponents.get())
+    jewelStandaloneAutoExitSeconds.orNull?.let {
+        systemProperty("jewel.standalone.autoExitSeconds", it)
+    }
+    systemProperty("jewel.standalone.maximized", jewelStandaloneMaximized.get())
+    systemProperty("jewel.standalone.displayTarget", jewelStandaloneDisplayTarget.get())
     systemProperty("jewel.standalone.markdownContent", jewelStandaloneMarkdownContent.get())
     systemProperty("jewel.standalone.markdownPreviewOnly", jewelStandaloneMarkdownPreviewOnly.get())
     systemProperty("jewel.standalone.markdownAutoScroll", jewelStandaloneMarkdownAutoScroll.get())
@@ -1091,9 +1138,35 @@ tasks.register<JavaExec>("runJewelStandalone") {
     group = ApplicationPlugin.APPLICATION_GROUP
     description = "Run the copied Jewel standalone sample through SwingGraphics."
     val patchedCompose = patchedComposeRuntimeJars()
-    classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
+    classpath = files(localSkikoAwtJar) + patchedCompose + sourceSets.main.get().runtimeClasspath
     mainClass.set("org.jetbrains.jewel.samples.standalone.SwingMainKt")
     configureJewelStandaloneJvm(interoperable = false)
+    doFirst {
+        logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
+    }
+}
+
+tasks.register<JavaExec>("runJewelStandaloneSoftware") {
+    group = ApplicationPlugin.APPLICATION_GROUP
+    description = "Run the copied Jewel standalone sample through the forced SoftwareSwingPainter path."
+    val patchedCompose = patchedComposeRuntimeJars()
+    classpath = files(localSkikoAwtJar) + patchedCompose + sourceSets.main.get().runtimeClasspath
+    mainClass.set("org.jetbrains.jewel.samples.standalone.SwingMainKt")
+    configureJewelStandaloneJvm(interoperable = false)
+    systemProperty("skiko.swing.painter.forceSoftware", "true")
+    doFirst {
+        logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
+    }
+}
+
+tasks.register<JavaExec>("runJewelStandaloneSoftwareJbrSkiaInterop") {
+    group = ApplicationPlugin.APPLICATION_GROUP
+    description = "Run the copied Jewel standalone sample through forced SoftwareSwingPainter with JBR Skia enabled."
+    val patchedCompose = patchedComposeRuntimeJars()
+    classpath = files(localSkikoAwtJar) + patchedCompose + sourceSets.main.get().runtimeClasspath
+    mainClass.set("org.jetbrains.jewel.samples.standalone.SwingMainKt")
+    configureJewelStandaloneJvm(interoperable = true)
+    systemProperty("skiko.swing.painter.forceSoftware", "true")
     doFirst {
         logger.lifecycle("Prepending ${patchedCompose.files.size} patched CMP jars from ${localCmpOut.get()}")
     }
@@ -1103,7 +1176,7 @@ tasks.register<JavaExec>("runJewelStandaloneJbrSkiaInterop") {
     group = ApplicationPlugin.APPLICATION_GROUP
     description = "Run the copied Jewel standalone sample through SwingGraphics with the JBR Skia fast path enabled."
     val patchedCompose = patchedComposeRuntimeJars()
-    classpath = patchedCompose + sourceSets.main.get().runtimeClasspath
+    classpath = files(localSkikoAwtJar) + patchedCompose + sourceSets.main.get().runtimeClasspath
     mainClass.set("org.jetbrains.jewel.samples.standalone.SwingMainKt")
     configureJewelStandaloneJvm(interoperable = true)
     doFirst {

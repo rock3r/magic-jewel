@@ -13,11 +13,13 @@ CURRENT_JBR_API_SHIM="${CURRENT_JBR_API_SHIM:-/tmp/jbr-api-shim.jar}"
 CURRENT_JBR_SKIA_LIB="${CURRENT_JBR_SKIA_LIB:-/tmp/jbr-skia-native/libjbrskiainterop.dylib}"
 CURRENT_SKIKO_VERSION="${CURRENT_SKIKO_VERSION:-${SKIKO_VERSION:-0.0.0-SNAPSHOT}}"
 CURRENT_CMP_OUT="${CURRENT_CMP_OUT:-${ROOT_DIR}/../cmp/out/compose-multiplatform-core}"
+CURRENT_ANDROIDX_TRACING_JARS="${CURRENT_ANDROIDX_TRACING_JARS:-${ANDROIDX_TRACING_JARS:-}}"
 OLD_DESKTOP_PATCH="${OLD_DESKTOP_PATCH:-}"
 OLD_JBR_API_SHIM="${OLD_JBR_API_SHIM:-}"
 OLD_JBR_SKIA_LIB="${OLD_JBR_SKIA_LIB:-}"
 OLD_SKIKO_VERSION="${OLD_SKIKO_VERSION:-}"
 OLD_CMP_OUT="${OLD_CMP_OUT:-}"
+OLD_ANDROIDX_TRACING_JARS="${OLD_ANDROIDX_TRACING_JARS:-}"
 OLD_ARTIFACT_BUNDLE="${OLD_ARTIFACT_BUNDLE:-}"
 OLD_JBR_EXPECTED_REASON="${OLD_JBR_EXPECTED_REASON:-native-abi-mismatch}"
 OLD_API_EXPECTED_REASON="${OLD_API_EXPECTED_REASON:-public-api-missing}"
@@ -67,6 +69,8 @@ Current artifact variables:
   CURRENT_JBR_SKIA_LIB    Default: /tmp/jbr-skia-native/libjbrskiainterop.dylib
   CURRENT_SKIKO_VERSION   Default: SKIKO_VERSION or 0.0.0-SNAPSHOT
   CURRENT_CMP_OUT         Default: sibling ../cmp/out/compose-multiplatform-core
+  CURRENT_ANDROIDX_TRACING_JARS
+                            Current AndroidX tracing jars for patched CMP classpath.
 
 Optional old artifact variables:
   OLD_ARTIFACT_BUNDLE    Bundle created by package-jbr-skia-artifact-bundle.sh.
@@ -75,6 +79,8 @@ Optional old artifact variables:
   OLD_JBR_SKIA_LIB        Old/native-incompatible JBR Skia dylib.
   OLD_SKIKO_VERSION       Old Skiko Maven version available to Gradle.
   OLD_CMP_OUT             Old patched CMP output root.
+  OLD_ANDROIDX_TRACING_JARS
+                            Old bundle AndroidX tracing jars loaded from manifest.
 
 Expected fallback variables for optional rows:
   OLD_JBR_EXPECTED_REASON     Default: native-abi-mismatch
@@ -296,6 +302,9 @@ load_old_artifact_bundle() {
       cmp_out)
         OLD_CMP_OUT="${OLD_CMP_OUT:-${value}}"
         ;;
+      androidx_tracing_jars)
+        OLD_ANDROIDX_TRACING_JARS="${OLD_ANDROIDX_TRACING_JARS:-${value}}"
+        ;;
     esac
   done <"${manifest}"
 }
@@ -309,6 +318,7 @@ run_case() {
   local cmp_out="$6"
   local expected_reason="$7"
   local out_dir="${OUT_ROOT}/${name}"
+  local androidx_tracing_jars="${CURRENT_ANDROIDX_TRACING_JARS:-${OLD_ANDROIDX_TRACING_JARS}}"
 
   echo "== ${name} =="
   if [[ "${DRY_RUN}" == "true" ]]; then
@@ -334,6 +344,7 @@ run_case() {
     JBR_SKIA_LIB="${native_lib}" \
     SKIKO_VERSION="${skiko_version}" \
     LOCAL_CMP_OUT="${cmp_out}" \
+    ANDROIDX_TRACING_JARS="${androidx_tracing_jars}" \
     "${expect_env[@]}" \
     "${SCRIPT_DIR}/jbr-skia-interop-report.sh" >/tmp/magic-jewel-${name}-artifact-matrix-report.txt
 

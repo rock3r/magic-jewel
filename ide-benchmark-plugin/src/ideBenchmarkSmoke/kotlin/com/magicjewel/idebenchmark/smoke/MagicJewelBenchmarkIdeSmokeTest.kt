@@ -46,6 +46,8 @@ class MagicJewelBenchmarkIdeSmokeTest {
                 addSystemProperty("magic.jewel.benchmark.mode", "chat")
                 setIdeStartupDialogEnabled(false)
                 setNeverShowInitConfigModal()
+                disableNewUsersOnboardingDialogue()
+                addSystemProperty("ide.experimental.ui.onboarding", false)
             }
             .skipIndicesInitialization()
             .runIdeWithDriver(configure = { capturedRunContext.set(this) })

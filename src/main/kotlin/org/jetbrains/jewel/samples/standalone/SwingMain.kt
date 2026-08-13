@@ -6,8 +6,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.awt.ComposePanel
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.GraphicsEnvironment
+import javax.swing.Timer
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
+import kotlin.system.exitProcess
 import org.jetbrains.jewel.foundation.LocalComponent
 import org.jetbrains.jewel.foundation.enableNewSwingCompositing
 import org.jetbrains.jewel.foundation.theme.JewelTheme
@@ -69,9 +72,34 @@ public fun main() {
                 BorderLayout.CENTER,
             )
             pack()
-            setLocationRelativeTo(null)
+            val targetInternalDisplay = System.getProperty("jewel.standalone.displayTarget") == "internal"
+            if (targetInternalDisplay) {
+                GraphicsEnvironment.getLocalGraphicsEnvironment().screenDevices
+                    .firstOrNull { it.getIDstring().contains("built-in", ignoreCase = true) || it.getIDstring().contains("internal", ignoreCase = true) }
+                    ?.defaultConfiguration
+                    ?.bounds
+                    ?.let { bounds -> setLocation(bounds.x + 40, bounds.y + 40) }
+            }
+            if (!targetInternalDisplay) setLocationRelativeTo(null)
             isVisible = true
-            SpectreStressController.startIfRequested(this)
+            if (java.lang.Boolean.getBoolean("jewel.standalone.maximized")) extendedState = JFrame.MAXIMIZED_BOTH
+            Timer(250) {
+                val transform = graphicsConfiguration.defaultTransform
+                val pixelWidth = (width * transform.scaleX).toInt()
+                val pixelHeight = (height * transform.scaleY).toInt()
+                println(
+                    "JEWEL_STANDALONE status=started pid=${ProcessHandle.current().pid()} " +
+                        "view=${MainViewModel.currentView.title} width=$width height=$height " +
+                        "backingScaleX=${transform.scaleX} backingScaleY=${transform.scaleY} " +
+                        "pixelWidth=$pixelWidth pixelHeight=$pixelHeight pixelArea=${pixelWidth * pixelHeight} " +
+                        "display=${graphicsConfiguration.device.getIDstring()}",
+                )
+                SpectreStressController.startIfRequested(this)
+                System.getProperty("jewel.standalone.autoExitSeconds")
+                    ?.toIntOrNull()
+                    ?.takeIf { it > 0 }
+                    ?.let { seconds -> Timer(seconds * 1_000) { println("JEWEL_STANDALONE status=auto-exit seconds=$seconds"); exitProcess(0) }.apply { isRepeats = false; start() } }
+            }.apply { isRepeats = false; start() }
         }
     }
 }

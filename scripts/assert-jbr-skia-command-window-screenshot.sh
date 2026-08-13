@@ -1,14 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE="${1:?Usage: $0 <window-screenshot.png>}"
+if [[ "$#" -ne 7 ]]; then
+  echo "Usage: $0 <window-screenshot.png> <logical-window-width> <logical-window-height> <content-x> <content-y> <content-width> <content-height>" >&2
+  exit 2
+fi
 
-/usr/bin/swift - "${IMAGE}" <<'SWIFT'
+/usr/bin/swift - "$@" <<'SWIFT'
 import CoreGraphics
 import Foundation
 import ImageIO
 
 let imagePath = CommandLine.arguments[1]
+guard
+    let logicalWindowWidth = Int(CommandLine.arguments[2]), logicalWindowWidth > 0,
+    let logicalWindowHeight = Int(CommandLine.arguments[3]), logicalWindowHeight > 0,
+    let logicalContentX = Int(CommandLine.arguments[4]),
+    let logicalContentY = Int(CommandLine.arguments[5]),
+    let logicalContentWidth = Int(CommandLine.arguments[6]), logicalContentWidth > 0,
+    let logicalContentHeight = Int(CommandLine.arguments[7]), logicalContentHeight > 0
+else {
+    fputs("JBR_SKIA_COMMAND_SCREENSHOT_GEOMETRY reason=geometry-unavailable invalid-arguments\n", stderr)
+    exit(2)
+}
 let url = URL(fileURLWithPath: imagePath)
 
 guard
@@ -21,6 +35,49 @@ else {
 
 let width = image.width
 let height = image.height
+let captureScaleX = Double(width) / Double(logicalWindowWidth)
+let captureScaleY = Double(height) / Double(logicalWindowHeight)
+let contentLeft = Int((Double(logicalContentX) * captureScaleX).rounded())
+let contentRight = Int((Double(logicalContentX + logicalContentWidth) * captureScaleX).rounded())
+// CGContext raster rows are bottom-up while AWT window geometry is top-down.
+let contentTop = height - Int((Double(logicalContentY + logicalContentHeight) * captureScaleY).rounded())
+let contentBottom = height - Int((Double(logicalContentY) * captureScaleY).rounded())
+let contentWidth = contentRight - contentLeft
+let contentHeight = contentBottom - contentTop
+guard captureScaleX.isFinite, captureScaleY.isFinite,
+      contentLeft >= 0, contentTop >= 0,
+      contentRight <= width, contentBottom <= height,
+      contentWidth > 0, contentHeight > 0 else {
+    fputs("JBR_SKIA_COMMAND_SCREENSHOT_GEOMETRY reason=geometry-unavailable invalid-content-rect\n", stderr)
+    exit(2)
+}
+
+func contentX(_ numerator: Int, _ denominator: Int) -> Int {
+    contentLeft + contentWidth * numerator / denominator
+}
+
+func contentY(_ numerator: Int, _ denominator: Int) -> Int {
+    contentTop + contentHeight * numerator / denominator
+}
+
+func scaledPixelCount(_ logicalCount: Int) -> Int {
+    Int(ceil(Double(logicalCount) * captureScaleX * captureScaleY))
+}
+
+func scaledXLength(_ logicalLength: Int) -> Int {
+    Int(ceil(Double(logicalLength) * captureScaleX))
+}
+
+func scaledYLength(_ logicalLength: Int) -> Int {
+    Int(ceil(Double(logicalLength) * captureScaleY))
+}
+
+print(String(
+    format: "JBR_SKIA_COMMAND_SCREENSHOT_GEOMETRY image=%dx%d logicalWindow=%dx%d captureScale=%.3fx%.3f contentRect=%d,%d,%d,%d logicalContent=%d,%d,%d,%d",
+    width, height, logicalWindowWidth, logicalWindowHeight, captureScaleX, captureScaleY,
+    contentLeft, contentTop, contentRight, contentBottom,
+    logicalContentX, logicalContentY, logicalContentWidth, logicalContentHeight
+))
 let bytesPerPixel = 4
 let bytesPerRow = width * bytesPerPixel
 var pixels = [UInt8](repeating: 0, count: height * bytesPerRow)
@@ -113,105 +170,105 @@ func inRect(x: Int, y: Int, left: Int, top: Int, right: Int, bottom: Int) -> Boo
 }
 
 let topTextRect = (
-    left: width / 16,
-    top: height / 12,
-    right: width * 7 / 16,
-    bottom: height / 5
+    left: contentX(1, 16),
+    top: contentY(1, 12),
+    right: contentX(7, 16),
+    bottom: contentY(1, 5)
 )
 let bottomTextRect = (
-    left: width / 16,
-    top: height * 7 / 10,
-    right: width / 2,
-    bottom: height * 17 / 20
+    left: contentX(1, 16),
+    top: contentY(7, 10),
+    right: contentX(1, 2),
+    bottom: contentY(19, 20)
 )
 let menuRect = (
-    left: width * 11 / 20,
-    top: height / 5,
-    right: width * 39 / 40,
-    bottom: height / 2
+    left: contentX(11, 20),
+    top: contentY(1, 5),
+    right: contentX(39, 40),
+    bottom: contentY(1, 2)
 )
 let probeTopLeftRect = (
-    left: width / 12,
-    top: height / 5,
-    right: width / 5,
-    bottom: height * 2 / 5
+    left: contentX(1, 12),
+    top: contentY(1, 5),
+    right: contentX(1, 5),
+    bottom: contentY(2, 5)
 )
 let probeBottomLeftRect = (
-    left: width / 10,
-    top: height * 7 / 10,
-    right: width / 5,
-    bottom: height * 17 / 20
+    left: contentX(1, 10),
+    top: contentY(7, 10),
+    right: contentX(1, 5),
+    bottom: contentY(17, 20)
 )
 let probeRightRect = (
-    left: width * 3 / 4,
-    top: height * 13 / 20,
-    right: width * 39 / 40,
-    bottom: height * 17 / 20
+    left: contentX(3, 4),
+    top: contentY(13, 20),
+    right: contentX(39, 40),
+    bottom: contentY(17, 20)
 )
 let blendModeRect = (
-    left: width / 2,
-    top: height / 5,
-    right: width * 49 / 50,
-    bottom: height * 17 / 20
+    left: contentX(1, 2),
+    top: contentY(1, 5),
+    right: contentX(49, 50),
+    bottom: contentY(17, 20)
 )
 let paragraphCenteredRect = (
-    left: width / 14,
-    top: height * 63 / 100,
-    right: width * 7 / 20,
-    bottom: height * 67 / 100
+    left: contentX(1, 14),
+    top: contentY(63, 100),
+    right: contentX(7, 20),
+    bottom: contentY(67, 100)
 )
 let paragraphItalicRightRect = (
-    left: width / 7,
-    top: height * 66 / 100,
-    right: width * 7 / 20,
-    bottom: height * 70 / 100
+    left: contentX(1, 7),
+    top: contentY(66, 100),
+    right: contentX(7, 20),
+    bottom: contentY(70, 100)
 )
 let paragraphRtlRect = (
-    left: width / 14,
-    top: height * 70 / 100,
-    right: width * 7 / 20,
-    bottom: height * 74 / 100
+    left: contentX(1, 14),
+    top: contentY(70, 100),
+    right: contentX(7, 20),
+    bottom: contentY(74, 100)
 )
 let paragraphOverflowRect = (
-    left: width / 14,
-    top: height * 74 / 100,
-    right: width * 7 / 20,
-    bottom: height * 78 / 100
+    left: contentX(1, 14),
+    top: contentY(74, 100),
+    right: contentX(7, 20),
+    bottom: contentY(78, 100)
 )
 let paragraphDecoratedRect = (
-    left: width / 14,
-    top: height * 78 / 100,
-    right: width * 7 / 20,
-    bottom: height * 82 / 100
+    left: contentX(1, 14),
+    top: contentY(78, 100),
+    right: contentX(7, 20),
+    bottom: contentY(82, 100)
 )
 let primaryButtonTextRect = (
-    left: width * 7 / 200,
-    top: height * 123 / 1000,
-    right: width * 17 / 200,
-    bottom: height * 157 / 1000
+    left: contentX(7, 200),
+    top: contentY(123, 1000),
+    right: contentX(17, 200),
+    bottom: contentY(17, 100)
 )
 let markdownReadmeLogoRect = (
-    left: width / 25,
-    top: height / 5,
-    right: width / 4,
-    bottom: height / 2
+    left: contentX(1, 25),
+    top: contentY(1, 5),
+    right: contentX(1, 4),
+    bottom: contentY(1, 2)
 )
 let buttonsBodyIconRects = [
-    (left: width * 109 / 1000, top: height * 452 / 1000, right: width * 129 / 1000, bottom: height * 491 / 1000),
-    (left: width * 209 / 1000, top: height * 452 / 1000, right: width * 229 / 1000, bottom: height * 491 / 1000),
-    (left: width * 513 / 1000, top: height * 452 / 1000, right: width * 533 / 1000, bottom: height * 491 / 1000),
-    (left: width * 582 / 1000, top: height * 452 / 1000, right: width * 602 / 1000, bottom: height * 491 / 1000),
-    (left: width * 111 / 1000, top: height * 542 / 1000, right: width * 131 / 1000, bottom: height * 577 / 1000),
-    (left: width * 219 / 1000, top: height * 542 / 1000, right: width * 239 / 1000, bottom: height * 577 / 1000),
-    (left: width * 312 / 1000, top: height * 542 / 1000, right: width * 332 / 1000, bottom: height * 577 / 1000),
-    (left: width * 400 / 1000, top: height * 542 / 1000, right: width * 420 / 1000, bottom: height * 577 / 1000),
-    (left: width * 480 / 1000, top: height * 542 / 1000, right: width * 500 / 1000, bottom: height * 577 / 1000),
+    (left: contentX(109, 1000), top: contentY(452, 1000), right: contentX(129, 1000), bottom: contentY(491, 1000)),
+    (left: contentX(209, 1000), top: contentY(452, 1000), right: contentX(229, 1000), bottom: contentY(491, 1000)),
+    (left: contentX(513, 1000), top: contentY(452, 1000), right: contentX(533, 1000), bottom: contentY(491, 1000)),
+    (left: contentX(582, 1000), top: contentY(452, 1000), right: contentX(602, 1000), bottom: contentY(491, 1000)),
+    (left: contentX(111, 1000), top: contentY(542, 1000), right: contentX(131, 1000), bottom: contentY(577, 1000)),
+    (left: contentX(219, 1000), top: contentY(542, 1000), right: contentX(239, 1000), bottom: contentY(577, 1000)),
+    (left: contentX(312, 1000), top: contentY(542, 1000), right: contentX(332, 1000), bottom: contentY(577, 1000)),
+    (left: contentX(400, 1000), top: contentY(542, 1000), right: contentX(420, 1000), bottom: contentY(577, 1000)),
+    (left: contentX(480, 1000), top: contentY(542, 1000), right: contentX(500, 1000), bottom: contentY(577, 1000)),
 ]
 let buttonsSelectedNavRect = (
-    left: 0,
-    top: height * 39 / 1000,
-    right: width * 30 / 1000,
-    bottom: height * 78 / 1000
+    left: contentX(0, 1),
+    top: contentY(39, 1000),
+    right: contentX(30, 1000),
+    bottom: contentY(78, 1000)
 )
 
 for y in 0..<height {
@@ -406,15 +463,11 @@ let markdownReadmeProbe =
     (markdownContent.hasPrefix("readme") || markdownContent.hasPrefix("rawReadme"))
 let rawMarkdownReadmeProbe = markdownReadmeProbe && markdownContent.hasPrefix("rawReadme")
 let buttonsComponentProbe = ProcessInfo.processInfo.environment["JEWEL_STANDALONE_INITIAL_COMPONENT"] == "Buttons"
-let imageArea = width * height
-let minTopTextPixels =
-    Int(ProcessInfo.processInfo.environment["MIN_TOP_TEXT_PIXELS"] ?? "") ?? min(900, max(450, imageArea / 1200))
-let minBottomTextPixels =
-    Int(ProcessInfo.processInfo.environment["MIN_BOTTOM_TEXT_PIXELS"] ?? "") ?? min(1200, max(700, imageArea / 900))
-let minTopTextHeight =
-    Int(ProcessInfo.processInfo.environment["MIN_TOP_TEXT_HEIGHT"] ?? "") ?? min(30, max(20, height / 30))
-let minBottomTextHeight =
-    Int(ProcessInfo.processInfo.environment["MIN_BOTTOM_TEXT_HEIGHT"] ?? "") ?? min(24, max(22, height / 60))
+let logicalContentArea = logicalContentWidth * logicalContentHeight
+let minTopTextPixels = min(900, max(450, logicalContentArea / 1200))
+let minBottomTextPixels = min(1200, max(700, logicalContentArea / 900))
+let minTopTextHeight = scaledYLength(min(30, max(20, logicalContentHeight / 30)))
+let minBottomTextHeight = scaledYLength(min(24, max(22, logicalContentHeight / 60)))
 var checks: [(String, Int, Int)]
 if markdownReadmeProbe {
     checks = [
@@ -448,7 +501,7 @@ if rawMarkdownReadmeProbe {
     checks.append(("yellow", yellow, 1000))
     checks.append(("orange", orange, 1000))
     checks.append(("purple", purple, 1000))
-} else if markdownReadmeProbe && markdownReadmeLogoGray > 10_000 {
+} else if markdownReadmeProbe && markdownReadmeLogoGray > scaledPixelCount(10_000) {
     fputs("Unexpected local README logo block in Markdown preview: markdownReadmeLogoGray=\(markdownReadmeLogoGray)\n", stderr)
     exit(1)
 }
@@ -457,7 +510,9 @@ let nativeTextProbe = ProcessInfo.processInfo.environment["JBR_SKIA_NATIVE_TEXT"
 let paragraphLayoutProbe = ProcessInfo.processInfo.environment["MAGIC_JEWEL_PARAGRAPH_LAYOUT_TEXT"] == "true"
 let popupStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_POPUP_STRESS"] == "true"
 let menuStress = ProcessInfo.processInfo.environment["MAGIC_JEWEL_MENU_STRESS"] == "true"
-let minimumTextWidth = nativeTextProbe ? min(width / 6, 180) : min(width / 5, 360)
+let minimumTextWidth = scaledXLength(
+    nativeTextProbe ? min(logicalContentWidth / 6, 180) : min(logicalContentWidth / 5, 360)
+)
 
 var textBoxChecks: [(String, Bool)] = []
 if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe && !popupStress && !menuStress {
@@ -468,16 +523,16 @@ if composeTextEnabled && !markdownReadmeProbe && !buttonsComponentProbe && !popu
     textBoxChecks.append(contentsOf: [
         ("topTextWidth", topTextMaxX - topTextMinX >= minimumTextWidth),
         ("topTextHeight", topTextMaxY - topTextMinY >= minTopTextHeight),
-        ("topTextVerticalAnchor", topTextMinY <= topTextRect.top + height / 12 && topTextMaxY >= topTextRect.top + height / 24),
+        ("topTextVerticalAnchor", topTextMinY <= topTextRect.top + contentHeight / 12 && topTextMaxY >= topTextRect.top + contentHeight / 24),
         ("bottomTextWidth", bottomTextMaxX - bottomTextMinX >= minimumTextWidth),
         ("bottomTextHeight", bottomTextMaxY - bottomTextMinY >= minBottomTextHeight),
         ("bottomTextVerticalAnchor", nativeTextProbe && paragraphLayoutProbe
-            ? bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.top + height / 20
-            : bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.bottom - height / 15),
-        ("primaryButtonTextColor", primaryButtonDarkText <= max(20, primaryButtonWhiteText / 8)),
-        ("primaryButtonTextWidth", primaryButtonTextMaxX - primaryButtonTextMinX >= width / 45),
-        ("primaryButtonTextHorizontalCenter", abs(primaryButtonTextCenterX - expectedPrimaryButtonTextCenterX) <= width / 80),
-        ("primaryButtonTextVerticalCenter", abs(primaryButtonTextCenterY - expectedPrimaryButtonTextCenterY) <= height / 70),
+            ? bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.top + contentHeight / 20
+            : bottomTextMinY <= bottomTextRect.bottom && bottomTextMaxY >= bottomTextRect.bottom - contentHeight / 15),
+        ("primaryButtonTextColor", primaryButtonDarkText <= max(scaledPixelCount(20), primaryButtonWhiteText / 8)),
+        ("primaryButtonTextWidth", primaryButtonTextMaxX - primaryButtonTextMinX >= contentWidth / 45),
+        ("primaryButtonTextHorizontalCenter", abs(primaryButtonTextCenterX - expectedPrimaryButtonTextCenterX) <= contentWidth / 80),
+        ("primaryButtonTextVerticalCenter", abs(primaryButtonTextCenterY - expectedPrimaryButtonTextCenterY) <= contentHeight / 70),
     ])
 }
 
@@ -664,13 +719,16 @@ if blendModeProbe {
     probeChecks.append(("blendModeLuminosity", blendModeLuminosity, 500))
 }
 
-for (name, count, minimum) in checks where count < minimum {
+for (name, count, logicalMinimum) in checks {
+    let minimum = scaledPixelCount(logicalMinimum)
+    if count >= minimum { continue }
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
     exit(1)
 }
 if buttonsComponentProbe {
-    let maxButtonsBodyIconTileVeryLight =
+    let logicalMaxButtonsBodyIconTileVeryLight =
         Int(ProcessInfo.processInfo.environment["MAX_BUTTONS_BODY_ICON_TILE_VERY_LIGHT"] ?? "") ?? 100
+    let maxButtonsBodyIconTileVeryLight = scaledPixelCount(logicalMaxButtonsBodyIconTileVeryLight)
     if buttonsBodyIconTileVeryLight > maxButtonsBodyIconTileVeryLight {
         fputs("Unexpected very-light body icon tile pixels: buttonsBodyIconTileVeryLight=\(buttonsBodyIconTileVeryLight) max=\(maxButtonsBodyIconTileVeryLight) selectedNavBackground=\(buttonsSelectedNavBackground)\n", stderr)
         exit(1)
@@ -680,15 +738,21 @@ for (name, passed) in textBoxChecks where !passed {
     fputs("Text placement check failed: \(name) topTextBox=\(topTextMinX),\(topTextMinY),\(topTextMaxX),\(topTextMaxY) bottomTextBox=\(bottomTextMinX),\(bottomTextMinY),\(bottomTextMaxX),\(bottomTextMaxY) primaryButtonTextBox=\(primaryButtonTextMinX),\(primaryButtonTextMinY),\(primaryButtonTextMaxX),\(primaryButtonTextMaxY) primaryButtonWhiteText=\(primaryButtonWhiteText) primaryButtonDarkText=\(primaryButtonDarkText)\n", stderr)
     exit(1)
 }
-for (name, count, minimum) in popupChecks where count < minimum {
+for (name, count, logicalMinimum) in popupChecks {
+    let minimum = scaledPixelCount(logicalMinimum)
+    if count >= minimum { continue }
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
     exit(1)
 }
-for (name, count, minimum) in menuChecks where count < minimum {
+for (name, count, logicalMinimum) in menuChecks {
+    let minimum = scaledPixelCount(logicalMinimum)
+    if count >= minimum { continue }
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
     exit(1)
 }
-for (name, count, minimum) in probeChecks where count < minimum {
+for (name, count, logicalMinimum) in probeChecks {
+    let minimum = scaledPixelCount(logicalMinimum)
+    if count >= minimum { continue }
     fputs("Expected at least \(minimum) \(name) pixels, found \(count)\n", stderr)
     exit(1)
 }

@@ -1,19 +1,29 @@
 package com.magicjewel.idebenchmark
 
+import androidx.tracing.DelicateTracingApi
+import androidx.tracing.Tracer
+import androidx.tracing.wire.TraceDriver
+import androidx.tracing.wire.TraceSink
+import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindowManager
 import dev.sebastiano.spectre.core.AutomatorNode
 import dev.sebastiano.spectre.core.ComposeAutomator
 import dev.sebastiano.spectre.core.RobotDriver
 import dev.sebastiano.spectre.recording.AutoScreenshotter
 import dev.sebastiano.spectre.recording.screencapturekit.asTitledWindow
+import java.awt.AWTEvent
 import java.awt.Frame
 import java.awt.Component
 import java.awt.Container
 import java.awt.Rectangle
 import java.awt.image.BufferedImage
+import java.io.File
+import java.lang.management.ManagementFactory
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Locale
@@ -21,14 +31,25 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.imageio.ImageIO
 import javax.swing.SwingUtilities
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlin.math.roundToInt
 
 class MagicJewelBenchmarkStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
         if (System.getProperty("magic.jewel.benchmark.autorun") != "true") return
+        try {
+            installJbrSkiaTraceDriverIfEnabled()
+        } catch (error: Throwable) {
+            println(
+                "MAGIC_JEWEL_IDE_BENCHMARK status=startup-failed phase=trace " +
+                    "error=${error::class.qualifiedName}:${error.message}",
+            )
+            throw error
+        }
         val mode = BenchmarkMode.from(System.getProperty("magic.jewel.benchmark.mode"))
         println("MAGIC_JEWEL_IDE_BENCHMARK status=project-opened project=${project.name} mode=$mode")
         println(
@@ -45,7 +66,108 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                 "composeSceneSource=${classSource("androidx.compose.ui.scene.ComposeScene")}",
         )
         delay(2_000)
+        if (!waitForIndexingToSettle(project)) return
         activateBenchmarkToolWindow(project, mode)
+    }
+
+    private fun installEdtDispatchProbeIfEnabled() {
+        if (System.getProperty(EDT_DISPATCH_PROBE_PROPERTY) != "true") return
+        if (!edtDispatchProbeInstalled.compareAndSet(false, true)) return
+        try {
+            val starts = ThreadLocal<Long>()
+            val disposable = Disposer.newDisposable("magic-jewel-benchmark-edt-dispatch-probe")
+            IdeEventQueue.getInstance().addPreprocessor(
+                IdeEventQueue.EventDispatcher { event ->
+                    starts.set(System.nanoTime())
+                    false
+                },
+                disposable,
+            )
+            IdeEventQueue.getInstance().addPostprocessor(
+                IdeEventQueue.EventDispatcher { event ->
+                    val startNanos = starts.get() ?: return@EventDispatcher false
+                    val endNanos = System.nanoTime()
+                    val durationNanos = endNanos - startNanos
+                    if (durationNanos >= EDT_DISPATCH_THRESHOLD_NANOS) {
+                        val uptimeNanos = runtimeMxBean.uptime * NANOS_PER_MILLI
+                        println(
+                            "MAGIC_JEWEL_IDE_BENCHMARK_EDT_DISPATCH " +
+                                "startNanos=$startNanos endNanos=$endNanos " +
+                                "uptimeNanos=$uptimeNanos durationNanos=$durationNanos " +
+                                "event=${event.javaClass.name}",
+                        )
+                    }
+                    false
+                },
+                disposable,
+            )
+            println(
+                "MAGIC_JEWEL_IDE_BENCHMARK_EDT_DISPATCH_PROBE " +
+                    "status=installed thresholdNanos=$EDT_DISPATCH_THRESHOLD_NANOS source=ideEventQueue",
+            )
+        } catch (error: Throwable) {
+            edtDispatchProbeInstalled.set(false)
+            println(
+                "MAGIC_JEWEL_IDE_BENCHMARK_EDT_DISPATCH_PROBE " +
+                    "status=failed error=${error::class.simpleName}:${error.message}",
+            )
+            throw error
+        }
+    }
+
+    @OptIn(DelicateTracingApi::class)
+    private fun installJbrSkiaTraceDriverIfEnabled() {
+        if (!System.getProperty(JBR_SKIA_TRACE_ENABLED_PROPERTY, "false").toBoolean()) return
+        synchronized(TRACE_DRIVER_LOCK) {
+            if (traceDriverInstalled) return
+            val outputDir = File(
+                System.getProperty(
+                    JBR_SKIA_TRACE_OUTPUT_DIR_PROPERTY,
+                    File(System.getProperty("java.io.tmpdir"), "jbr-skia-traces").absolutePath,
+                ),
+            )
+            outputDir.mkdirs()
+            val categories = System.getProperty(JBR_SKIA_TRACE_CATEGORY_PROPERTY, JBR_SKIA_TRACE_CATEGORY)
+                .split(',')
+                .map(String::trim)
+                .filter(String::isNotEmpty)
+                .toSet()
+            val driver = TraceDriver(
+                sink = TraceSink(directory = outputDir),
+                isCategoryEnabled = categories::contains,
+            )
+            Tracer.setGlobalTracer(driver.tracer)
+            Runtime.getRuntime().addShutdownHook(
+                Thread(driver::close, "jbr-skia-ide-trace-close"),
+            )
+            traceDriverInstalled = true
+            println("MAGIC_JEWEL_IDE_BENCHMARK_TRACE status=enabled outputDir=${outputDir.absolutePath}")
+        }
+    }
+
+    private suspend fun waitForIndexingToSettle(project: Project): Boolean {
+        val startedAt = System.nanoTime()
+        val dumbService = DumbService.getInstance(project)
+        var consecutiveSmartSamples = 0
+        repeat(INDEXING_WAIT_TIMEOUT_SECONDS) {
+            if (dumbService.isDumb) {
+                consecutiveSmartSamples = 0
+            } else {
+                consecutiveSmartSamples++
+                if (consecutiveSmartSamples >= INDEXING_SETTLE_SECONDS) {
+                    val elapsedMs = (System.nanoTime() - startedAt) / NANOS_PER_MILLI
+                    println(
+                        "MAGIC_JEWEL_IDE_BENCHMARK status=indexing-complete " +
+                            "elapsedMs=$elapsedMs stableSeconds=$INDEXING_SETTLE_SECONDS",
+                    )
+                    return true
+                }
+            }
+            delay(1_000)
+        }
+        val elapsedMs = (System.nanoTime() - startedAt) / NANOS_PER_MILLI
+        println("MAGIC_JEWEL_IDE_BENCHMARK status=indexing-timeout elapsedMs=$elapsedMs")
+        return false
     }
 
     private suspend fun activateBenchmarkToolWindow(project: Project, mode: BenchmarkMode) {
@@ -91,32 +213,43 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                 }
                 return@runBlocking
             }
-            println("MAGIC_JEWEL_IDE_BENCHMARK status=started mode=$mode")
-            var cycle = 0
-            while (true) {
-                if (stopRequestPath?.let(Files::exists) == true) {
-                    println("MAGIC_JEWEL_IDE_BENCHMARK status=stop-requested mode=$mode cycle=$cycle")
-                    ApplicationManager.getApplication().invokeLater {
-                        println("MAGIC_JEWEL_IDE_BENCHMARK status=application-exit-requested mode=$mode")
-                        ApplicationManager.getApplication().exit()
+            println("MAGIC_JEWEL_IDE_BENCHMARK status=started mode=$mode pid=${ProcessHandle.current().pid()}")
+            installEdtDispatchProbeIfEnabled()
+            val threadCpuSampler = NamedThreadCpuSampler.start()
+            try {
+                var cycle = 0
+                while (true) {
+                    if (stopRequestPath?.let(Files::exists) == true) {
+                        println("MAGIC_JEWEL_IDE_BENCHMARK status=stop-requested mode=$mode cycle=$cycle")
+                        ApplicationManager.getApplication().invokeLater {
+                            println("MAGIC_JEWEL_IDE_BENCHMARK status=application-exit-requested mode=$mode")
+                            ApplicationManager.getApplication().exit()
+                        }
+                        return@runBlocking
                     }
-                    return@runBlocking
-                }
-                runOnEdt {
-                    automator.refreshWindows()
-                    if (mode == BenchmarkMode.Hypnotoad) {
-                        val target =
-                            when (cycle % 6) {
-                                0, 1, 2, 3 -> "magic.benchmark.hypnotoad.warp"
-                                4 -> "magic.benchmark.hypnotoad.calm"
-                                else -> "magic.benchmark.hypnotoad.reset"
-                            }
-                        automator.findOneByTestTag(target)?.let { automator.performSemanticsClick(it) }
+                    val edtStartNanos = System.nanoTime()
+                    runOnEdt {
+                        automator.refreshWindows()
+                        if (mode == BenchmarkMode.Hypnotoad) {
+                            val target =
+                                when (cycle % 6) {
+                                    0, 1, 2, 3 -> "magic.benchmark.hypnotoad.warp"
+                                    4 -> "magic.benchmark.hypnotoad.calm"
+                                    else -> "magic.benchmark.hypnotoad.reset"
+                                }
+                            automator.findOneByTestTag(target)?.let { automator.performSemanticsClick(it) }
+                        }
                     }
+                    val tickNanos = System.nanoTime()
+                    println(
+                        "MAGIC_JEWEL_IDE_BENCHMARK phase=tick mode=$mode cycle=$cycle " +
+                            "timeNanos=$tickNanos edtBusyNanos=${tickNanos - edtStartNanos}",
+                    )
+                    cycle += 1
+                    delay(150)
                 }
-                println("MAGIC_JEWEL_IDE_BENCHMARK phase=tick mode=$mode cycle=$cycle")
-                cycle += 1
-                delay(150)
+            } finally {
+                threadCpuSampler.close()
             }
         }
     }
@@ -174,6 +307,7 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
                         it.requestFocusInWindow()
                         Thread.sleep(PAINT_PROBE_FRONT_DELAY_MS)
                         logComponentBounds("toolWindow", it, depth = 0, maxDepth = 4)
+                        logSurfaceRegime("toolWindow", it)
                         val expectedNodePresent =
                             runCatching {
                                     val automator = ComposeAutomator.inProcess(robotDriver = RobotDriver.headless())
@@ -376,6 +510,27 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
         }
     }
 
+    private fun logSurfaceRegime(label: String, component: Component) {
+        val transform = component.graphicsConfiguration?.defaultTransform
+        val scaleX = transform?.scaleX ?: 0.0
+        val scaleY = transform?.scaleY ?: 0.0
+        val logicalWidth = component.width.coerceAtLeast(1)
+        val logicalHeight = component.height.coerceAtLeast(1)
+        val pixelWidth = (logicalWidth * scaleX).roundToInt()
+        val pixelHeight = (logicalHeight * scaleY).roundToInt()
+        println(
+            "MAGIC_JEWEL_IDE_BENCHMARK_SURFACE_REGIME " +
+                "label=$label " +
+                "logicalWidth=$logicalWidth " +
+                "logicalHeight=$logicalHeight " +
+                "backingScaleX=${String.format(Locale.US, "%.3f", scaleX)} " +
+                "backingScaleY=${String.format(Locale.US, "%.3f", scaleY)} " +
+                "pixelWidth=$pixelWidth " +
+                "pixelHeight=$pixelHeight " +
+                "pixelArea=${pixelWidth.toLong() * pixelHeight.toLong()}",
+        )
+    }
+
     private fun sampleImage(
         image: BufferedImage,
         region: Rectangle = Rectangle(0, 0, image.width, image.height),
@@ -445,6 +600,18 @@ class MagicJewelBenchmarkStartupActivity : ProjectActivity {
             .getOrElse { "missing:${it::class.simpleName}" }
 
     private companion object {
+        const val JBR_SKIA_TRACE_ENABLED_PROPERTY: String = "jbr.skia.trace.enabled"
+        const val JBR_SKIA_TRACE_OUTPUT_DIR_PROPERTY: String = "jbr.skia.trace.outputDir"
+        const val JBR_SKIA_TRACE_CATEGORY_PROPERTY: String = "jbr.skia.trace.category"
+        const val JBR_SKIA_TRACE_CATEGORY: String = "jbr-skia"
+        const val EDT_DISPATCH_PROBE_PROPERTY: String = "magic.jewel.benchmark.edtDispatchProbe"
+        const val EDT_DISPATCH_THRESHOLD_NANOS: Long = 10_000_000
+        val TRACE_DRIVER_LOCK: Any = Any()
+        val edtDispatchProbeInstalled = AtomicBoolean(false)
+        val runtimeMxBean = ManagementFactory.getRuntimeMXBean()
+        var traceDriverInstalled: Boolean = false
+        const val INDEXING_SETTLE_SECONDS: Int = 5
+        const val INDEXING_WAIT_TIMEOUT_SECONDS: Int = 600
         const val POLL_BUDGET_MS: Long = 30_000
         const val POLL_INTERVAL_MS: Long = 50
         const val NANOS_PER_MILLI: Long = 1_000_000

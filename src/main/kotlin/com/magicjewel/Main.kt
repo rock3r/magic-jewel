@@ -103,12 +103,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.text.platform.Font as ComposeFont
+import androidx.tracing.DelicateTracingApi
+import androidx.tracing.Tracer
+import androidx.tracing.wire.TraceDriver
+import androidx.tracing.wire.TraceSink
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Font
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
+import java.io.File
 import javax.swing.BorderFactory
 import javax.swing.JComponent
 import javax.swing.JDialog
@@ -133,6 +138,11 @@ import java.util.concurrent.atomic.AtomicLong
 private const val WindowTitle = "MagicJewelJbrSkiaWindow"
 private const val FrameMarker = "MAGIC_JEWEL_COMPOSE_FRAME"
 private const val SwingFrameMarker = "MAGIC_JEWEL_SWING_FRAME"
+private const val JbrSkiaTraceEnabledProperty = "jbr.skia.trace.enabled"
+private const val JbrSkiaTraceOutputDirProperty = "jbr.skia.trace.outputDir"
+private const val JbrSkiaTraceCategoryProperty = "jbr.skia.trace.category"
+private const val JbrSkiaTraceCategory = "jbr-skia"
+private const val AutoExitSecondsProperty = "magic.jewel.autoExitSeconds"
 private const val ComposeTextProperty = "magic.jewel.compose.text"
 private const val ComposeImageProperty = "magic.jewel.compose.image"
 private const val ComposeImageBlendModeProperty = "magic.jewel.compose.imageBlendMode"
@@ -340,6 +350,9 @@ private const val StableImageCacheChurnProperty = "magic.jewel.stableImageCacheC
 private const val InvalidSweepGradientProperty = "magic.jewel.invalidSweepGradient"
 private const val AutoResizeProperty = "magic.jewel.autoResize"
 private const val AutoResizeDelayMillisProperty = "magic.jewel.autoResizeDelayMillis"
+private const val AutoResizeStormProperty = "magic.jewel.autoResizeStorm"
+private const val AutoResizeStormIntervalMillisProperty = "magic.jewel.autoResizeStormIntervalMillis"
+private const val AutoResizeStormCountProperty = "magic.jewel.autoResizeStormCount"
 private const val PopupStressProperty = "magic.jewel.popupStress"
 private const val PopupStressDelayMillisProperty = "magic.jewel.popupStressDelayMillis"
 private const val PopupWindowStressProperty = "magic.jewel.popupWindowStress"
@@ -349,9 +362,11 @@ private const val MenuStressDelayMillisProperty = "magic.jewel.menuStressDelayMi
 private const val FixedAnimationPhaseProperty = "magic.jewel.fixedAnimationPhase"
 private const val FixedFrameTicksProperty = "magic.jewel.fixedFrameTicks"
 private const val PauseSwingAnimationProperty = "magic.jewel.pauseSwingAnimation"
+private const val IdleSmokeProperty = "magic.jewel.idleSmoke"
 private const val SwingIslandProperty = "magic.jewel.swingIsland"
 private const val BackgroundWindowProperty = "magic.jewel.backgroundWindow"
 private const val ResizeMarker = "MAGIC_JEWEL_WINDOW_RESIZE"
+private const val WindowGeometryMarker = "MAGIC_JEWEL_WINDOW_GEOMETRY"
 private const val PopupShownMarker = "MAGIC_JEWEL_POPUP_SHOWN"
 private const val PopupWindowTitle = "MagicJewelPopupWindow"
 private const val PopupWindowShownMarker = "MAGIC_JEWEL_POPUP_WINDOW_SHOWN"
@@ -370,7 +385,37 @@ private fun churnColor(index: Int): Color {
 private fun invalidGradientColors(): List<Color> = List(17, ::churnColor)
 
 fun main() {
+    installJbrSkiaTraceDriverIfEnabled()
     SwingUtilities.invokeLater(::showMagicJewel)
+}
+
+@OptIn(DelicateTracingApi::class)
+private fun installJbrSkiaTraceDriverIfEnabled() {
+    if (!System.getProperty(JbrSkiaTraceEnabledProperty, "false").toBoolean()) return
+
+    val outputDir = File(
+        System.getProperty(
+            JbrSkiaTraceOutputDirProperty,
+            File(System.getProperty("java.io.tmpdir"), "jbr-skia-traces").absolutePath,
+        )
+    )
+    outputDir.mkdirs()
+
+    val categories = System.getProperty(JbrSkiaTraceCategoryProperty, JbrSkiaTraceCategory)
+        .split(',')
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+        .toSet()
+    val driver = TraceDriver(
+        sink = TraceSink(directory = outputDir),
+        isCategoryEnabled = { it in categories },
+    )
+    Tracer.setGlobalTracer(driver.tracer)
+    Runtime.getRuntime().addShutdownHook(
+        Thread({
+            driver.close()
+        }, "jbr-skia-trace-close")
+    )
 }
 
 private fun showMagicJewel() {
@@ -391,10 +436,12 @@ private fun showMagicJewel() {
         pack()
         setLocationRelativeTo(null)
         isVisible = true
+        logWindowGeometry(panel)
         panel.schedulePopupStressIfNeeded()
         panel.scheduleMenuStressIfNeeded()
         schedulePopupWindowStressIfNeeded()
-        scheduleAutoResizeIfNeeded()
+        scheduleAutoResizeIfNeeded(panel)
+        scheduleAutoExitIfNeeded()
     }
 }
 
@@ -476,16 +523,85 @@ private fun java.awt.Window.applyAutomationWindowFocusPolicy() {
     setAutoRequestFocus(false)
 }
 
-private fun JFrame.scheduleAutoResizeIfNeeded() {
+private fun JFrame.scheduleAutoResizeIfNeeded(panel: ComposePanel) {
     if (!System.getProperty(AutoResizeProperty, "false").toBoolean()) return
 
     val delayMillis = System.getProperty(AutoResizeDelayMillisProperty, "2500").toIntOrNull() ?: 2500
+    if (System.getProperty(AutoResizeStormProperty, "false").toBoolean()) {
+        scheduleAutoResizeStorm(panel, delayMillis)
+        return
+    }
+
     Timer(delayMillis) {
-        val expanded = Dimension(width + 96, height + 64)
-        size = expanded
+        val expanded = Dimension(panel.width + 96, panel.height + 64)
+        panel.preferredSize = expanded
+        pack()
         revalidate()
         repaint()
-        System.err.println("$ResizeMarker width=${expanded.width} height=${expanded.height}")
+        logWindowGeometry(panel)
+        System.err.println(
+            "$ResizeMarker contentWidth=${expanded.width} contentHeight=${expanded.height} " +
+                "frameWidth=$width frameHeight=$height",
+        )
+    }.apply {
+        isRepeats = false
+        start()
+    }
+}
+
+private fun JFrame.scheduleAutoResizeStorm(panel: ComposePanel, delayMillis: Int) {
+    val intervalMillis = System.getProperty(AutoResizeStormIntervalMillisProperty, "125").toIntOrNull()
+        ?.coerceAtLeast(1)
+        ?: 125
+    val maxSteps = System.getProperty(AutoResizeStormCountProperty, "0").toIntOrNull() ?: 0
+    val base = panel.size.takeIf { it.width > 0 && it.height > 0 }
+        ?: panel.preferredSize
+        ?: Dimension(980, 680)
+    var step = 0
+    lateinit var resizeTimer: Timer
+    Timer(delayMillis) {
+        resizeTimer = Timer(intervalMillis) {
+            val next = Dimension(base.width + step * 2, base.height + step)
+            panel.preferredSize = next
+            pack()
+            revalidate()
+            repaint()
+            logWindowGeometry(panel)
+            System.err.println(
+                "$ResizeMarker step=$step contentWidth=${next.width} contentHeight=${next.height} " +
+                    "frameWidth=$width frameHeight=$height",
+            )
+            step += 1
+            if (maxSteps > 0 && step >= maxSteps) {
+                resizeTimer.stop()
+            }
+        }.apply {
+            isRepeats = true
+            start()
+        }
+    }.apply {
+        isRepeats = false
+        start()
+    }
+}
+
+private fun JFrame.logWindowGeometry(panel: ComposePanel) {
+    val contentOrigin = SwingUtilities.convertPoint(panel, 0, 0, this)
+    System.err.println(
+        "$WindowGeometryMarker name=$WindowTitle frameWidth=$width frameHeight=$height " +
+            "contentX=${contentOrigin.x} contentY=${contentOrigin.y} " +
+            "contentWidth=${panel.width} contentHeight=${panel.height}",
+    )
+}
+
+private fun JFrame.scheduleAutoExitIfNeeded() {
+    val delaySeconds = System.getProperty(AutoExitSecondsProperty)?.toIntOrNull() ?: return
+    if (delaySeconds <= 0) return
+
+    Timer(delaySeconds * 1000) {
+        System.err.println("MAGIC_JEWEL_AUTO_EXIT seconds=$delaySeconds")
+        dispose()
+        System.exit(0)
     }.apply {
         isRepeats = false
         start()
@@ -497,6 +613,9 @@ private fun JFrame.scheduleAutoResizeIfNeeded() {
 private fun MagicJewelApp() {
     val fixedFrameTicks = remember {
         System.getProperty(FixedFrameTicksProperty)?.toIntOrNull()
+    }
+    val idleSmoke = remember {
+        System.getProperty(IdleSmokeProperty, "false").toBoolean()
     }
     var ticks by remember { mutableIntStateOf(fixedFrameTicks ?: 0) }
     var repaintPulse by remember { mutableIntStateOf(0) }
@@ -1060,19 +1179,27 @@ private fun MagicJewelApp() {
             null
         }
     }
-    val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
-    val animatedPhase by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 900, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "always-on-progress-phase",
-    )
-    val phase = fixedAnimationPhase() ?: animatedPhase
+    val fixedPhase = fixedAnimationPhase()
+    val phase = if (fixedPhase != null || idleSmoke) {
+        fixedPhase ?: 0f
+    } else {
+        val infiniteTransition = rememberInfiniteTransition(label = "magic-jewel-busy-loop")
+        val animatedPhase by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 900, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart,
+            ),
+            label = "always-on-progress-phase",
+        )
+        animatedPhase
+    }
 
-    LaunchedEffect(fixedFrameTicks) {
+    LaunchedEffect(fixedFrameTicks, idleSmoke) {
+        if (idleSmoke) {
+            return@LaunchedEffect
+        }
         if (fixedFrameTicks == null) {
             while (true) {
                 delay(250)

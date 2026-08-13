@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 REPORT_SCRIPT="${SCRIPT_DIR}/jbr-skia-interop-report.sh"
+GPU_POWER_PREFLIGHT_SCRIPT="${SCRIPT_DIR}/jbr-skia-gpu-power-preflight.sh"
 
 make_report_dir() {
   local dir
@@ -22,11 +23,79 @@ run_validate_only() {
     "${REPORT_SCRIPT}" --validate-only >/dev/null
 }
 
+gpu_power_preflight_parser_enforces_threshold() {
+  local dir file summary status
+  dir="$(mktemp -d "${TMPDIR:-/tmp}/magic-jewel-gpu-preflight.XXXXXX")"
+  file="${dir}/powermetrics.txt"
+  {
+    echo "GPU Power: 180 mW"
+    echo "GPU Power: 220 mW"
+  } > "${file}"
+  summary="$("${GPU_POWER_PREFLIGHT_SCRIPT}" --summarize "${file}" 400 500)"
+  [[ "${summary}" == "status=passed reason=none samples=2 gpu_power_avg_mw=200 gpu_power_max_mw=220 max_gpu_power_avg_mw=400 max_gpu_power_peak_mw=500" ]]
+
+  {
+    echo "GPU Power: 900 mW"
+    echo "GPU Power: 1100 mW"
+  } > "${file}"
+  set +e
+  summary="$("${GPU_POWER_PREFLIGHT_SCRIPT}" --summarize "${file}" 400 500)"
+  status=$?
+  set -e
+  [[ "${status}" -eq 1 ]]
+  [[ "${summary}" == "status=blocked reason=gpu-power-avg>400mW samples=2 gpu_power_avg_mw=1000 gpu_power_max_mw=1100 max_gpu_power_avg_mw=400 max_gpu_power_peak_mw=500" ]]
+
+  {
+    echo "GPU Power: 150 mW"
+    echo "GPU Power: 550 mW"
+  } > "${file}"
+  set +e
+  summary="$("${GPU_POWER_PREFLIGHT_SCRIPT}" --summarize "${file}" 400 500)"
+  status=$?
+  set -e
+  [[ "${status}" -eq 1 ]]
+  [[ "${summary}" == "status=blocked reason=gpu-power-peak>500mW samples=2 gpu_power_avg_mw=350 gpu_power_max_mw=550 max_gpu_power_avg_mw=400 max_gpu_power_peak_mw=500" ]]
+
+  : > "${file}"
+  set +e
+  summary="$("${GPU_POWER_PREFLIGHT_SCRIPT}" --summarize "${file}" 400 500)"
+  status=$?
+  set -e
+  [[ "${status}" -eq 2 ]]
+  [[ "${summary}" == "status=unavailable reason=gpu-power-unavailable samples=0 gpu_power_avg_mw=0 gpu_power_max_mw=0 max_gpu_power_avg_mw=400 max_gpu_power_peak_mw=500" ]]
+}
+
+runtime_environment_summary_awk_smoke() {
+  local summary
+  summary="$(
+    printf '%s\n' \
+      'timestamp,mode,variant,kind,pid,cpu_percent,command' \
+      '1,chat,old,remote_session,10,3.0,screensharingd' \
+      '2,chat,old,foreign_gpu_watch,11,4.0,Codex' |
+      awk -F, '
+        NR == 1 { next }
+        $4 == "remote_session" {
+          remoteSamples++
+          if (!seenRemote[$7]++) remoteProcesses = remoteProcesses (remoteProcesses == "" ? "" : "+") $7
+        }
+        $4 == "foreign_gpu_watch" {
+          foreignSamples++
+          if ($6 + 0 > foreignMaxCpu) foreignMaxCpu = $6 + 0
+          if (!seenForeign[$7]++) foreignProcesses = foreignProcesses (foreignProcesses == "" ? "" : "+") $7
+        }
+        END {
+          printf "remote_samples=%d remote_processes=%s foreign_gpu_watch_samples=%d foreign_gpu_watch_max_cpu_percent=%.2f foreign_gpu_watch_processes=%s", remoteSamples, (remoteProcesses == "" ? "none" : remoteProcesses), foreignSamples, foreignMaxCpu, (foreignProcesses == "" ? "none" : foreignProcesses)
+        }
+      '
+  )"
+  [[ "${summary}" == "remote_samples=1 remote_processes=screensharingd foreign_gpu_watch_samples=1 foreign_gpu_watch_max_cpu_percent=4.00 foreign_gpu_watch_processes=Codex" ]]
+}
+
 strict_command_passes() {
   local dir
   dir="$(make_report_dir)"
   {
-    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
+    echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0 compactionScans=12 compactionNanos=34567 compactionAborted=0"
     echo "CMP_JBR_COMMAND_RECORDER_OPS fillRect=2 save=1"
     echo "CMP_JBR_COMMAND_RECORDER_OP_WORDS fillRect=14 save=3"
     echo "CMP_JBR_COMMAND_RECORDER_OP_PAIRS fillRect>save=17 save>fillRect=15"
@@ -43,6 +112,7 @@ strict_command_passes() {
   grep -q "^cmp_recorder_top_ops=frames=1 top=fillRect:avg=2.0,max=2,total=2,save:avg=1.0,max=1,total=1$" "${dir}/summary.properties"
   grep -q "^cmp_recorder_top_op_words=frames=1 top=fillRect:avg=14.0,max=14,total=14,save:avg=3.0,max=3,total=3$" "${dir}/summary.properties"
   grep -q "^cmp_recorder_top_op_pairs=frames=1 top=fillRect>save:avg=17.0,max=17,total=17,save>fillRect:avg=15.0,max=15,total=15$" "${dir}/summary.properties"
+  grep -q "^cmp_command_recorder_summary=.*avg_compaction_scans=12.0 max_compaction_scans=12 avg_compaction_nanos=34567 max_compaction_nanos=34567 avg_compaction_aborted=0.0 max_compaction_aborted=0 reasons=none$" "${dir}/summary.properties"
   grep -q "^old_avg_cpu=0$" "${dir}/summary.properties"
   grep -q "^new_avg_cpu=0$" "${dir}/summary.properties"
   grep -q "^host_cpu_count=" "${dir}/summary.properties"
@@ -852,11 +922,12 @@ strict_command_requires_min_jbr_shadow_commands() {
     echo "CMP_JBR_COMMAND_RECORDER_FRAME commands=21 unsupported=0"
     echo "SKIKO_JBR_INTEROP_COMMAND_FRAME commands=21 rendered=true"
     echo "JBR_SKIA_INTEROP_COMMAND_FRAME commands=21 rendered=true"
-    echo "JBR_SKIA_INTEROP_COMMAND_TIMING totalNanos=100 drawNanos=80 flushNanos=10 paragraphCommands=0 paragraphNanos=0 shadowCommands=1"
+    echo "JBR_SKIA_INTEROP_COMMAND_TIMING totalNanos=10000000 mallocNanos=500000 contextNanos=1000000 surfaceNanos=2000000 drawNanos=3000000 flushNanos=1500000 purgeNanos=2000000 paragraphCommands=0 paragraphNanos=0 shadowCommands=1"
   } > "${dir}/new.log"
 
   run_validate_only "${dir}" EXPECT_MIN_JBR_SHADOW_COMMANDS=1
   grep -q "^jbr_shadow_commands_max=1$" "${dir}/summary.properties"
+  grep -q "^jbr_command_timing_summary=frames=1 avg_total_ms=10.000 max_total_ms=10.000 avg_malloc_ms=0.500 max_malloc_ms=0.500 avg_context_ms=1.000 max_context_ms=1.000 avg_surface_ms=2.000 max_surface_ms=2.000 avg_draw_ms=3.000 max_draw_ms=3.000 avg_flush_ms=1.500 max_flush_ms=1.500 avg_purge_ms=2.000 max_purge_ms=2.000" "${dir}/summary.properties"
 }
 
 strict_command_fails_without_min_jbr_shadow_commands() {
@@ -1376,6 +1447,8 @@ handshake_fallback_fails_with_command_frames() {
   fi
 }
 
+gpu_power_preflight_parser_enforces_threshold
+runtime_environment_summary_awk_smoke
 strict_command_passes
 report_defaults_to_background_window
 strict_command_requires_min_app_new_frames

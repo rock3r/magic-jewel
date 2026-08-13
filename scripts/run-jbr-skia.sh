@@ -12,6 +12,10 @@ GRADLE_TASK=${GRADLE_TASK:-runJbrSkiaInterop}
 LOCAL_CMP_OUT=${LOCAL_CMP_OUT:-}
 JBR_SKIA_RENDER_MODE=${JBR_SKIA_RENDER_MODE:-picture}
 JBR_SKIA_NATIVE_TEXT=${JBR_SKIA_NATIVE_TEXT:-false}
+JBR_SKIA_LOG_COMMAND_FRAMES=${JBR_SKIA_LOG_COMMAND_FRAMES:-true}
+JBR_SKIA_TRACE_ENABLED=${JBR_SKIA_TRACE_ENABLED:-false}
+JBR_SKIA_TRACE_DIR=${JBR_SKIA_TRACE_DIR:-${ROOT}/build/jbr-skia-traces}
+JBR_SKIA_TRACE_CATEGORY=${JBR_SKIA_TRACE_CATEGORY:-jbr-skia}
 MAGIC_JEWEL_CORRUPT_COMMAND_STREAM=${MAGIC_JEWEL_CORRUPT_COMMAND_STREAM:-false}
 MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS=${MAGIC_JEWEL_CORRUPT_COMMAND_RECORD_FLAGS:-false}
 MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE=${MAGIC_JEWEL_CORRUPT_COMMAND_COORDINATE_SPACE:-false}
@@ -344,11 +348,19 @@ if [[ -n "${JBR_SKIA_LIBRARY_PATH}" ]]; then
   JBR_ARGS+=("-Djava.library.path=${JBR_SKIA_LIBRARY_PATH}")
   JBR_ARGS+=("-Dsun.boot.library.path=${JAVA_HOME_FOR_BOOT_LIBRARY_PATH}/lib:${JBR_SKIA_LIBRARY_PATH}")
 fi
+JBR_ARGS+=("-Djbr.skia.trace.enabled=${JBR_SKIA_TRACE_ENABLED}")
+JBR_ARGS+=("-Djbr.skia.trace.outputDir=${JBR_SKIA_TRACE_DIR}")
+JBR_ARGS+=("-Djbr.skia.trace.category=${JBR_SKIA_TRACE_CATEGORY}")
 
 case "${JBR_SKIA_RENDER_MODE}" in
   commands)
     JBR_ARGS+=("-Dskiko.jbr.interop.renderCommands=true")
     JBR_ARGS+=("-Dcompose.jbr.skia.command.strict=true")
+    if [[ "${JBR_SKIA_LOG_COMMAND_FRAMES}" == "true" ]]; then
+      JBR_ARGS+=("-Dcompose.jbr.skia.command.logFrames=true")
+      JBR_ARGS+=("-Dskiko.jbr.interop.logCommandFrames=true")
+      JBR_ARGS+=("-Dsun.java2d.skia.interop.logCommandFrames=true")
+    fi
     if [[ "${JBR_SKIA_NATIVE_TEXT}" == "true" ]]; then
       JBR_ARGS+=("-Dcompose.jbr.skia.command.nativeText=true")
     fi
@@ -1325,10 +1337,17 @@ fi
 
 printf -v JOINED_ARGS "%s " "${JBR_ARGS[@]}"
 cd "$ROOT"
+export JBR_SKIA_LOG_COMMAND_FRAMES="${JBR_SKIA_LOG_COMMAND_FRAMES}"
+export JBR_SKIA_TRACE_ENABLED="${JBR_SKIA_TRACE_ENABLED}"
+export JBR_SKIA_TRACE_DIR="${JBR_SKIA_TRACE_DIR}"
+export JBR_SKIA_TRACE_CATEGORY="${JBR_SKIA_TRACE_CATEGORY}"
 GRADLE_ARGS=(
   "${GRADLE_TASK}"
   "-PjbrSkiaInteropJvmArgs=${JOINED_ARGS% }"
   "-PjbrSkiaRenderMode=${JBR_SKIA_RENDER_MODE}"
+  "-PjbrSkiaTraceEnabled=${JBR_SKIA_TRACE_ENABLED}"
+  "-PjbrSkiaTraceOutputDir=${JBR_SKIA_TRACE_DIR}"
+  "-PjbrSkiaTraceCategory=${JBR_SKIA_TRACE_CATEGORY}"
 )
 if [[ -n "${LOCAL_CMP_OUT}" ]]; then
   GRADLE_ARGS+=("-PlocalCmpOut=${LOCAL_CMP_OUT}")

@@ -62,6 +62,7 @@ REQUIRE_COMPONENTS="${REQUIRED_STANDALONE_COMPONENTS}" \
 ide_status=0
 REQUIRE_COMMAND_CLEAN=true \
 REQUIRE_VISUAL_PROBES=true \
+REQUIRE_PERF_REGRESSION_CLEAN=true \
   "${SCRIPT_DIR}/analyze-jewel-ide-plugin-benchmark-suite.sh" \
   "${IDE_SUITE}" "${ide_analysis}" \
   >"${ide_analysis}.stdout" 2>"${ide_analysis}.stderr" || ide_status=$?
@@ -80,6 +81,7 @@ ide_perf_status=0
 REQUIRE_COMMAND_CLEAN=true \
 REQUIRE_VISUAL_PROBES=true \
 REQUIRE_POWERMETRICS=true \
+REQUIRE_PERF_REGRESSION_CLEAN=true \
   "${SCRIPT_DIR}/analyze-jewel-ide-plugin-benchmark-suite.sh" \
   "${IDE_SUITE}" "${ide_perf_analysis}" \
   >"${ide_perf_analysis}.stdout" 2>"${ide_perf_analysis}.stderr" || ide_perf_status=$?
@@ -136,7 +138,7 @@ fi
   echo "- top_cpu: ${top_cpu:-unknown}"
   echo "- powermetrics_sudo_cached: ${sudo_cached:-unknown}"
   echo
-  echo "Completion requires standalone coverage plus IDE command/visual/powermetrics evidence. The standalone powermetrics audit and current readiness probe are informational: standalone covers the broad showcase surface, while the IDE suite carries the sampled CPU/GPU power evidence; readiness only says whether another clean perf run can start right now."
+  echo "Completion requires standalone coverage plus IDE command/visual/powermetrics evidence with no CPU/GPU regression over the configured thresholds. The standalone powermetrics audit and current readiness probe are informational: standalone covers the broad showcase surface, while the IDE suite carries the sampled CPU/GPU power evidence; readiness only says whether another clean perf run can start right now."
 } >> "${status_file}"
 
 cat "${status_file}"

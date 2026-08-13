@@ -17,6 +17,10 @@ import org.jetbrains.jewel.intui.standalone.styling.defaults
 import org.jetbrains.jewel.samples.showcase.ShowcaseIcons
 import org.jetbrains.jewel.samples.showcase.components.Hypnotoad
 import org.jetbrains.jewel.samples.showcase.components.IdleRedraw
+import org.jetbrains.jewel.samples.showcase.components.EditorProbe
+import org.jetbrains.jewel.samples.showcase.components.ImageGrid
+import org.jetbrains.jewel.samples.showcase.components.LayerGrid
+import org.jetbrains.jewel.samples.showcase.components.SharedLayerProbe
 import org.jetbrains.jewel.samples.showcase.views.ComponentsView
 import org.jetbrains.jewel.samples.showcase.views.ComponentsViewModel
 import org.jetbrains.jewel.samples.showcase.views.KeyBinding
@@ -101,6 +105,26 @@ private val mainMenuItems =
             title = "IdleRedraw",
             iconKey = ShowcaseIcons.Components.borders,
             content = { IdleRedraw() },
+        ),
+        ViewInfo(
+            title = "LayerGrid",
+            iconKey = ShowcaseIcons.Components.borders,
+            content = { LayerGrid() },
+        ),
+        ViewInfo(
+            title = "SharedLayer",
+            iconKey = ShowcaseIcons.Components.borders,
+            content = { SharedLayerProbe() },
+        ),
+        ViewInfo(
+            title = "ImageGrid",
+            iconKey = ShowcaseIcons.Components.borders,
+            content = { ImageGrid() },
+        ),
+        ViewInfo(
+            title = "Editor",
+            iconKey = ShowcaseIcons.Components.borders,
+            content = { EditorProbe() },
         ),
         ViewInfo(
             title = "Markdown",
