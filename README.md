@@ -4,6 +4,13 @@ Standalone Jewel-on-Compose sample for the JBR Skia interop PoC. The app is inte
 
 The scene mixes animated Compose drawing with an embedded Swing island and a Compose overlay, plus app-level draw-frame markers for old/new FPS-style smoke reporting.
 
+## Repository and license
+
+- Public repository: [rock3r/magic-jewel](https://github.com/rock3r/magic-jewel)
+- License: [Apache License 2.0](LICENSE)
+
+Magic Jewel project contributions are licensed under Apache-2.0. Files that carry separate third-party notices remain subject to those notices.
+
 ## Run
 
 Baseline SwingGraphics path:
